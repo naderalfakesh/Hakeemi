@@ -7,11 +7,22 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "pod": "cd ./ios && pod"
   },
   "dependencies": {
+    "@react-native-community/masked-view": "^0.1.10",
+    "@react-navigation/native": "^5.9.3",
+    "i18next": "^20.0.0",
     "react": "17.0.1",
-    "react-native": "0.64.0"
+    "react-i18next": "^11.8.10",
+    "react-native": "0.64.0",
+    "react-native-bootsplash": "^3.2.0",
+    "react-native-gesture-handler": "^1.10.3",
+    "react-native-localize": "^2.0.2",
+    "react-native-reanimated": "^2.0.0",
+    "react-native-safe-area-context": "^3.2.0",
+    "react-native-screens": "^2.18.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
