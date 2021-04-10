@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import styles from './styles';
 import TextField from '../../components/TextField';
 import Button from '../../components/Button';
@@ -8,11 +8,10 @@ import HomeBgPattern from '../../../assets/homeBgPattern.svg';
 import Text from '../../components/Text';
 
 const SignUp: FC = () => {
-  const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
-  const { goBack, navigate } = useNavigation();
+  const { navigate, goBack } = useNavigation();
   return (
     <View style={styles.container}>
       <HomeBgPattern
@@ -23,22 +22,16 @@ const SignUp: FC = () => {
       />
       <View style={styles.paper}>
         <Text size="head-30" color="black" align="center" style={styles.title}>
-          Sign Up
+          Sign In
         </Text>
         <Text
           size="body-22"
           color="black"
           align="center"
           style={styles.subtitle}>
-          Sign up now to make new appointments.
+          Welcome again!
         </Text>
         <View style={styles.fields}>
-          <TextField
-            style={styles.field}
-            value={name}
-            onChangeText={setName}
-            placeholder="Full name"
-          />
           <TextField
             style={styles.field}
             value={email}
@@ -52,23 +45,31 @@ const SignUp: FC = () => {
             secureTextEntry={true}
           />
         </View>
+        <Text
+          size="body-16"
+          align="right"
+          color="primary"
+          onPress={() => navigate('signup')}
+          style={StyleSheet.flatten([styles.forgotPass, styles.underline])}>
+          Forgot Password
+        </Text>
         <Button
           style={styles.button}
           theme="primary"
           size="big"
           onPress={() => goBack()}>
-          Create A Free Account
+          Secure Login
         </Button>
       </View>
-      <Text size="body-20" align="center" color="white">
-        {'Already have an account? '}
+      <Text size="body-22" align="center" color="white">
+        {'Don’t have an account? '}
         <Text
           style={styles.underline}
-          size="body-20"
-          level="700"
+          size="body-22"
+          level="600"
           color="white"
-          onPress={() => navigate('signin')}>
-          Sign In
+          onPress={() => navigate('signup')}>
+          Sign Up
         </Text>
       </Text>
     </View>

@@ -1,4 +1,4 @@
-import { StyleSheet, TextStyle } from 'react-native';
+import { Platform, StyleSheet, TextStyle } from 'react-native';
 import colors, { palette } from '../../theme/colors';
 
 export type Color =
@@ -13,7 +13,7 @@ export type Size = 'button-22' | 'body-16' | 'body-20' | 'body-22' | 'head-30';
 
 export default StyleSheet.create({
   base: {
-    // fontFamily: 'system',
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
     includeFontPadding: false,
   },
 });
