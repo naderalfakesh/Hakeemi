@@ -22,7 +22,7 @@ const ButtonDemo = ({ theme }: { theme: Themes }) => (
   </Fragment>
 );
 
-storiesOf('Button/Themes', module)
+storiesOf('Buttons', module)
   .addDecorator(Container)
   .add('primary', () => <ButtonDemo theme="primary" />)
   .add('secondary', () => <ButtonDemo theme="secondary" />)
