@@ -26,14 +26,19 @@ const mapTextColor = (theme: Themes): TextProps['color'] => {
       return 'black';
   }
 };
-const mapTextSize = (size: Sizes): TextProps['size'] => {
+
+type sizeProps = {
+  size: TextProps['size'];
+  level: TextProps['level'];
+};
+const mapTextSize = (size: Sizes): sizeProps => {
   switch (size) {
     case 'small':
-      return 'body-16';
+      return { size: 'body-16', level: '600' };
     case 'medium':
-      return 'body-16';
+      return { size: 'body-16', level: '600' };
     case 'big':
-      return 'button-22';
+      return { size: 'button-22', level: '600' };
   }
 };
 
@@ -57,7 +62,7 @@ const Button: FC<Props> = ({
       ]}
       onPress={onPress && onPress}
       {...otherProps}>
-      <Text size={mapTextSize(size)} color={mapTextColor(theme)}>
+      <Text color={mapTextColor(theme)} {...mapTextSize(size)}>
         {children}
       </Text>
     </Pressable>

@@ -1,11 +1,18 @@
 import React, { FC } from 'react';
-import { TextStyle, Text as TextBase, StyleSheet } from 'react-native';
+import {
+  TextStyle,
+  Text as TextBase,
+  StyleSheet,
+  TextProps,
+} from 'react-native';
 import styles, { Color, colorTheme, Size, sizeTheme } from './styles';
 
-export interface Props {
+export interface Props extends TextProps {
   style?: TextStyle;
   size?: Size;
   color?: Color;
+  align?: TextStyle['textAlign'];
+  level?: TextStyle['fontWeight'];
   onPress?: () => void;
 }
 
@@ -14,6 +21,8 @@ const Text: FC<Props> = ({
   style,
   size = 'body-16',
   color = 'primary',
+  align,
+  level = '400',
   onPress,
   ...otherProps
 }) => {
@@ -21,11 +30,12 @@ const Text: FC<Props> = ({
     styles.base,
     colorTheme[color],
     sizeTheme[size],
+    { textAlign: align, fontWeight: level },
     style,
   ]);
 
   return (
-    <TextBase style={flatStyle} onPress={onPress} {...otherProps}>
+    <TextBase testID="Text" style={flatStyle} onPress={onPress} {...otherProps}>
       {children}
     </TextBase>
   );
