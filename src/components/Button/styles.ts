@@ -1,12 +1,12 @@
 import { StyleSheet, ViewStyle } from 'react-native';
 import colors from '../../theme/colors';
+import spacing from '../../theme/spacing';
 
 export type Sizes = 'small' | 'medium' | 'big';
 export type Themes = 'primary' | 'secondary' | 'grey';
 
 export default StyleSheet.create({
   base: {
-    height: 72,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 20,
@@ -34,5 +34,17 @@ export const pressedStyle: Record<Themes, ViewStyle> = StyleSheet.create({
   },
   grey: {
     backgroundColor: colors.dark,
+  },
+});
+
+export const sizeStyle: Record<Sizes, ViewStyle> = StyleSheet.create({
+  small: {
+    padding: spacing.small1,
+  },
+  medium: {
+    padding: spacing.small3,
+  },
+  big: {
+    padding: spacing.medium1,
   },
 });
