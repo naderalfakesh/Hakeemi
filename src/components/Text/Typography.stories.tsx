@@ -16,6 +16,9 @@ const TextDemo = ({ color }: { color: Color }) => (
     <Text color={color} size="body-22">
       Lorem ipsum dolor sit.
     </Text>
+    <Text color={color} size="body-20">
+      Lorem ipsum dolor sit.
+    </Text>
     <Text color={color} size="button-22">
       Lorem ipsum dolor sit.
     </Text>
