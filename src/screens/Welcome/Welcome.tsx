@@ -41,7 +41,7 @@ const Welcome: FC = () => {
             size="body-16"
             level="600"
             color="white"
-            onPress={() => console.log('Navigate to Login')}>
+            onPress={() => navigate('signin')}>
             Log In
           </Text>
         </Text>
