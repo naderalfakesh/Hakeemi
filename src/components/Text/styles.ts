@@ -9,7 +9,7 @@ export type Color =
   | 'white'
   | 'black';
 
-export type Size = 'button-22' | 'body-16' | 'body-22' | 'head-30';
+export type Size = 'button-22' | 'body-16' | 'body-20' | 'body-22' | 'head-30';
 
 export default StyleSheet.create({
   base: {
@@ -22,6 +22,10 @@ export const sizeTheme: Record<Size, TextStyle> = StyleSheet.create({
   'body-16': {
     fontSize: 16,
     lineHeight: 20,
+  },
+  'body-20': {
+    fontSize: 20,
+    lineHeight: 24,
   },
   'body-22': {
     fontSize: 22,
