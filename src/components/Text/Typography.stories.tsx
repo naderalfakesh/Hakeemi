@@ -25,7 +25,7 @@ const TextDemo = ({ color }: { color: Color }) => (
   </Fragment>
 );
 
-storiesOf('Typography/Themes', module)
+storiesOf('Typography', module)
   .addDecorator(Container)
   .add('primary', () => <TextDemo color="primary" />)
   .add('secondary', () => <TextDemo color="secondary" />)
