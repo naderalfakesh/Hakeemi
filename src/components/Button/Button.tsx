@@ -1,7 +1,13 @@
 import React, { FC } from 'react';
 import { Pressable, ViewStyle } from 'react-native';
 import Text, { Props as TextProps } from '../Text';
-import styles, { pressedStyle, Sizes, Themes, themeStyle } from './styles';
+import styles, {
+  pressedStyle,
+  Sizes,
+  Themes,
+  themeStyle,
+  sizeStyle,
+} from './styles';
 
 interface Props {
   style?: ViewStyle;
@@ -41,13 +47,15 @@ const Button: FC<Props> = ({
 }) => {
   return (
     <Pressable
+      testID="Button"
       style={({ pressed }) => [
         styles.base,
         themeStyle[theme],
+        sizeStyle[size],
         pressed && pressedStyle[theme],
         style,
       ]}
-      onPress={onPress}
+      onPress={onPress && onPress}
       {...otherProps}>
       <Text size={mapTextSize(size)} color={mapTextColor(theme)}>
         {children}

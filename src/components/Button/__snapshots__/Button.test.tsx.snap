@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Button component test renders correctly with default params 1`] = `
+<View
+  accessible={true}
+  collapsable={false}
+  focusable={true}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onFocus={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    Array [
+      Object {
+        "alignItems": "center",
+        "borderRadius": 20,
+        "justifyContent": "center",
+      },
+      Object {
+        "backgroundColor": "rgba(0, 188, 212, 1)",
+      },
+      Object {
+        "padding": 16,
+      },
+      false,
+      undefined,
+    ]
+  }
+  testID="Button"
+>
+  <Text
+    style={
+      Object {
+        "color": "rgba(255, 255, 255, 1)",
+        "fontSize": 16,
+        "fontWeight": "600",
+        "includeFontPadding": false,
+        "lineHeight": 20,
+      }
+    }
+    testID="Text"
+  >
+    Hello
+  </Text>
+</View>
+`;
