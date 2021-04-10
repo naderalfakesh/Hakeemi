@@ -47,6 +47,15 @@ describe('Button component test', () => {
     expect(style.padding).toBe(spacing.medium1);
   });
 
+  it('overrides styles', () => {
+    const { getByTestId } = render(
+      <Button style={{ borderRadius: 0 }}>Hello</Button>,
+    );
+    const btn = getByTestId('Button');
+    const style = StyleSheet.flatten(btn.props.style);
+    expect(style.borderRadius).toBe(0);
+  });
+
   it('invokes a function when pressed', () => {
     const mockFn = jest.fn();
     const { getByText } = render(<Button onPress={mockFn}>BUTTON</Button>);
