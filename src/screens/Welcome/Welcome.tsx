@@ -5,8 +5,10 @@ import HomeDoctor from '../../../assets/homeDoctor.svg';
 import HomeBgPattern from '../../../assets/homeBgPattern.svg';
 import Text from '../../components/Text';
 import Button from '../../components/Button';
+import { useNavigation } from '@react-navigation/core';
 
 const Welcome: FC = () => {
+  const { navigate } = useNavigation();
   return (
     <View style={styles.container}>
       <HomeDoctor
@@ -24,14 +26,20 @@ const Welcome: FC = () => {
           style={styles.signUpBtn}
           theme="secondary"
           size="big"
-          onPress={() => console.log('Navigate to sign up')}>
+          onPress={() => navigate('signup')}>
           Get Started For Free
         </Button>
-        <Text style={styles.loginText} size="body-16" color="white">
+        <Text
+          style={styles.loginText}
+          size="body-16"
+          level="600"
+          align="center"
+          color="white">
           {'Already Have An Account? '}
           <Text
             style={styles.loginUnderline}
             size="body-16"
+            level="600"
             color="white"
             onPress={() => console.log('Navigate to Login')}>
             Log In
