@@ -12,6 +12,7 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		14E02AE926225F4400B6B7E0 /* doctor-font.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 14E02AE826225F4400B6B7E0 /* doctor-font.ttf */; };
 		75B9F050991B7B1AB1AD626D /* libPods-DoctorApp-DoctorAppTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F7C7A694D0089E3876BDBB0F /* libPods-DoctorApp-DoctorAppTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
@@ -36,6 +37,7 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = DoctorApp/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = DoctorApp/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = DoctorApp/main.m; sourceTree = "<group>"; };
+		14E02AE826225F4400B6B7E0 /* doctor-font.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "doctor-font.ttf"; path = "../../assets/fonts/doctor-font.ttf"; sourceTree = "<group>"; };
 		20B1D844F330CEF2747F9BC8 /* Pods-DoctorApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoctorApp.debug.xcconfig"; path = "Target Support Files/Pods-DoctorApp/Pods-DoctorApp.debug.xcconfig"; sourceTree = "<group>"; };
 		275C1AB19092918A7D2CA3E3 /* Pods-DoctorApp-DoctorAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoctorApp-DoctorAppTests.release.xcconfig"; path = "Target Support Files/Pods-DoctorApp-DoctorAppTests/Pods-DoctorApp-DoctorAppTests.release.xcconfig"; sourceTree = "<group>"; };
 		598C56AEA0AAC30EC094707F /* Pods-DoctorApp-DoctorAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoctorApp-DoctorAppTests.debug.xcconfig"; path = "Target Support Files/Pods-DoctorApp-DoctorAppTests/Pods-DoctorApp-DoctorAppTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -96,6 +98,14 @@
 			name = DoctorApp;
 			sourceTree = "<group>";
 		};
+		14E02AE726225EF300B6B7E0 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				14E02AE826225F4400B6B7E0 /* doctor-font.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -116,6 +126,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				14E02AE726225EF300B6B7E0 /* Fonts */,
 				13B07FAE1A68108700A75B9A /* DoctorApp */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* DoctorAppTests */,
@@ -145,7 +156,6 @@
 				598C56AEA0AAC30EC094707F /* Pods-DoctorApp-DoctorAppTests.debug.xcconfig */,
 				275C1AB19092918A7D2CA3E3 /* Pods-DoctorApp-DoctorAppTests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -245,6 +255,7 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				14E02AE926225F4400B6B7E0 /* doctor-font.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
