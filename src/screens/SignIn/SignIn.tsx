@@ -6,6 +6,7 @@ import Button from '../../components/Button';
 import { useNavigation } from '@react-navigation/core';
 import HomeBgPattern from '../../../assets/homeBgPattern.svg';
 import Text from '../../components/Text';
+import Icon from '../../components/Icon';
 
 const SignUp: FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -14,6 +15,7 @@ const SignUp: FC = () => {
   const { navigate, goBack } = useNavigation();
   return (
     <View style={styles.container}>
+      <Icon style={styles.back} name="left-arrow" size={24} onPress={goBack} />
       <HomeBgPattern
         style={styles.background}
         height="100%"
@@ -61,12 +63,12 @@ const SignUp: FC = () => {
           Secure Login
         </Button>
       </View>
-      <Text size="body-22" align="center" color="white">
+      <Text size="body-20" align="center" color="white">
         {'Don’t have an account? '}
         <Text
           style={styles.underline}
-          size="body-22"
-          level="600"
+          size="body-20"
+          level="700"
           color="white"
           onPress={() => navigate('signup')}>
           Sign Up

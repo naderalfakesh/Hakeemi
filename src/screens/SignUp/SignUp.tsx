@@ -6,6 +6,7 @@ import Button from '../../components/Button';
 import { useNavigation } from '@react-navigation/core';
 import HomeBgPattern from '../../../assets/homeBgPattern.svg';
 import Text from '../../components/Text';
+import Icon from '../../components/Icon/Icon';
 
 const SignUp: FC = () => {
   const [name, setName] = useState<string>('');
@@ -15,6 +16,7 @@ const SignUp: FC = () => {
   const { goBack, navigate } = useNavigation();
   return (
     <View style={styles.container}>
+      <Icon style={styles.back} name="left-arrow" size={24} onPress={goBack} />
       <HomeBgPattern
         style={styles.background}
         height="100%"

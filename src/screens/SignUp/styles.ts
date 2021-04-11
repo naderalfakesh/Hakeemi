@@ -29,4 +29,5 @@ export default StyleSheet.create({
   field: { marginBottom: spacing.medium3 },
   button: { marginTop: spacing.medium3 },
   underline: { textDecorationLine: 'underline' },
+  back: { position: 'absolute', top: 60, left: 25, zIndex: 1, color: 'white' },
 });

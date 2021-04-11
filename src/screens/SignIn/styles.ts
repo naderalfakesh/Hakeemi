@@ -30,4 +30,5 @@ export default StyleSheet.create({
   button: { marginTop: spacing.medium3 },
   underline: { textDecorationLine: 'underline' },
   forgotPass: { marginTop: spacing.small3 },
+  back: { position: 'absolute', top: 60, left: 25, zIndex: 1, color: 'white' },
 });
