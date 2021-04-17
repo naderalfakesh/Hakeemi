@@ -10,6 +10,9 @@ const Container = (storyFn: any) => (
 
 const TextDemo = ({ color }: { color: Color }) => (
   <Fragment>
+    <Text color={color} size="body-14">
+      Lorem ipsum dolor sit.
+    </Text>
     <Text color={color} size="body-16">
       Lorem ipsum dolor sit.
     </Text>
@@ -20,6 +23,9 @@ const TextDemo = ({ color }: { color: Color }) => (
       Lorem ipsum dolor sit.
     </Text>
     <Text color={color} size="button-22">
+      Lorem ipsum dolor sit.
+    </Text>
+    <Text color={color} size="head-24">
       Lorem ipsum dolor sit.
     </Text>
     <Text color={color} size="head-30">

@@ -13,6 +13,7 @@ export const palette = {
   grey: {
     base: 'rgba(240, 240, 240, 1)',
     light: 'rgba(251, 251, 251, 1)',
+    medium: 'rgba(237, 243, 247, 1)',
     dark: 'rgba(144, 144, 144, 1)',
   },
   white: {
