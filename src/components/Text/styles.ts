@@ -9,7 +9,14 @@ export type Color =
   | 'white'
   | 'black';
 
-export type Size = 'button-22' | 'body-16' | 'body-20' | 'body-22' | 'head-30';
+export type Size =
+  | 'button-22'
+  | 'body-14'
+  | 'body-16'
+  | 'body-20'
+  | 'body-22'
+  | 'head-24'
+  | 'head-30';
 
 export default StyleSheet.create({
   base: {
@@ -19,6 +26,10 @@ export default StyleSheet.create({
 });
 
 export const sizeTheme: Record<Size, TextStyle> = StyleSheet.create({
+  'body-14': {
+    fontSize: 14,
+    lineHeight: 18,
+  },
   'body-16': {
     fontSize: 16,
     lineHeight: 20,
@@ -38,6 +49,10 @@ export const sizeTheme: Record<Size, TextStyle> = StyleSheet.create({
   'head-30': {
     fontSize: 30,
     lineHeight: 38,
+  },
+  'head-24': {
+    fontSize: 24,
+    lineHeight: 30,
   },
 });
 

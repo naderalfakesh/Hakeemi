@@ -31,6 +31,9 @@ describe('Button component test', () => {
     const txt = getByText('Hello');
     expect(txt.props.style.fontSize).toBe(16);
 
+    rerender(<Text size="body-14">Hello</Text>);
+    expect(txt.props.style.fontSize).toBe(14);
+
     rerender(<Text size="body-20">Hello</Text>);
     expect(txt.props.style.fontSize).toBe(20);
 
@@ -39,6 +42,9 @@ describe('Button component test', () => {
 
     rerender(<Text size="button-22">Hello</Text>);
     expect(txt.props.style.lineHeight).toBe(28);
+
+    rerender(<Text size="head-24">Hello</Text>);
+    expect(txt.props.style.fontSize).toBe(24);
 
     rerender(<Text size="head-30">Hello</Text>);
     expect(txt.props.style.fontSize).toBe(30);
