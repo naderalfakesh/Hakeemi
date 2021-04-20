@@ -6,19 +6,20 @@ import * as config from './config.json';
 const BaseIcon = createIconSetFromFontello(config);
 
 export type IconName =
-  | 'advice'
   | 'ambulance'
+  | 'diagnose'
+  | 'nav-menu'
+  | 'heart-plus'
   | 'badge'
-  | 'checkup'
-  | 'close'
-  | 'diagnos'
   | 'heart-beat'
-  | 'heart-fill'
-  | 'heart'
-  | 'left-arrow'
-  | 'nav-1'
   | 'pill'
+  | 'heart'
+  | 'checkup'
+  | 'heart-fill'
   | 'search'
+  | 'cancel'
+  | 'close-filled'
+  | 'left-arrow'
   | 'shot';
 
 export interface IconProps extends Omit<BaseIconProps, 'color'> {
