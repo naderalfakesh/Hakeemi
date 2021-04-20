@@ -37,10 +37,12 @@ exports[`Button component test renders correctly with default params 1`] = `
     style={
       Object {
         "color": "rgba(255, 255, 255, 1)",
+        "fontFamily": "System",
         "fontSize": 16,
         "fontWeight": "600",
         "includeFontPadding": false,
         "lineHeight": 20,
+        "textAlign": undefined,
       }
     }
     testID="Text"

@@ -22,7 +22,7 @@ const RootStack = () => {
         options={{
           title: 'Home',
           headerLeft: () => (
-            <Icon name="nav-1" size={20} onPress={openDrawer} />
+            <Icon name="nav-menu" size={20} onPress={openDrawer} />
           ),
         }}
       />
