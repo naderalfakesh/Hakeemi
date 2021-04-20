@@ -1,5 +1,5 @@
 import { StyleSheet, ViewStyle } from 'react-native';
-import colors from '../../theme/colors';
+import colors, { palette } from '../../theme/colors';
 import spacing from '../../theme/spacing';
 
 export type Sizes = 'small' | 'medium' | 'big';
@@ -27,7 +27,7 @@ export const themeStyle: Record<Themes, ViewStyle> = StyleSheet.create({
 
 export const pressedStyle: Record<Themes, ViewStyle> = StyleSheet.create({
   primary: {
-    backgroundColor: colors.light,
+    backgroundColor: palette.primary.dark,
   },
   secondary: {
     backgroundColor: colors.secondary,
