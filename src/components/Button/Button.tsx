@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Pressable, ViewStyle } from 'react-native';
+import { Pressable, ViewStyle, PressableProps } from 'react-native';
 import Text, { Props as TextProps } from '../Text';
 import styles, {
   pressedStyle,
@@ -9,7 +9,7 @@ import styles, {
   sizeStyle,
 } from './styles';
 
-interface Props {
+interface Props extends PressableProps {
   style?: ViewStyle;
   theme?: Themes;
   size?: Sizes;
@@ -52,6 +52,7 @@ const Button: FC<Props> = ({
 }) => {
   return (
     <Pressable
+      {...otherProps}
       testID="Button"
       style={({ pressed }) => [
         styles.base,
@@ -60,8 +61,7 @@ const Button: FC<Props> = ({
         pressed && pressedStyle[theme],
         style,
       ]}
-      onPress={onPress && onPress}
-      {...otherProps}>
+      onPress={onPress && onPress}>
       <Text color={mapTextColor(theme)} {...mapTextSize(size)}>
         {children}
       </Text>
