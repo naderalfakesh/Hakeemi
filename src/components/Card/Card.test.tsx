@@ -10,7 +10,7 @@ describe('Button component test', () => {
       <Card
         title="Card title"
         subtitle="Card subtitle"
-        rightNode={<Icon name="advice" />}
+        rightNode={<Icon name="heart-plus" />}
         closeIconName="checkup"
       />,
     );

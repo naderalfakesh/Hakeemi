@@ -5,6 +5,7 @@ exports[`Button component test renders correctly with default params 1`] = `
   style={
     Object {
       "color": "rgba(0, 188, 212, 1)",
+      "fontFamily": "System",
       "fontSize": 16,
       "fontWeight": "400",
       "includeFontPadding": false,

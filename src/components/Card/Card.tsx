@@ -27,7 +27,7 @@ const Card: FC<Props> = ({
     <View testID="card-container" style={[styles.base, containerStyle]}>
       <Icon
         testID="close-icon"
-        name={closeIconName ? closeIconName : 'close'}
+        name={closeIconName ? closeIconName : 'close-filled'}
         style={styles.icon}
         size={ICON_SIZE}
         onPress={onClose}
