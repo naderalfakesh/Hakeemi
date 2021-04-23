@@ -239,6 +239,7 @@ exports[`Button component test renders correctly with image list 1`] = `
           "padding": 16,
         },
         false,
+        false,
         Object {
           "paddingHorizontal": 21,
           "paddingTop": 13,
