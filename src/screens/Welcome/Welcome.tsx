@@ -6,7 +6,7 @@ import HomeBgPattern from '../../../assets/homeBgPattern.svg';
 import Text from '../../components/Text';
 import Button from '../../components/Button';
 import { useNavigation } from '@react-navigation/core';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 const Welcome: FC = () => {
   const { navigate } = useNavigation();
