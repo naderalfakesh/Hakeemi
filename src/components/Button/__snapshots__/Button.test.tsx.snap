@@ -28,6 +28,7 @@ exports[`Button component test renders correctly with default params 1`] = `
         "padding": 16,
       },
       false,
+      false,
       undefined,
     ]
   }

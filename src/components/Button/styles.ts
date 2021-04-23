@@ -1,8 +1,8 @@
-import { StyleSheet, ViewStyle } from 'react-native';
+import { StyleSheet, TextStyle, ViewStyle } from 'react-native';
 import colors, { palette } from '../../theme/colors';
 import spacing from '../../theme/spacing';
 
-export type Sizes = 'small' | 'medium' | 'big';
+export type Sizes = 'small' | 'medium' | 'big' | 'squareIcon' | 'inlineIcon';
 export type Themes = 'primary' | 'secondary' | 'grey';
 
 export default StyleSheet.create({
@@ -10,6 +10,12 @@ export default StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 20,
+  },
+  icon: {
+    padding: spacing.mini2,
+  },
+  inlineIcon: {
+    flexDirection: 'row',
   },
 });
 
@@ -46,5 +52,25 @@ export const sizeStyle: Record<Sizes, ViewStyle> = StyleSheet.create({
   },
   big: {
     padding: spacing.medium1,
+  },
+  squareIcon: {
+    padding: spacing.small1,
+    width: 70,
+    height: 70,
+  },
+  inlineIcon: {
+    padding: spacing.small4,
+  },
+});
+
+export const iconColor: Record<Themes, TextStyle> = StyleSheet.create({
+  primary: {
+    color: colors.white,
+  },
+  secondary: {
+    color: palette.primary.dark,
+  },
+  grey: {
+    color: colors.primary,
   },
 });
