@@ -4,9 +4,11 @@ import { RootParamsList } from './params';
 import Home from '../../screens/Home';
 import Icon from '../../components/Icon';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 
 const RootStack = () => {
   const { dispatch } = useNavigation();
+  const { t } = useTranslation();
   const openDrawer = () => dispatch(DrawerActions.openDrawer());
   const Stack = createStackNavigator<RootParamsList>();
   return (
@@ -21,7 +23,7 @@ const RootStack = () => {
         name="home"
         component={Home}
         options={{
-          title: 'Home',
+          title: t('home:title'),
           headerLeft: () => (
             <Icon name="nav-menu" size={20} onPress={openDrawer} />
           ),

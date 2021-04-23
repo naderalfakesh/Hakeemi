@@ -1,4 +1,5 @@
 import React, { Fragment, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, ViewStyle } from 'react-native';
 import Button from '../../../components/Button';
 import { IconName } from '../../../components/Icon';
@@ -7,16 +8,15 @@ import styles from './styles';
 const SERVICES: {
   id: string;
   iconName: IconName;
-  text: string;
 }[] = [
-  { id: '1', iconName: 'diagnose', text: 'Diagnosis' },
-  { id: '2', iconName: 'badge', text: 'Bandage' },
-  { id: '3', iconName: 'shot', text: 'Shots' },
-  { id: '4', iconName: 'ambulance', text: 'Ambulance' },
-  { id: '5', iconName: 'heart-beat', text: 'Heartbeats' },
-  { id: '6', iconName: 'checkup', text: 'Checkup' },
-  { id: '7', iconName: 'pill', text: 'Medicines' },
-  { id: '8', iconName: 'heart-plus', text: 'Advice' },
+  { id: '1', iconName: 'diagnose' },
+  { id: '2', iconName: 'badge' },
+  { id: '3', iconName: 'shot' },
+  { id: '4', iconName: 'ambulance' },
+  { id: '5', iconName: 'heart-beat' },
+  { id: '6', iconName: 'checkup' },
+  { id: '7', iconName: 'pill' },
+  { id: '8', iconName: 'heart-plus' },
 ];
 
 interface Props {
@@ -25,13 +25,15 @@ interface Props {
 }
 
 const MedicalServices = ({ style, onPress }: Props) => {
+  const { t } = useTranslation('home');
   const [selected, setSelected] = useState<Array<string>>([]);
 
   return (
     <Fragment>
       <View style={[styles.base, style]}>
-        {SERVICES.map(({ id, iconName, text }, index) => (
+        {SERVICES.map(({ id, iconName }, index) => (
           <Button
+            key={id}
             style={(index + 1) % 4 ? styles.button : undefined}
             theme={selected.includes(id) ? 'primary' : 'grey'}
             size="squareIcon"
@@ -41,14 +43,14 @@ const MedicalServices = ({ style, onPress }: Props) => {
                 ? setSelected(selected.filter(item => item !== id))
                 : setSelected([...selected, id])
             }>
-            {text}
+            {t('services.types.' + iconName)}
           </Button>
         ))}
       </View>
       <Button
         testID="search-button"
         onPress={() => onPress && onPress(selected)}>
-        Available doctors
+        {t('services.button')}
       </Button>
     </Fragment>
   );
