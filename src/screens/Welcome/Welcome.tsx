@@ -6,9 +6,11 @@ import HomeBgPattern from '../../../assets/homeBgPattern.svg';
 import Text from '../../components/Text';
 import Button from '../../components/Button';
 import { useNavigation } from '@react-navigation/core';
+import { Trans, useTranslation } from 'react-i18next';
 
 const Welcome: FC = () => {
   const { navigate } = useNavigation();
+  const { t } = useTranslation('welcome');
   return (
     <View style={styles.container}>
       <HomeDoctor
@@ -27,7 +29,7 @@ const Welcome: FC = () => {
           theme="secondary"
           size="big"
           onPress={() => navigate('signup')}>
-          Get Started For Free
+          {t('getStarted')}
         </Button>
         <Text
           style={styles.loginText}
@@ -35,14 +37,14 @@ const Welcome: FC = () => {
           level="600"
           align="center"
           color="white">
-          {'Already Have An Account? '}
+          {t('haveAccount') + ' '}
           <Text
             style={styles.loginUnderline}
             size="body-16"
             level="600"
             color="white"
             onPress={() => navigate('signin')}>
-            Log In
+            {t('login')}
           </Text>
         </Text>
       </View>
