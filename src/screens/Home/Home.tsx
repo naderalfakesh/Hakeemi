@@ -8,6 +8,7 @@ import RecentDoctors from '../../components/RecentList';
 import MedicalServices from './MedicalServices';
 import styles from './styles';
 import { ScrollView } from 'react-native-gesture-handler';
+import { Trans, useTranslation } from 'react-i18next';
 
 const ITEMS = [
   { id: '1', url: 'https://images2.imgbox.com/f7/bb/7HJeSokt_o.png' },
@@ -20,6 +21,7 @@ const ITEMS = [
 ];
 
 const Home: FC = () => {
+  const { t } = useTranslation('home');
   const [term, setTerm] = useState<string>('');
   const [showCard, setShowCard] = useState<boolean>(true);
   const findDoctors = (services: Array<string>) => {
@@ -31,15 +33,18 @@ const Home: FC = () => {
       <ScrollView style={styles.container}>
         <View style={styles.title}>
           <Text color="black" size="head-30">
-            {'Hello, '}
-            <Text color="black" size="head-30" level="500">
-              Nader !
-            </Text>
+            <Trans
+              i18nKey="home:header"
+              values={{ name: 'Nader' }}
+              components={{
+                b: <Text color="black" size="head-30" level="500" />,
+              }}
+            />
           </Text>
         </View>
         <View style={styles.search}>
           <SearchField
-            placeholder="Search..."
+            placeholder={t('search.placeholder')}
             value={term}
             onChangeText={setTerm}
             handleClear={() => setTerm('')}
@@ -49,18 +54,18 @@ const Home: FC = () => {
           {showCard && (
             <HomeCard
               onClose={() => setShowCard(false)}
-              title="Stay Home!"
-              subtitle="You can schedule an e-visit (comes free with any plan)."
+              title={t('card.title')}
+              subtitle={t('card.subtitle')}
               rightNode={<CardDoctor style={styles.doctorIcon} />}
             />
           )}
         </View>
         <View style={styles.recent}>
           <Text color="black" size="head-24" level="600">
-            Recent
+            {t('doctors.title')}
           </Text>
           <Text color="dark" size="body-14">
-            12 Doctors
+            {t('doctors.subtitle', { count: 12 })}
           </Text>
           <RecentDoctors
             style={styles.innerContainer}
@@ -70,10 +75,10 @@ const Home: FC = () => {
         </View>
         <View>
           <Text color="black" size="head-24" level="600">
-            Medical services
+            {t('services.title')}
           </Text>
           <Text color="dark" size="body-14">
-            Choose a service to find available doctor
+            {t('services.subtitle')}
           </Text>
           <MedicalServices
             style={styles.innerContainer}
