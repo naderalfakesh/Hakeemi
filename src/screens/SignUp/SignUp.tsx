@@ -7,8 +7,10 @@ import { useNavigation } from '@react-navigation/core';
 import HomeBgPattern from '../../../assets/homeBgPattern.svg';
 import Text from '../../components/Text';
 import Icon from '../../components/Icon/Icon';
+import { useTranslation } from 'react-i18next';
 
 const SignUp: FC = () => {
+  const { t } = useTranslation('signup');
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -25,33 +27,33 @@ const SignUp: FC = () => {
       />
       <View style={styles.paper}>
         <Text size="head-30" color="black" align="center" style={styles.title}>
-          Sign Up
+          {t('title')}
         </Text>
         <Text
           size="body-22"
           color="black"
           align="center"
           style={styles.subtitle}>
-          Sign up now to make new appointments.
+          {t('subtitle')}
         </Text>
         <View style={styles.fields}>
           <TextField
             style={styles.field}
             value={name}
             onChangeText={setName}
-            placeholder="Full name"
+            placeholder={t('form.fullName.placeholder')}
           />
           <TextField
             style={styles.field}
             value={email}
             onChangeText={setEmail}
-            placeholder="Email Address"
+            placeholder={t('form.email.placeholder')}
           />
           <TextField
             value={password}
             onChangeText={setPassword}
-            placeholder="Password"
             secureTextEntry={true}
+            placeholder={t('form.password.placeholder')}
           />
         </View>
         <Button
@@ -59,18 +61,18 @@ const SignUp: FC = () => {
           theme="primary"
           size="big"
           onPress={() => goBack()}>
-          Create A Free Account
+          {t('form.submit.text')}
         </Button>
       </View>
       <Text size="body-20" align="center" color="white">
-        {'Already have an account? '}
+        {t('haveAccount') + ' '}
         <Text
           style={styles.underline}
           size="body-20"
           level="700"
           color="white"
           onPress={() => navigate('signin')}>
-          Sign In
+          {t('signIn')}
         </Text>
       </Text>
     </View>
