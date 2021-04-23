@@ -7,8 +7,10 @@ import { useNavigation } from '@react-navigation/core';
 import HomeBgPattern from '../../../assets/homeBgPattern.svg';
 import Text from '../../components/Text';
 import Icon from '../../components/Icon';
+import { useTranslation } from 'react-i18next';
 
 const SignUp: FC = () => {
+  const { t } = useTranslation('signIn');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
@@ -24,27 +26,27 @@ const SignUp: FC = () => {
       />
       <View style={styles.paper}>
         <Text size="head-30" color="black" align="center" style={styles.title}>
-          Sign In
+          {t('title')}
         </Text>
         <Text
           size="body-22"
           color="black"
           align="center"
           style={styles.subtitle}>
-          Welcome again!
+          {t('subtitle')}
         </Text>
         <View style={styles.fields}>
           <TextField
             style={styles.field}
             value={email}
             onChangeText={setEmail}
-            placeholder="Email Address"
+            placeholder={t('form.email.placeholder')}
           />
           <TextField
             value={password}
             onChangeText={setPassword}
-            placeholder="Password"
             secureTextEntry={true}
+            placeholder={t('form.password.placeholder')}
           />
         </View>
         <Text
@@ -53,25 +55,25 @@ const SignUp: FC = () => {
           color="primary"
           onPress={() => navigate('signup')}
           style={StyleSheet.flatten([styles.forgotPass, styles.underline])}>
-          Forgot Password
+          {t('form.forgotPassword.text')}
         </Text>
         <Button
           style={styles.button}
           theme="primary"
           size="big"
           onPress={() => goBack()}>
-          Secure Login
+          {t('form.submit.text')}
         </Button>
       </View>
       <Text size="body-20" align="center" color="white">
-        {'Don’t have an account? '}
+        {t('haveAccount') + ' '}
         <Text
           style={styles.underline}
           size="body-20"
           level="700"
           color="white"
           onPress={() => navigate('signup')}>
-          Sign Up
+          {t('signUp')}
         </Text>
       </Text>
     </View>
