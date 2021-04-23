@@ -43,7 +43,7 @@ const MedicalServices = ({ style, onPress }: Props) => {
                 ? setSelected(selected.filter(item => item !== id))
                 : setSelected([...selected, id])
             }>
-            {t('services.types.' + iconName)}
+            {t(('services.types.' + iconName) as any)}
           </Button>
         ))}
       </View>
