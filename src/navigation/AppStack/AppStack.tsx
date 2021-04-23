@@ -15,6 +15,7 @@ const RootStack = () => {
       screenOptions={{
         headerLeftContainerStyle: { paddingLeft: 24 },
         headerRightContainerStyle: { paddingRight: 24 },
+        headerStyle: { shadowColor: 'transparent' },
       }}>
       <Stack.Screen
         name="home"
