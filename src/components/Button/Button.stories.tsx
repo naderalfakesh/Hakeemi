@@ -19,6 +19,14 @@ const ButtonDemo = ({ theme }: { theme: Themes }) => (
     <Button theme={theme} size="big">
       Big button
     </Button>
+    <View style={styles.icons}>
+      <Button theme={theme} size="squareIcon" iconName="heart-beat">
+        Heartbeats
+      </Button>
+      <Button theme={theme} size="inlineIcon" iconName="heart-beat">
+        Heartbeats
+      </Button>
+    </View>
   </Fragment>
 );
 
@@ -34,5 +42,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 8,
     justifyContent: 'space-evenly',
+  },
+  icons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
   },
 });

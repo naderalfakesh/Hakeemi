@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { Pressable, ViewStyle, PressableProps } from 'react-native';
+import Icon, { IconName } from '../Icon';
 import Text, { Props as TextProps } from '../Text';
 import styles, {
   pressedStyle,
@@ -7,12 +8,14 @@ import styles, {
   Themes,
   themeStyle,
   sizeStyle,
+  iconColor,
 } from './styles';
 
 interface Props extends PressableProps {
   style?: ViewStyle;
   theme?: Themes;
   size?: Sizes;
+  iconName?: IconName;
   onPress?: () => void;
 }
 
@@ -39,6 +42,10 @@ const mapTextSize = (size: Sizes): sizeProps => {
       return { size: 'body-16', level: '600' };
     case 'big':
       return { size: 'button-22', level: '600' };
+    case 'squareIcon':
+      return { size: 'button-8', level: '400' };
+    case 'inlineIcon':
+      return { size: 'body-16', level: '400' };
   }
 };
 
@@ -47,21 +54,31 @@ const Button: FC<Props> = ({
   style,
   size = 'medium',
   theme = 'primary',
+  iconName,
   onPress,
   ...otherProps
 }) => {
   return (
     <Pressable
-      {...otherProps}
       testID="Button"
       style={({ pressed }) => [
         styles.base,
         themeStyle[theme],
         sizeStyle[size],
         pressed && pressedStyle[theme],
+        size === 'inlineIcon' && styles.inlineIcon,
         style,
       ]}
-      onPress={onPress && onPress}>
+      onPress={onPress && onPress}
+      {...otherProps}>
+      {iconName && (
+        <Icon
+          style={styles.icon}
+          name={iconName}
+          size={24}
+          color={iconColor[theme].color}
+        />
+      )}
       <Text color={mapTextColor(theme)} {...mapTextSize(size)}>
         {children}
       </Text>
