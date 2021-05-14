@@ -6,9 +6,10 @@ import SignUp from '../../screens/SignUp';
 import SignIn from '../../screens/SignIn';
 import DrawerStack from '../DrawerStack';
 
+const Stack = createStackNavigator<RootParamsList>();
+
 const RootStack = () => {
   const loggedIn = true;
-  const Stack = createStackNavigator<RootParamsList>();
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {!loggedIn ? (

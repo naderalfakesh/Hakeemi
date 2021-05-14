@@ -35,6 +35,7 @@ const MedicalServices = ({ style, onPress }: Props) => {
           <Button
             key={id}
             style={(index + 1) % 4 ? styles.button : undefined}
+            highlight={false}
             theme={selected.includes(id) ? 'primary' : 'grey'}
             size="squareIcon"
             iconName={iconName}
