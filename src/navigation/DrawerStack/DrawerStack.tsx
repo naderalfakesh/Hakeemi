@@ -6,8 +6,13 @@ const Drawer = createDrawerNavigator();
 
 const MyDrawer = () => {
   return (
-    <Drawer.Navigator>
-      <Drawer.Screen name="Home" component={AppStack} />
+    <Drawer.Navigator initialRouteName="Home">
+      <Drawer.Screen name="Home">
+        {() => <AppStack initialRouteName="home" />}
+      </Drawer.Screen>
+      <Drawer.Screen name="Doctors">
+        {() => <AppStack initialRouteName="doctors" />}
+      </Drawer.Screen>
     </Drawer.Navigator>
   );
 };

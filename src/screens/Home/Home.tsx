@@ -10,7 +10,6 @@ import styles from './styles';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/core';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const ITEMS = [
   { id: '1', url: 'https://images2.imgbox.com/f7/bb/7HJeSokt_o.png' },
@@ -23,8 +22,6 @@ const ITEMS = [
 ];
 
 const Home: FC = () => {
-  const insets = useSafeAreaInsets();
-
   const { t } = useTranslation('home');
   const { navigate } = useNavigation();
   const [term, setTerm] = useState<string>('');
@@ -37,11 +34,7 @@ const Home: FC = () => {
   return (
     <Fragment>
       <StatusBar barStyle="dark-content" />
-      <ScrollView
-        style={[
-          styles.container,
-          { paddingTop: insets.top, paddingBottom: insets.bottom },
-        ]}>
+      <ScrollView style={styles.container}>
         <View style={styles.title}>
           <Text color="black" size="head-30">
             <Trans
@@ -82,6 +75,7 @@ const Home: FC = () => {
             style={styles.innerContainer}
             imageList={ITEMS}
             onPress={console.log}
+            onExtraPress={() => navigate('doctors')}
           />
         </View>
         <View>
