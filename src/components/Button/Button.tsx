@@ -16,6 +16,7 @@ interface Props extends PressableProps {
   theme?: Themes;
   size?: Sizes;
   iconName?: IconName;
+  highlight?: boolean;
   onPress?: () => void;
 }
 
@@ -56,6 +57,7 @@ const Button: FC<Props> = ({
   theme = 'primary',
   iconName,
   onPress,
+  highlight = true,
   ...otherProps
 }) => {
   return (
@@ -65,7 +67,7 @@ const Button: FC<Props> = ({
         styles.base,
         themeStyle[theme],
         sizeStyle[size],
-        pressed && pressedStyle[theme],
+        pressed && highlight && pressedStyle[theme],
         size === 'inlineIcon' && styles.inlineIcon,
         style,
       ]}
