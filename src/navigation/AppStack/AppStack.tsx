@@ -6,11 +6,13 @@ import Doctors from '../../screens/Doctors';
 import Icon from '../../components/Icon';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import DoctorProfile from '../../screens/DoctorProfile';
 
 const Stack = createStackNavigator<AppStackParams>();
 type AppStackRouteName = keyof AppStackParams;
 export interface AppStackProps<R extends AppStackRouteName> {
   initialRouteName: R;
+  initialParams: AppStackParams[R];
   modal?: boolean;
 }
 const AppStack = <R extends AppStackRouteName>({
@@ -46,6 +48,11 @@ const AppStack = <R extends AppStackRouteName>({
             <Icon name="nav-menu" size={20} onPress={openDrawer} />
           ),
         }}
+      />
+      <Stack.Screen
+        name="DoctorProfile"
+        component={DoctorProfile}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
