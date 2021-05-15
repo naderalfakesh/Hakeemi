@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { palette } from '../../../theme/colors';
+import spacing from '../../../theme/spacing';
 
 export default StyleSheet.create({
   container: {
@@ -8,9 +9,9 @@ export default StyleSheet.create({
     borderBottomWidth: 1,
     borderTopWidth: 1,
     borderColor: palette.grey.base,
-    marginTop: 16,
+    marginTop: spacing.small3,
   },
-  textContainer: { flex: 1, padding: 40 },
+  textContainer: { flex: 1, padding: spacing.big1 },
   divider: {
     height: '100%',
     borderRightWidth: 1,
