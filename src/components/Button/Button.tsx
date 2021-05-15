@@ -18,6 +18,7 @@ interface Props extends PressableProps {
   iconName?: IconName;
   highlight?: boolean;
   onPress?: () => void;
+  subtitle?: string;
 }
 
 const mapTextColor = (theme: Themes): TextProps['color'] => {
@@ -26,6 +27,8 @@ const mapTextColor = (theme: Themes): TextProps['color'] => {
       return 'white';
     case 'secondary':
       return 'secondary';
+    case 'tertiary':
+      return 'primary';
     case 'grey':
       return 'black';
   }
@@ -35,6 +38,7 @@ type sizeProps = {
   size: TextProps['size'];
   level: TextProps['level'];
 };
+
 const mapTextSize = (size: Sizes): sizeProps => {
   switch (size) {
     case 'small':
@@ -50,6 +54,21 @@ const mapTextSize = (size: Sizes): sizeProps => {
   }
 };
 
+const mapSubtitleSize = (size: Sizes): sizeProps => {
+  switch (size) {
+    case 'small':
+      return { size: 'body-14', level: '400' };
+    case 'medium':
+      return { size: 'body-14', level: '400' };
+    case 'big':
+      return { size: 'button-8', level: '400' };
+    case 'squareIcon':
+      return { size: 'button-8', level: '400' };
+    case 'inlineIcon':
+      return { size: 'body-16', level: '400' };
+  }
+};
+
 const Button: FC<Props> = ({
   children,
   style,
@@ -57,6 +76,7 @@ const Button: FC<Props> = ({
   theme = 'primary',
   iconName,
   onPress,
+  subtitle,
   highlight = true,
   ...otherProps
 }) => {
@@ -84,6 +104,11 @@ const Button: FC<Props> = ({
       <Text color={mapTextColor(theme)} {...mapTextSize(size)}>
         {children}
       </Text>
+      {subtitle && (
+        <Text color={mapTextColor(theme)} {...mapSubtitleSize(size)}>
+          {subtitle}
+        </Text>
+      )}
     </Pressable>
   );
 };

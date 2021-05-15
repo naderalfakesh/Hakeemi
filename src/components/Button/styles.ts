@@ -3,7 +3,7 @@ import colors, { palette } from '../../theme/colors';
 import spacing from '../../theme/spacing';
 
 export type Sizes = 'small' | 'medium' | 'big' | 'squareIcon' | 'inlineIcon';
-export type Themes = 'primary' | 'secondary' | 'grey';
+export type Themes = 'primary' | 'secondary' | 'grey' | 'tertiary';
 
 export default StyleSheet.create({
   base: {
@@ -26,6 +26,9 @@ export const themeStyle: Record<Themes, ViewStyle> = StyleSheet.create({
   secondary: {
     backgroundColor: colors.white,
   },
+  tertiary: {
+    backgroundColor: colors.secondary,
+  },
   grey: {
     backgroundColor: colors.light,
   },
@@ -37,6 +40,9 @@ export const pressedStyle: Record<Themes, ViewStyle> = StyleSheet.create({
   },
   secondary: {
     backgroundColor: colors.secondary,
+  },
+  tertiary: {
+    backgroundColor: colors.dark,
   },
   grey: {
     backgroundColor: colors.dark,
