@@ -4,6 +4,7 @@ import signIn from './signIn.json';
 import signup from './signup.json';
 import welcome from './welcome.json';
 import doctors from './doctors.json';
+import doctorProfile from './doctorProfile.json';
 
 export default {
   common,
@@ -12,4 +13,5 @@ export default {
   signup,
   welcome,
   doctors,
+  doctorProfile,
 };

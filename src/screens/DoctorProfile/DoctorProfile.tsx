@@ -1,5 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { Fragment } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, ScrollView, StatusBar } from 'react-native';
 import BgPattern from '../../../assets/homeBgPattern.svg';
 import Button from '../../components/Button';
@@ -11,6 +12,8 @@ import DoctorHeader from './DoctorHeader';
 import styles from './styles';
 const DoctorProfile = () => {
   const { goBack } = useNavigation();
+  const { t } = useTranslation('doctorProfile');
+
   return (
     <Fragment>
       <StatusBar barStyle="light-content" translucent={true} />
@@ -40,18 +43,18 @@ const DoctorProfile = () => {
             email=" info@drafreen.com"
           />
           <Description
-            title="About the Doctor"
+            title={t('description.title')}
             details="Dr. Afreen Khan is a cardiologist and nationally recognized pioneer in women’s heart health and her New York City practice Total Heart Care is focused primarily to care for women."
           />
           <Appointments
-            title="Availability"
+            title={t('appointments.title')}
             dateList={[
               new Date(2021, 5, 3, 9, 15),
               new Date(2021, 5, 4, 10, 55),
             ]}
           />
           <Button style={styles.button} size="big">
-            Schedule An Appointment
+            {t('button.text')}
           </Button>
         </View>
       </ScrollView>
