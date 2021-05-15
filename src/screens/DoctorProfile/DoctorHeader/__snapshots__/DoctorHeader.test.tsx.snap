@@ -1,0 +1,92 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Button component test renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "flexDirection": "row",
+      "paddingHorizontal": 30,
+    }
+  }
+>
+  <View
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      Array [
+        Object {
+          "backgroundColor": "rgba(214, 250, 255, 1)",
+          "borderRadius": 20,
+          "height": 80,
+          "overflow": "hidden",
+          "width": 80,
+        },
+        undefined,
+        undefined,
+      ]
+    }
+    testID="avatar"
+  >
+    <Image
+      source={
+        Object {
+          "height": 80,
+          "uri": "http://www.test.com/image.jpg",
+          "width": 80,
+        }
+      }
+    />
+  </View>
+  <View
+    style={
+      Object {
+        "marginLeft": 10,
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "rgba(0, 0, 0, 1)",
+          "fontFamily": "System",
+          "fontSize": 30,
+          "fontWeight": "400",
+          "includeFontPadding": false,
+          "lineHeight": 38,
+          "textAlign": undefined,
+        }
+      }
+      testID="Text"
+    >
+      Title
+    </Text>
+    <Text
+      style={
+        Object {
+          "color": "rgba(144, 144, 144, 1)",
+          "fontFamily": "System",
+          "fontSize": 14,
+          "fontWeight": "400",
+          "includeFontPadding": false,
+          "lineHeight": 18,
+          "textAlign": undefined,
+        }
+      }
+      testID="Text"
+    >
+      Subtitle
+    </Text>
+  </View>
+</View>
+`;
