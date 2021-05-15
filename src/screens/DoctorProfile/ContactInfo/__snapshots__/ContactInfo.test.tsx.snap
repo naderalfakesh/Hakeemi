@@ -1,0 +1,93 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Button component test renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "borderBottomWidth": 1,
+      "borderColor": "rgba(240, 240, 240, 1)",
+      "borderTopWidth": 1,
+      "flexDirection": "row",
+      "marginTop": 16,
+    }
+  }
+>
+  <View
+    style={
+      Array [
+        Object {
+          "flex": 1,
+          "padding": 40,
+        },
+        Object {
+          "borderColor": "rgba(240, 240, 240, 1)",
+          "borderRightWidth": 1,
+          "height": "100%",
+        },
+      ]
+    }
+  >
+    <Text
+      selectable={true}
+      style={
+        Object {
+          "color": "rgba(144, 144, 144, 1)",
+          "fontFamily": "System",
+          "fontSize": 14,
+          "fontWeight": "400",
+          "includeFontPadding": false,
+          "lineHeight": 18,
+          "textAlign": undefined,
+        }
+      }
+      testID="Text"
+    >
+      Address
+    </Text>
+  </View>
+  <View
+    style={
+      Object {
+        "flex": 1,
+        "padding": 40,
+      }
+    }
+  >
+    <Text
+      selectable={true}
+      style={
+        Object {
+          "color": "rgba(144, 144, 144, 1)",
+          "fontFamily": "System",
+          "fontSize": 14,
+          "fontWeight": "400",
+          "includeFontPadding": false,
+          "lineHeight": 18,
+          "textAlign": undefined,
+        }
+      }
+      testID="Text"
+    >
+      +90 545 693 9297
+      <Text
+        selectable={true}
+        style={
+          Object {
+            "color": "rgba(144, 144, 144, 1)",
+            "fontFamily": "System",
+            "fontSize": 14,
+            "fontWeight": "400",
+            "includeFontPadding": false,
+            "lineHeight": 18,
+            "textAlign": undefined,
+          }
+        }
+        testID="Text"
+      >
+        email@test.com
+      </Text>
+    </Text>
+  </View>
+</View>
+`;
