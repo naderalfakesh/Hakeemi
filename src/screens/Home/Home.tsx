@@ -74,7 +74,7 @@ const Home: FC = () => {
           <RecentDoctors
             style={styles.innerContainer}
             imageList={ITEMS}
-            onPress={console.log}
+            onPress={id => navigate('DoctorProfileModal', { id })}
             onExtraPress={() => navigate('doctors')}
           />
         </View>

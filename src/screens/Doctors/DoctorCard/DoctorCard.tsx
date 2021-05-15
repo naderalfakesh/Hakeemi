@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, TouchableOpacity, View } from 'react-native';
@@ -10,10 +11,12 @@ interface Props {
 }
 const Card: FC<Props> = ({ item }) => {
   const { t } = useTranslation('doctors');
+  const { navigate } = useNavigation();
+
   return (
     <TouchableOpacity
       activeOpacity={0.7}
-      onPress={() => console.log('Open doctor modal ', item.id)}
+      onPress={() => navigate('DoctorProfileModal', { id: item.id })}
       style={styles.card}>
       <View style={styles.avatar}>
         <Image source={{ uri: item.image, height: 134, width: 134 }} />
