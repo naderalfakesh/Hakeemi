@@ -18,7 +18,6 @@ import {
 } from 'react-native-safe-area-context';
 
 const App: () => ReactNode = () => {
-  console.log(initialWindowMetrics);
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <NavigationContainer>
