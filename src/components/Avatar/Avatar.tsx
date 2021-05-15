@@ -47,7 +47,7 @@ const Avatar: FC<Props> = ({
       testID="avatar"
       style={({ pressed }) => [
         styles.container,
-        pressed ? styles.pressed : undefined,
+        onPress && pressed ? styles.pressed : undefined,
         style,
       ]}
       onPress={onPress}>
