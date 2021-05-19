@@ -1,0 +1,13 @@
+{
+  "timeFormat": "{{time, h:mm a}}",
+  "description": {
+    "title": "About the Doctor"
+  },
+  "appointments": {
+    "title": "Availability"
+  },
+  "button": {
+    "text": "Schedule An Appointment"
+  },
+  "dateFormat": "{{date, do MMM}}"
+}
