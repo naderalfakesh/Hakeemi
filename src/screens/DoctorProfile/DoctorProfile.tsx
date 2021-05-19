@@ -11,7 +11,7 @@ import Description from './Description';
 import DoctorHeader from './DoctorHeader';
 import styles from './styles';
 const DoctorProfile = () => {
-  const { goBack } = useNavigation();
+  const { goBack, navigate } = useNavigation();
   const { t } = useTranslation('doctorProfile');
 
   return (
@@ -53,7 +53,10 @@ const DoctorProfile = () => {
               new Date(2021, 5, 4, 10, 55),
             ]}
           />
-          <Button style={styles.button} size="big">
+          <Button
+            style={styles.button}
+            size="big"
+            onPress={() => navigate('ScheduleDialog')}>
             {t('button.text')}
           </Button>
         </View>
