@@ -7,6 +7,7 @@ import Icon from '../../components/Icon';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import DoctorProfile from '../../screens/DoctorProfile';
+import ScheduleDialog from '../../screens/ScheduleDialog';
 
 const Stack = createStackNavigator<AppStackParams>();
 type AppStackRouteName = keyof AppStackParams;
@@ -52,6 +53,11 @@ const AppStack = <R extends AppStackRouteName>({
       <Stack.Screen
         name="DoctorProfile"
         component={DoctorProfile}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ScheduleDialog"
+        component={ScheduleDialog}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

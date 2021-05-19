@@ -4,7 +4,7 @@ import spacing from '../../theme/spacing';
 
 export default StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: colors.white,
     paddingHorizontal: spacing.medium2,
   },

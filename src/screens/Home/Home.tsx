@@ -34,7 +34,7 @@ const Home: FC = () => {
   return (
     <Fragment>
       <StatusBar barStyle="dark-content" />
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container} bounces={false}>
         <View style={styles.title}>
           <Text color="black" size="head-30">
             <Trans

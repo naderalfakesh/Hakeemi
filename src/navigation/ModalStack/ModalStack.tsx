@@ -7,6 +7,7 @@ import { AppStackParams } from '../AppStack/params';
 export type ModalStackParams = {
   AppStack: undefined;
   DoctorProfileModal: AppStackParams['DoctorProfile'];
+  ScheduleDialogModal: AppStackParams['ScheduleDialog'];
 };
 
 const Stack = createStackNavigator<ModalStackParams>();
@@ -24,6 +25,15 @@ const ModalStack = () => {
           />
         )}
       </Stack.Screen>
+      {/* <Stack.Screen name="ScheduleDialogModal">
+        {({ route }) => (
+          <AppStack
+            initialRouteName="ScheduleDialog"
+            initialParams={route.params}
+            modal
+          />
+        )}
+      </Stack.Screen> */}
     </Stack.Navigator>
   );
 };

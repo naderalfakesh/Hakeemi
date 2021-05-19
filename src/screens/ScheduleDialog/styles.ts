@@ -16,14 +16,21 @@ export default StyleSheet.create({
     marginTop: 200,
     borderTopRightRadius: spacing.big2,
     borderTopLeftRadius: spacing.big2,
-    paddingTop: spacing.medium2,
+    paddingTop: spacing.big2,
+    paddingHorizontal: spacing.medium3,
   },
   pattern: {
     position: 'absolute',
   },
   back: { position: 'absolute', top: 60, left: 25, zIndex: 1, color: 'white' },
-  button: {
-    marginVertical: spacing.big1,
-    marginHorizontal: spacing.medium3,
+  timesHeader: { marginTop: spacing.medium3 },
+  timesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginTop: 20,
   },
+  timeButton: { marginBottom: 10, minWidth: '30%' },
+  button: { marginTop: spacing.huge3 },
+  subtitle: { marginTop: spacing.mini3 },
 });
