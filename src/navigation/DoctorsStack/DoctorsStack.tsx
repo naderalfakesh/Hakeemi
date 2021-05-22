@@ -2,14 +2,18 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import AppStack from '../AppStack';
-import { ModalStackParams } from '../types';
+import { DoctorStackParams } from '../types';
 
-const Stack = createStackNavigator<ModalStackParams>();
+const Stack = createStackNavigator<DoctorStackParams>();
 
 const ModalStack = () => {
   return (
-    <Stack.Navigator initialRouteName="AppStack" mode="modal" headerMode="none">
-      <Stack.Screen name="AppStack" component={AppStack} />
+    <Stack.Navigator initialRouteName="Doctors" mode="modal" headerMode="none">
+      <Stack.Screen name="Doctors">
+        {({ route }) => (
+          <AppStack initialRouteName="Doctors" initialParams={route.params} />
+        )}
+      </Stack.Screen>
       <Stack.Screen name="DoctorProfileModal">
         {({ route }) => (
           <AppStack

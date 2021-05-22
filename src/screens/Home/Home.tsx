@@ -28,7 +28,7 @@ const Home: FC = () => {
   const [showCard, setShowCard] = useState<boolean>(true);
 
   const findDoctors = (services: Array<string>) => {
-    navigate('doctors', { services });
+    navigate('DoctorsDrawer', { services });
   };
 
   return (
@@ -75,7 +75,7 @@ const Home: FC = () => {
             style={styles.innerContainer}
             imageList={ITEMS}
             onPress={id => navigate('DoctorProfileModal', { id })}
-            onExtraPress={() => navigate('Doctors')}
+            onExtraPress={() => navigate('DoctorsDrawer')}
           />
         </View>
         <View>

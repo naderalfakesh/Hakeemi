@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { RootParamsList } from './params';
+import { RootParamsList } from '../types';
 import Welcome from '../../screens/Welcome';
 import SignUp from '../../screens/SignUp';
 import SignIn from '../../screens/SignIn';
