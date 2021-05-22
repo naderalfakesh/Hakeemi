@@ -14,9 +14,9 @@ const RootStack = () => {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {!loggedIn ? (
         <Fragment>
-          <Stack.Screen name="welcome" component={Welcome} />
-          <Stack.Screen name="signup" component={SignUp} />
-          <Stack.Screen name="signin" component={SignIn} />
+          <Stack.Screen name="Welcome" component={Welcome} />
+          <Stack.Screen name="SignUp" component={SignUp} />
+          <Stack.Screen name="SignIn" component={SignIn} />
         </Fragment>
       ) : (
         <Stack.Screen name="App" component={DrawerStack} />

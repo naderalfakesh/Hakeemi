@@ -76,6 +76,9 @@ export const iconColor: Record<Themes, TextStyle> = StyleSheet.create({
   secondary: {
     color: palette.primary.dark,
   },
+  tertiary: {
+    color: colors.primary,
+  },
   grey: {
     color: colors.primary,
   },

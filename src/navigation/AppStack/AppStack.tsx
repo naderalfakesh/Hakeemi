@@ -31,7 +31,7 @@ const AppStack = <R extends AppStackRouteName>({
         headerStyle: { shadowColor: 'transparent' },
       }}>
       <Stack.Screen
-        name="home"
+        name="Home"
         component={Home}
         options={{
           title: t('home:title'),
@@ -41,7 +41,7 @@ const AppStack = <R extends AppStackRouteName>({
         }}
       />
       <Stack.Screen
-        name="doctors"
+        name="Doctors"
         component={Doctors}
         options={{
           title: '',

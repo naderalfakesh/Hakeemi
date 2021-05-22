@@ -1,6 +1,6 @@
 export type AppStackParams = {
-  home: undefined;
-  doctors: undefined;
+  Home: undefined;
+  Doctors: undefined;
   DoctorProfile: { id?: string };
   ScheduleDialog: { id?: string };
 };

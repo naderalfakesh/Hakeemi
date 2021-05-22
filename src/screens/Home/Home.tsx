@@ -75,7 +75,7 @@ const Home: FC = () => {
             style={styles.innerContainer}
             imageList={ITEMS}
             onPress={id => navigate('DoctorProfileModal', { id })}
-            onExtraPress={() => navigate('doctors')}
+            onExtraPress={() => navigate('Doctors')}
           />
         </View>
         <View>
