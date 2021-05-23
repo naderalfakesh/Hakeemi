@@ -1,18 +1,18 @@
 import i18next from 'i18next';
 import en from './en';
-import ar from './ar';
+import tr from './tr';
 import { format } from 'date-fns';
-import { enGB as English, ar as Arabic } from 'date-fns/locale';
+import { enGB as English, tr as Turkish } from 'date-fns/locale';
 
 export const resources = {
   en,
-  ar,
+  tr,
 } as const;
 
 const getDateLocale = (lng?: string) => {
   switch (lng) {
-    case 'ar':
-      return Arabic;
+    case 'tr':
+      return Turkish;
     case 'en':
     default:
       return English;
@@ -23,7 +23,7 @@ const i18n = i18next.createInstance();
 i18n.init({
   fallbackLng: 'en',
   lng: 'en',
-  supportedLngs: ['en', 'ar'],
+  supportedLngs: ['en', 'tr'],
   defaultNS: 'common',
   resources,
   react: {
