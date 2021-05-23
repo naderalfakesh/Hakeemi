@@ -4,10 +4,13 @@ import ModalStack from '../ModalStack';
 import DoctorsStack from '../DoctorsStack';
 import DrawerMenu from './DrawerMenu';
 import { DrawerStackParams } from '../types';
+import { useTranslation } from 'react-i18next';
 
 const Drawer = createDrawerNavigator<DrawerStackParams>();
 
 const MyDrawer = () => {
+  const { t } = useTranslation('common');
+
   return (
     <Drawer.Navigator
       initialRouteName="HomeDrawer"
@@ -15,12 +18,12 @@ const MyDrawer = () => {
       <Drawer.Screen
         name="HomeDrawer"
         component={ModalStack}
-        options={{ drawerLabel: 'Home' }}
+        options={{ drawerLabel: t('drawer.home') }}
       />
       <Drawer.Screen
         name="DoctorsDrawer"
         component={DoctorsStack}
-        options={{ drawerLabel: 'Doctors' }}
+        options={{ drawerLabel: t('drawer.doctors') }}
       />
     </Drawer.Navigator>
   );
