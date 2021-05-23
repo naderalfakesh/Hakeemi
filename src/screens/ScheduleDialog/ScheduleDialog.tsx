@@ -49,18 +49,18 @@ const ScheduleDialog = () => {
         <View style={styles.paper}>
           <View>
             <Text size="head-24" level="600" color="black">
-              Schedule An Appointment
+              {t('description.title')}
             </Text>
             <Text size="body-16" color="dark" style={styles.subtitle}>
-              Schedule an online appointment with Dr.Afreen Khan
+              {t('description.subtitle')}
             </Text>
           </View>
           <View style={styles.timesHeader}>
             <Text size="head-20" color="black">
-              Time
+              {t('appointments.title')}
             </Text>
             <Text size="body-16" color="dark" style={styles.subtitle}>
-              Only the below slots are available
+              {t('appointments.subtitle')}
             </Text>
           </View>
           <View style={styles.timesContainer}>

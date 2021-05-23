@@ -1,13 +1,14 @@
 {
+  "timeFormat": "{{time, h:mm a}}",
   "description": {
-    "title": "About the Doctor"
+    "title": "Schedule An Appointment",
+    "subtitle": "Schedule an online appointment with Dr.Afreen Khan"
   },
   "appointments": {
-    "title": "Availability"
+    "title": "Time",
+    "subtitle": "Only the below slots are available"
   },
   "button": {
     "text": "Schedule An Appointment"
-  },
-  "timeFormat": "{{date, h:mm a}}",
-  "dateFormat": "{{date, do MMM}}"
+  }
 }
