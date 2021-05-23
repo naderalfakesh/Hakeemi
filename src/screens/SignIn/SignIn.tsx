@@ -8,11 +8,13 @@ import HomeBgPattern from '../../../assets/homeBgPattern.svg';
 import Text from '../../components/Text';
 import Icon from '../../components/Icon';
 import { useTranslation } from 'react-i18next';
+import useAuth from '../../services/useAuth';
 
 const SignUp: FC = () => {
   const { t } = useTranslation('signIn');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const { login } = useAuth();
 
   const { navigate, goBack } = useNavigation();
   return (
@@ -41,11 +43,17 @@ const SignUp: FC = () => {
             value={email}
             onChangeText={setEmail}
             placeholder={t('form.email.placeholder')}
+            autoCapitalize="none"
+            textContentType="emailAddress"
+            autoCompleteType="email"
           />
           <TextField
             value={password}
             onChangeText={setPassword}
             secureTextEntry={true}
+            autoCapitalize="none"
+            autoCompleteType="password"
+            textContentType="password"
             placeholder={t('form.password.placeholder')}
           />
         </View>
@@ -61,7 +69,7 @@ const SignUp: FC = () => {
           style={styles.button}
           theme="primary"
           size="big"
-          onPress={() => goBack()}>
+          onPress={() => login(email, password)}>
           {t('form.submit.text')}
         </Button>
       </View>
@@ -72,7 +80,7 @@ const SignUp: FC = () => {
           size="body-20"
           level="700"
           color="white"
-          onPress={() => navigate('signup')}>
+          onPress={() => navigate('SignUp')}>
           {t('signUp')}
         </Text>
       </Text>

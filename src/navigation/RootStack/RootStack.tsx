@@ -5,11 +5,14 @@ import Welcome from '../../screens/Welcome';
 import SignUp from '../../screens/SignUp';
 import SignIn from '../../screens/SignIn';
 import DrawerStack from '../DrawerStack';
+import useAuth from '../../services/useAuth';
 
 const Stack = createStackNavigator<RootParamsList>();
 
 const RootStack = () => {
-  const loggedIn = true;
+  const { currentUser } = useAuth();
+  const loggedIn = currentUser !== null;
+
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {!loggedIn ? (

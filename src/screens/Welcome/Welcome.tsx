@@ -28,9 +28,10 @@ const Welcome: FC = () => {
           style={styles.signUpBtn}
           theme="secondary"
           size="big"
-          onPress={() => navigate('signup')}>
+          onPress={() => navigate('SignUp')}>
           {t('getStarted')}
         </Button>
+
         <Text
           style={styles.loginText}
           size="body-16"
@@ -43,7 +44,7 @@ const Welcome: FC = () => {
             size="body-16"
             level="600"
             color="white"
-            onPress={() => navigate('signin')}>
+            onPress={() => navigate('SignIn')}>
             {t('login')}
           </Text>
         </Text>
