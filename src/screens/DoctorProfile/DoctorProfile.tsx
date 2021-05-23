@@ -16,7 +16,11 @@ const DoctorProfile = () => {
 
   return (
     <Fragment>
-      <StatusBar barStyle="light-content" translucent={true} />
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="rgba(0, 188, 212, 1)"
+        translucent={true}
+      />
 
       <ScrollView bounces={false} contentContainerStyle={styles.container}>
         <Icon

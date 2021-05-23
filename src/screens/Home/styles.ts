@@ -7,6 +7,7 @@ export default StyleSheet.create({
     flexGrow: 1,
     backgroundColor: colors.white,
     paddingHorizontal: spacing.medium2,
+    paddingBottom: spacing.medium3,
   },
   doctorIcon: { marginBottom: -1 }, // A fix for extra space in svg
   title: { marginVertical: spacing.small1 },

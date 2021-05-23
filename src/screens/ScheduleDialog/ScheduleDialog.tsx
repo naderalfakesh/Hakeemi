@@ -31,7 +31,11 @@ const ScheduleDialog = () => {
 
   return (
     <Fragment>
-      <StatusBar barStyle="light-content" translucent={true} />
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="rgba(0, 188, 212, 1)"
+        translucent={true}
+      />
 
       <ScrollView contentContainerStyle={styles.container} bounces={false}>
         <Icon

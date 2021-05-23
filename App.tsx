@@ -21,7 +21,11 @@ const App: () => ReactNode = () => {
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <NavigationContainer>
-        <StatusBar barStyle="light-content" translucent={true} />
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="rgba(0, 188, 212, 1)"
+          translucent={true}
+        />
         <I18nextProvider i18n={i18n}>
           <RootStack />
         </I18nextProvider>
