@@ -6,6 +6,7 @@ import SignUp from '../../screens/SignUp';
 import SignIn from '../../screens/SignIn';
 import DrawerStack from '../DrawerStack';
 import useAuth from '../../services/useAuth';
+import ForgotPassword from '../../screens/ForgotPassword';
 
 const Stack = createStackNavigator<RootParamsList>();
 
@@ -20,6 +21,7 @@ const RootStack = () => {
           <Stack.Screen name="Welcome" component={Welcome} />
           <Stack.Screen name="SignUp" component={SignUp} />
           <Stack.Screen name="SignIn" component={SignIn} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
         </Fragment>
       ) : (
         <Stack.Screen name="App" component={DrawerStack} />

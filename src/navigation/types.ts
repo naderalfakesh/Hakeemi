@@ -2,6 +2,7 @@ export type RootParamsList = {
   Welcome: undefined;
   SignUp: undefined;
   SignIn: undefined;
+  ForgotPassword: undefined;
   App: undefined;
 };
 

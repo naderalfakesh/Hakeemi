@@ -6,6 +6,7 @@ import welcome from './welcome.json';
 import doctors from './doctors.json';
 import doctorProfile from './doctorProfile.json';
 import scheduleDialog from './scheduleDialog.json';
+import forgotPassword from './forgotPassword.json';
 
 export default {
   common,
@@ -16,4 +17,5 @@ export default {
   doctors,
   doctorProfile,
   scheduleDialog,
+  forgotPassword,
 };

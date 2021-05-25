@@ -35,10 +35,15 @@ const useAuth = () => {
       .then(() => {
         setCurrentUser(null);
         console.log('User signed off');
-      });
+      })
+      .catch(console.log);
   };
 
-  return { login, logout, register, currentUser };
+  const forgotPassword = (email: string) => {
+    return auth().sendPasswordResetEmail(email);
+  };
+
+  return { login, logout, register, currentUser, forgotPassword };
 };
 
 export default useAuth;
