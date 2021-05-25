@@ -23,10 +23,7 @@ const useAuth = () => {
   };
 
   const login = (email: string, password: string) => {
-    auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(() => console.log('User signed in!'))
-      .catch(console.log);
+    return auth().signInWithEmailAndPassword(email, password);
   };
 
   const logout = () => {

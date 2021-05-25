@@ -16,5 +16,8 @@
     }
   },
   "haveAccount": "Don’t have an account?",
-  "signUp": "Sign Up"
+  "signUp": "Sign Up",
+  "toastMessages": {
+    "error": "Sign in failed with error code: {{-code}}"
+  }
 }

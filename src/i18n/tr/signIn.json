@@ -1,3 +1,23 @@
 {
-  "placeholder": "placeholder"
+  "title": "Sign In",
+  "subtitle": "Welcome again!",
+  "form": {
+    "email": {
+      "placeholder": "Email address"
+    },
+    "password": {
+      "placeholder": "Password"
+    },
+    "submit": {
+      "text": "Secure Login"
+    },
+    "forgotPassword": {
+      "text": "Forgot Password"
+    }
+  },
+  "haveAccount": "Don’t have an account?",
+  "signUp": "Sign Up",
+  "toastMessages": {
+    "error": "Sign in failed with error code: {{-code}}"
+  }
 }
