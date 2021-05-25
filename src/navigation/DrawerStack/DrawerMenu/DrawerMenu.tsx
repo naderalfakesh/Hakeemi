@@ -10,17 +10,14 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import VersionInfo from 'react-native-version-info';
 import Text from '../../../components/Text';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const DrawerMenu = (props: DrawerContentComponentProps) => {
   const { logout } = useAuth();
   const { t } = useTranslation('common');
-  const { bottom } = useSafeAreaInsets();
 
   return (
     <DrawerContentScrollView
       bounces={false}
-      style={{ paddingBottom: bottom }}
       contentContainerStyle={styles.container}>
       <View>
         <DrawerItemList {...props} />
