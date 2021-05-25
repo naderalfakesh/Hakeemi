@@ -9,18 +9,24 @@ import Text from '../../components/Text';
 import Icon from '../../components/Icon';
 import { useTranslation } from 'react-i18next';
 import useAuth from '../../services/useAuth';
+import useToastMessage from '../../services/useToastMessage';
 
 const ForgotPassword: FC = () => {
   const { t } = useTranslation('forgotPassword');
   const [email, setEmail] = useState<string>('');
   const { forgotPassword } = useAuth();
-
   const { navigate, goBack } = useNavigation();
+  const toastMessage = useToastMessage();
 
   const handleSubmit = () => {
     forgotPassword(email)
-      .then(() => navigate('Welcome'))
-      .catch(() => console.log('Fail'));
+      .then(() => {
+        toastMessage.success(t('toastMessages.success'));
+        navigate('Welcome');
+      })
+      .catch(() => {
+        toastMessage.error(t('toastMessages.error'));
+      });
   };
 
   return (

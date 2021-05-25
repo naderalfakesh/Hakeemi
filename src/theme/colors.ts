@@ -10,6 +10,9 @@ export const palette = {
   danger: {
     base: 'rgba(255, 87, 34, 1)',
   },
+  cheer: {
+    base: 'rgba(39, 140, 61, 1)',
+  },
   grey: {
     base: 'rgba(240, 240, 240, 1)',
     light: 'rgba(251, 251, 251, 1)',
@@ -28,6 +31,7 @@ export default {
   primary: palette.primary.base,
   secondary: palette.secondary.base,
   danger: palette.danger.base,
+  cheer: palette.cheer.base,
   light: palette.grey.light,
   dark: palette.grey.dark,
   white: palette.white.base,
