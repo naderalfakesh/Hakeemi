@@ -1,6 +1,8 @@
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { useEffect, useState } from 'react';
 
+const getErrorMessage = (text: string) => text.substr(text.indexOf(' ') + 1);
+
 const useAuth = () => {
   const [currentUser, setCurrentUser] = useState<FirebaseAuthTypes.User | null>(
     null,
@@ -18,26 +20,32 @@ const useAuth = () => {
       await auth().createUserWithEmailAndPassword(email, password);
       await auth().currentUser?.updateProfile({ displayName: name });
     } catch (error) {
-      console.error(error);
+      throw getErrorMessage(error.message);
     }
   };
 
-  const login = (email: string, password: string) => {
-    return auth().signInWithEmailAndPassword(email, password);
+  const login = async (email: string, password: string) => {
+    try {
+      await auth().signInWithEmailAndPassword(email, password);
+    } catch (error) {
+      throw getErrorMessage(error.message);
+    }
   };
 
-  const logout = () => {
-    auth()
-      .signOut()
-      .then(() => {
-        setCurrentUser(null);
-        console.log('User signed off');
-      })
-      .catch(console.log);
+  const logout = async () => {
+    try {
+      await auth().signOut();
+    } catch (error) {
+      throw getErrorMessage(error.message);
+    }
   };
 
-  const forgotPassword = (email: string) => {
-    return auth().sendPasswordResetEmail(email);
+  const forgotPassword = async (email: string) => {
+    try {
+      await auth().sendPasswordResetEmail(email);
+    } catch (error) {
+      throw getErrorMessage(error.message);
+    }
   };
 
   return { login, logout, register, currentUser, forgotPassword };

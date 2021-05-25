@@ -9,6 +9,7 @@ import Text from '../../components/Text';
 import Icon from '../../components/Icon/Icon';
 import { useTranslation } from 'react-i18next';
 import useAuth from '../../services/useAuth';
+import useToastMessage from '../../services/useToastMessage';
 
 const SignUp: FC = () => {
   const { t } = useTranslation('signup');
@@ -16,8 +17,15 @@ const SignUp: FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const { register } = useAuth();
-
+  const toastMessage = useToastMessage();
   const { goBack, navigate } = useNavigation();
+
+  const handleSubmit = () => {
+    register(name, email, password).catch(err => {
+      toastMessage.error(err);
+    });
+  };
+
   return (
     <View style={styles.container}>
       <Icon style={styles.back} name="left-arrow" size={24} onPress={goBack} />
@@ -68,7 +76,7 @@ const SignUp: FC = () => {
           style={styles.button}
           theme="primary"
           size="big"
-          onPress={() => register(name, email, password)}>
+          onPress={handleSubmit}>
           {t('form.submit.text')}
         </Button>
       </View>

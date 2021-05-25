@@ -20,9 +20,7 @@ const SignUp: FC = () => {
   const toastMessage = useToastMessage();
 
   const handleLogin = () => {
-    login(email, password).catch(({ code }) =>
-      toastMessage.error(t('toastMessages.error', { code })),
-    );
+    login(email, password).catch(error => toastMessage.error(error));
   };
 
   return (
