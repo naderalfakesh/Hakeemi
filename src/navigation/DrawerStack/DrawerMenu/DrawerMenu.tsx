@@ -10,10 +10,16 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import VersionInfo from 'react-native-version-info';
 import Text from '../../../components/Text';
+import useToastMessage from '../../../services/useToastMessage';
 
 const DrawerMenu = (props: DrawerContentComponentProps) => {
   const { logout } = useAuth();
   const { t } = useTranslation('common');
+  const toastMessage = useToastMessage();
+
+  const handleLogout = () => {
+    logout().catch(error => toastMessage.error(error));
+  };
 
   return (
     <DrawerContentScrollView
@@ -23,7 +29,7 @@ const DrawerMenu = (props: DrawerContentComponentProps) => {
         <DrawerItemList {...props} />
       </View>
       <View>
-        <DrawerItem label={t('drawer.signOut')} onPress={logout} />
+        <DrawerItem label={t('drawer.signOut')} onPress={handleLogout} />
         <Text style={styles.version} color="secondary">
           Version: {VersionInfo.appVersion} ({VersionInfo.buildVersion})
         </Text>
