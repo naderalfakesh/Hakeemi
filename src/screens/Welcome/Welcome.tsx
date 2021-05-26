@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { View } from 'react-native';
+import { Switch, View } from 'react-native';
 import styles, { DOCTOR_ILLUSTRATION_HEIGHT } from './styles';
 import HomeDoctor from '../../../assets/homeDoctor.svg';
 import HomeBgPattern from '../../../assets/homeBgPattern.svg';
@@ -7,10 +7,16 @@ import Text from '../../components/Text';
 import Button from '../../components/Button';
 import { useNavigation } from '@react-navigation/core';
 import { useTranslation } from 'react-i18next';
+import i18n, { Languages } from '../../i18n';
 
 const Welcome: FC = () => {
   const { navigate } = useNavigation();
   const { t } = useTranslation('welcome');
+
+  const changeLanguage = (lang: Languages) => {
+    i18n.changeLanguage(lang);
+  };
+
   return (
     <View style={styles.container}>
       <HomeDoctor
@@ -48,6 +54,20 @@ const Welcome: FC = () => {
             {t('login')}
           </Text>
         </Text>
+        <View style={styles.languageContainer}>
+          <Text color="white" size="body-16" level="600">
+            English
+          </Text>
+          <Switch
+            onValueChange={val =>
+              val ? changeLanguage('tr') : changeLanguage('en')
+            }
+            value={i18n.language === 'tr'}
+          />
+          <Text color="white" size="body-16" level="600">
+            Turkish
+          </Text>
+        </View>
       </View>
     </View>
   );

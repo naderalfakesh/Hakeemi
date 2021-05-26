@@ -1,3 +1,31 @@
 {
-  "stayHome": "Stay Home!"
+  "title": "Ana sayfa",
+  "header": "Merhaba, <b>{{name}}</b> !",
+  "search": {
+    "placeholder": "Ara..."
+  },
+  "card": {
+    "title": "Evde kal!",
+    "subtitle": "E-rezarvasyon yapabilirsin (Ücretsiz)."
+  },
+  "doctors": {
+    "title": "Son",
+    "subtitle": "{{count}} Hekim",
+    "subtitle_plural": "{{count}} Hekim"
+  },
+  "services": {
+    "title": "Tıppı hizmetler",
+    "subtitle": "İstediğiniz hizmetler seçin müsait bir doctor bulmak için",
+    "types": {
+      "diagnose": "Taşhis",
+      "badge": "bandaj",
+      "shot": "Aşı",
+      "ambulance": "Ambulans",
+      "heart-beat": "Kalp atışı",
+      "checkup": "sağlık kontrolü",
+      "pill": "İlaç",
+      "heart-plus": "Danışma"
+    },
+    "button": "Müsait hekimler"
+  }
 }

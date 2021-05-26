@@ -1,20 +1,20 @@
 {
-  "title": "Sign In",
-  "subtitle": "Welcome again!",
+  "title": "Giriş",
+  "subtitle": "Hoş geldin!",
   "form": {
     "email": {
-      "placeholder": "Email address"
+      "placeholder": "Mail adresi"
     },
     "password": {
-      "placeholder": "Password"
+      "placeholder": "Şifre"
     },
     "submit": {
-      "text": "Secure Login"
+      "text": "Güvenli giriş"
     },
     "forgotPassword": {
-      "text": "Forgot Password"
+      "text": "Şifreyi unuttum"
     }
   },
-  "haveAccount": "Don’t have an account?",
-  "signUp": "Sign Up"
+  "haveAccount": "Hesabın yok mu?",
+  "signUp": "Kayıt ol"
 }

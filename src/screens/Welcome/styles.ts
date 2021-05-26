@@ -15,4 +15,10 @@ export default StyleSheet.create({
   signUpBtn: { marginHorizontal: spacing.medium3, marginTop: spacing.big3 },
   loginText: { marginTop: spacing.small4 },
   loginUnderline: { textDecorationLine: 'underline' },
+  languageContainer: {
+    marginTop: spacing.medium1,
+    paddingHorizontal: spacing.huge3,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
 });

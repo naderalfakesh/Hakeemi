@@ -56,7 +56,7 @@ const ScheduleDialog = () => {
               {t('description.title')}
             </Text>
             <Text size="body-16" color="dark" style={styles.subtitle}>
-              {t('description.subtitle')}
+              {t('description.subtitle', { name: 'Afreen Khan' })}
             </Text>
           </View>
           <View style={styles.timesHeader}>

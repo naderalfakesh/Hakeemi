@@ -2,11 +2,11 @@
   "timeFormat": "{{time, h:mm a}}",
   "description": {
     "title": "Schedule An Appointment",
-    "subtitle": "Schedule an online appointment with Dr.Afreen Khan"
+    "subtitle": "Schedule an online appointment with Dr.{{name}}"
   },
   "appointments": {
     "title": "Time",
-    "subtitle": "Only the below slots are available"
+    "subtitle": "Choose one the available slots."
   },
   "button": {
     "text": "Schedule An Appointment"

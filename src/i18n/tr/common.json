@@ -1,3 +1,7 @@
 {
-  "drawer": { "signOut": "Sign out", "home": "Home", "doctors": "Doctors" }
+  "drawer": {
+    "signOut": "Çıkış yap",
+    "home": "Ana sayfa",
+    "doctors": "Hekimler"
+  }
 }

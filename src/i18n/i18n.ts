@@ -9,6 +9,8 @@ export const resources = {
   tr,
 } as const;
 
+export type Languages = keyof typeof resources;
+
 const getDateLocale = (lng?: string) => {
   switch (lng) {
     case 'tr':

@@ -1,14 +1,14 @@
 {
   "timeFormat": "{{time, h:mm a}}",
   "description": {
-    "title": "Schedule An Appointment",
-    "subtitle": "Schedule an online appointment with Dr.Afreen Khan"
+    "title": "Rezervasyon ekle",
+    "subtitle": "Dr.{{name}} ile rezervasyon ayarla"
   },
   "appointments": {
-    "title": "Time",
-    "subtitle": "Only the below slots are available"
+    "title": "Zaman",
+    "subtitle": "Müsait zamalardan birini seç"
   },
   "button": {
-    "text": "Schedule An Appointment"
+    "text": "Rezervasyon ekle"
   }
 }

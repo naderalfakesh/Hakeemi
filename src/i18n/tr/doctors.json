@@ -1,5 +1,5 @@
 {
-  "title": "Doctors",
-  "subtitle": "Popular This Week",
+  "title": "Hekimler",
+  "subtitle": "Pöpüler hekimler",
   "doctorName": "Dr. {{name}}"
 }

@@ -1,12 +1,12 @@
 {
   "description": {
-    "title": "About the Doctor"
+    "title": "Hekim hakkında"
   },
   "appointments": {
-    "title": "Availability"
+    "title": "Müsaitlik"
   },
   "button": {
-    "text": "Schedule An Appointment"
+    "text": "Rezervasyon ekle"
   },
   "timeFormat": "{{date, h:mm a}}",
   "dateFormat": "{{date, do MMM}}"

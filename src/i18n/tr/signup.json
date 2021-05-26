@@ -1,20 +1,20 @@
 {
-  "title": "Sign Up",
-  "subtitle": "Sign up now to make new appointments.",
+  "title": "Kayıt ol",
+  "subtitle": "Rezarvasyon eklemek için kayıt ol.",
   "form": {
     "fullName": {
-      "placeholder": "Full name"
+      "placeholder": "Ad soyad"
     },
     "email": {
-      "placeholder": "Email address"
+      "placeholder": "Mail adresi"
     },
     "password": {
-      "placeholder": "Password"
+      "placeholder": "Şifre"
     },
     "submit": {
-      "text": "Create A Free Account"
+      "text": "Ücretsiz hesab aç"
     }
   },
-  "haveAccount": "Already have an account?",
-  "signIn": "Sign In"
+  "haveAccount": "Hesabınız varsa",
+  "signIn": "Giriş yap"
 }
