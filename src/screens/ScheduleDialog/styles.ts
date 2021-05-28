@@ -2,8 +2,6 @@ import { StyleSheet } from 'react-native';
 import colors from '../../theme/colors';
 import spacing from '../../theme/spacing';
 
-export const DOCTOR_ILLUSTRATION_HEIGHT = 512;
-
 export default StyleSheet.create({
   container: {
     flexGrow: 1,
