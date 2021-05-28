@@ -5,6 +5,7 @@ import DoctorsStack from '../DoctorsStack';
 import DrawerMenu from './DrawerMenu';
 import { DrawerStackParams } from '../types';
 import { useTranslation } from 'react-i18next';
+import ProfileStack from '../ProfileStack';
 
 const Drawer = createDrawerNavigator<DrawerStackParams>();
 
@@ -24,6 +25,11 @@ const MyDrawer = () => {
         name="DoctorsDrawer"
         component={DoctorsStack}
         options={{ drawerLabel: t('drawer.doctors') }}
+      />
+      <Drawer.Screen
+        name="ProfileDrawer"
+        component={ProfileStack}
+        options={{ drawerLabel: t('drawer.profile') }}
       />
     </Drawer.Navigator>
   );

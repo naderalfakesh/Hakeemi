@@ -1,3 +1,8 @@
 {
-  "drawer": { "signOut": "Sign out", "home": "Home", "doctors": "Doctors" }
+  "drawer": {
+    "signOut": "Sign out",
+    "home": "Home",
+    "doctors": "Doctors",
+    "profile": "Profile"
+  }
 }

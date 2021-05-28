@@ -10,6 +10,10 @@ import ScheduleDialog from '../../screens/ScheduleDialog';
 import Doctors from '../../screens/Doctors';
 import Avatar from '../../components/Avatar';
 import { Image } from 'react-native';
+import Profile from '../../screens/Profile';
+
+const MENU_ICON_SIZE = 20;
+const AVATAR_SIZE = 32;
 
 const Stack = createStackNavigator<AppStackParams>();
 export interface AppStackProps<R extends AppStackRouteName> {
@@ -19,7 +23,7 @@ export interface AppStackProps<R extends AppStackRouteName> {
 const AppStack = <R extends AppStackRouteName>({
   initialRouteName,
 }: AppStackProps<R>) => {
-  const { dispatch } = useNavigation();
+  const { dispatch, navigate } = useNavigation();
   const { t } = useTranslation();
   const openDrawer = () => dispatch(DrawerActions.openDrawer());
   return (
@@ -36,18 +40,21 @@ const AppStack = <R extends AppStackRouteName>({
         options={{
           title: t('home:title'),
           headerLeft: () => (
-            <Icon name="nav-menu" size={20} onPress={openDrawer} />
+            <Icon name="nav-menu" size={MENU_ICON_SIZE} onPress={openDrawer} />
           ),
           headerRight: () => (
-            <Avatar shape="circular" size={32}>
+            <Avatar
+              shape="circular"
+              size={AVATAR_SIZE}
+              onPress={() => {
+                navigate('ProfileDrawer');
+              }}>
               <Image
-                width={32}
-                height={32}
                 source={{
                   uri:
                     'https://firebasestorage.googleapis.com/v0/b/hakeemi.appspot.com/o/person.png?alt=media&token=f5613d3f-58a2-4755-8152-1fc484537705',
-                  width: 32,
-                  height: 32,
+                  width: AVATAR_SIZE,
+                  height: AVATAR_SIZE,
                 }}
               />
             </Avatar>
@@ -60,21 +67,34 @@ const AppStack = <R extends AppStackRouteName>({
         options={{
           title: '',
           headerLeft: () => (
-            <Icon name="nav-menu" size={20} onPress={openDrawer} />
+            <Icon name="nav-menu" size={MENU_ICON_SIZE} onPress={openDrawer} />
           ),
           headerRight: () => (
-            <Avatar shape="circular" size={32}>
+            <Avatar
+              shape="circular"
+              size={AVATAR_SIZE}
+              onPress={() => {
+                navigate('ProfileDrawer');
+              }}>
               <Image
-                width={32}
-                height={32}
                 source={{
                   uri:
                     'https://firebasestorage.googleapis.com/v0/b/hakeemi.appspot.com/o/person.png?alt=media&token=f5613d3f-58a2-4755-8152-1fc484537705',
-                  width: 32,
-                  height: 32,
+                  width: AVATAR_SIZE,
+                  height: AVATAR_SIZE,
                 }}
               />
             </Avatar>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          title: t('profile:title'),
+          headerLeft: () => (
+            <Icon name="nav-menu" size={MENU_ICON_SIZE} onPress={openDrawer} />
           ),
         }}
       />

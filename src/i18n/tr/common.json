@@ -2,6 +2,7 @@
   "drawer": {
     "signOut": "Çıkış yap",
     "home": "Ana sayfa",
-    "doctors": "Hekimler"
+    "doctors": "Hekimler",
+    "profile": "Profil"
   }
 }
