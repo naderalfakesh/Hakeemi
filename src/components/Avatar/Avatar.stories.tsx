@@ -10,7 +10,8 @@ const Container = (storyFn: any) => (
 const ImageDemo = () => (
   <Image
     source={{
-      uri: 'https://i.ibb.co/4WGLRjs/person.png',
+      uri:
+        'https://firebasestorage.googleapis.com/v0/b/hakeemi.appspot.com/o/person.png?alt=media&token=f5613d3f-58a2-4755-8152-1fc484537705',
       width: 50,
       height: 50,
     }}

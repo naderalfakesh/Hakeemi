@@ -8,6 +8,8 @@ import { useTranslation } from 'react-i18next';
 import DoctorProfile from '../../screens/DoctorProfile';
 import ScheduleDialog from '../../screens/ScheduleDialog';
 import Doctors from '../../screens/Doctors';
+import Avatar from '../../components/Avatar';
+import { Image } from 'react-native';
 
 const Stack = createStackNavigator<AppStackParams>();
 export interface AppStackProps<R extends AppStackRouteName> {
@@ -36,6 +38,20 @@ const AppStack = <R extends AppStackRouteName>({
           headerLeft: () => (
             <Icon name="nav-menu" size={20} onPress={openDrawer} />
           ),
+          headerRight: () => (
+            <Avatar shape="circular" size={32}>
+              <Image
+                width={32}
+                height={32}
+                source={{
+                  uri:
+                    'https://firebasestorage.googleapis.com/v0/b/hakeemi.appspot.com/o/person.png?alt=media&token=f5613d3f-58a2-4755-8152-1fc484537705',
+                  width: 32,
+                  height: 32,
+                }}
+              />
+            </Avatar>
+          ),
         }}
       />
       <Stack.Screen
@@ -45,6 +61,20 @@ const AppStack = <R extends AppStackRouteName>({
           title: '',
           headerLeft: () => (
             <Icon name="nav-menu" size={20} onPress={openDrawer} />
+          ),
+          headerRight: () => (
+            <Avatar shape="circular" size={32}>
+              <Image
+                width={32}
+                height={32}
+                source={{
+                  uri:
+                    'https://firebasestorage.googleapis.com/v0/b/hakeemi.appspot.com/o/person.png?alt=media&token=f5613d3f-58a2-4755-8152-1fc484537705',
+                  width: 32,
+                  height: 32,
+                }}
+              />
+            </Avatar>
           ),
         }}
       />
