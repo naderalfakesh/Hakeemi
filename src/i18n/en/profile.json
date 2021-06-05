@@ -1,6 +1,6 @@
 {
   "title": "Profile",
-  "recentAppointments": "Recent Appointments",
+  "upcomingAppointments": "Upcoming Appointments",
   "appointment": "{{count}} appointment",
   "appointment_plural": "{{count}} appointments",
   "language": "App language",

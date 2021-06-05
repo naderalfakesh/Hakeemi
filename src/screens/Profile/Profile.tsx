@@ -4,6 +4,7 @@ import { Image, ScrollView, Switch, View } from 'react-native';
 import Avatar from '../../components/Avatar';
 import Text from '../../components/Text';
 import i18n, { Languages } from '../../i18n';
+import colors from '../../theme/colors';
 import styles, { AVATAR_SIZE } from './styles';
 
 const appointmentList = [
@@ -50,6 +51,11 @@ const Profile: FC = () => {
         </Text>
         <View style={styles.languageForm}>
           <Switch
+            trackColor={{
+              true: colors.primary,
+              false: colors.secondary,
+            }}
+            ios_backgroundColor={colors.secondary}
             onValueChange={val =>
               val ? changeLanguage('tr') : changeLanguage('en')
             }
@@ -65,7 +71,7 @@ const Profile: FC = () => {
       <View style={styles.divider} />
       <View style={styles.appointments}>
         <Text size="head-24" color="black" level="600">
-          {t('recentAppointments')}
+          {t('upcomingAppointments')}
         </Text>
         <Text size="body-14" color="dark">
           {t('appointment', { count: appointmentList.length })}

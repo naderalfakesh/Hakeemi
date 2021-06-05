@@ -15,9 +15,9 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   divider: {
-    height: 1,
+    height: 2,
     width: '80%',
-    backgroundColor: colors.dark,
+    backgroundColor: colors.secondary,
     alignSelf: 'center',
   },
   language: {
@@ -45,7 +45,7 @@ export default StyleSheet.create({
     paddingVertical: spacing.small2,
     paddingHorizontal: spacing.medium2,
     marginBottom: spacing.small2,
-    backgroundColor: palette.primary.light,
+    backgroundColor: palette.primary.lightest,
     borderRadius: 20,
   },
   date: {
