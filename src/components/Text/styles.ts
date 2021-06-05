@@ -11,8 +11,10 @@ export type Color =
 
 export type Size =
   | 'button-8'
+  | 'button-10'
   | 'button-22'
   | 'body-10'
+  | 'body-12'
   | 'body-14'
   | 'body-16'
   | 'body-20'
@@ -37,6 +39,10 @@ export const sizeTheme: Record<Size, TextStyle> = StyleSheet.create({
     fontSize: 14,
     lineHeight: 18,
   },
+  'body-12': {
+    fontSize: 12,
+    lineHeight: 16,
+  },
   'body-16': {
     fontSize: 16,
     lineHeight: 20,
@@ -51,6 +57,10 @@ export const sizeTheme: Record<Size, TextStyle> = StyleSheet.create({
   },
   'button-8': {
     fontSize: 8,
+    lineHeight: 10,
+  },
+  'button-10': {
+    fontSize: 10,
     lineHeight: 10,
   },
   'button-22': {

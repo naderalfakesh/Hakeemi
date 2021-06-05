@@ -25,10 +25,10 @@ const Card: FC<Props> = ({ item }) => {
         <Text color="black" size="head-20">
           {t('doctorName', { name: item.name })}
         </Text>
-        <Text color="black" size="body-10">
+        <Text color="black" size="body-14">
           {item.specialization}
         </Text>
-        <Text style={styles.bio} color="dark" size="body-10">
+        <Text style={styles.bio} color="dark" size="body-12">
           {item.bio}
         </Text>
       </View>

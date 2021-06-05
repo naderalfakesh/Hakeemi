@@ -48,7 +48,7 @@ const mapTextSize = (size: Sizes): sizeProps => {
     case 'big':
       return { size: 'button-22', level: '600' };
     case 'squareIcon':
-      return { size: 'button-8', level: '400' };
+      return { size: 'button-10', level: '400' };
     case 'inlineIcon':
       return { size: 'body-16', level: '400' };
   }
@@ -63,7 +63,7 @@ const mapSubtitleSize = (size: Sizes): sizeProps => {
     case 'big':
       return { size: 'button-8', level: '400' };
     case 'squareIcon':
-      return { size: 'button-8', level: '400' };
+      return { size: 'button-10', level: '400' };
     case 'inlineIcon':
       return { size: 'body-16', level: '400' };
   }

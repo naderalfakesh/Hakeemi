@@ -9,7 +9,7 @@ export default StyleSheet.create({
   base: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 20,
+    borderRadius: 16,
   },
   icon: {
     padding: spacing.mini2,
@@ -61,7 +61,7 @@ export const sizeStyle: Record<Sizes, ViewStyle> = StyleSheet.create({
   },
   squareIcon: {
     padding: spacing.small1,
-    width: 70,
+    width: 75,
     height: 70,
   },
   inlineIcon: {
