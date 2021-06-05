@@ -7,6 +7,7 @@ import BgPattern from '../../../assets/homeBgPattern.svg';
 import Button from '../../components/Button';
 import Icon from '../../components/Icon';
 import Text from '../../components/Text';
+import colors from '../../theme/colors';
 import styles from './styles';
 
 const START = { hours: 10, minutes: 0 };
@@ -33,7 +34,7 @@ const ScheduleDialog = () => {
     <Fragment>
       <StatusBar
         barStyle="light-content"
-        backgroundColor="rgba(0, 188, 212, 1)"
+        backgroundColor={colors.primary}
         translucent={true}
       />
 

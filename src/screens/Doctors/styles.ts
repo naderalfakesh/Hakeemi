@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import colors from '../../theme/colors';
+import colors, { palette } from '../../theme/colors';
 import spacing from '../../theme/spacing';
 
 export default StyleSheet.create({
@@ -18,11 +18,11 @@ export default StyleSheet.create({
   avatar: {
     height: 140,
     width: 134,
-    backgroundColor: 'rgba(214, 250, 255, 1)',
+    backgroundColor: palette.primary.lighter,
     justifyContent: 'flex-end',
   },
   cardContent: {
-    backgroundColor: 'rgba(251, 251, 251, 1)',
+    backgroundColor: palette.secondary.light,
     justifyContent: 'center',
     paddingHorizontal: spacing.small3,
     flexShrink: 1,

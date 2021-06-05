@@ -17,7 +17,7 @@ exports[`Avatar component test renders correctly with default params 1`] = `
   style={
     Array [
       Object {
-        "backgroundColor": "rgba(214, 250, 255, 1)",
+        "backgroundColor": "#4dcfe1",
         "borderRadius": 0,
         "height": 50,
         "overflow": "hidden",

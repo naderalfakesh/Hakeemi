@@ -9,12 +9,11 @@
     "test": "jest",
     "lint": "tsc --skipLibCheck && eslint .",
     "pod": "cd ./ios && pod",
+    "prestorybook": "rnstl",
+    "storybook": "start-storybook -p 7007",
     "storybook:custom": "watch rnstl ./src --wait=100 | start-storybook | yarn run start --projectRoot storybook --watchFolders $PWD",
     "android-storybook": "yarn run android && yarn run adb-reverse",
-    "storybook": "start-storybook -p 7007",
-    "prestorybook": "rnstl",
-    "adb-reverse": "adb reverse tcp:7007 tcp:7007",
-    "build-storybook": "build-storybook"
+    "adb-reverse": "adb reverse tcp:7007 tcp:7007"
   },
   "dependencies": {
     "@react-native-community/masked-view": "^0.1.10",

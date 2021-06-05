@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { palette } from '../../../theme/colors';
+import colors from '../../../theme/colors';
 import spacing from '../../../theme/spacing';
 
 export default StyleSheet.create({
@@ -8,13 +8,13 @@ export default StyleSheet.create({
     alignItems: 'center',
     borderBottomWidth: 1,
     borderTopWidth: 1,
-    borderColor: palette.grey.base,
+    borderColor: colors.secondary,
     marginTop: spacing.small3,
   },
   textContainer: { flex: 1, padding: spacing.big1 },
   divider: {
     height: '100%',
     borderRightWidth: 1,
-    borderColor: palette.grey.base,
+    borderColor: colors.secondary,
   },
 });

@@ -30,7 +30,7 @@ const mapTextColor = (theme: Themes): TextProps['color'] => {
     case 'tertiary':
       return 'primary';
     case 'grey':
-      return 'black';
+      return 'dark';
   }
 };
 

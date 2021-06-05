@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import Avatar from './Avatar';
-import { palette } from '../../theme/colors';
+import colors from '../../theme/colors';
 import { Image, StyleSheet } from 'react-native';
 
 const SIZE = 50;
@@ -33,7 +33,7 @@ describe('Avatar component test', () => {
     );
     const avatar = getByTestId('avatar');
     const style = StyleSheet.flatten(avatar.props.style);
-    expect(style.backgroundColor).toBe(palette.grey.base);
+    expect(style.backgroundColor).toBe(colors.secondary);
     expect(style.borderRadius).toBe(0.5 * SIZE);
   });
 

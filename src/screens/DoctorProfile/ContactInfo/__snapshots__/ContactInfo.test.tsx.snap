@@ -6,7 +6,7 @@ exports[`Button component test renders correctly 1`] = `
     Object {
       "alignItems": "center",
       "borderBottomWidth": 1,
-      "borderColor": "rgba(240, 240, 240, 1)",
+      "borderColor": "#edf3f7",
       "borderTopWidth": 1,
       "flexDirection": "row",
       "marginTop": 16,
@@ -21,7 +21,7 @@ exports[`Button component test renders correctly 1`] = `
           "padding": 40,
         },
         Object {
-          "borderColor": "rgba(240, 240, 240, 1)",
+          "borderColor": "#edf3f7",
           "borderRightWidth": 1,
           "height": "100%",
         },
@@ -32,7 +32,7 @@ exports[`Button component test renders correctly 1`] = `
       selectable={true}
       style={
         Object {
-          "color": "rgba(144, 144, 144, 1)",
+          "color": "#a6aaad",
           "fontFamily": "System",
           "fontSize": 14,
           "fontWeight": "400",
@@ -58,7 +58,7 @@ exports[`Button component test renders correctly 1`] = `
       selectable={true}
       style={
         Object {
-          "color": "rgba(144, 144, 144, 1)",
+          "color": "#a6aaad",
           "fontFamily": "System",
           "fontSize": 14,
           "fontWeight": "400",
@@ -74,7 +74,7 @@ exports[`Button component test renders correctly 1`] = `
         selectable={true}
         style={
           Object {
-            "color": "rgba(144, 144, 144, 1)",
+            "color": "#a6aaad",
             "fontFamily": "System",
             "fontSize": 14,
             "fontWeight": "400",

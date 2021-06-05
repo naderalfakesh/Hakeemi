@@ -1,10 +1,10 @@
 import { StyleSheet } from 'react-native';
-import colors, { palette } from '../../theme/colors';
+import colors from '../../theme/colors';
 import spacing from '../../theme/spacing';
 
 export default StyleSheet.create({
   base: {
-    backgroundColor: palette.grey.medium,
+    backgroundColor: colors.secondary,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: spacing.medium1,

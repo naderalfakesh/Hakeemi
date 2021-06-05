@@ -5,14 +5,14 @@ exports[`Button component test renders correctly with default params 1`] = `
   allowFontScaling={true}
   onChangeText={[MockFunction]}
   placeholder="placeHolder"
-  placeholderTextColor="rgba(144, 144, 144, 1)"
+  placeholderTextColor="#a6aaad"
   rejectResponderTermination={true}
   style={
     Array [
       Object {
-        "borderBottomColor": "rgba(144, 144, 144, 1)",
+        "borderBottomColor": "#a6aaad",
         "borderBottomWidth": 1,
-        "color": "rgba(0, 0, 0, 1)",
+        "color": "#000000",
         "fontSize": 18,
         "lineHeight": 22,
         "padding": 10,

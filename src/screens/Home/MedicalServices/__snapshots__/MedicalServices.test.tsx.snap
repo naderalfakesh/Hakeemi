@@ -35,7 +35,7 @@ Array [
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "rgba(251, 251, 251, 1)",
+            "backgroundColor": "#f2f7f9",
           },
           Object {
             "height": 70,
@@ -57,7 +57,7 @@ Array [
         style={
           Array [
             Object {
-              "color": "rgba(0, 188, 212, 1)",
+              "color": "#00bbd4",
               "fontSize": 24,
             },
             Array [
@@ -83,7 +83,7 @@ Array [
       <Text
         style={
           Object {
-            "color": "rgba(0, 0, 0, 1)",
+            "color": "#a6aaad",
             "fontFamily": "System",
             "fontSize": 8,
             "fontWeight": "400",
@@ -118,7 +118,7 @@ Array [
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "rgba(251, 251, 251, 1)",
+            "backgroundColor": "#f2f7f9",
           },
           Object {
             "height": 70,
@@ -140,7 +140,7 @@ Array [
         style={
           Array [
             Object {
-              "color": "rgba(0, 188, 212, 1)",
+              "color": "#00bbd4",
               "fontSize": 24,
             },
             Array [
@@ -166,7 +166,7 @@ Array [
       <Text
         style={
           Object {
-            "color": "rgba(0, 0, 0, 1)",
+            "color": "#a6aaad",
             "fontFamily": "System",
             "fontSize": 8,
             "fontWeight": "400",
@@ -201,7 +201,7 @@ Array [
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "rgba(251, 251, 251, 1)",
+            "backgroundColor": "#f2f7f9",
           },
           Object {
             "height": 70,
@@ -223,7 +223,7 @@ Array [
         style={
           Array [
             Object {
-              "color": "rgba(0, 188, 212, 1)",
+              "color": "#00bbd4",
               "fontSize": 24,
             },
             Array [
@@ -249,7 +249,7 @@ Array [
       <Text
         style={
           Object {
-            "color": "rgba(0, 0, 0, 1)",
+            "color": "#a6aaad",
             "fontFamily": "System",
             "fontSize": 8,
             "fontWeight": "400",
@@ -284,7 +284,7 @@ Array [
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "rgba(251, 251, 251, 1)",
+            "backgroundColor": "#f2f7f9",
           },
           Object {
             "height": 70,
@@ -303,7 +303,7 @@ Array [
         style={
           Array [
             Object {
-              "color": "rgba(0, 188, 212, 1)",
+              "color": "#00bbd4",
               "fontSize": 24,
             },
             Array [
@@ -329,7 +329,7 @@ Array [
       <Text
         style={
           Object {
-            "color": "rgba(0, 0, 0, 1)",
+            "color": "#a6aaad",
             "fontFamily": "System",
             "fontSize": 8,
             "fontWeight": "400",
@@ -364,7 +364,7 @@ Array [
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "rgba(251, 251, 251, 1)",
+            "backgroundColor": "#f2f7f9",
           },
           Object {
             "height": 70,
@@ -386,7 +386,7 @@ Array [
         style={
           Array [
             Object {
-              "color": "rgba(0, 188, 212, 1)",
+              "color": "#00bbd4",
               "fontSize": 24,
             },
             Array [
@@ -412,7 +412,7 @@ Array [
       <Text
         style={
           Object {
-            "color": "rgba(0, 0, 0, 1)",
+            "color": "#a6aaad",
             "fontFamily": "System",
             "fontSize": 8,
             "fontWeight": "400",
@@ -447,7 +447,7 @@ Array [
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "rgba(251, 251, 251, 1)",
+            "backgroundColor": "#f2f7f9",
           },
           Object {
             "height": 70,
@@ -469,7 +469,7 @@ Array [
         style={
           Array [
             Object {
-              "color": "rgba(0, 188, 212, 1)",
+              "color": "#00bbd4",
               "fontSize": 24,
             },
             Array [
@@ -495,7 +495,7 @@ Array [
       <Text
         style={
           Object {
-            "color": "rgba(0, 0, 0, 1)",
+            "color": "#a6aaad",
             "fontFamily": "System",
             "fontSize": 8,
             "fontWeight": "400",
@@ -530,7 +530,7 @@ Array [
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "rgba(251, 251, 251, 1)",
+            "backgroundColor": "#f2f7f9",
           },
           Object {
             "height": 70,
@@ -552,7 +552,7 @@ Array [
         style={
           Array [
             Object {
-              "color": "rgba(0, 188, 212, 1)",
+              "color": "#00bbd4",
               "fontSize": 24,
             },
             Array [
@@ -578,7 +578,7 @@ Array [
       <Text
         style={
           Object {
-            "color": "rgba(0, 0, 0, 1)",
+            "color": "#a6aaad",
             "fontFamily": "System",
             "fontSize": 8,
             "fontWeight": "400",
@@ -613,7 +613,7 @@ Array [
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "rgba(251, 251, 251, 1)",
+            "backgroundColor": "#f2f7f9",
           },
           Object {
             "height": 70,
@@ -632,7 +632,7 @@ Array [
         style={
           Array [
             Object {
-              "color": "rgba(0, 188, 212, 1)",
+              "color": "#00bbd4",
               "fontSize": 24,
             },
             Array [
@@ -658,7 +658,7 @@ Array [
       <Text
         style={
           Object {
-            "color": "rgba(0, 0, 0, 1)",
+            "color": "#a6aaad",
             "fontFamily": "System",
             "fontSize": 8,
             "fontWeight": "400",
@@ -694,7 +694,7 @@ Array [
           "justifyContent": "center",
         },
         Object {
-          "backgroundColor": "rgba(0, 188, 212, 1)",
+          "backgroundColor": "#00bbd4",
         },
         Object {
           "padding": 16,
@@ -709,7 +709,7 @@ Array [
     <Text
       style={
         Object {
-          "color": "rgba(255, 255, 255, 1)",
+          "color": "#ffffff",
           "fontFamily": "System",
           "fontSize": 16,
           "fontWeight": "600",

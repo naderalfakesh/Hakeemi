@@ -1,29 +1,37 @@
 export const palette = {
   primary: {
-    base: 'rgba(0, 188, 212, 1)',
-    light: 'rgba(214, 250, 255, 1)',
-    dark: 'rgba(144, 180, 206, 1)',
+    lighter: '#99e4ee',
+    light: '#4dcfe1',
+    base: '#00bbd4',
+    dark: '#008394',
+    darker: '#004b55',
   },
   secondary: {
-    base: 'rgba(237, 243, 247, 1)',
+    lighter: '#f8fafc',
+    light: '#f2f7f9',
+    base: '#edf3f7',
+    dark: '#a6aaad',
+    darker: '#5f6163',
   },
   danger: {
-    base: 'rgba(255, 87, 34, 1)',
+    lighter: '#ffbca7',
+    light: '#ff8964',
+    base: '#ff5722',
+    dark: '#b33d18',
+    darker: '#66230e',
   },
   cheer: {
-    base: 'rgba(39, 140, 61, 1)',
-  },
-  grey: {
-    base: 'rgba(240, 240, 240, 1)',
-    light: 'rgba(251, 251, 251, 1)',
-    medium: 'rgba(237, 243, 247, 1)',
-    dark: 'rgba(144, 144, 144, 1)',
+    lighter: '#a9d1b1',
+    light: '#68af77',
+    base: '#278c3d',
+    dark: '#1b622b',
+    darker: '#103818',
   },
   white: {
-    base: 'rgba(255, 255, 255, 1)',
+    base: '#ffffff',
   },
   black: {
-    base: 'rgba(0, 0, 0, 1)',
+    base: '#000000',
   },
 };
 
@@ -32,8 +40,8 @@ export default {
   secondary: palette.secondary.base,
   danger: palette.danger.base,
   cheer: palette.cheer.base,
-  light: palette.grey.light,
-  dark: palette.grey.dark,
+  light: palette.secondary.light,
+  dark: palette.secondary.dark,
   white: palette.white.base,
   black: palette.black.base,
 };

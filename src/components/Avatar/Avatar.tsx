@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { Pressable, StyleSheet, ViewStyle } from 'react-native';
-import { palette } from '../../theme/colors';
+import colors, { palette } from '../../theme/colors';
 
 export interface Props {
   style?: ViewStyle;
@@ -34,11 +34,11 @@ const Avatar: FC<Props> = ({
       borderRadius: borderRadius,
       overflow: 'hidden',
       backgroundColor:
-        theme === 'primary' ? palette.primary.light : palette.grey.base,
+        theme === 'primary' ? palette.primary.light : colors.secondary,
     },
     pressed: {
       backgroundColor:
-        theme === 'primary' ? palette.primary.dark : palette.grey.dark,
+        theme === 'primary' ? palette.primary.dark : palette.secondary.dark,
     },
   });
 

@@ -5,6 +5,7 @@ import { View, ScrollView, StatusBar } from 'react-native';
 import BgPattern from '../../../assets/homeBgPattern.svg';
 import Button from '../../components/Button';
 import Icon from '../../components/Icon';
+import colors from '../../theme/colors';
 import Appointments from './Appointments';
 import ContactInfo from './ContactInfo';
 import Description from './Description';
@@ -18,7 +19,7 @@ const DoctorProfile = () => {
     <Fragment>
       <StatusBar
         barStyle="light-content"
-        backgroundColor="rgba(0, 188, 212, 1)"
+        backgroundColor={colors.primary}
         translucent={true}
       />
 

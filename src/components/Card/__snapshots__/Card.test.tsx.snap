@@ -28,7 +28,7 @@ exports[`Button component test renders correctly 1`] = `
           Object {
             "backgroundColor": "white",
             "borderRadius": 20,
-            "color": "rgba(255, 87, 34, 1)",
+            "color": "#ff5722",
             "height": 40,
             "overflow": "hidden",
             "position": "absolute",
@@ -54,7 +54,7 @@ exports[`Button component test renders correctly 1`] = `
     style={
       Array [
         Object {
-          "backgroundColor": "rgba(0, 188, 212, 1)",
+          "backgroundColor": "#00bbd4",
           "borderRadius": 30,
           "flexDirection": "row",
           "paddingHorizontal": 32,
@@ -76,7 +76,7 @@ exports[`Button component test renders correctly 1`] = `
       <Text
         style={
           Object {
-            "color": "rgba(255, 255, 255, 1)",
+            "color": "#ffffff",
             "fontFamily": "System",
             "fontSize": 24,
             "fontWeight": "600",
@@ -92,7 +92,7 @@ exports[`Button component test renders correctly 1`] = `
       <Text
         style={
           Object {
-            "color": "rgba(255, 255, 255, 1)",
+            "color": "#ffffff",
             "fontFamily": "System",
             "fontSize": 14,
             "fontWeight": "400",
