@@ -17,6 +17,7 @@ interface Props extends PressableProps {
   size?: Sizes;
   iconName?: IconName;
   highlight?: boolean;
+  loading?: boolean;
   onPress?: () => void;
   subtitle?: string;
 }
@@ -78,6 +79,7 @@ const Button: FC<Props> = ({
   onPress,
   subtitle,
   highlight = true,
+  loading = false,
   ...otherProps
 }) => {
   return (
@@ -87,11 +89,12 @@ const Button: FC<Props> = ({
         styles.base,
         themeStyle[theme],
         sizeStyle[size],
-        pressed && highlight && pressedStyle[theme],
+        !loading && pressed && highlight && pressedStyle[theme],
         size === 'inlineIcon' && styles.inlineIcon,
+        loading && pressedStyle[theme],
         style,
       ]}
-      onPress={onPress && onPress}
+      onPress={!loading && onPress ? onPress : undefined}
       {...otherProps}>
       {iconName && (
         <Icon
@@ -102,7 +105,7 @@ const Button: FC<Props> = ({
         />
       )}
       <Text color={mapTextColor(theme)} {...mapTextSize(size)}>
-        {children}
+        {loading ? '...' : children}
       </Text>
       {subtitle && (
         <Text color={mapTextColor(theme)} {...mapSubtitleSize(size)}>

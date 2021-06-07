@@ -16,7 +16,7 @@ const SignUp: FC = () => {
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const { register } = useAuth();
+  const { register, loading } = useAuth();
   const toastMessage = useToastMessage();
   const { goBack, navigate } = useNavigation();
 
@@ -74,6 +74,7 @@ const SignUp: FC = () => {
         </View>
         <Button
           style={styles.button}
+          loading={loading}
           theme="primary"
           size="big"
           onPress={handleSubmit}>

@@ -229,7 +229,7 @@ exports[`Button component test renders correctly with image list 1`] = `
       Array [
         Object {
           "alignItems": "center",
-          "borderRadius": 20,
+          "borderRadius": 16,
           "justifyContent": "center",
         },
         Object {
@@ -238,6 +238,7 @@ exports[`Button component test renders correctly with image list 1`] = `
         Object {
           "padding": 16,
         },
+        false,
         false,
         false,
         Object {
