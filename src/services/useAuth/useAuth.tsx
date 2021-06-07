@@ -1,5 +1,8 @@
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { useEffect, useState } from 'react';
+import i18n, { Languages } from '../../i18n';
+import api from '../api';
+import { User } from '../api/types';
 
 const getErrorMessage = (text: string) => text.substr(text.indexOf(' ') + 1);
 
@@ -7,20 +10,48 @@ const useAuth = () => {
   const [currentUser, setCurrentUser] = useState<FirebaseAuthTypes.User | null>(
     null,
   );
+  const [localState, setLocalState] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(user => {
       setCurrentUser(user);
     });
-    return subscriber; // unsubscribe on unmount
+    return subscriber; // unsubscribe
   }, []);
+
+  useEffect(() => {
+    try {
+      async function fetchMyAPI() {
+        if (localState && currentUser) {
+          await api.users.create(currentUser.uid, {
+            name: localState.name,
+            email: localState.email,
+            language: localState.language,
+            avatar: '',
+          });
+        }
+      }
+      fetchMyAPI();
+    } catch (error) {
+      throw getErrorMessage(error.message);
+    }
+  }, [localState, currentUser]);
 
   const register = async (name: string, email: string, password: string) => {
     try {
+      setLoading(true);
       await auth().createUserWithEmailAndPassword(email, password);
-      await auth().currentUser?.updateProfile({ displayName: name });
+      setLocalState({
+        name,
+        email,
+        language: i18n.language as Languages,
+        avatar: '',
+      });
     } catch (error) {
       throw getErrorMessage(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -48,7 +79,7 @@ const useAuth = () => {
     }
   };
 
-  return { login, logout, register, currentUser, forgotPassword };
+  return { login, logout, register, currentUser, forgotPassword, loading };
 };
 
 export default useAuth;

@@ -31,7 +31,7 @@ Array [
         Array [
           Object {
             "alignItems": "center",
-            "borderRadius": 20,
+            "borderRadius": 16,
             "justifyContent": "center",
           },
           Object {
@@ -40,8 +40,9 @@ Array [
           Object {
             "height": 70,
             "padding": 10,
-            "width": 70,
+            "width": 75,
           },
+          false,
           false,
           false,
           Object {
@@ -85,7 +86,7 @@ Array [
           Object {
             "color": "#a6aaad",
             "fontFamily": "System",
-            "fontSize": 8,
+            "fontSize": 10,
             "fontWeight": "400",
             "includeFontPadding": false,
             "lineHeight": 10,
@@ -114,7 +115,7 @@ Array [
         Array [
           Object {
             "alignItems": "center",
-            "borderRadius": 20,
+            "borderRadius": 16,
             "justifyContent": "center",
           },
           Object {
@@ -123,8 +124,9 @@ Array [
           Object {
             "height": 70,
             "padding": 10,
-            "width": 70,
+            "width": 75,
           },
+          false,
           false,
           false,
           Object {
@@ -168,7 +170,7 @@ Array [
           Object {
             "color": "#a6aaad",
             "fontFamily": "System",
-            "fontSize": 8,
+            "fontSize": 10,
             "fontWeight": "400",
             "includeFontPadding": false,
             "lineHeight": 10,
@@ -197,7 +199,7 @@ Array [
         Array [
           Object {
             "alignItems": "center",
-            "borderRadius": 20,
+            "borderRadius": 16,
             "justifyContent": "center",
           },
           Object {
@@ -206,8 +208,9 @@ Array [
           Object {
             "height": 70,
             "padding": 10,
-            "width": 70,
+            "width": 75,
           },
+          false,
           false,
           false,
           Object {
@@ -251,7 +254,7 @@ Array [
           Object {
             "color": "#a6aaad",
             "fontFamily": "System",
-            "fontSize": 8,
+            "fontSize": 10,
             "fontWeight": "400",
             "includeFontPadding": false,
             "lineHeight": 10,
@@ -280,7 +283,7 @@ Array [
         Array [
           Object {
             "alignItems": "center",
-            "borderRadius": 20,
+            "borderRadius": 16,
             "justifyContent": "center",
           },
           Object {
@@ -289,8 +292,9 @@ Array [
           Object {
             "height": 70,
             "padding": 10,
-            "width": 70,
+            "width": 75,
           },
+          false,
           false,
           false,
           undefined,
@@ -331,7 +335,7 @@ Array [
           Object {
             "color": "#a6aaad",
             "fontFamily": "System",
-            "fontSize": 8,
+            "fontSize": 10,
             "fontWeight": "400",
             "includeFontPadding": false,
             "lineHeight": 10,
@@ -360,7 +364,7 @@ Array [
         Array [
           Object {
             "alignItems": "center",
-            "borderRadius": 20,
+            "borderRadius": 16,
             "justifyContent": "center",
           },
           Object {
@@ -369,8 +373,9 @@ Array [
           Object {
             "height": 70,
             "padding": 10,
-            "width": 70,
+            "width": 75,
           },
+          false,
           false,
           false,
           Object {
@@ -414,7 +419,7 @@ Array [
           Object {
             "color": "#a6aaad",
             "fontFamily": "System",
-            "fontSize": 8,
+            "fontSize": 10,
             "fontWeight": "400",
             "includeFontPadding": false,
             "lineHeight": 10,
@@ -443,7 +448,7 @@ Array [
         Array [
           Object {
             "alignItems": "center",
-            "borderRadius": 20,
+            "borderRadius": 16,
             "justifyContent": "center",
           },
           Object {
@@ -452,8 +457,9 @@ Array [
           Object {
             "height": 70,
             "padding": 10,
-            "width": 70,
+            "width": 75,
           },
+          false,
           false,
           false,
           Object {
@@ -497,7 +503,7 @@ Array [
           Object {
             "color": "#a6aaad",
             "fontFamily": "System",
-            "fontSize": 8,
+            "fontSize": 10,
             "fontWeight": "400",
             "includeFontPadding": false,
             "lineHeight": 10,
@@ -526,7 +532,7 @@ Array [
         Array [
           Object {
             "alignItems": "center",
-            "borderRadius": 20,
+            "borderRadius": 16,
             "justifyContent": "center",
           },
           Object {
@@ -535,8 +541,9 @@ Array [
           Object {
             "height": 70,
             "padding": 10,
-            "width": 70,
+            "width": 75,
           },
+          false,
           false,
           false,
           Object {
@@ -580,7 +587,7 @@ Array [
           Object {
             "color": "#a6aaad",
             "fontFamily": "System",
-            "fontSize": 8,
+            "fontSize": 10,
             "fontWeight": "400",
             "includeFontPadding": false,
             "lineHeight": 10,
@@ -609,7 +616,7 @@ Array [
         Array [
           Object {
             "alignItems": "center",
-            "borderRadius": 20,
+            "borderRadius": 16,
             "justifyContent": "center",
           },
           Object {
@@ -618,8 +625,9 @@ Array [
           Object {
             "height": 70,
             "padding": 10,
-            "width": 70,
+            "width": 75,
           },
+          false,
           false,
           false,
           undefined,
@@ -660,7 +668,7 @@ Array [
           Object {
             "color": "#a6aaad",
             "fontFamily": "System",
-            "fontSize": 8,
+            "fontSize": 10,
             "fontWeight": "400",
             "includeFontPadding": false,
             "lineHeight": 10,
@@ -690,7 +698,7 @@ Array [
       Array [
         Object {
           "alignItems": "center",
-          "borderRadius": 20,
+          "borderRadius": 16,
           "justifyContent": "center",
         },
         Object {
@@ -699,6 +707,7 @@ Array [
         Object {
           "padding": 16,
         },
+        false,
         false,
         false,
         undefined,
