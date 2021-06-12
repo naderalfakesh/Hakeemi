@@ -1,12 +1,17 @@
-const get = () => {
-  return { id: 'id', name: 'nader' };
+import { Doctor } from './types';
+
+import firestore from '@react-native-firebase/firestore';
+
+const doctorsCollection = firestore().collection<Doctor>('Doctors');
+
+const get = async (id: string): Promise<Doctor | undefined> => {
+  const result = await doctorsCollection.doc(id).get();
+  return result.data();
 };
 
-const list = () => {
-  return [
-    { id: 'id', name: 'nader' },
-    { id: 'id', name: 'nader' },
-  ];
+const list = async (): Promise<Doctor[] | undefined> => {
+  const result = await doctorsCollection.get();
+  return result.docs.map(doc => ({ ...doc.data(), id: doc.id }));
 };
 
 const availability = () => {

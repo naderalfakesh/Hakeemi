@@ -710,7 +710,9 @@ Array [
         false,
         false,
         false,
-        undefined,
+        Object {
+          "marginVertical": 10,
+        },
       ]
     }
     testID="search-button"

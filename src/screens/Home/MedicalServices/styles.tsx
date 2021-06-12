@@ -11,4 +11,7 @@ export default StyleSheet.create({
     marginBottom: spacing.small1,
     marginRight: spacing.small4,
   },
+  submitButton: {
+    marginVertical: spacing.small1,
+  },
 });
