@@ -50,7 +50,8 @@ const MedicalServices = ({ style, onPress }: Props) => {
       </View>
       <Button
         testID="search-button"
-        onPress={() => onPress && onPress(selected)}>
+        onPress={() => onPress && onPress(selected)}
+        style={styles.submitButton}>
         {t('services.button')}
       </Button>
     </Fragment>

@@ -2,7 +2,7 @@ import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { useEffect, useState } from 'react';
 import i18n, { Languages } from '../../i18n';
 import api from '../api';
-import { User } from '../api/types';
+import { NewUser, User } from '../api/types';
 
 const getErrorMessage = (text: string) => text.substr(text.indexOf(' ') + 1);
 
@@ -10,7 +10,7 @@ const useAuth = () => {
   const [currentUser, setCurrentUser] = useState<FirebaseAuthTypes.User | null>(
     null,
   );
-  const [localState, setLocalState] = useState<User | null>(null);
+  const [localState, setLocalState] = useState<User | NewUser | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -25,8 +25,8 @@ const useAuth = () => {
       async function fetchMyAPI() {
         if (localState && currentUser) {
           await api.users.create(currentUser.uid, {
-            name: localState.name,
-            email: localState.email,
+            name: localState.name!,
+            email: localState.email!,
             language: localState.language,
             avatar: '',
           });

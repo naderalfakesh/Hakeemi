@@ -9,6 +9,7 @@ export type Appointment = {
 };
 
 interface Person {
+  id: string;
   name: string;
   email: string;
   avatar: string;
@@ -17,6 +18,7 @@ interface Person {
 export interface User extends Person {
   language: Languages;
 }
+export interface NewUser extends Partial<User> {}
 
 export interface Doctor extends Person {
   title: string;
