@@ -5,7 +5,7 @@ import useToastMessage from '../useToastMessage';
 
 const getErrorMessage = (text: string) => text.substr(text.indexOf(' ') + 1);
 
-const useAuth = () => {
+const useDoctors = () => {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,6 +23,7 @@ const useAuth = () => {
         toastMessage.error(getErrorMessage(err));
         setLoading(false);
       }
+      setLoading(false);
     };
     getDoctorsList();
   }, []);
@@ -30,4 +31,4 @@ const useAuth = () => {
   return { doctors, loading, error };
 };
 
-export default useAuth;
+export default useDoctors;

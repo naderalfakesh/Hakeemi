@@ -21,7 +21,7 @@ export interface User extends Person {
 export interface NewUser extends Partial<User> {}
 
 export interface Doctor extends Person {
-  title: string;
+  title: Specialty;
   bio: string;
   specialty: Specialty[];
 }
