@@ -85,23 +85,7 @@ exports[`Button component test renders correctly 1`] = `
         }
         testID="Text"
       >
-        10:45 AM
-      </Text>
-      <Text
-        style={
-          Object {
-            "color": "#00bbd4",
-            "fontFamily": "System",
-            "fontSize": 14,
-            "fontWeight": "400",
-            "includeFontPadding": false,
-            "lineHeight": 18,
-            "textAlign": undefined,
-          }
-        }
-        testID="Text"
-      >
-        5th Jun
+        Sat, 5-Jun
       </Text>
     </View>
     <View
@@ -155,23 +139,7 @@ exports[`Button component test renders correctly 1`] = `
         }
         testID="Text"
       >
-        3:18 PM
-      </Text>
-      <Text
-        style={
-          Object {
-            "color": "#00bbd4",
-            "fontFamily": "System",
-            "fontSize": 14,
-            "fontWeight": "400",
-            "includeFontPadding": false,
-            "lineHeight": 18,
-            "textAlign": undefined,
-          }
-        }
-        testID="Text"
-      >
-        6th Jun
+        Sun, 6-Jun
       </Text>
     </View>
   </View>

@@ -8,6 +8,5 @@
   "button": {
     "text": "Schedule An Appointment"
   },
-  "timeFormat": "{{date, h:mm a}}",
-  "dateFormat": "{{date, do MMM}}"
+  "dateFormat": "{{date, EEE, d-MMM}}"
 }

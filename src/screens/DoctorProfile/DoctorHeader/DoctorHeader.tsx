@@ -17,6 +17,7 @@ const DoctorHeader = ({ title, subtitle, imagURL }: Props) => {
     <View style={styles.container}>
       <Avatar size={AVATAR_SIZE} shape="rounded">
         <Image
+          resizeMode="contain"
           source={{
             uri: imagURL,
             height: AVATAR_SIZE,

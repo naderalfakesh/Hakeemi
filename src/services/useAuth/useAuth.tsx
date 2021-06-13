@@ -3,8 +3,7 @@ import { useEffect, useState } from 'react';
 import i18n, { Languages } from '../../i18n';
 import api from '../api';
 import { NewUser, User } from '../api/types';
-
-const getErrorMessage = (text: string) => text.substr(text.indexOf(' ') + 1);
+import { getErrorMessage } from '../Utilities/getErrorMessage';
 
 const useAuth = () => {
   const [currentUser, setCurrentUser] = useState<FirebaseAuthTypes.User | null>(

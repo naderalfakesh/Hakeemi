@@ -8,6 +8,5 @@
   "button": {
     "text": "Rezervasyon ekle"
   },
-  "timeFormat": "{{date, h:mm a}}",
-  "dateFormat": "{{date, do MMM}}"
+  "dateFormat": "{{date, EEE, d-MMM}}"
 }

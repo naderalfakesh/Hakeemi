@@ -70,23 +70,23 @@ exports[`Button component test renders correctly 1`] = `
       testID="Text"
     >
       +90 545 693 9297
-      <Text
-        selectable={true}
-        style={
-          Object {
-            "color": "#a6aaad",
-            "fontFamily": "System",
-            "fontSize": 14,
-            "fontWeight": "400",
-            "includeFontPadding": false,
-            "lineHeight": 18,
-            "textAlign": undefined,
-          }
+    </Text>
+    <Text
+      selectable={true}
+      style={
+        Object {
+          "color": "#a6aaad",
+          "fontFamily": "System",
+          "fontSize": 14,
+          "fontWeight": "400",
+          "includeFontPadding": false,
+          "lineHeight": 18,
+          "textAlign": undefined,
         }
-        testID="Text"
-      >
-        email@test.com
-      </Text>
+      }
+      testID="Text"
+    >
+      email@test.com
     </Text>
   </View>
 </View>

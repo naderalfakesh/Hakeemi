@@ -12,8 +12,8 @@ export type RootParamsList = {
 export type AppStackParams = {
   Home: undefined;
   Doctors: undefined;
-  DoctorProfile: { id?: string };
-  ScheduleDialog: { id?: string };
+  DoctorProfile: { id: string };
+  ScheduleDialog: { date: Date };
   Profile: undefined;
 };
 

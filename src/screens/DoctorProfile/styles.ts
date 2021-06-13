@@ -20,8 +20,4 @@ export default StyleSheet.create({
     position: 'absolute',
   },
   back: { position: 'absolute', top: 60, left: 25, zIndex: 1, color: 'white' },
-  button: {
-    marginVertical: spacing.big1,
-    marginHorizontal: spacing.medium3,
-  },
 });

@@ -6,7 +6,7 @@ exports[`Button component test renders correctly 1`] = `
     Object {
       "alignItems": "center",
       "flexDirection": "row",
-      "paddingHorizontal": 30,
+      "paddingHorizontal": 32,
     }
   }
 >
@@ -39,6 +39,7 @@ exports[`Button component test renders correctly 1`] = `
     testID="avatar"
   >
     <Image
+      resizeMode="contain"
       source={
         Object {
           "height": 80,
@@ -51,6 +52,7 @@ exports[`Button component test renders correctly 1`] = `
   <View
     style={
       Object {
+        "flex": 1,
         "marginLeft": 10,
       }
     }

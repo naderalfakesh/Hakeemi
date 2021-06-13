@@ -19,9 +19,9 @@ const ContactInfo = ({ address, phone, email }: Props) => {
       <View style={styles.textContainer}>
         <Text color="dark" size="body-14" selectable>
           {phone}
-          <Text color="dark" size="body-14" selectable>
-            {email}
-          </Text>
+        </Text>
+        <Text color="dark" size="body-14" selectable>
+          {email}
         </Text>
       </View>
     </View>

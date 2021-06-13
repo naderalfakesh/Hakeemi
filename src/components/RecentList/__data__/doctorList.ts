@@ -9,6 +9,9 @@ const list: Doctor[] = [
     specialty: [Specialty.NEUROLOGY],
     bio: '',
     email: '',
+    address: '',
+    phone: '',
+    availability: [0, 1, 2],
   },
   {
     id: '2',
@@ -18,6 +21,9 @@ const list: Doctor[] = [
     specialty: [Specialty.NEUROLOGY],
     bio: '',
     email: '',
+    address: '',
+    phone: '',
+    availability: [0, 1, 2],
   },
   {
     id: '3',
@@ -27,6 +33,9 @@ const list: Doctor[] = [
     specialty: [Specialty.NEUROLOGY],
     bio: '',
     email: '',
+    address: '',
+    phone: '',
+    availability: [3, 4, 5],
   },
   {
     id: '4',
@@ -36,6 +45,9 @@ const list: Doctor[] = [
     specialty: [Specialty.NEUROLOGY],
     bio: '',
     email: '',
+    address: '',
+    phone: '',
+    availability: [6],
   },
   {
     id: '5',
@@ -45,6 +57,9 @@ const list: Doctor[] = [
     specialty: [Specialty.NEUROLOGY],
     bio: '',
     email: '',
+    address: '',
+    phone: '',
+    availability: [0, 2],
   },
   {
     id: '6',
@@ -54,6 +69,9 @@ const list: Doctor[] = [
     specialty: [Specialty.NEUROLOGY],
     bio: '',
     email: '',
+    address: '',
+    phone: '',
+    availability: [0, 1, 2, 3, 4, 5, 6],
   },
   {
     id: '7',
@@ -63,6 +81,9 @@ const list: Doctor[] = [
     specialty: [Specialty.NEUROLOGY],
     bio: '',
     email: '',
+    address: '',
+    phone: '',
+    availability: [5],
   },
 ];
 
