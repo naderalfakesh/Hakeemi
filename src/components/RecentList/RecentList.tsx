@@ -37,6 +37,7 @@ const RecentList: FC<Props> = ({
                 shape="rounded"
                 roundness={0.4}>
                 <Image
+                  resizeMode="contain"
                   width={AVATAR_SIZE}
                   height={AVATAR_SIZE}
                   source={{

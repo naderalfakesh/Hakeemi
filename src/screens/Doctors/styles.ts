@@ -4,10 +4,12 @@ import spacing from '../../theme/spacing';
 
 export default StyleSheet.create({
   container: {
-    flex: 1,
-    paddingTop: spacing.medium2,
-    paddingHorizontal: spacing.medium2,
+    flexGrow: 1,
     backgroundColor: colors.white,
+  },
+  content: {
+    paddingVertical: spacing.medium2,
+    paddingHorizontal: spacing.medium2,
   },
   card: {
     flexDirection: 'row',
@@ -25,7 +27,7 @@ export default StyleSheet.create({
     backgroundColor: palette.secondary.light,
     justifyContent: 'center',
     paddingHorizontal: spacing.small3,
-    flexShrink: 1,
+    flex: 1,
   },
   bio: { marginTop: spacing.mini3 },
   listHeader: { marginBottom: spacing.medium2 },

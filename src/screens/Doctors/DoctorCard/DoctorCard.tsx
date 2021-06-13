@@ -3,33 +3,39 @@ import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, TouchableOpacity, View } from 'react-native';
 import Text from '../../../components/Text';
-import { Doctor } from '../Doctors';
+import { Doctor } from '../../../services/api/types';
 import styles from '../styles';
 
 interface Props {
-  item: Doctor;
+  doctor: Doctor;
 }
-const Card: FC<Props> = ({ item }) => {
+const Card: FC<Props> = ({ doctor }) => {
   const { t } = useTranslation('doctors');
   const { navigate } = useNavigation();
 
   return (
     <TouchableOpacity
       activeOpacity={0.7}
-      onPress={() => navigate('DoctorProfileModal', { id: item.id })}
-      style={styles.card}>
+      style={styles.card}
+      onPress={() => navigate('DoctorProfileModal', { id: doctor.id })}>
       <View style={styles.avatar}>
-        <Image source={{ uri: item.image, height: 134, width: 134 }} />
+        <Image
+          resizeMode="contain"
+          source={{ uri: doctor.avatar, height: 134, width: 134 }}
+        />
       </View>
       <View style={styles.cardContent}>
-        <Text color="black" size="head-20">
-          {t('doctorName', { name: item.name })}
+        <Text color="black" size="head-20" numberOfLines={1}>
+          {t('doctorName', { name: doctor.name })}
         </Text>
-        <Text color="black" size="body-14">
-          {item.specialization}
+        <Text color="secondary" size="body-14" numberOfLines={1}>
+          {doctor.title}
         </Text>
-        <Text style={styles.bio} color="dark" size="body-12">
-          {item.bio}
+        <Text color="black" size="body-12" numberOfLines={1}>
+          {doctor.email}
+        </Text>
+        <Text style={styles.bio} color="dark" size="body-12" numberOfLines={3}>
+          {doctor.bio}
         </Text>
       </View>
     </TouchableOpacity>
