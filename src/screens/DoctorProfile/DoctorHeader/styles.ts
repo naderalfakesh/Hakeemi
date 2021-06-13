@@ -1,10 +1,11 @@
 import { StyleSheet } from 'react-native';
+import spacing from '../../../theme/spacing';
 
 export default StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 30,
+    paddingHorizontal: spacing.medium3,
   },
-  textContainer: { marginLeft: 10 },
+  textContainer: { marginLeft: spacing.small1, flex: 1 },
 });

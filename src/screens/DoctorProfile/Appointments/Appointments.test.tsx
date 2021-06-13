@@ -12,10 +12,11 @@ describe('Button component test', () => {
     const { toJSON } = render(
       <Appointments
         title="Title"
-        dateList={[
+        availableDates={[
           new Date(2021, 5, 5, 10, 45, 0),
           new Date(2021, 5, 6, 15, 18, 0),
         ]}
+        onPress={() => {}}
       />,
       { wrapper },
     );

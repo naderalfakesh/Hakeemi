@@ -103,13 +103,13 @@ const AppStack = <R extends AppStackRouteName>({
         name="DoctorProfile"
         component={DoctorProfile}
         options={{ headerShown: false }}
-        initialParams={initialParams}
+        initialParams={initialParams as any}
       />
       <Stack.Screen
         name="ScheduleDialog"
         component={ScheduleDialog}
         options={{ headerShown: false }}
-        initialParams={initialParams}
+        initialParams={initialParams as any}
       />
     </Stack.Navigator>
   );

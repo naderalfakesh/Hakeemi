@@ -9,19 +9,25 @@ import MedicalServices from './MedicalServices';
 import styles from './styles';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Trans, useTranslation } from 'react-i18next';
-import { useNavigation } from '@react-navigation/core';
 import useDoctors from '../../services/useDoctors';
+import { useAppNavigation } from '../../navigation/AppStack';
 
 const Home: FC = () => {
   const { t } = useTranslation('home');
-  const { navigate } = useNavigation();
+  // const { navigate } = useNavigation();
+  const { navigate } = useAppNavigation();
   const [term, setTerm] = useState<string>('');
   const [showCard, setShowCard] = useState<boolean>(true);
 
   const { doctors, loading, error } = useDoctors();
-  const findDoctors = (services: Array<string>) => {
-    navigate('DoctorsDrawer', { services });
+  const findDoctors = () => {
+    navigate('DoctorsDrawer');
   };
+  /** Todo
+   * const findDoctors = (services: Array<string>) => {
+   * navigate('DoctorsDrawer', { services });
+   * };
+   */
 
   return (
     <Fragment>
@@ -73,8 +79,10 @@ const Home: FC = () => {
                 style={styles.innerContainer}
                 doctors={doctors}
                 loading={loading}
-                onPress={id => navigate('DoctorProfileModal', { id })}
-                onExtraPress={() => navigate('DoctorsDrawer')}
+                onPress={id => {
+                  navigate('DoctorProfileModal', { id });
+                }}
+                onExtraPress={findDoctors}
               />
             </>
           )}

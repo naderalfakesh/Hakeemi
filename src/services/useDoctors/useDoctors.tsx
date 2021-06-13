@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import api from '../api';
 import { Doctor } from '../api/types';
 import useToastMessage from '../useToastMessage';
-
-const getErrorMessage = (text: string) => text.substr(text.indexOf(' ') + 1);
+import { getErrorMessage } from '../Utilities/getErrorMessage';
 
 const useDoctors = () => {
   const [doctors, setDoctors] = useState<Doctor[]>([]);

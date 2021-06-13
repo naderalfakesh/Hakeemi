@@ -1,19 +1,24 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
-import { View, ScrollView, StatusBar } from 'react-native';
+import { View, ScrollView, StatusBar, Text } from 'react-native';
 import BgPattern from '../../../assets/homeBgPattern.svg';
-import Button from '../../components/Button';
 import Icon from '../../components/Icon';
+import { useAppNavigation, useAppRoute } from '../../navigation/AppStack/hooks';
 import colors from '../../theme/colors';
 import Appointments from './Appointments';
 import ContactInfo from './ContactInfo';
 import Description from './Description';
 import DoctorHeader from './DoctorHeader';
 import styles from './styles';
+import useDoctor from './useDoctor';
+
 const DoctorProfile = () => {
-  const { goBack, navigate } = useNavigation();
+  const { goBack } = useNavigation();
+  const { navigate } = useAppNavigation();
   const { t } = useTranslation('doctorProfile');
+  const { params } = useAppRoute<'DoctorProfileModal'>();
+  const { doctor, loading, availability } = useDoctor(params.id);
 
   return (
     <Fragment>
@@ -37,33 +42,33 @@ const DoctorProfile = () => {
           preserveAspectRatio="xMaxYMin slice"
         />
         <View style={styles.paper}>
-          <DoctorHeader
-            title="Dr. Afreen Khan"
-            subtitle="Heart Specialist - Surgeon"
-            imagURL="https://images2.imgbox.com/5f/04/DMMRtfvg_o.png"
-          />
-          <ContactInfo
-            address="8502 Preston Rd. Inglewood, Maine 98380"
-            phone="(405) 555-0128"
-            email=" info@drafreen.com"
-          />
-          <Description
-            title={t('description.title')}
-            details="Dr. Afreen Khan is a cardiologist and nationally recognized pioneer in women’s heart health and her New York City practice Total Heart Care is focused primarily to care for women."
-          />
-          <Appointments
-            title={t('appointments.title')}
-            dateList={[
-              new Date(2021, 5, 3, 9, 15),
-              new Date(2021, 5, 4, 10, 55),
-            ]}
-          />
-          <Button
-            style={styles.button}
-            size="big"
-            onPress={() => navigate('ScheduleDialog')}>
-            {t('button.text')}
-          </Button>
+          {loading ? (
+            <Text>Loading</Text>
+          ) : doctor === null ? (
+            <Text>Doctor not found</Text>
+          ) : (
+            <>
+              <DoctorHeader
+                title={'Dr. ' + doctor.name}
+                subtitle={doctor.title} //"Heart Specialist - Surgeon"
+                imagURL={doctor.avatar}
+              />
+              <ContactInfo
+                address={doctor.address}
+                phone={doctor.phone}
+                email={doctor.email}
+              />
+              <Description
+                title={t('description.title')}
+                details={doctor.bio}
+              />
+              <Appointments
+                title={t('appointments.title')}
+                availableDates={availability || []}
+                onPress={date => navigate('ScheduleDialog', { date })}
+              />
+            </>
+          )}
         </View>
       </ScrollView>
     </Fragment>

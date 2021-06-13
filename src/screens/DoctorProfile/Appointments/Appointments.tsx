@@ -7,9 +7,10 @@ import { useTranslation } from 'react-i18next';
 
 interface Props {
   title: string;
-  dateList: Array<Date>;
+  availableDates: Array<Date>;
+  onPress: (date: Date) => void;
 }
-const Appointments = ({ title, dateList }: Props) => {
+const Appointments = ({ title, availableDates, onPress }: Props) => {
   const { t } = useTranslation('doctorProfile');
   return (
     <View style={styles.container}>
@@ -17,14 +18,13 @@ const Appointments = ({ title, dateList }: Props) => {
         {title}
       </Text>
       <View style={styles.listContainer}>
-        {dateList.map((date, index) => (
+        {availableDates.map((date, index) => (
           <Button
             style={styles.button}
             key={index}
-            highlight={false}
-            theme="tertiary"
-            subtitle={t('dateFormat', { date })}>
-            {t('timeFormat', { date })}
+            onPress={() => onPress(date)}
+            theme="tertiary">
+            {t('dateFormat', { date })}
           </Button>
         ))}
       </View>

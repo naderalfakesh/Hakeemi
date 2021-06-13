@@ -24,6 +24,9 @@ export interface Doctor extends Person {
   title: Specialty;
   bio: string;
   specialty: Specialty[];
+  address: string;
+  phone: string;
+  availability: Array<number>;
 }
 
 export enum Specialty {
