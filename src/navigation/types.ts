@@ -1,3 +1,6 @@
+import { CompositeNavigationProp, RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+
 export type RootParamsList = {
   Welcome: undefined;
   SignUp: undefined;
@@ -22,9 +25,10 @@ export type ModalStackParams = {
   ScheduleDialogModal: AppStackParams['ScheduleDialog'];
 };
 
+export type ModalStackRouteName = keyof ModalStackParams;
+
 export type DoctorStackParams = {
   Doctors: AppStackParams['Doctors'];
-  Profile: AppStackParams['Profile'];
   DoctorProfileModal: AppStackParams['DoctorProfile'];
 };
 
@@ -33,3 +37,30 @@ export type DrawerStackParams = {
   DoctorsDrawer: undefined;
   ProfileDrawer: undefined;
 };
+
+export type DrawerStackRouteName = keyof DrawerStackParams;
+
+export type TotalRouteName =
+  | ModalStackRouteName
+  | AppStackRouteName
+  | DrawerStackRouteName;
+
+export type TotalParamList = ModalStackParams &
+  AppStackParams &
+  DrawerStackParams;
+
+export type AppModalNavigationProp<
+  R extends keyof TotalParamList = any
+> = StackNavigationProp<TotalParamList, R>;
+
+export type TotalNavigationProp<
+  T extends TotalRouteName
+> = CompositeNavigationProp<
+  StackNavigationProp<TotalParamList, T>,
+  AppModalNavigationProp
+>;
+
+export type AppStackRouteProp<T extends TotalRouteName> = RouteProp<
+  TotalParamList,
+  T
+>;

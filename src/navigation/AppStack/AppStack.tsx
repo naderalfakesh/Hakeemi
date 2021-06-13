@@ -22,6 +22,7 @@ export interface AppStackProps<R extends AppStackRouteName> {
 }
 const AppStack = <R extends AppStackRouteName>({
   initialRouteName,
+  initialParams,
 }: AppStackProps<R>) => {
   const { dispatch, navigate } = useNavigation();
   const { t } = useTranslation();
@@ -102,11 +103,13 @@ const AppStack = <R extends AppStackRouteName>({
         name="DoctorProfile"
         component={DoctorProfile}
         options={{ headerShown: false }}
+        initialParams={initialParams}
       />
       <Stack.Screen
         name="ScheduleDialog"
         component={ScheduleDialog}
         options={{ headerShown: false }}
+        initialParams={initialParams}
       />
     </Stack.Navigator>
   );
