@@ -75,6 +75,7 @@ exports[`Button component test renders correctly with image list 1`] = `
     >
       <Image
         height={50}
+        resizeMode="contain"
         source={
           Object {
             "height": 50,
@@ -117,6 +118,7 @@ exports[`Button component test renders correctly with image list 1`] = `
     >
       <Image
         height={50}
+        resizeMode="contain"
         source={
           Object {
             "height": 50,
@@ -159,6 +161,7 @@ exports[`Button component test renders correctly with image list 1`] = `
     >
       <Image
         height={50}
+        resizeMode="contain"
         source={
           Object {
             "height": 50,
@@ -201,6 +204,7 @@ exports[`Button component test renders correctly with image list 1`] = `
     >
       <Image
         height={50}
+        resizeMode="contain"
         source={
           Object {
             "height": 50,
