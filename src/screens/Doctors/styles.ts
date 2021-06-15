@@ -7,6 +7,10 @@ export default StyleSheet.create({
     flexGrow: 1,
     backgroundColor: colors.white,
   },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   content: {
     paddingVertical: spacing.medium2,
     paddingHorizontal: spacing.medium2,

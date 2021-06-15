@@ -74,7 +74,9 @@ exports[`Button component test renders correctly with image list 1`] = `
       testID="avatar"
     >
       <Image
+        fadeDuration={0}
         height={50}
+        onLoad={[Function]}
         resizeMode="contain"
         source={
           Object {
@@ -85,6 +87,21 @@ exports[`Button component test renders correctly with image list 1`] = `
         }
         width={50}
       />
+      <ActivityIndicator
+        animating={true}
+        color="#00bbd4"
+        hidesWhenStopped={true}
+        size="small"
+        style={
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          }
+        }
+      />
     </View>
     <View
       accessible={true}
@@ -117,7 +134,9 @@ exports[`Button component test renders correctly with image list 1`] = `
       testID="avatar"
     >
       <Image
+        fadeDuration={0}
         height={50}
+        onLoad={[Function]}
         resizeMode="contain"
         source={
           Object {
@@ -128,48 +147,20 @@ exports[`Button component test renders correctly with image list 1`] = `
         }
         width={50}
       />
-    </View>
-    <View
-      accessible={true}
-      collapsable={false}
-      focusable={true}
-      onBlur={[Function]}
-      onClick={[Function]}
-      onFocus={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      style={
-        Array [
+      <ActivityIndicator
+        animating={true}
+        color="#00bbd4"
+        hidesWhenStopped={true}
+        size="small"
+        style={
           Object {
-            "backgroundColor": "#edf3f7",
-            "borderRadius": 20,
-            "height": 50,
-            "overflow": "hidden",
-            "width": 50,
-          },
-          undefined,
-          Object {
-            "marginRight": 10,
-          },
-        ]
-      }
-      testID="avatar"
-    >
-      <Image
-        height={50}
-        resizeMode="contain"
-        source={
-          Object {
-            "height": 50,
-            "uri": "https://images2.imgbox.com/19/80/QQZwXNbP_o.png",
-            "width": 50,
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
           }
         }
-        width={50}
       />
     </View>
     <View
@@ -203,7 +194,69 @@ exports[`Button component test renders correctly with image list 1`] = `
       testID="avatar"
     >
       <Image
+        fadeDuration={0}
         height={50}
+        onLoad={[Function]}
+        resizeMode="contain"
+        source={
+          Object {
+            "height": 50,
+            "uri": "https://images2.imgbox.com/19/80/QQZwXNbP_o.png",
+            "width": 50,
+          }
+        }
+        width={50}
+      />
+      <ActivityIndicator
+        animating={true}
+        color="#00bbd4"
+        hidesWhenStopped={true}
+        size="small"
+        style={
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          }
+        }
+      />
+    </View>
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Array [
+          Object {
+            "backgroundColor": "#edf3f7",
+            "borderRadius": 20,
+            "height": 50,
+            "overflow": "hidden",
+            "width": 50,
+          },
+          undefined,
+          Object {
+            "marginRight": 10,
+          },
+        ]
+      }
+      testID="avatar"
+    >
+      <Image
+        fadeDuration={0}
+        height={50}
+        onLoad={[Function]}
         resizeMode="contain"
         source={
           Object {
@@ -213,6 +266,21 @@ exports[`Button component test renders correctly with image list 1`] = `
           }
         }
         width={50}
+      />
+      <ActivityIndicator
+        animating={true}
+        color="#00bbd4"
+        hidesWhenStopped={true}
+        size="small"
+        style={
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          }
+        }
       />
     </View>
   </View>
@@ -242,7 +310,6 @@ exports[`Button component test renders correctly with image list 1`] = `
         Object {
           "padding": 16,
         },
-        false,
         false,
         false,
         Object {

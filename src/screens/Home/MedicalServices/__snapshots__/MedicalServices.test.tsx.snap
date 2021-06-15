@@ -44,7 +44,6 @@ Array [
           },
           false,
           false,
-          false,
           Object {
             "marginBottom": 10,
             "marginRight": 18,
@@ -126,7 +125,6 @@ Array [
             "padding": 10,
             "width": 75,
           },
-          false,
           false,
           false,
           Object {
@@ -212,7 +210,6 @@ Array [
           },
           false,
           false,
-          false,
           Object {
             "marginBottom": 10,
             "marginRight": 18,
@@ -296,7 +293,6 @@ Array [
           },
           false,
           false,
-          false,
           undefined,
         ]
       }
@@ -375,7 +371,6 @@ Array [
             "padding": 10,
             "width": 75,
           },
-          false,
           false,
           false,
           Object {
@@ -461,7 +456,6 @@ Array [
           },
           false,
           false,
-          false,
           Object {
             "marginBottom": 10,
             "marginRight": 18,
@@ -543,7 +537,6 @@ Array [
             "padding": 10,
             "width": 75,
           },
-          false,
           false,
           false,
           Object {
@@ -629,7 +622,6 @@ Array [
           },
           false,
           false,
-          false,
           undefined,
         ]
       }
@@ -707,7 +699,6 @@ Array [
         Object {
           "padding": 16,
         },
-        false,
         false,
         false,
         Object {

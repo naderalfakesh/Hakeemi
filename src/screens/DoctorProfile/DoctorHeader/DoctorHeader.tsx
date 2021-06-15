@@ -1,5 +1,5 @@
-import React from 'react';
-import { Image, View } from 'react-native';
+import React, { useState } from 'react';
+import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
 import Avatar from '../../../components/Avatar';
 import Text from '../../../components/Text';
 import styles from './styles';
@@ -13,6 +13,7 @@ interface Props {
 }
 
 const DoctorHeader = ({ title, subtitle, imagURL }: Props) => {
+  const [loading, setLoading] = useState(true);
   return (
     <View style={styles.container}>
       <Avatar size={AVATAR_SIZE} shape="rounded">
@@ -23,7 +24,15 @@ const DoctorHeader = ({ title, subtitle, imagURL }: Props) => {
             height: AVATAR_SIZE,
             width: AVATAR_SIZE,
           }}
+          onLoad={() => setLoading(false)}
         />
+        {loading && (
+          <ActivityIndicator
+            style={StyleSheet.absoluteFill}
+            color="white"
+            size="large"
+          />
+        )}
       </Avatar>
       <View style={styles.textContainer}>
         <Text color="black" size="head-30">

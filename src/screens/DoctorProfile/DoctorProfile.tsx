@@ -1,7 +1,13 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
-import { View, ScrollView, StatusBar, Text } from 'react-native';
+import {
+  View,
+  ScrollView,
+  StatusBar,
+  Text,
+  ActivityIndicator,
+} from 'react-native';
 import BgPattern from '../../../assets/homeBgPattern.svg';
 import Icon from '../../components/Icon';
 import { useAppNavigation, useAppRoute } from '../../navigation/AppStack/hooks';
@@ -43,7 +49,11 @@ const DoctorProfile = () => {
         />
         <View style={styles.paper}>
           {loading ? (
-            <Text>Loading</Text>
+            <ActivityIndicator
+              style={styles.loading}
+              size="large"
+              color={colors.primary}
+            />
           ) : doctor === null ? (
             <Text>Doctor not found</Text>
           ) : (
