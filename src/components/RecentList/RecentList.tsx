@@ -1,9 +1,16 @@
-import React, { FC } from 'react';
-import { View, ViewStyle, Image } from 'react-native';
+import React, { FC, useState } from 'react';
+import {
+  View,
+  ViewStyle,
+  Image,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
 import styles from './styles';
 import Avatar from '../Avatar';
 import Button from '../Button';
 import { Doctor } from '../../services/api/types';
+import colors from '../../theme/colors';
 
 const AVATAR_SIZE = 50;
 const ITEM_COUNT_TO_SHOW = 4;
@@ -23,6 +30,8 @@ const RecentList: FC<Props> = ({
   onExtraPress,
   loading,
 }) => {
+  const [imageLoading, setImageLoading] = useState(true);
+
   return (
     <View testID="list" style={[styles.base, style]}>
       <View style={styles.list}>
@@ -40,12 +49,20 @@ const RecentList: FC<Props> = ({
                   resizeMode="contain"
                   width={AVATAR_SIZE}
                   height={AVATAR_SIZE}
+                  fadeDuration={0}
                   source={{
                     uri: doctor.avatar,
                     width: AVATAR_SIZE,
                     height: AVATAR_SIZE,
                   }}
+                  onLoad={() => setImageLoading(false)}
                 />
+                {imageLoading && (
+                  <ActivityIndicator
+                    style={StyleSheet.absoluteFill}
+                    color={colors.primary}
+                  />
+                )}
               </Avatar>
             ))
           : undefined}

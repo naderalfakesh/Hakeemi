@@ -29,7 +29,6 @@ exports[`Button component test renders correctly with default params 1`] = `
       },
       false,
       false,
-      false,
       undefined,
     ]
   }

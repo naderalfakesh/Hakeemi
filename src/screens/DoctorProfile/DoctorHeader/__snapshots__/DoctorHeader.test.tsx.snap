@@ -39,12 +39,28 @@ exports[`Button component test renders correctly 1`] = `
     testID="avatar"
   >
     <Image
+      onLoad={[Function]}
       resizeMode="contain"
       source={
         Object {
           "height": 80,
           "uri": "http://www.test.com/image.jpg",
           "width": 80,
+        }
+      }
+    />
+    <ActivityIndicator
+      animating={true}
+      color="white"
+      hidesWhenStopped={true}
+      size="large"
+      style={
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
         }
       }
     />

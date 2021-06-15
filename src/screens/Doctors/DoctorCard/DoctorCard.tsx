@@ -1,7 +1,13 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+} from 'react-native';
 import Text from '../../../components/Text';
 import { Doctor } from '../../../services/api/types';
 import styles from '../styles';
@@ -12,6 +18,7 @@ interface Props {
 const Card: FC<Props> = ({ doctor }) => {
   const { t } = useTranslation('doctors');
   const { navigate } = useNavigation();
+  const [loading, setLoading] = useState(true);
 
   return (
     <TouchableOpacity
@@ -22,7 +29,16 @@ const Card: FC<Props> = ({ doctor }) => {
         <Image
           resizeMode="contain"
           source={{ uri: doctor.avatar, height: 134, width: 134 }}
+          onLoad={() => setLoading(false)}
+          fadeDuration={0}
         />
+        {loading && (
+          <ActivityIndicator
+            style={StyleSheet.absoluteFill}
+            size="large"
+            color="white"
+          />
+        )}
       </View>
       <View style={styles.cardContent}>
         <Text color="black" size="head-20" numberOfLines={1}>

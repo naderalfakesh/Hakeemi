@@ -1,5 +1,10 @@
 import React, { FC } from 'react';
-import { Pressable, ViewStyle, PressableProps } from 'react-native';
+import {
+  Pressable,
+  ViewStyle,
+  PressableProps,
+  ActivityIndicator,
+} from 'react-native';
 import Icon, { IconName } from '../Icon';
 import Text, { Props as TextProps } from '../Text';
 import styles, {
@@ -91,7 +96,6 @@ const Button: FC<Props> = ({
         sizeStyle[size],
         !loading && pressed && highlight && pressedStyle[theme],
         size === 'inlineIcon' && styles.inlineIcon,
-        loading && pressedStyle[theme],
         style,
       ]}
       onPress={!loading && onPress ? onPress : undefined}
@@ -104,9 +108,13 @@ const Button: FC<Props> = ({
           color={iconColor[theme].color}
         />
       )}
-      <Text color={mapTextColor(theme)} {...mapTextSize(size)}>
-        {loading ? '...' : children}
-      </Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="white" />
+      ) : (
+        <Text color={mapTextColor(theme)} {...mapTextSize(size)}>
+          {children}
+        </Text>
+      )}
       {subtitle && (
         <Text color={mapTextColor(theme)} {...mapSubtitleSize(size)}>
           {subtitle}

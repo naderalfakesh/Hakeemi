@@ -1,6 +1,13 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, ScrollView, Switch, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  View,
+} from 'react-native';
 import Avatar from '../../components/Avatar';
 import Text from '../../components/Text';
 import i18n, { Languages } from '../../i18n';
@@ -20,7 +27,7 @@ const userInfo = {
 
 const Profile: FC = () => {
   const { t } = useTranslation('profile');
-
+  const [loading, setLoading] = useState(true);
   const changeLanguage = (lang: Languages) => {
     i18n.changeLanguage(lang);
   };
@@ -35,7 +42,15 @@ const Profile: FC = () => {
               width: AVATAR_SIZE,
               height: AVATAR_SIZE,
             }}
+            onLoad={() => setLoading(false)}
           />
+          {loading && (
+            <ActivityIndicator
+              style={StyleSheet.absoluteFill}
+              color="white"
+              size="large"
+            />
+          )}
         </Avatar>
         <Text size="head-30" color="black">
           {userInfo.name}

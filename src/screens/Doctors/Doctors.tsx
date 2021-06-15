@@ -1,10 +1,11 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, View } from 'react-native';
+import { ActivityIndicator, FlatList, View } from 'react-native';
 import Text from '../../components/Text';
 import styles from './styles';
 import DoctorCard from './DoctorCard';
 import useDoctors from '../../services/useDoctors';
+import colors from '../../theme/colors';
 
 const ListHeader = () => {
   const { t } = useTranslation('doctors');
@@ -23,7 +24,11 @@ const ListHeader = () => {
 
 const Doctors: FC = () => {
   const { doctors, loading } = useDoctors();
-  return !loading ? (
+  return loading ? (
+    <View style={[styles.container, styles.loadingContainer]}>
+      <ActivityIndicator size="large" color={colors.primary} />
+    </View>
+  ) : (
     <FlatList
       bounces={false}
       style={styles.container}
@@ -34,10 +39,6 @@ const Doctors: FC = () => {
       renderItem={({ item }) => <DoctorCard doctor={item} />}
       keyExtractor={item => item.id}
     />
-  ) : (
-    <View>
-      <Text>Loading...</Text>
-    </View>
   );
 };
 
