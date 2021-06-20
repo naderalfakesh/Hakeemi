@@ -14,11 +14,17 @@ const list = async (): Promise<Doctor[] | undefined> => {
   return result.docs.map(doc => ({ ...doc.data(), id: doc.id }));
 };
 
-const availability = () => {
-  return [
-    { id: 'id', startDate: '2011-01-01', endDate: '2011-01-01' },
-    { id: 'id', startDate: '2011-01-01', endDate: '2011-01-01' },
-  ];
+const setAppointment = async (
+  doctorId: string,
+  userId: string,
+  date: Date,
+): Promise<void> => {
+  return await doctorsCollection.doc(doctorId).update({
+    appointments: firestore.FieldValue.arrayUnion({
+      userId,
+      date: firestore.Timestamp.fromDate(date),
+    }),
+  });
 };
 
-export default { get, list, availability };
+export default { get, list, setAppointment };

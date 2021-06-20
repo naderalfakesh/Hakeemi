@@ -1,4 +1,5 @@
 import { Specialty, Doctor } from '../../../services/api/types';
+import firestore from '@react-native-firebase/firestore';
 
 const list: Doctor[] = [
   {
@@ -12,6 +13,12 @@ const list: Doctor[] = [
     address: '',
     phone: '',
     availability: [0, 1, 2],
+    appointments: [
+      {
+        date: firestore.Timestamp.fromDate(new Date(2021, 10, 61)),
+        userId: 'user id 1',
+      },
+    ],
   },
   {
     id: '2',
@@ -24,6 +31,7 @@ const list: Doctor[] = [
     address: '',
     phone: '',
     availability: [0, 1, 2],
+    appointments: [],
   },
   {
     id: '3',
@@ -36,6 +44,7 @@ const list: Doctor[] = [
     address: '',
     phone: '',
     availability: [3, 4, 5],
+    appointments: [],
   },
   {
     id: '4',
@@ -48,6 +57,7 @@ const list: Doctor[] = [
     address: '',
     phone: '',
     availability: [6],
+    appointments: [],
   },
   {
     id: '5',
@@ -60,6 +70,7 @@ const list: Doctor[] = [
     address: '',
     phone: '',
     availability: [0, 2],
+    appointments: [],
   },
   {
     id: '6',
@@ -72,6 +83,7 @@ const list: Doctor[] = [
     address: '',
     phone: '',
     availability: [0, 1, 2, 3, 4, 5, 6],
+    appointments: [],
   },
   {
     id: '7',
@@ -84,6 +96,7 @@ const list: Doctor[] = [
     address: '',
     phone: '',
     availability: [5],
+    appointments: [],
   },
 ];
 

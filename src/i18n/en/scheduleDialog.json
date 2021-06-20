@@ -10,5 +10,8 @@
   },
   "button": {
     "text": "Schedule An Appointment"
+  },
+  "message": {
+    "success": "Appointment reserved successfully"
   }
 }
