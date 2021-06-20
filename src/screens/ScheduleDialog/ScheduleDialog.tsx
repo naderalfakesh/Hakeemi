@@ -1,34 +1,49 @@
 import { useNavigation } from '@react-navigation/native';
-import { addMinutes, set } from 'date-fns';
-import React, { Fragment, useEffect, useState } from 'react';
+import { addMinutes, set, Duration, isSameHour, isEqual } from 'date-fns';
+import React, { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View, ScrollView, StatusBar } from 'react-native';
 import BgPattern from '../../../assets/homeBgPattern.svg';
 import Button from '../../components/Button';
 import Icon from '../../components/Icon';
 import Text from '../../components/Text';
+import { useAppRoute } from '../../navigation/AppStack';
 import colors from '../../theme/colors';
 import styles from './styles';
 
-const START = { hours: 10, minutes: 0 };
-const DURATION = 60;
+const START_OF_SHIFT = { hours: 10, minutes: 0 };
 const APPOINTMENT_COUNT = 9;
-const TAKEN = [3, 8];
+const DURATION = 60;
 
-const startTime = set(new Date(), START);
-const TIMES: Array<Date> = [];
-for (let index = 0; index < APPOINTMENT_COUNT; index++) {
-  TIMES.push(addMinutes(startTime, index * DURATION));
-}
+const getTimes = (
+  day: Date,
+  startOfShift: Duration,
+  dailyAppointmentCount: number,
+  duration: number,
+): Date[] => {
+  const startTime = set(day, startOfShift);
+  const times: Array<Date> = [];
+  for (let index = 0; index < dailyAppointmentCount; index++) {
+    times.push(addMinutes(startTime, index * duration));
+  }
+  return times;
+};
 
 const ScheduleDialog = () => {
   const { goBack } = useNavigation();
+  const { params } = useAppRoute<'ScheduleDialog'>();
+  const { date, appointments, onSchedule } = params;
+
   const { t } = useTranslation('scheduleDialog');
-  const [selected, setSelected] = useState<number | null>(null);
-  const [taken, setTaken] = useState<number[]>([]);
-  useEffect(() => {
-    setTaken(TAKEN);
-  }, []);
+  const [selectedTime, setSelectedTime] = useState<Date | null>(null);
+
+  const timeList = getTimes(date, START_OF_SHIFT, APPOINTMENT_COUNT, DURATION);
+  const handleSchedule = () => {
+    if (selectedTime) {
+      onSchedule(selectedTime);
+      goBack();
+    }
+  };
 
   return (
     <Fragment>
@@ -69,9 +84,9 @@ const ScheduleDialog = () => {
             </Text>
           </View>
           <View style={styles.timesContainer}>
-            {TIMES.map((time, index) => {
-              const isSelected = selected === index;
-              const isTaken = taken.includes(index);
+            {timeList.map((time, index) => {
+              const isSelected = selectedTime && isEqual(selectedTime, time);
+              const isTaken = appointments.find(item => isSameHour(item, time));
 
               return (
                 <Button
@@ -79,13 +94,15 @@ const ScheduleDialog = () => {
                   key={index}
                   highlight={false}
                   theme={isTaken ? 'grey' : isSelected ? 'primary' : 'tertiary'}
-                  onPress={() => (!isTaken ? setSelected(index) : undefined)}>
+                  onPress={() =>
+                    !isTaken ? setSelectedTime(time) : undefined
+                  }>
                   {t('timeFormat', { time })}
                 </Button>
               );
             })}
           </View>
-          <Button style={styles.button} size="big">
+          <Button style={styles.button} size="big" onPress={handleSchedule}>
             {t('button.text')}
           </Button>
         </View>

@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { isSameDay } from 'date-fns';
 import React, { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -20,11 +20,27 @@ import styles from './styles';
 import useDoctor from './useDoctor';
 
 const DoctorProfile = () => {
-  const { goBack } = useNavigation();
-  const { navigate } = useAppNavigation();
+  const { navigate, goBack } = useAppNavigation();
   const { t } = useTranslation('doctorProfile');
   const { params } = useAppRoute<'DoctorProfileModal'>();
-  const { doctor, loading, availability } = useDoctor(params.id);
+  const {
+    doctor,
+    loading,
+    availability,
+    appointments,
+    setAppointment,
+  } = useDoctor(params.id);
+
+  const handlePress = (date: Date) => {
+    navigate('ScheduleDialog', {
+      date,
+      appointments:
+        appointments
+          ?.filter(appointment => isSameDay(appointment.date, date))
+          .map(item => item.date) || [],
+      onSchedule: setAppointment,
+    });
+  };
 
   return (
     <Fragment>
@@ -75,7 +91,7 @@ const DoctorProfile = () => {
               <Appointments
                 title={t('appointments.title')}
                 availableDates={availability || []}
-                onPress={date => navigate('ScheduleDialog', { date })}
+                onPress={handlePress}
               />
             </>
           )}

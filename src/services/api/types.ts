@@ -1,3 +1,4 @@
+import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Languages } from '../../i18n';
 
 export type Appointment = {
@@ -27,6 +28,10 @@ export interface Doctor extends Person {
   address: string;
   phone: string;
   availability: Array<number>;
+  appointments: Array<{
+    userId: string;
+    date: FirebaseFirestoreTypes.Timestamp;
+  }>;
 }
 
 export enum Specialty {

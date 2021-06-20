@@ -25,6 +25,7 @@ const useDoctors = () => {
       setLoading(false);
     };
     getDoctorsList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { doctors, loading, error };

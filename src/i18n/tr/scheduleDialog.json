@@ -10,5 +10,8 @@
   },
   "button": {
     "text": "Rezervasyon ekle"
+  },
+  "message": {
+    "success": "Rezervasyon eklenmiştir"
   }
 }

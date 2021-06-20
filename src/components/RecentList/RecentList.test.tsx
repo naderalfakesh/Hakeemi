@@ -2,6 +2,9 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import RecentList from './RecentList';
 import doctorList from './__data__/doctorList';
+jest.mock('@react-native-firebase/firestore', () => ({
+  Timestamp: { fromDate: jest.fn },
+}));
 
 describe('Button component test', () => {
   it('renders correctly with image list', () => {

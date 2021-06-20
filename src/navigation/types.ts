@@ -13,7 +13,11 @@ export type AppStackParams = {
   Home: undefined;
   Doctors: undefined;
   DoctorProfile: { id: string };
-  ScheduleDialog: { date: Date };
+  ScheduleDialog: {
+    date: Date;
+    appointments: Array<Date>;
+    onSchedule: (time: Date) => void;
+  };
   Profile: undefined;
 };
 
