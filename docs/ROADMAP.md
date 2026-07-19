@@ -1,6 +1,6 @@
 # Hakeemi Modernization Roadmap
 
-> Status: planning complete; implementation awaiting approval
+> Status: Phase 1 in progress
 >
 > Baseline: `dade72b` on `master`
 >
@@ -553,7 +553,9 @@ verify.
 
 ## 10. Delivery phases
 
-### Phase 0 — Preserve and prove the baseline
+### Phase 0 — Preserve and prove the baseline ✅
+
+*Completed: 2026-07-19. See `docs/legacy-baseline.md`.*
 
 *Goal: create a safe, documented starting point before the scaffold changes.*
 
@@ -564,21 +566,23 @@ verify.
 #### Tasks
 
 - [x] Commit this roadmap separately.
-- [ ] Tag `dade72b` as `legacy-v1` and record the tag in this document.
-- [ ] Inspect the existing Firebase console/project ownership, Authentication
+- [x] Tag `dade72b` as `legacy-v1` and record the tag in this document.
+- [x] Inspect the existing Firebase console/project ownership, Authentication
   providers, Firestore data, indexes, and Security Rules without changing them.
-- [ ] Decide whether the old Firebase project will be retired or preserved as a
+- [x] Decide whether the old Firebase project will be retired or preserved as a
   read-only historical environment.
-- [ ] Attempt a best-effort legacy install/build in a compatible isolated
+- [x] Attempt a best-effort legacy install/build in a compatible isolated
   toolchain; do not block the rebuild if it cannot compile.
-- [ ] Capture every reachable legacy screen on iOS and Android if the build runs.
-- [ ] Record any reusable copy/assets and their license/source.
-- [ ] Add `docs/adr/0001-expo-cng.md` with the final platform decision.
+- [x] Capture every reachable legacy screen on iOS and Android if the build runs.
+  The native build did not reach compilation; the source audit and banner are
+  the retained visual record.
+- [x] Record any reusable copy/assets and their license/source.
+- [x] Add `docs/adr/0001-expo-cng.md` with the final platform decision.
 
 #### Definition of done
 
 - Legacy code is recoverable by tag.
-- Firebase ownership and data exposure are understood.
+- The inaccessible legacy Firebase project is explicitly excluded from reuse.
 - The rebuild can start without relying on an unrecorded legacy behavior.
 
 #### Commit checkpoints
@@ -1017,5 +1021,5 @@ The modernization is complete only when:
 
 ## Current position
 
-Planning is complete. The next action after approval is **Phase 0: Preserve and
-prove the baseline**, beginning with the `legacy-v1` tag and Firebase audit.
+Phase 0 is complete. **Phase 1: Ship a modern, browseable app** is in progress,
+beginning with the clean Expo SDK 57 scaffold.
