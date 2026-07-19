@@ -10,7 +10,10 @@
   development project contains the 24-document fictional seed.
 - Native integration: Expo CNG configures React Native Firebase Auth, Firestore,
   and Functions. iOS Simulator, Android arm64, and static web export checks pass.
+- Account UI: typed sign-in, sign-up, password recovery, and email verification
+  routes are connected to a platform-safe Firebase Auth adapter.
 - Billing boundary: Cloud Storage remains emulator-only; enabling it now
   requires the Blaze plan and an explicit billing decision.
-- Next action: add typed Auth routes and one application-level session provider.
+- Next action: add one application-level session provider and idempotent profile
+  bootstrap.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).

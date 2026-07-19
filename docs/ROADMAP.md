@@ -673,7 +673,7 @@ _Estimated effort: two sessions_
 #### Mobile
 
 - [ ] Add one application-level auth/session provider.
-- [ ] Implement email/password sign-up, sign-in, sign-out, password reset, and
+- [x] Implement email/password sign-up, sign-in, sign-out, password reset, and
       verification states with typed validation.
 - [ ] Create the user profile through one idempotent server-controlled flow.
 - [ ] Add TanStack Query keys, Firebase adapters, DTO-to-domain mappers, and

@@ -8,8 +8,8 @@ import { InlineError } from './inline-error';
 
 type TextFieldProps = Omit<TextInputProps, 'style'> & {
   containerStyle?: ViewStyle;
-  error?: string;
-  hint?: string;
+  error?: string | undefined;
+  hint?: string | undefined;
   label: string;
 };
 

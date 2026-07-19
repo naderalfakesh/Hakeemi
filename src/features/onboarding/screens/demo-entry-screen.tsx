@@ -7,9 +7,10 @@ import { useAppTheme, type AppTheme } from '@/theme';
 
 type DemoEntryScreenProps = {
   onContinue: () => void;
+  onSignIn: () => void;
 };
 
-export function DemoEntryScreen({ onContinue }: DemoEntryScreenProps) {
+export function DemoEntryScreen({ onContinue, onSignIn }: DemoEntryScreenProps) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
@@ -77,6 +78,9 @@ export function DemoEntryScreen({ onContinue }: DemoEntryScreenProps) {
         <View style={styles.actions}>
           <Button accessibilityLabel="Explore the Hakeemi portfolio demo" onPress={onContinue}>
             Explore the demo
+          </Button>
+          <Button onPress={onSignIn} variant="secondary">
+            Sign in
           </Button>
           <AppText style={styles.disclaimer} tone="secondary" variant="caption">
             Portfolio demonstration only. No real clinicians, medical services, or patient data.

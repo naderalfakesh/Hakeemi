@@ -7,9 +7,10 @@ import { DemoEntryScreen } from './demo-entry-screen';
 describe('DemoEntryScreen', () => {
   it('explains the portfolio context and enters the demo', async () => {
     const onContinue = jest.fn();
+    const onSignIn = jest.fn();
     const view = await render(
       <AppThemeProvider colorScheme="light">
-        <DemoEntryScreen onContinue={onContinue} />
+        <DemoEntryScreen onContinue={onContinue} onSignIn={onSignIn} />
       </AppThemeProvider>,
     );
 
@@ -19,5 +20,9 @@ describe('DemoEntryScreen', () => {
     await fireEvent.press(view.getByRole('button', { name: 'Explore the Hakeemi portfolio demo' }));
 
     expect(onContinue).toHaveBeenCalledTimes(1);
+
+    await fireEvent.press(view.getByRole('button', { name: 'Sign in' }));
+
+    expect(onSignIn).toHaveBeenCalledTimes(1);
   });
 });
