@@ -1,0 +1,80 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isActivePublicResource() {
+      return resource.data.isActive == true;
+    }
+
+    function isValidPreferences() {
+      return request.resource.data.keys().hasOnly(['locale', 'theme', 'updatedAt'])
+        && request.resource.data.locale in ['en', 'ar']
+        && request.resource.data.theme in ['system', 'light', 'dark']
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    function isValidSavedProvider(providerId) {
+      return request.resource.data.keys().hasOnly(['providerId', 'savedAt'])
+        && request.resource.data.providerId == providerId
+        && request.resource.data.savedAt == request.time
+        && exists(/databases/$(database)/documents/providers/$(providerId));
+    }
+
+    match /specialties/{specialtyId} {
+      allow get, list: if isActivePublicResource();
+      allow create, update, delete: if false;
+    }
+
+    match /clinics/{clinicId} {
+      allow get, list: if isActivePublicResource();
+      allow create, update, delete: if false;
+    }
+
+    match /providers/{providerId} {
+      allow get, list: if isActivePublicResource();
+      allow create, update, delete: if false;
+    }
+
+    match /availabilitySlots/{slotId} {
+      allow get, list: if resource.data.status == 'available';
+      allow create, update, delete: if false;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list, create, update, delete: if false;
+
+      match /preferences/{preferenceId} {
+        allow get, list: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && preferenceId == 'app'
+          && isValidPreferences();
+        allow delete: if false;
+      }
+
+      match /savedProviders/{providerId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidSavedProvider(providerId);
+        allow update: if false;
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    match /appointments/{appointmentId} {
+      allow get, list: if isSignedIn() && resource.data.patientId == request.auth.uid;
+      allow create, update, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

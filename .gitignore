@@ -9,6 +9,13 @@ dist/
 web-build/
 expo-env.d.ts
 
+# Firebase local state and project selection
+.firebase/
+.firebaserc
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+
 # Native
 .kotlin/
 *.orig.*
@@ -46,3 +53,6 @@ coverage/
 # generated native folders
 /ios
 /android
+
+# Cloud Functions build output
+/functions/lib
