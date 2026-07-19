@@ -555,7 +555,7 @@ verify.
 
 ### Phase 0 — Preserve and prove the baseline ✅
 
-*Completed: 2026-07-19. See `docs/legacy-baseline.md`.*
+*Completed: 2026-07-19, commit `b2aca92`. See `docs/legacy-baseline.md`.*
 
 *Goal: create a safe, documented starting point before the scaffold changes.*
 
@@ -601,7 +601,7 @@ and inspect provider details using local fixtures.*
 
 #### Setup
 
-- [ ] Replace the legacy scaffold with a clean Expo SDK 57 TypeScript project.
+- [x] Replace the legacy scaffold with a clean Expo SDK 57 TypeScript project.
 - [ ] Configure CNG, `expo-dev-client`, New Architecture, npm scripts, and Node
   version metadata.
 - [ ] Configure Expo Router under `src/app` with typed routes and four tab
@@ -1021,5 +1021,6 @@ The modernization is complete only when:
 
 ## Current position
 
-Phase 0 is complete. **Phase 1: Ship a modern, browseable app** is in progress,
-beginning with the clean Expo SDK 57 scaffold.
+Phase 0 is complete. **Phase 1: Ship a modern, browseable app** is in progress.
+The clean SDK 57 scaffold is verified; development-client and router
+configuration are next.

@@ -2,6 +2,6 @@
 
 - Current phase: Phase 1 — modern Expo foundation.
 - Baseline: `dade72b` on `master`.
-- Next action: replace the legacy scaffold with Expo SDK 57 and verify the clean
-  CNG foundation.
+- Next action: configure the development client, stable four-tab Expo Router
+  structure, and EAS build profiles.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).
