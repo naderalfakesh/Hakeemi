@@ -1,5 +1,5 @@
 import type { CareRepository } from '../domain/repository';
-import type { ProviderSearch } from '../domain/types';
+import type { Provider, ProviderSearch } from '../domain/types';
 import {
   buildAvailabilityFixtures,
   clinicFixtures,
@@ -7,6 +7,9 @@ import {
   specialtyFixtures,
 } from './fixtures';
 import { selectProviders } from './selectors';
+import { compareProviderToCursor, createProviderCursor } from './provider-cursor';
+
+const DEFAULT_PROVIDER_PAGE_SIZE = 12;
 
 export class FixtureCareRepository implements CareRepository {
   public constructor(private readonly now: () => Date = () => new Date()) {}
@@ -29,8 +32,37 @@ export class FixtureCareRepository implements CareRepository {
     return clinicFixtures.filter((clinic) => clinic.isActive);
   }
 
-  public async listProviders(search: ProviderSearch = {}) {
-    return selectProviders(providerFixtures, specialtyFixtures, search);
+  public async listProviderPage(
+    search: ProviderSearch = {},
+    cursor: string | null = null,
+    pageSize = DEFAULT_PROVIDER_PAGE_SIZE,
+  ) {
+    const safePageSize =
+      Number.isFinite(pageSize) && pageSize > 0 ? Math.floor(pageSize) : DEFAULT_PROVIDER_PAGE_SIZE;
+    const candidates = (providerFixtures as readonly Provider[])
+      .filter((provider) => provider.isActive)
+      .filter(
+        (provider) => !search.specialtyId || provider.specialtyIds.includes(search.specialtyId),
+      )
+      .sort(
+        (left, right) =>
+          Number(right.isFeatured) - Number(left.isFeatured) ||
+          left.displayName.localeCompare(right.displayName) ||
+          left.id.localeCompare(right.id),
+      );
+    const pageStart = cursor
+      ? candidates.findIndex((provider) => compareProviderToCursor(provider, cursor) > 0)
+      : 0;
+    const safePageStart = pageStart < 0 ? candidates.length : pageStart;
+    const pageCandidates = candidates.slice(safePageStart, safePageStart + safePageSize);
+    const hasNextPage = safePageStart + safePageSize < candidates.length;
+    const lastProvider = pageCandidates[pageCandidates.length - 1];
+
+    return {
+      items: selectProviders(pageCandidates, specialtyFixtures, search),
+      nextCursor:
+        hasNextPage && lastProvider !== undefined ? createProviderCursor(lastProvider) : null,
+    };
   }
 
   public async listSpecialties() {

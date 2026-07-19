@@ -1,6 +1,6 @@
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
-import { AppThemeProvider } from '@/theme';
+import { TestAppProviders } from '@/test/test-app-providers';
 
 import { fixtureCareRepository } from '../data/fixture-care-repository';
 import type { CareRepository } from '../domain/repository';
@@ -9,9 +9,9 @@ import { FindCareScreen } from './find-care-screen';
 describe('FindCareScreen', () => {
   it('searches fictional clinicians by language', async () => {
     const view = await render(
-      <AppThemeProvider colorScheme="light">
+      <TestAppProviders colorScheme="light">
         <FindCareScreen onSelectProvider={jest.fn()} repository={fixtureCareRepository} />
-      </AppThemeProvider>,
+      </TestAppProviders>,
     );
 
     await waitFor(() =>
@@ -31,9 +31,9 @@ describe('FindCareScreen', () => {
   it('filters by specialty and opens a provider', async () => {
     const onSelectProvider = jest.fn();
     const view = await render(
-      <AppThemeProvider colorScheme="dark">
+      <TestAppProviders colorScheme="dark">
         <FindCareScreen onSelectProvider={onSelectProvider} repository={fixtureCareRepository} />
-      </AppThemeProvider>,
+      </TestAppProviders>,
     );
 
     await waitFor(() => expect(view.getByRole('button', { name: 'Cardiology' })).toBeVisible());
@@ -53,13 +53,16 @@ describe('FindCareScreen', () => {
       getProvider: jest.fn().mockResolvedValue(null),
       listAvailableSlots: jest.fn().mockResolvedValue([]),
       listClinics: jest.fn().mockResolvedValue([]),
-      listProviders: jest.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValue([]),
+      listProviderPage: jest
+        .fn()
+        .mockRejectedValueOnce(new Error('offline'))
+        .mockResolvedValue({ items: [], nextCursor: null }),
       listSpecialties: jest.fn().mockResolvedValue([]),
     };
     const view = await render(
-      <AppThemeProvider colorScheme="light">
+      <TestAppProviders colorScheme="light">
         <FindCareScreen onSelectProvider={jest.fn()} repository={repository} />
-      </AppThemeProvider>,
+      </TestAppProviders>,
     );
 
     await waitFor(() =>

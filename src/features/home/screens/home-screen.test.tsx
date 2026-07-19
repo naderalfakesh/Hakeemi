@@ -1,8 +1,7 @@
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
-import { AppThemeProvider } from '@/theme';
-
 import { fixtureCareRepository } from '@/features/care/data/fixture-care-repository';
+import { TestAppProviders } from '@/test/test-app-providers';
 
 import { HomeScreen } from './home-screen';
 
@@ -10,13 +9,13 @@ describe('HomeScreen', () => {
   it('surfaces fixture-backed recommendations and opens a provider', async () => {
     const onSelectProvider = jest.fn();
     const view = await render(
-      <AppThemeProvider colorScheme="dark">
+      <TestAppProviders colorScheme="dark">
         <HomeScreen
           onFindCare={jest.fn()}
           onSelectProvider={onSelectProvider}
           repository={fixtureCareRepository}
         />
-      </AppThemeProvider>,
+      </TestAppProviders>,
     );
 
     const provider = await waitFor(() =>

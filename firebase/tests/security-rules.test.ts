@@ -123,14 +123,24 @@ describe('Cloud Firestore rules', () => {
     await assertSucceeds(firestore.doc('providers/lina-haddad').get());
     await assertSucceeds(firestore.doc('availabilitySlots/lina-slot').get());
     await assertSucceeds(
-      firestore.collection('providers').where('isActive', '==', true).orderBy('displayName').get(),
+      firestore
+        .collection('providers')
+        .where('isActive', '==', true)
+        .orderBy('isFeatured', 'desc')
+        .orderBy('displayName')
+        .orderBy(firebase.firestore.FieldPath.documentId())
+        .limit(13)
+        .get(),
     );
     await assertSucceeds(
       firestore
         .collection('providers')
         .where('isActive', '==', true)
         .where('specialtyIds', 'array-contains', 'family-medicine')
+        .orderBy('isFeatured', 'desc')
         .orderBy('displayName')
+        .orderBy(firebase.firestore.FieldPath.documentId())
+        .limit(13)
         .get(),
     );
     await assertSucceeds(firestore.collection('specialties').where('isActive', '==', true).get());

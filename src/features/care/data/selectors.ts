@@ -40,6 +40,6 @@ export function selectProviders(
         return left.isFeatured ? -1 : 1;
       }
 
-      return (right.ratingSummary?.average ?? 0) - (left.ratingSummary?.average ?? 0);
+      return left.displayName.localeCompare(right.displayName) || left.id.localeCompare(right.id);
     });
 }

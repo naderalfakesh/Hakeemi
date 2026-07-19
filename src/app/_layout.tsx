@@ -7,6 +7,7 @@ import '@/config/env';
 import { AppText } from '@/components/ui';
 import { AuthSessionProvider, useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { initializeFirebaseServices } from '@/services/firebase/initialize';
+import { AppQueryProvider } from '@/services/query/query-provider';
 import { AppThemeProvider, darkNavigationTheme, lightNavigationTheme, useAppTheme } from '@/theme';
 
 initializeFirebaseServices();
@@ -42,9 +43,11 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.root}>
       <AppThemeProvider>
-        <AuthSessionProvider>
-          <Navigation />
-        </AuthSessionProvider>
+        <AppQueryProvider>
+          <AuthSessionProvider>
+            <Navigation />
+          </AuthSessionProvider>
+        </AppQueryProvider>
       </AppThemeProvider>
     </GestureHandlerRootView>
   );

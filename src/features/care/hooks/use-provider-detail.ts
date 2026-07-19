@@ -1,6 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useCallback } from 'react';
 
 import { careRepository } from '@/features/care/data/care-repository';
+
+import { careQueryKeys } from '../data/query-keys';
 import type { CareRepository } from '../domain/repository';
 import type { AvailabilitySlot, Clinic, Provider, Specialty } from '../domain/types';
 
@@ -19,59 +22,43 @@ export type ProviderDetailState =
 
 export function useProviderDetail(providerId: string, repository?: CareRepository) {
   const resolvedRepository = repository ?? careRepository;
-  const [requestVersion, setRequestVersion] = useState(0);
-  const [state, setState] = useState<ProviderDetailState>({ status: 'loading' });
+  const providerQuery = useQuery({
+    queryKey: careQueryKeys.detail(providerId),
+    queryFn: async (): Promise<ProviderDetailData | null> => {
+      const provider = await resolvedRepository.getProvider(providerId);
 
-  useEffect(() => {
-    let isCurrent = true;
-
-    async function loadProviderDetail() {
-      try {
-        const provider = await resolvedRepository.getProvider(providerId);
-        if (!isCurrent) {
-          return;
-        }
-        if (!provider) {
-          setState({ status: 'not-found' });
-          return;
-        }
-
-        const [allSpecialties, slots, clinicResults] = await Promise.all([
-          resolvedRepository.listSpecialties(),
-          resolvedRepository.listAvailableSlots(provider.id),
-          Promise.all(provider.clinicIds.map((clinicId) => resolvedRepository.getClinic(clinicId))),
-        ]);
-
-        if (!isCurrent) {
-          return;
-        }
-
-        const specialtyIds = new Set(provider.specialtyIds);
-        const clinics = clinicResults.filter((clinic): clinic is Clinic => clinic !== null);
-        const specialties = allSpecialties.filter((specialty) => specialtyIds.has(specialty.id));
-
-        setState({
-          status: 'success',
-          data: { clinics, provider, slots, specialties },
-        });
-      } catch {
-        if (isCurrent) {
-          setState({ status: 'error' });
-        }
+      if (!provider) {
+        return null;
       }
-    }
 
-    void loadProviderDetail();
+      const [allSpecialties, slots, clinicResults] = await Promise.all([
+        resolvedRepository.listSpecialties(),
+        resolvedRepository.listAvailableSlots(provider.id),
+        Promise.all(provider.clinicIds.map((clinicId) => resolvedRepository.getClinic(clinicId))),
+      ]);
+      const specialtyIds = new Set(provider.specialtyIds);
+      const clinics = clinicResults.filter((clinic): clinic is Clinic => clinic !== null);
+      const specialties = allSpecialties.filter((specialty) => specialtyIds.has(specialty.id));
 
-    return () => {
-      isCurrent = false;
-    };
-  }, [providerId, requestVersion, resolvedRepository]);
+      return { clinics, provider, slots, specialties };
+    },
+  });
+
+  let state: ProviderDetailState;
+
+  if (providerQuery.isPending) {
+    state = { status: 'loading' };
+  } else if (providerQuery.isError) {
+    state = { status: 'error' };
+  } else if (providerQuery.data === null) {
+    state = { status: 'not-found' };
+  } else {
+    state = { status: 'success', data: providerQuery.data };
+  }
 
   const retry = useCallback(() => {
-    setState({ status: 'loading' });
-    setRequestVersion((version) => version + 1);
-  }, []);
+    void providerQuery.refetch();
+  }, [providerQuery]);
 
   return { retry, state };
 }

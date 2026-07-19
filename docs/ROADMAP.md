@@ -677,7 +677,7 @@ _Estimated effort: two sessions_
       verification states with typed validation.
 - [x] Create the user profile through one idempotent server-controlled flow.
 - [x] Add bounded Firebase adapters and DTO-to-domain mappers.
-- [ ] Add TanStack Query keys, caching, and provider cursor pagination.
+- [x] Add TanStack Query keys, caching, and provider cursor pagination.
 - [x] Replace local provider fixtures with Firestore repositories while keeping
       an explicit demo data adapter for tests/previews.
 - [ ] Persist locale/theme preferences without storing secrets in general
@@ -1037,5 +1037,8 @@ application-level session restoration, and idempotent server-owned profile
 bootstrap are implemented. Native provider discovery now resolves a bounded
 React Native Firebase repository with runtime-validated DTO mappers; Jest and
 the static web export explicitly resolve the deterministic fixture repository.
-Rules tests cover the production discovery query shapes. TanStack Query cursor
-pagination and user preference persistence remain before Phase 2 can close.
+Rules tests cover the production discovery query shapes, and their cloud
+indexes are deployed (the final specialty-ordering index is completing its
+background build). TanStack Query now owns server-state caching, retry, and
+cursor pagination. User preference persistence remains before Phase 2 can
+close.

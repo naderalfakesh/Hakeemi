@@ -22,7 +22,7 @@ export function FindCareScreen({ onSelectProvider, repository }: FindCareScreenP
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [query, setQuery] = useState('');
   const [specialtyId, setSpecialtyId] = useState<string | null>(null);
-  const { retry, state } = useProviderDiscovery({
+  const { hasMore, isLoadingMore, loadMore, retry, state } = useProviderDiscovery({
     query,
     specialtyId,
     ...(repository ? { repository } : {}),
@@ -98,6 +98,15 @@ export function FindCareScreen({ onSelectProvider, repository }: FindCareScreenP
             )}
           </View>
         }
+        ListFooterComponent={
+          data && data.providers.length > 0 && (hasMore || isLoadingMore) ? (
+            <View style={styles.pagination}>
+              <Button busy={isLoadingMore} onPress={loadMore} variant="secondary">
+                {isLoadingMore ? 'Loading more clinicians' : 'Load more clinicians'}
+              </Button>
+            </View>
+          ) : null
+        }
         contentContainerStyle={styles.content}
         data={data?.providers ?? []}
         initialNumToRender={6}
@@ -106,6 +115,8 @@ export function FindCareScreen({ onSelectProvider, repository }: FindCareScreenP
         keyboardShouldPersistTaps="handled"
         keyExtractor={providerKeyExtractor}
         maxToRenderPerBatch={6}
+        onEndReached={hasMore && !isLoadingMore ? loadMore : undefined}
+        onEndReachedThreshold={0.35}
         renderItem={renderProvider}
         showsVerticalScrollIndicator={false}
         windowSize={5}
@@ -205,6 +216,9 @@ function createStyles(theme: AppTheme) {
     },
     loadingCards: {
       gap: theme.spacing.sm,
+    },
+    pagination: {
+      paddingTop: theme.spacing.lg,
     },
   });
 }

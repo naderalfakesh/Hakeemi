@@ -34,14 +34,25 @@ describe('fictional care fixtures', () => {
   it('filters providers by specialty and human search terms', async () => {
     const repository = new FixtureCareRepository();
 
-    await expect(repository.listProviders({ specialtyId: 'cardiology' })).resolves.toEqual([
-      expect.objectContaining({ id: 'omar-rahman' }),
-    ]);
-    await expect(repository.listProviders({ query: 'Malayalam' })).resolves.toEqual([
-      expect.objectContaining({ id: 'priya-menon' }),
-    ]);
-    await expect(repository.listProviders({ query: 'family medicine' })).resolves.toEqual([
-      expect.objectContaining({ id: 'lina-haddad' }),
-    ]);
+    await expect(repository.listProviderPage({ specialtyId: 'cardiology' })).resolves.toMatchObject(
+      { items: [expect.objectContaining({ id: 'omar-rahman' })] },
+    );
+    await expect(repository.listProviderPage({ query: 'Malayalam' })).resolves.toMatchObject({
+      items: [expect.objectContaining({ id: 'priya-menon' })],
+    });
+    await expect(repository.listProviderPage({ query: 'family medicine' })).resolves.toMatchObject({
+      items: [expect.objectContaining({ id: 'lina-haddad' })],
+    });
+  });
+
+  it('paginates with an opaque stable cursor', async () => {
+    const repository = new FixtureCareRepository();
+    const firstPage = await repository.listProviderPage({}, null, 2);
+    const secondPage = await repository.listProviderPage({}, firstPage.nextCursor, 2);
+
+    expect(firstPage.items).toHaveLength(2);
+    expect(firstPage.nextCursor).not.toBeNull();
+    expect(secondPage.items).toHaveLength(2);
+    expect(secondPage.items.map(({ id }) => id)).not.toEqual(firstPage.items.map(({ id }) => id));
   });
 });

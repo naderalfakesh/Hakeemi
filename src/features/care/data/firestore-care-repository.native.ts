@@ -1,18 +1,20 @@
 import {
   collection,
   doc,
+  documentId,
   getDoc,
   getDocs,
   getFirestore,
   limit,
   orderBy,
   query,
+  startAfter,
   where,
   type Firestore,
   type QueryConstraint,
 } from '@react-native-firebase/firestore';
 
-import type { CareRepository } from '../domain/repository';
+import type { CareRepository, ProviderPageCursor } from '../domain/repository';
 import type { ProviderSearch, Specialty } from '../domain/types';
 import {
   mapAvailabilitySlotDocument,
@@ -21,8 +23,10 @@ import {
   mapSpecialtyDocument,
 } from './firestore-care-mappers';
 import { selectProviders } from './selectors';
+import { createProviderCursor, parseProviderCursor } from './provider-cursor';
 
-const PROVIDER_RESULT_LIMIT = 50;
+const DEFAULT_PROVIDER_PAGE_SIZE = 12;
+const MAX_PROVIDER_PAGE_SIZE = 20;
 const SLOT_RESULT_LIMIT = 12;
 
 export class FirestoreCareRepository implements CareRepository {
@@ -66,24 +70,49 @@ export class FirestoreCareRepository implements CareRepository {
       .sort((left, right) => left.name.en.localeCompare(right.name.en));
   }
 
-  public async listProviders(search: ProviderSearch = {}) {
+  public async listProviderPage(
+    search: ProviderSearch = {},
+    cursor: ProviderPageCursor | null = null,
+    requestedPageSize = DEFAULT_PROVIDER_PAGE_SIZE,
+  ) {
+    const pageSize = Number.isFinite(requestedPageSize)
+      ? Math.max(1, Math.min(Math.floor(requestedPageSize), MAX_PROVIDER_PAGE_SIZE))
+      : DEFAULT_PROVIDER_PAGE_SIZE;
     const constraints: QueryConstraint[] = [where('isActive', '==', true)];
 
     if (search.specialtyId) {
       constraints.push(where('specialtyIds', 'array-contains', search.specialtyId));
     }
 
-    constraints.push(orderBy('displayName', 'asc'), limit(PROVIDER_RESULT_LIMIT));
+    constraints.push(
+      orderBy('isFeatured', 'desc'),
+      orderBy('displayName', 'asc'),
+      orderBy(documentId(), 'asc'),
+    );
+
+    if (cursor) {
+      constraints.push(startAfter(...parseProviderCursor(cursor)));
+    }
+
+    constraints.push(limit(pageSize + 1));
 
     const [providerSnapshot, specialties] = await Promise.all([
       getDocs(query(collection(this.firestore, 'providers'), ...constraints)),
       this.listSpecialties(),
     ]);
-    const providers = providerSnapshot.docs.map((document) =>
+    const pageDocuments = providerSnapshot.docs.slice(0, pageSize);
+    const providers = pageDocuments.map((document) =>
       mapProviderDocument(document.id, document.data()),
     );
+    const lastProvider = providers[providers.length - 1];
 
-    return selectProviders(providers, specialties, search);
+    return {
+      items: selectProviders(providers, specialties, search),
+      nextCursor:
+        providerSnapshot.size > pageSize && lastProvider !== undefined
+          ? createProviderCursor(lastProvider)
+          : null,
+    };
   }
 
   public async listSpecialties() {

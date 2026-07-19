@@ -1,6 +1,6 @@
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
-import { AppThemeProvider } from '@/theme';
+import { TestAppProviders } from '@/test/test-app-providers';
 
 import { fixtureCareRepository } from '../data/fixture-care-repository';
 import type { CareRepository } from '../domain/repository';
@@ -9,13 +9,13 @@ import { ProviderDetailScreen } from './provider-detail-screen';
 describe('ProviderDetailScreen', () => {
   it('shows decision-making details from the fictional repository', async () => {
     const view = await render(
-      <AppThemeProvider colorScheme="light">
+      <TestAppProviders colorScheme="light">
         <ProviderDetailScreen
           onBack={jest.fn()}
           providerId="lina-haddad"
           repository={fixtureCareRepository}
         />
-      </AppThemeProvider>,
+      </TestAppProviders>,
     );
 
     await waitFor(() =>
@@ -30,13 +30,13 @@ describe('ProviderDetailScreen', () => {
   it('provides a safe way back when a provider is missing', async () => {
     const onBack = jest.fn();
     const view = await render(
-      <AppThemeProvider colorScheme="dark">
+      <TestAppProviders colorScheme="dark">
         <ProviderDetailScreen
           onBack={onBack}
           providerId="missing-provider"
           repository={fixtureCareRepository}
         />
-      </AppThemeProvider>,
+      </TestAppProviders>,
     );
 
     const browseButton = await waitFor(() =>
@@ -54,13 +54,13 @@ describe('ProviderDetailScreen', () => {
       getProvider: jest.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValue(null),
       listAvailableSlots: jest.fn().mockResolvedValue([]),
       listClinics: jest.fn().mockResolvedValue([]),
-      listProviders: jest.fn().mockResolvedValue([]),
+      listProviderPage: jest.fn().mockResolvedValue({ items: [], nextCursor: null }),
       listSpecialties: jest.fn().mockResolvedValue([]),
     };
     const view = await render(
-      <AppThemeProvider colorScheme="light">
+      <TestAppProviders colorScheme="light">
         <ProviderDetailScreen onBack={jest.fn()} providerId="lina-haddad" repository={repository} />
-      </AppThemeProvider>,
+      </TestAppProviders>,
     );
 
     const retryButton = await waitFor(() => view.getByRole('button', { name: 'Try again' }));

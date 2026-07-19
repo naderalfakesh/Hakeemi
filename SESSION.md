@@ -17,10 +17,14 @@
 - Provider data: native builds now use a bounded React Native Firebase
   repository with Zod-validated DTO mappers; Jest and the static web portfolio
   export resolve an explicit deterministic fixture adapter.
-- Cloud verification: the new provider-list index is deployed and building;
-  the matching query shapes pass Emulator Suite authorization tests.
+- Server state: TanStack Query owns stable discovery/detail keys, retry and
+  caching; provider discovery uses tested opaque Firestore cursor pages.
+- Cloud verification: the primary provider-list index is ready and the
+  specialty-ordering index is deployed and completing its background build.
+  The exact native contract reads 6 providers, 6 specialties, and ordered slots
+  from the seeded development project.
 - Billing boundary: Cloud Storage remains emulator-only; enabling it now
   requires the Blaze plan and an explicit billing decision.
-- Next action: add TanStack Query caching and cursor pagination, then persist
-  locale/theme preferences behind the existing owner-only rules.
+- Next action: persist locale/theme preferences behind the existing owner-only
+  rules and close Phase 2 with end-to-end verification.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).

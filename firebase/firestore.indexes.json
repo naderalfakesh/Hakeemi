@@ -23,6 +23,16 @@
       "fields": [
         { "fieldPath": "isActive", "order": "ASCENDING" },
         { "fieldPath": "specialtyIds", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "isFeatured", "order": "DESCENDING" },
+        { "fieldPath": "displayName", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "providers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "isActive", "order": "ASCENDING" },
+        { "fieldPath": "specialtyIds", "arrayConfig": "CONTAINS" },
         { "fieldPath": "displayName", "order": "ASCENDING" }
       ]
     },

@@ -1,8 +1,13 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useInfiniteQuery, useQueries, useQuery } from '@tanstack/react-query';
+import { useCallback, useMemo } from 'react';
 
 import { careRepository } from '@/features/care/data/care-repository';
-import type { CareRepository } from '../domain/repository';
+
+import { careQueryKeys } from '../data/query-keys';
+import type { CareRepository, ProviderPageCursor } from '../domain/repository';
 import type { AvailabilitySlot, Provider, Specialty } from '../domain/types';
+
+const PROVIDER_PAGE_SIZE = 12;
 
 export type ProviderDiscoveryData = {
   nextSlots: ReadonlyMap<string, AvailabilitySlot>;
@@ -24,61 +29,93 @@ export function useProviderDiscovery({
   repository = careRepository,
   specialtyId,
 }: ProviderDiscoveryOptions) {
-  const [requestVersion, setRequestVersion] = useState(0);
-  const [state, setState] = useState<ProviderDiscoveryState>({ status: 'loading' });
+  const search = useMemo(
+    () => ({ query, ...(specialtyId ? { specialtyId } : {}) }),
+    [query, specialtyId],
+  );
+  const specialtiesQuery = useQuery({
+    queryKey: careQueryKeys.specialties(),
+    queryFn: () => repository.listSpecialties(),
+  });
+  const providersQuery = useInfiniteQuery({
+    queryKey: careQueryKeys.discovery(search),
+    queryFn: ({ pageParam }) => repository.listProviderPage(search, pageParam, PROVIDER_PAGE_SIZE),
+    initialPageParam: null as ProviderPageCursor | null,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+  });
+  const providers = useMemo(() => {
+    const seen = new Set<string>();
 
-  useEffect(() => {
-    let isCurrent = true;
-
-    async function loadDiscovery() {
-      try {
-        const [providers, specialties] = await Promise.all([
-          repository.listProviders({
-            query,
-            ...(specialtyId ? { specialtyId } : {}),
-          }),
-          repository.listSpecialties(),
-        ]);
-        const slotsByProvider = await Promise.all(
-          providers.map(async (provider) => {
-            const slots = await repository.listAvailableSlots(provider.id);
-            return [provider.id, slots[0]] as const;
-          }),
-        );
-
-        if (!isCurrent) {
-          return;
-        }
-
-        const nextSlots = new Map<string, AvailabilitySlot>();
-        for (const [providerId, slot] of slotsByProvider) {
-          if (slot) {
-            nextSlots.set(providerId, slot);
+    return (
+      providersQuery.data?.pages
+        .flatMap((page) => page.items)
+        .filter((provider) => {
+          if (seen.has(provider.id)) {
+            return false;
           }
-        }
 
-        setState({
-          status: 'success',
-          data: { nextSlots, providers, specialties },
-        });
-      } catch {
-        if (isCurrent) {
-          setState({ status: 'error' });
-        }
+          seen.add(provider.id);
+          return true;
+        }) ?? []
+    );
+  }, [providersQuery.data?.pages]);
+  const slotQueries = useQueries({
+    queries: providers.map((provider) => ({
+      queryKey: careQueryKeys.availability(provider.id),
+      queryFn: () => repository.listAvailableSlots(provider.id),
+    })),
+  });
+  const hasSlotError = slotQueries.some((slotQuery) => slotQuery.isError);
+  const hasPendingSlot = slotQueries.some((slotQuery) => slotQuery.isPending);
+  let state: ProviderDiscoveryState;
+
+  if (providersQuery.isError || specialtiesQuery.isError || hasSlotError) {
+    state = { status: 'error' };
+  } else if (providersQuery.isPending || specialtiesQuery.isPending || hasPendingSlot) {
+    state = { status: 'loading' };
+  } else {
+    const nextSlots = new Map<string, AvailabilitySlot>();
+
+    for (const [index, slotQuery] of slotQueries.entries()) {
+      const provider = providers[index];
+      const slot = slotQuery.data?.[0];
+
+      if (provider && slot) {
+        nextSlots.set(provider.id, slot);
       }
     }
 
-    void loadDiscovery();
-
-    return () => {
-      isCurrent = false;
+    state = {
+      status: 'success',
+      data: {
+        nextSlots,
+        providers,
+        specialties: specialtiesQuery.data,
+      },
     };
-  }, [query, repository, requestVersion, specialtyId]);
+  }
 
   const retry = useCallback(() => {
-    setState({ status: 'loading' });
-    setRequestVersion((version) => version + 1);
-  }, []);
+    void providersQuery.refetch();
+    void specialtiesQuery.refetch();
 
-  return { retry, state };
+    for (const slotQuery of slotQueries) {
+      if (slotQuery.isError) {
+        void slotQuery.refetch();
+      }
+    }
+  }, [providersQuery, slotQueries, specialtiesQuery]);
+  const loadMore = useCallback(() => {
+    if (providersQuery.hasNextPage && !providersQuery.isFetching) {
+      void providersQuery.fetchNextPage();
+    }
+  }, [providersQuery]);
+
+  return {
+    hasMore: providersQuery.hasNextPage,
+    isLoadingMore: providersQuery.isFetchingNextPage,
+    loadMore,
+    retry,
+    state,
+  };
 }
