@@ -35,7 +35,7 @@ export function selectProviders(
 
       return normalize(searchableValues.join(' ')).includes(normalizedQuery);
     })
-    .toSorted((left, right) => {
+    .sort((left, right) => {
       if (left.isFeatured !== right.isFeatured) {
         return left.isFeatured ? -1 : 1;
       }

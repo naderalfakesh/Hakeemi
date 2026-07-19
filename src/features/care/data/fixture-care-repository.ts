@@ -22,7 +22,7 @@ export class FixtureCareRepository implements CareRepository {
   public async listAvailableSlots(providerId: string) {
     return buildAvailabilityFixtures(this.now())
       .filter((slot) => slot.providerId === providerId)
-      .toSorted((left, right) => left.startsAt.localeCompare(right.startsAt));
+      .sort((left, right) => left.startsAt.localeCompare(right.startsAt));
   }
 
   public async listClinics() {
@@ -36,7 +36,7 @@ export class FixtureCareRepository implements CareRepository {
   public async listSpecialties() {
     return specialtyFixtures
       .filter((specialty) => specialty.isActive)
-      .toSorted((left, right) => left.sortOrder - right.sortOrder);
+      .sort((left, right) => left.sortOrder - right.sortOrder);
   }
 }
 
