@@ -602,13 +602,13 @@ and inspect provider details using local fixtures.*
 #### Setup
 
 - [x] Replace the legacy scaffold with a clean Expo SDK 57 TypeScript project.
-- [ ] Configure CNG, `expo-dev-client`, New Architecture, npm scripts, and Node
+- [x] Configure CNG, `expo-dev-client`, New Architecture, npm scripts, and Node
   version metadata.
-- [ ] Configure Expo Router under `src/app` with typed routes and four tab
+- [x] Configure Expo Router under `src/app` with typed routes and four tab
   destinations.
 - [ ] Configure strict TypeScript, ESLint, Prettier, import aliases, environment
   validation, and pre-commit checks.
-- [ ] Add development, preview, and production EAS profiles without credentials.
+- [x] Add development, preview, and production EAS profiles without credentials.
 
 #### Design system
 
@@ -1022,5 +1022,6 @@ The modernization is complete only when:
 ## Current position
 
 Phase 0 is complete. **Phase 1: Ship a modern, browseable app** is in progress.
-The clean SDK 57 scaffold is verified; development-client and router
-configuration are next.
+The SDK 57 scaffold, development client, typed four-tab router, CNG prebuild,
+and credential-free EAS profiles are verified. Strict quality tooling and the
+test harness are next.
