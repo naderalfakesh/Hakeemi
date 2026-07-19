@@ -25,7 +25,7 @@ service cloud.firestore {
       return request.resource.data.keys().hasOnly(['providerId', 'savedAt'])
         && request.resource.data.providerId == providerId
         && request.resource.data.savedAt == request.time
-        && exists(/databases/$(database)/documents/providers/$(providerId));
+        && get(/databases/$(database)/documents/providers/$(providerId)).data.isActive == true;
     }
 
     match /specialties/{specialtyId} {

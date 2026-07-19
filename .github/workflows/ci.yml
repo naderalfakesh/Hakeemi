@@ -33,9 +33,24 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            functions/package-lock.json
 
-      - name: Install dependencies
+      - name: Install app dependencies
         run: npm ci
+
+      - name: Install Functions dependencies
+        run: npm ci --prefix functions
 
       - name: Validate app
         run: npm run validate
+
+      - name: Use Java for Firebase emulators
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Test Firebase Security Rules
+        run: npm run firebase:rules:test
