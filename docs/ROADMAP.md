@@ -614,11 +614,11 @@ _Estimated effort: two to three sessions_
 
 - [x] Implement semantic color, spacing, radius, typography, elevation, and
       motion tokens for light and dark themes.
-- [ ] Build accessible text, button, icon button, field, chip, surface, skeleton,
+- [x] Build accessible text, button, icon button, field, chip, surface, skeleton,
       empty-state, and inline-error primitives.
-- [ ] Add a development-only component catalogue or current React Native
+- [x] Add a development-only component catalogue or current React Native
       Storybook if it is cleanly compatible with the development build.
-- [ ] Add interaction tests for component states and accessibility labels.
+- [x] Add interaction tests for component states and accessibility labels.
 
 #### Frontend
 
@@ -1022,7 +1022,6 @@ The modernization is complete only when:
 ## Current position
 
 Phase 0 is complete. **Phase 1: Ship a modern, browseable app** is in progress.
-The SDK 57 foundation now includes development builds, typed routing, strict
-automated quality gates, and semantic light/dark design tokens whose critical
-text combinations are contrast-tested. Accessible primitives and the component
-catalogue are next.
+The SDK 57 foundation, automated quality gates, semantic themes, accessible
+primitives, and development-only component catalogue are complete. Demo entry,
+the real tab experience, and fixture-backed provider discovery are next.
