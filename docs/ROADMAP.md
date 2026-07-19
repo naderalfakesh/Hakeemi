@@ -622,7 +622,7 @@ _Estimated effort: two to three sessions_
 
 #### Frontend
 
-- [ ] Implement onboarding/demo entry and the tab shell.
+- [x] Implement onboarding/demo entry and the tab shell.
 - [ ] Create typed local provider, specialty, clinic, and slot fixtures.
 - [ ] Implement Home, Find Care, provider results, and provider details.
 - [ ] Make search and specialty filters functional against fixtures.
@@ -1022,6 +1022,6 @@ The modernization is complete only when:
 ## Current position
 
 Phase 0 is complete. **Phase 1: Ship a modern, browseable app** is in progress.
-The SDK 57 foundation, automated quality gates, semantic themes, accessible
-primitives, and development-only component catalogue are complete. Demo entry,
-the real tab experience, and fixture-backed provider discovery are next.
+The SDK 57 foundation, quality gates, design system, explicit portfolio-demo
+entry, and four-tab shell are complete. Typed fictional fixtures and functional
+provider discovery are next.
