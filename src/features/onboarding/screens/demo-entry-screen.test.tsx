@@ -16,7 +16,7 @@ describe('DemoEntryScreen', () => {
     expect(view.getByRole('header', { name: 'Care, without the runaround.' })).toBeOnTheScreen();
     expect(view.getByText(/No real clinicians/iu)).toBeOnTheScreen();
 
-    fireEvent.press(view.getByRole('button', { name: 'Explore the Hakeemi portfolio demo' }));
+    await fireEvent.press(view.getByRole('button', { name: 'Explore the Hakeemi portfolio demo' }));
 
     expect(onContinue).toHaveBeenCalledTimes(1);
   });

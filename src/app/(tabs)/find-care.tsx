@@ -1,10 +1,13 @@
-import { PlaceholderScreen } from '@/components/navigation/placeholder-screen';
+import { router } from 'expo-router';
 
-export default function FindCareScreen() {
+import { FindCareScreen } from '@/features/care/screens/find-care-screen';
+
+export default function FindCareRoute() {
   return (
-    <PlaceholderScreen
-      description="Search specialists, compare availability, and choose the right clinician."
-      title="Find care"
+    <FindCareScreen
+      onSelectProvider={(providerId) =>
+        router.push({ pathname: '/providers/[providerId]', params: { providerId } })
+      }
     />
   );
 }

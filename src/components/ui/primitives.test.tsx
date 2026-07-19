@@ -23,8 +23,8 @@ describe('interactive primitives', () => {
       </>,
     );
 
-    fireEvent.press(view.getByRole('button', { name: 'Continue' }));
-    fireEvent.press(view.getByRole('button', { name: 'Unavailable' }));
+    await fireEvent.press(view.getByRole('button', { name: 'Continue' }));
+    await fireEvent.press(view.getByRole('button', { name: 'Unavailable' }));
 
     expect(onPress).toHaveBeenCalledTimes(1);
     expect(view.getByRole('button', { name: 'Unavailable' })).toBeDisabled();

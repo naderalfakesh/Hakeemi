@@ -625,9 +625,9 @@ _Estimated effort: two to three sessions_
 - [x] Implement onboarding/demo entry and the tab shell.
 - [x] Create typed local provider, specialty, clinic, and slot fixtures.
 - [ ] Implement Home, Find Care, provider results, and provider details.
-- [ ] Make search and specialty filters functional against fixtures.
+- [x] Make search and specialty filters functional against fixtures.
 - [ ] Add loading, empty, error, and retry variants to every data surface.
-- [ ] Use only serializable route parameters.
+- [x] Use only serializable route parameters.
 
 #### Definition of done
 
