@@ -612,7 +612,7 @@ _Estimated effort: two to three sessions_
 
 #### Design system
 
-- [ ] Implement semantic color, spacing, radius, typography, elevation, and
+- [x] Implement semantic color, spacing, radius, typography, elevation, and
       motion tokens for light and dark themes.
 - [ ] Build accessible text, button, icon button, field, chip, surface, skeleton,
       empty-state, and inline-error primitives.
@@ -1022,7 +1022,7 @@ The modernization is complete only when:
 ## Current position
 
 Phase 0 is complete. **Phase 1: Ship a modern, browseable app** is in progress.
-The SDK 57 foundation now includes the development client, typed four-tab
-router, CNG prebuild, credential-free EAS profiles, strict static analysis,
-environment validation, pre-commit checks, and a passing component-test harness.
-The design foundations are next.
+The SDK 57 foundation now includes development builds, typed routing, strict
+automated quality gates, and semantic light/dark design tokens whose critical
+text combinations are contrast-tested. Accessible primitives and the component
+catalogue are next.

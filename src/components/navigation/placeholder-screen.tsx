@@ -1,5 +1,8 @@
+import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { useAppTheme, type AppTheme } from '@/theme';
 
 type PlaceholderScreenProps = {
   description: string;
@@ -7,6 +10,9 @@ type PlaceholderScreenProps = {
 };
 
 export function PlaceholderScreen({ description, title }: PlaceholderScreenProps) {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <View style={styles.content}>
@@ -19,27 +25,26 @@ export function PlaceholderScreen({ description, title }: PlaceholderScreenProps
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#F7FAF9',
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 24,
-  },
-  title: {
-    color: '#102A2A',
-    fontSize: 32,
-    fontWeight: '700',
-    letterSpacing: -0.8,
-  },
-  description: {
-    color: '#4D6564',
-    fontSize: 17,
-    lineHeight: 25,
-    marginTop: 8,
-    maxWidth: 480,
-  },
-});
+function createStyles(theme: AppTheme) {
+  return StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: theme.colors.canvas,
+    },
+    content: {
+      flex: 1,
+      justifyContent: 'center',
+      padding: theme.spacing.lg,
+    },
+    title: {
+      ...theme.typeScale.titleLarge,
+      color: theme.colors.textPrimary,
+    },
+    description: {
+      ...theme.typeScale.bodyLarge,
+      color: theme.colors.textSecondary,
+      marginTop: theme.spacing.xs,
+      maxWidth: theme.sizes.contentMaxWidth,
+    },
+  });
+}

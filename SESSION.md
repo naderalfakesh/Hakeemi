@@ -2,5 +2,5 @@
 
 - Current phase: Phase 1 — modern Expo foundation.
 - Legacy baseline: `dade72b`, preserved by the `legacy-v1` tag.
-- Next action: implement semantic light/dark design tokens and theme plumbing.
+- Next action: build accessible UI primitives and their development catalogue.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).
