@@ -1,6 +1,6 @@
 # Hakeemi Modernization Roadmap
 
-> Status: Phase 1 in progress
+> Status: Phase 1 complete; Phase 2 ready
 >
 > Baseline: `dade72b` on `master`
 >
@@ -590,7 +590,10 @@ _Estimated effort: one short session_
 1. `docs: add Hakeemi modernization roadmap`
 2. `docs: record legacy baseline and Expo architecture decision`
 
-### Phase 1 — Ship a modern, browseable app
+### Phase 1 — Ship a modern, browseable app ✅
+
+_Completed: 2026-07-19, final implementation commit `d426031`. See
+`docs/phase-1-verification.md`._
 
 _Goal: a user can open a modern Expo app, browse realistic fictional providers,
 and inspect provider details using local fixtures._
@@ -1007,7 +1010,7 @@ _Estimated effort: one session_
 
 The modernization is complete only when:
 
-- [ ] The current Expo SDK and New Architecture run on iOS and Android.
+- [x] The current Expo SDK and New Architecture run on iOS and Android.
 - [ ] A user can discover, book, view, reschedule, and cancel an appointment.
 - [ ] Double-booking and cross-user data access are prevented by tested server
       logic and rules.
@@ -1021,8 +1024,13 @@ The modernization is complete only when:
 
 ## Current position
 
-Phase 0 is complete. **Phase 1: Ship a modern, browseable app** is in progress.
-The Phase 1 product slice is implemented: explicit demo entry, Home
-recommendations, functional search and specialty filters, provider results, and
-deep-linkable provider profiles backed by a replaceable fictional repository.
-Native simulator smoke testing is next.
+Phases 0 and 1 are complete. The Expo SDK 57 product slice builds and runs on
+current iOS and Android simulators. The verified guest journey covers demo
+entry, Home recommendations, functional provider search and specialty filters,
+and deep-linkable provider profiles backed by a replaceable fictional
+repository. Full results are recorded in `docs/phase-1-verification.md`.
+
+**Phase 2: Connect secure accounts and live provider data** is ready to begin
+with emulator-first Firebase scaffolding. Creating or linking an external
+Firebase development project remains a deliberate user-owned environment step;
+the inaccessible legacy project will not be reused.
