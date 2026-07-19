@@ -680,7 +680,7 @@ _Estimated effort: two sessions_
 - [x] Add TanStack Query keys, caching, and provider cursor pagination.
 - [x] Replace local provider fixtures with Firestore repositories while keeping
       an explicit demo data adapter for tests/previews.
-- [ ] Persist locale/theme preferences without storing secrets in general
+- [x] Persist locale/theme preferences without storing secrets in general
       storage.
 
 #### Definition of done
@@ -1037,8 +1037,9 @@ application-level session restoration, and idempotent server-owned profile
 bootstrap are implemented. Native provider discovery now resolves a bounded
 React Native Firebase repository with runtime-validated DTO mappers; Jest and
 the static web export explicitly resolve the deterministic fixture repository.
-Rules tests cover the production discovery query shapes, and their cloud
-indexes are deployed (the final specialty-ordering index is completing its
-background build). TanStack Query now owns server-state caching, retry, and
-cursor pagination. User preference persistence remains before Phase 2 can
-close.
+Rules tests cover the production discovery query shapes, and all cloud indexes
+are ready. TanStack Query owns server-state caching, retry, and cursor
+pagination. Owner-only locale/theme preferences now synchronize through
+Firestore with optimistic updates and rollback; an authenticated disposable
+cloud smoke test passed and removed both its Auth user and preference document.
+Phase 2 implementation is complete and final end-to-end verification remains.

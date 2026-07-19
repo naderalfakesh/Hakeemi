@@ -3,6 +3,7 @@ import type { ViewStyle } from 'react-native';
 import { motion, radii, sizes, spacing, typeScale, zIndices } from './tokens';
 
 export type ThemeMode = 'light' | 'dark';
+export type ThemePreference = ThemeMode | 'system';
 
 export type SemanticColors = {
   accent: string;

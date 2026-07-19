@@ -19,12 +19,14 @@
   export resolve an explicit deterministic fixture adapter.
 - Server state: TanStack Query owns stable discovery/detail keys, retry and
   caching; provider discovery uses tested opaque Firestore cursor pages.
-- Cloud verification: the primary provider-list index is ready and the
-  specialty-ordering index is deployed and completing its background build.
-  The exact native contract reads 6 providers, 6 specialties, and ordered slots
-  from the seeded development project.
+- Preferences: owner-only locale/theme choices sync through Firestore with
+  optimistic updates and rollback; the theme preference updates the live app.
+- Cloud verification: all provider indexes are ready. Exact discovery and
+  specialty query contracts pass against the 6-provider development seed, and
+  a disposable authenticated owner preference write/read passed with complete
+  Auth and document cleanup.
 - Billing boundary: Cloud Storage remains emulator-only; enabling it now
   requires the Blaze plan and an explicit billing decision.
-- Next action: persist locale/theme preferences behind the existing owner-only
-  rules and close Phase 2 with end-to-end verification.
+- Next action: close Phase 2 with end-to-end verification, then rewrite the
+  README as the current portfolio case study.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).

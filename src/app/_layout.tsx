@@ -6,6 +6,10 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import '@/config/env';
 import { AppText } from '@/components/ui';
 import { AuthSessionProvider, useAuthSession } from '@/features/auth/context/auth-session-provider';
+import {
+  AppPreferencesProvider,
+  useAppPreferences,
+} from '@/features/preferences/context/app-preferences-provider';
 import { initializeFirebaseServices } from '@/services/firebase/initialize';
 import { AppQueryProvider } from '@/services/query/query-provider';
 import { AppThemeProvider, darkNavigationTheme, lightNavigationTheme, useAppTheme } from '@/theme';
@@ -39,16 +43,26 @@ function Navigation() {
   );
 }
 
+function AppShell() {
+  const { preferences } = useAppPreferences();
+
+  return (
+    <AppThemeProvider preference={preferences.theme}>
+      <Navigation />
+    </AppThemeProvider>
+  );
+}
+
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.root}>
-      <AppThemeProvider>
-        <AppQueryProvider>
-          <AuthSessionProvider>
-            <Navigation />
-          </AuthSessionProvider>
-        </AppQueryProvider>
-      </AppThemeProvider>
+      <AppQueryProvider>
+        <AuthSessionProvider>
+          <AppPreferencesProvider>
+            <AppShell />
+          </AppPreferencesProvider>
+        </AuthSessionProvider>
+      </AppQueryProvider>
     </GestureHandlerRootView>
   );
 }

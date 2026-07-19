@@ -11,6 +11,9 @@ export function createAppQueryClient({
 }: QueryClientOptions = {}) {
   return new QueryClient({
     defaultOptions: {
+      mutations: {
+        gcTime,
+      },
       queries: {
         gcTime,
         refetchOnWindowFocus: false,
