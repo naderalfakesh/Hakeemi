@@ -418,7 +418,7 @@ Only the owner may read or update approved profile fields.
 - `visitModes: ('in_person' | 'video')[]`
 - `consultationFee: { amount: number; currency: string } | null`
 - `ratingSummary: { average: number; count: number } | null`
-- `image: { url: string; blurhash: string; alt: string }`
+- `image: { url: string; blurhash: string; alt: string } | null`
 - `isFeatured: boolean`
 - `isActive: boolean`
 - `createdAt: Timestamp`
@@ -623,7 +623,7 @@ _Estimated effort: two to three sessions_
 #### Frontend
 
 - [x] Implement onboarding/demo entry and the tab shell.
-- [ ] Create typed local provider, specialty, clinic, and slot fixtures.
+- [x] Create typed local provider, specialty, clinic, and slot fixtures.
 - [ ] Implement Home, Find Care, provider results, and provider details.
 - [ ] Make search and specialty filters functional against fixtures.
 - [ ] Add loading, empty, error, and retry variants to every data surface.
