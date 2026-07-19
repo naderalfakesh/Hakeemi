@@ -85,22 +85,22 @@ claims:
 
 ### Repository baseline
 
-| Area | Current state | Consequence |
-| --- | --- | --- |
-| Runtime | React Native 0.64.1, React 17, TypeScript 4.2 | About five years of framework and toolchain drift |
-| Native projects | Manually maintained `ios/` and `android/` | Large upgrade surface despite no custom native feature |
-| Architecture | Legacy bridge-era project | Must move to the mandatory New Architecture used by current React Native |
-| Navigation | React Navigation 5 with nested drawer, stack, and modal stacks | High boilerplate; function values are passed in route params |
-| Backend | React Native Firebase Auth and Firestore | Backend exists only as direct client calls; no server contract in the repo |
-| Booking model | Appointment objects embedded in each doctor document | Leaks user IDs, grows documents, and permits booking races |
-| Profile | Hard-coded user and appointment data | The core post-booking experience is not real |
-| Search/filter | Search field and service selection are visual only | Primary discovery UI does not affect data |
-| Localization | English and Turkish toggle | Not persisted; no RTL; Turkish appears inherited from the original concept |
-| UI foundation | Custom components, theme values, 7 stories, 12 tests/snapshots | Useful intent, but the design system and test stack are obsolete |
-| Quality | No CI, E2E, emulator tests, rules, error boundary, or release setup | Cannot establish production readiness |
-| Native release | Android release build uses the debug signing key | Must never be carried into a modern release setup |
-| Configuration | Firebase mobile config files are tracked | Existing project access and rules must be audited before reuse |
-| Reproducibility | `node_modules` absent and no current build proof | Legacy runtime capture is best-effort, not a migration blocker |
+| Area            | Current state                                                       | Consequence                                                                |
+| --------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Runtime         | React Native 0.64.1, React 17, TypeScript 4.2                       | About five years of framework and toolchain drift                          |
+| Native projects | Manually maintained `ios/` and `android/`                           | Large upgrade surface despite no custom native feature                     |
+| Architecture    | Legacy bridge-era project                                           | Must move to the mandatory New Architecture used by current React Native   |
+| Navigation      | React Navigation 5 with nested drawer, stack, and modal stacks      | High boilerplate; function values are passed in route params               |
+| Backend         | React Native Firebase Auth and Firestore                            | Backend exists only as direct client calls; no server contract in the repo |
+| Booking model   | Appointment objects embedded in each doctor document                | Leaks user IDs, grows documents, and permits booking races                 |
+| Profile         | Hard-coded user and appointment data                                | The core post-booking experience is not real                               |
+| Search/filter   | Search field and service selection are visual only                  | Primary discovery UI does not affect data                                  |
+| Localization    | English and Turkish toggle                                          | Not persisted; no RTL; Turkish appears inherited from the original concept |
+| UI foundation   | Custom components, theme values, 7 stories, 12 tests/snapshots      | Useful intent, but the design system and test stack are obsolete           |
+| Quality         | No CI, E2E, emulator tests, rules, error boundary, or release setup | Cannot establish production readiness                                      |
+| Native release  | Android release build uses the debug signing key                    | Must never be carried into a modern release setup                          |
+| Configuration   | Firebase mobile config files are tracked                            | Existing project access and rules must be audited before reuse             |
+| Reproducibility | `node_modules` absent and no current build proof                    | Legacy runtime capture is best-effort, not a migration blocker             |
 
 ### Code and product issues to retire
 
@@ -137,31 +137,31 @@ legacy toolchain can still run.
 Legend: **P** = pass, **W** = needs work, **F** = fail, **—** = not applicable
 to the static screen.
 
-| Screen | Hierarchy | Spacing | Type | Color | Grid | Components | Icons | Motion | Empty | Loading | Error | Theme | Density | Responsive | A11y |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Welcome | W | W | W | W | W | P | — | F | — | — | F | F | W | F | F |
-| Sign in | W | W | W | W | W | P | W | F | — | W | W | F | W | W | F |
-| Sign up | W | W | W | W | W | P | W | F | — | W | W | F | W | W | F |
-| Forgot password | W | W | W | W | W | P | W | F | — | W | W | F | W | W | F |
-| Home | W | W | W | W | W | W | W | F | F | W | F | F | W | F | F |
-| Doctors | W | W | W | W | W | W | W | F | F | W | F | F | W | W | F |
-| Doctor profile | W | W | W | W | W | W | W | F | F | W | W | F | W | W | F |
-| Schedule dialog | W | W | W | W | W | W | W | F | F | W | W | F | F | F | F |
-| Profile | W | W | W | W | W | W | — | F | F | W | F | F | W | W | F |
+| Screen          | Hierarchy | Spacing | Type | Color | Grid | Components | Icons | Motion | Empty | Loading | Error | Theme | Density | Responsive | A11y |
+| --------------- | --------- | ------- | ---- | ----- | ---- | ---------- | ----- | ------ | ----- | ------- | ----- | ----- | ------- | ---------- | ---- |
+| Welcome         | W         | W       | W    | W     | W    | P          | —     | F      | —     | —       | F     | F     | W       | F          | F    |
+| Sign in         | W         | W       | W    | W     | W    | P          | W     | F      | —     | W       | W     | F     | W       | W          | F    |
+| Sign up         | W         | W       | W    | W     | W    | P          | W     | F      | —     | W       | W     | F     | W       | W          | F    |
+| Forgot password | W         | W       | W    | W     | W    | P          | W     | F      | —     | W       | W     | F     | W       | W          | F    |
+| Home            | W         | W       | W    | W     | W    | W          | W     | F      | F     | W       | F     | F     | W       | F          | F    |
+| Doctors         | W         | W       | W    | W     | W    | W          | W     | F      | F     | W       | F     | F     | W       | W          | F    |
+| Doctor profile  | W         | W       | W    | W     | W    | W          | W     | F      | F     | W       | W     | F     | W       | W          | F    |
+| Schedule dialog | W         | W       | W    | W     | W    | W          | W     | F      | F     | W       | W     | F     | F       | F          | F    |
+| Profile         | W         | W       | W    | W     | W    | W          | —     | F      | F     | W       | F     | F     | W       | W          | F    |
 
 ### Kill, elevate, redesign
 
-| Existing element | Decision | Reason |
-| --- | --- | --- |
-| Drawer as primary navigation | Remove | Hides the three core destinations and adds a redundant stack layer |
-| COVID “Stay Home” card | Remove | Time-bound 2021 content no longer serves the booking task |
-| Language toggle on Welcome and Profile | Redesign | Language is valuable, but a binary switch does not scale or explain the choice |
-| Avatar-only “recent doctors” row | Redesign | Fast access is useful, but faces without names, specialty, or availability are ambiguous |
-| Eight equal medical-service tiles | Redesign | Selection is useful, but equal visual weight and non-functional filtering create cognitive load |
-| Search | Elevate | Provider discovery is a primary intent and must lead to useful results immediately |
-| Next available appointment | Elevate | This is the decisive booking information and belongs on list cards and provider profiles |
-| Booking confirmation and management | Elevate | This is the product's promise, not an incidental modal |
-| Decorative background pattern | Remove or greatly reduce | It competes with content and does not strengthen trust |
+| Existing element                       | Decision                 | Reason                                                                                          |
+| -------------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------- |
+| Drawer as primary navigation           | Remove                   | Hides the three core destinations and adds a redundant stack layer                              |
+| COVID “Stay Home” card                 | Remove                   | Time-bound 2021 content no longer serves the booking task                                       |
+| Language toggle on Welcome and Profile | Redesign                 | Language is valuable, but a binary switch does not scale or explain the choice                  |
+| Avatar-only “recent doctors” row       | Redesign                 | Fast access is useful, but faces without names, specialty, or availability are ambiguous        |
+| Eight equal medical-service tiles      | Redesign                 | Selection is useful, but equal visual weight and non-functional filtering create cognitive load |
+| Search                                 | Elevate                  | Provider discovery is a primary intent and must lead to useful results immediately              |
+| Next available appointment             | Elevate                  | This is the decisive booking information and belongs on list cards and provider profiles        |
+| Booking confirmation and management    | Elevate                  | This is the product's promise, not an incidental modal                                          |
+| Decorative background pattern          | Remove or greatly reduce | It competes with content and does not strengthen trust                                          |
 
 ## 4. Target experience and information architecture
 
@@ -181,12 +181,12 @@ to the static screen.
 
 Use four visible bottom tabs instead of a drawer:
 
-| Tab | Purpose | Primary action |
-| --- | --- | --- |
-| Home | Greeting, next appointment, specialties, recommended providers | Resume care or find a doctor |
-| Find care | Search, filters, results, recent searches | Choose a provider |
-| Appointments | Upcoming and past appointments | Manage the next appointment |
-| Profile | Personal details, saved providers, language, theme, privacy | Update preferences |
+| Tab          | Purpose                                                        | Primary action               |
+| ------------ | -------------------------------------------------------------- | ---------------------------- |
+| Home         | Greeting, next appointment, specialties, recommended providers | Resume care or find a doctor |
+| Find care    | Search, filters, results, recent searches                      | Choose a provider            |
+| Appointments | Upcoming and past appointments                                 | Manage the next appointment  |
+| Profile      | Personal details, saved providers, language, theme, privacy    | Update preferences           |
 
 Stack and modal routes:
 
@@ -264,19 +264,19 @@ teal healthcare template.
 These are implementation targets, subject to contrast verification on real
 devices:
 
-| Token group | Direction |
-| --- | --- |
-| Canvas | Warm off-white `#F7F8F5`; dark canvas based on deep blue-black rather than pure black |
-| Surface | White/light neutral cards; dark surfaces use brightness steps and borders |
-| Brand | Deep teal around `#0B6B69`, with a pale teal support surface |
-| Ink | Deep ink around `#112326`; muted copy around `#5B6B6E` |
-| Accent | Restrained warm coral for highlights, never as the only state indicator |
-| Semantic | Separate success, warning, destructive, and information tokens with WCAG AA contrast |
-| Spacing | 4-point base with primary rhythm at 8, 12, 16, 24, 32, and 48 |
-| Radius | 12 for controls, 16 for cards, 24 for large sheets; pills only for tags/status |
-| Type | System-first semantic type ramp; choose an Arabic-capable pair only after glyph and Dynamic Type testing |
-| Motion | 160–240 ms micro-interactions, natural spring for selection, reduced-motion alternative |
-| Targets | Minimum 44×44 pt interactive area; 48 pt preferred for primary controls |
+| Token group | Direction                                                                                                |
+| ----------- | -------------------------------------------------------------------------------------------------------- |
+| Canvas      | Warm off-white `#F7F8F5`; dark canvas based on deep blue-black rather than pure black                    |
+| Surface     | White/light neutral cards; dark surfaces use brightness steps and borders                                |
+| Brand       | Deep teal around `#0B6B69`, with a pale teal support surface                                             |
+| Ink         | Deep ink around `#112326`; muted copy around `#5B6B6E`                                                   |
+| Accent      | Restrained warm coral for highlights, never as the only state indicator                                  |
+| Semantic    | Separate success, warning, destructive, and information tokens with WCAG AA contrast                     |
+| Spacing     | 4-point base with primary rhythm at 8, 12, 16, 24, 32, and 48                                            |
+| Radius      | 12 for controls, 16 for cards, 24 for large sheets; pills only for tags/status                           |
+| Type        | System-first semantic type ramp; choose an Arabic-capable pair only after glyph and Dynamic Type testing |
+| Motion      | 160–240 ms micro-interactions, natural spring for selection, reduced-motion alternative                  |
+| Targets     | Minimum 44×44 pt interactive area; 48 pt preferred for primary controls                                  |
 
 ### Component system
 
@@ -294,39 +294,39 @@ devices:
 
 ### Screen-level redesign intent
 
-| Screen | Primary hierarchy change |
-| --- | --- |
-| Onboarding | One clear promise, one primary CTA, secondary sign-in, unobtrusive language access |
-| Authentication | Short forms, inline validation, password-manager support, calm recovery states |
-| Home | Next appointment first for returning users; discovery first for new users |
-| Find care | Search and filters remain visible; result cards expose decision-making information |
-| Provider | Trust details and next availability precede long biography/contact content |
-| Booking | One decision per step, sticky primary action, visible progress, clear timezone |
-| Confirmation | Summarize what happened, provide calendar/reminder actions, link to appointment |
-| Appointments | Upcoming and history segmentation with status and recovery actions |
-| Profile | Real data and preferences; remove the ornamental static appointment section |
+| Screen         | Primary hierarchy change                                                           |
+| -------------- | ---------------------------------------------------------------------------------- |
+| Onboarding     | One clear promise, one primary CTA, secondary sign-in, unobtrusive language access |
+| Authentication | Short forms, inline validation, password-manager support, calm recovery states     |
+| Home           | Next appointment first for returning users; discovery first for new users          |
+| Find care      | Search and filters remain visible; result cards expose decision-making information |
+| Provider       | Trust details and next availability precede long biography/contact content         |
+| Booking        | One decision per step, sticky primary action, visible progress, clear timezone     |
+| Confirmation   | Summarize what happened, provide calendar/reminder actions, link to appointment    |
+| Appointments   | Upcoming and history segmentation with status and recovery actions                 |
+| Profile        | Real data and preferences; remove the ornamental static appointment section        |
 
 ## 7. Target technical stack
 
-| Layer | Choice | Why |
-| --- | --- | --- |
-| Mobile framework | Expo SDK 57 / RN 0.86 / React 19.2 | Current stable framework pairing at plan time |
-| Native lifecycle | CNG + `expo-dev-client`; generated `ios/` and `android/` ignored | Declarative upgrades with full native-library access |
-| Architecture | React Native New Architecture | Required by current React Native and the forward path for libraries |
-| Routing | Expo Router with typed routes | Deep links, simpler route ownership, serializable navigation |
-| Language | Strict TypeScript | Reliable contracts across routes, features, Firebase, and tests |
-| Server state | TanStack Query | Cache, retry, invalidation, mutations, and offline-aware reads |
-| UI state | Local React state and narrowly scoped contexts | Avoid a global store until a concrete cross-feature need exists |
-| Forms | React Hook Form + Zod | Typed validation and reusable form contracts |
-| Backend SDK | React Native Firebase | Retains native Firebase services, Crashlytics, and FCM in a development build |
-| Backend | Firebase Auth, Firestore, Cloud Functions, Storage, App Check, Emulator Suite | Existing domain fit with a repository-owned server contract |
-| Lists/images/motion | FlashList, `expo-image`, Reanimated | Production list, image, and transition behavior |
-| Localization | i18next + Expo Localization; English and Arabic | Existing investment with persisted locale and RTL support |
-| Unit/integration tests | Jest Expo + React Native Testing Library | User-observable component and feature behavior |
-| Backend tests | Functions tests + `@firebase/rules-unit-testing` + emulators | Booking correctness and authorization proofs |
-| E2E | Maestro on iOS and Android | Readable native journey coverage and screenshot automation |
-| CI/CD | GitHub Actions + EAS Build/Update/Submit profiles | Repeatable checks, installable previews, and release evidence |
-| Observability | Crashlytics, Performance Monitoring, structured analytics | Production-shaped diagnosis without exposing sensitive content |
+| Layer                  | Choice                                                                        | Why                                                                           |
+| ---------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Mobile framework       | Expo SDK 57 / RN 0.86 / React 19.2                                            | Current stable framework pairing at plan time                                 |
+| Native lifecycle       | CNG + `expo-dev-client`; generated `ios/` and `android/` ignored              | Declarative upgrades with full native-library access                          |
+| Architecture           | React Native New Architecture                                                 | Required by current React Native and the forward path for libraries           |
+| Routing                | Expo Router with typed routes                                                 | Deep links, simpler route ownership, serializable navigation                  |
+| Language               | Strict TypeScript                                                             | Reliable contracts across routes, features, Firebase, and tests               |
+| Server state           | TanStack Query                                                                | Cache, retry, invalidation, mutations, and offline-aware reads                |
+| UI state               | Local React state and narrowly scoped contexts                                | Avoid a global store until a concrete cross-feature need exists               |
+| Forms                  | React Hook Form + Zod                                                         | Typed validation and reusable form contracts                                  |
+| Backend SDK            | React Native Firebase                                                         | Retains native Firebase services, Crashlytics, and FCM in a development build |
+| Backend                | Firebase Auth, Firestore, Cloud Functions, Storage, App Check, Emulator Suite | Existing domain fit with a repository-owned server contract                   |
+| Lists/images/motion    | FlashList, `expo-image`, Reanimated                                           | Production list, image, and transition behavior                               |
+| Localization           | i18next + Expo Localization; English and Arabic                               | Existing investment with persisted locale and RTL support                     |
+| Unit/integration tests | Jest Expo + React Native Testing Library                                      | User-observable component and feature behavior                                |
+| Backend tests          | Functions tests + `@firebase/rules-unit-testing` + emulators                  | Booking correctness and authorization proofs                                  |
+| E2E                    | Maestro on iOS and Android                                                    | Readable native journey coverage and screenshot automation                    |
+| CI/CD                  | GitHub Actions + EAS Build/Update/Submit profiles                             | Repeatable checks, installable previews, and release evidence                 |
+| Observability          | Crashlytics, Performance Monitoring, structured analytics                     | Production-shaped diagnosis without exposing sensitive content                |
 
 ### Proposed repository structure
 
@@ -504,13 +504,13 @@ transitions happen only through callable functions.
 
 ### Callable function surface
 
-| Function | Phase | Auth | Responsibility |
-| --- | --- | --- | --- |
-| `bookAppointment` | 3 | Patient | Transactionally verify an available slot, create appointment, mark slot booked |
-| `cancelAppointment` | 4 | Owner | Validate cancellation policy, cancel appointment, reopen slot atomically |
-| `rescheduleAppointment` | 4 | Owner | Atomically release old slot and reserve new slot |
-| `registerDeviceToken` | 4 | User | Store a normalized FCM token without exposing other users' tokens |
-| `sendAppointmentReminders` | 4 | Scheduled service | Send reminders and record delivery-safe metadata |
+| Function                   | Phase | Auth              | Responsibility                                                                 |
+| -------------------------- | ----- | ----------------- | ------------------------------------------------------------------------------ |
+| `bookAppointment`          | 3     | Patient           | Transactionally verify an available slot, create appointment, mark slot booked |
+| `cancelAppointment`        | 4     | Owner             | Validate cancellation policy, cancel appointment, reopen slot atomically       |
+| `rescheduleAppointment`    | 4     | Owner             | Atomically release old slot and reserve new slot                               |
+| `registerDeviceToken`      | 4     | User              | Store a normalized FCM token without exposing other users' tokens              |
+| `sendAppointmentReminders` | 4     | Scheduled service | Send reminders and record delivery-safe metadata                               |
 
 Firestore transactions are mandatory for slot state changes. Firebase documents
 transactions as atomic and retryable on concurrent edits:
@@ -555,27 +555,27 @@ verify.
 
 ### Phase 0 — Preserve and prove the baseline ✅
 
-*Completed: 2026-07-19, commit `b2aca92`. See `docs/legacy-baseline.md`.*
+_Completed: 2026-07-19, commit `b2aca92`. See `docs/legacy-baseline.md`._
 
-*Goal: create a safe, documented starting point before the scaffold changes.*
+_Goal: create a safe, documented starting point before the scaffold changes._
 
-*Depends on: roadmap approval*
+_Depends on: roadmap approval_
 
-*Estimated effort: one short session*
+_Estimated effort: one short session_
 
 #### Tasks
 
 - [x] Commit this roadmap separately.
 - [x] Tag `dade72b` as `legacy-v1` and record the tag in this document.
 - [x] Inspect the existing Firebase console/project ownership, Authentication
-  providers, Firestore data, indexes, and Security Rules without changing them.
+      providers, Firestore data, indexes, and Security Rules without changing them.
 - [x] Decide whether the old Firebase project will be retired or preserved as a
-  read-only historical environment.
+      read-only historical environment.
 - [x] Attempt a best-effort legacy install/build in a compatible isolated
-  toolchain; do not block the rebuild if it cannot compile.
+      toolchain; do not block the rebuild if it cannot compile.
 - [x] Capture every reachable legacy screen on iOS and Android if the build runs.
-  The native build did not reach compilation; the source audit and banner are
-  the retained visual record.
+      The native build did not reach compilation; the source audit and banner are
+      the retained visual record.
 - [x] Record any reusable copy/assets and their license/source.
 - [x] Add `docs/adr/0001-expo-cng.md` with the final platform decision.
 
@@ -592,32 +592,32 @@ verify.
 
 ### Phase 1 — Ship a modern, browseable app
 
-*Goal: a user can open a modern Expo app, browse realistic fictional providers,
-and inspect provider details using local fixtures.*
+_Goal: a user can open a modern Expo app, browse realistic fictional providers,
+and inspect provider details using local fixtures._
 
-*Depends on: Phase 0*
+_Depends on: Phase 0_
 
-*Estimated effort: two to three sessions*
+_Estimated effort: two to three sessions_
 
 #### Setup
 
 - [x] Replace the legacy scaffold with a clean Expo SDK 57 TypeScript project.
 - [x] Configure CNG, `expo-dev-client`, New Architecture, npm scripts, and Node
-  version metadata.
+      version metadata.
 - [x] Configure Expo Router under `src/app` with typed routes and four tab
-  destinations.
-- [ ] Configure strict TypeScript, ESLint, Prettier, import aliases, environment
-  validation, and pre-commit checks.
+      destinations.
+- [x] Configure strict TypeScript, ESLint, Prettier, import aliases, environment
+      validation, and pre-commit checks.
 - [x] Add development, preview, and production EAS profiles without credentials.
 
 #### Design system
 
 - [ ] Implement semantic color, spacing, radius, typography, elevation, and
-  motion tokens for light and dark themes.
+      motion tokens for light and dark themes.
 - [ ] Build accessible text, button, icon button, field, chip, surface, skeleton,
-  empty-state, and inline-error primitives.
+      empty-state, and inline-error primitives.
 - [ ] Add a development-only component catalogue or current React Native
-  Storybook if it is cleanly compatible with the development build.
+      Storybook if it is cleanly compatible with the development build.
 - [ ] Add interaction tests for component states and accessibility labels.
 
 #### Frontend
@@ -648,37 +648,37 @@ and inspect provider details using local fixtures.*
 
 ### Phase 2 — Connect secure accounts and live provider data
 
-*Goal: users can create an account or sign in, and provider discovery reads from
-a reproducible Firebase environment.*
+_Goal: users can create an account or sign in, and provider discovery reads from
+a reproducible Firebase environment._
 
-*Depends on: Phase 1*
+_Depends on: Phase 1_
 
-*Estimated effort: two sessions*
+_Estimated effort: two sessions_
 
 #### Backend
 
 - [ ] Initialize Firebase configuration for Auth, Firestore, Functions, Storage,
-  indexes, rules, and Emulator Suite.
+      indexes, rules, and Emulator Suite.
 - [ ] Create environment-safe React Native Firebase config plugins and
-  development build configuration.
+      development build configuration.
 - [ ] Add deterministic fictional seed data for providers, specialties, clinics,
-  and future slots.
+      and future slots.
 - [ ] Write default-deny Firestore and Storage rules.
 - [ ] Write rules tests for public provider reads, private user reads/writes, and
-  denied cross-user access.
+      denied cross-user access.
 
 #### Mobile
 
 - [ ] Add one application-level auth/session provider.
 - [ ] Implement email/password sign-up, sign-in, sign-out, password reset, and
-  verification states with typed validation.
+      verification states with typed validation.
 - [ ] Create the user profile through one idempotent server-controlled flow.
 - [ ] Add TanStack Query keys, Firebase adapters, DTO-to-domain mappers, and
-  provider pagination.
+      provider pagination.
 - [ ] Replace local provider fixtures with Firestore repositories while keeping
-  an explicit demo data adapter for tests/previews.
+      an explicit demo data adapter for tests/previews.
 - [ ] Persist locale/theme preferences without storing secrets in general
-  storage.
+      storage.
 
 #### Definition of done
 
@@ -697,24 +697,24 @@ a reproducible Firebase environment.*
 
 ### Phase 3 — Make booking trustworthy
 
-*Goal: an authenticated patient can book one real available slot and receive a
-reliable confirmation without double-booking.*
+_Goal: an authenticated patient can book one real available slot and receive a
+reliable confirmation without double-booking._
 
-*Depends on: Phase 2*
+_Depends on: Phase 2_
 
-*Estimated effort: two to three sessions*
+_Estimated effort: two to three sessions_
 
 #### Backend
 
 - [ ] Implement `availabilitySlots` and `appointments` indexes and rules.
 - [ ] Implement `bookAppointment` as an authenticated callable Cloud Function
-  using a Firestore transaction.
+      using a Firestore transaction.
 - [ ] Validate slot ownership, status, time bounds, and allowed request fields on
-  the server.
+      the server.
 - [ ] Make idempotency/retry behavior explicit so a repeated client request does
-  not create duplicate appointments.
+      not create duplicate appointments.
 - [ ] Add unit/integration tests for success, contention, duplicate attempts,
-  expired slots, unauthenticated calls, and forged patient IDs.
+      expired slots, unauthenticated calls, and forged patient IDs.
 
 #### Mobile
 
@@ -723,7 +723,7 @@ reliable confirmation without double-booking.*
 - [ ] Show timezone and visit mode at each decision point.
 - [ ] Prevent submission when offline; preserve safe draft choices locally.
 - [ ] Use a mutation state machine with disabled duplicate submission, clear
-  errors, and post-success cache reconciliation.
+      errors, and post-success cache reconciliation.
 - [ ] Show the confirmed appointment in the Appointments tab.
 
 #### Definition of done
@@ -744,17 +744,17 @@ reliable confirmation without double-booking.*
 
 ### Phase 4 — Manage appointments and native follow-through
 
-*Goal: patients can manage upcoming care and use meaningful native integrations
-after booking.*
+_Goal: patients can manage upcoming care and use meaningful native integrations
+after booking._
 
-*Depends on: Phase 3*
+_Depends on: Phase 3_
 
-*Estimated effort: two sessions*
+_Estimated effort: two sessions_
 
 #### Backend
 
 - [ ] Implement atomic `cancelAppointment` and `rescheduleAppointment`
-  functions with policy validation and audit timestamps.
+      functions with policy validation and audit timestamps.
 - [ ] Implement device-token registration and scheduled reminder delivery.
 - [ ] Prevent reminder payloads and logs from including sensitive fields.
 - [ ] Add indexes and tests for upcoming/history queries and status transitions.
@@ -763,12 +763,12 @@ after booking.*
 
 - [ ] Implement upcoming, past, cancelled, and appointment-detail states.
 - [ ] Add cancellation and rescheduling with clear consequences and optimistic
-  feedback only where rollback is safe.
+      feedback only where rollback is safe.
 - [ ] Add saved providers as an owner-only subcollection.
 - [ ] Add calendar permission education and “Add to calendar” through an Expo
-  native API.
+      native API.
 - [ ] Add notification permission education, token refresh handling, and deep
-  links into appointment details.
+      links into appointment details.
 - [ ] Add restrained haptics to successful booking and destructive confirmation.
 
 #### Definition of done
@@ -789,35 +789,35 @@ after booking.*
 
 ### Phase 5 — Make the experience inclusive and resilient
 
-*Goal: Hakeemi feels deliberate across language, theme, assistive technology,
-device size, network state, and failure conditions.*
+_Goal: Hakeemi feels deliberate across language, theme, assistive technology,
+device size, network state, and failure conditions._
 
-*Depends on: Phase 4*
+_Depends on: Phase 4_
 
-*Estimated effort: two sessions*
+_Estimated effort: two sessions_
 
 #### Localization and accessibility
 
 - [ ] Complete English and Arabic copy, plural rules, date/time formatting, and
-  locale persistence.
+      locale persistence.
 - [ ] Mirror layout intentionally for RTL; verify icons whose meaning must not
-  mirror.
+      mirror.
 - [ ] Test Dynamic Type/font scaling, screen reader order/labels, focus after
-  navigation, 44 pt targets, contrast, reduced motion, and reduced transparency.
+      navigation, 44 pt targets, contrast, reduced motion, and reduced transparency.
 - [ ] Validate VoiceOver and TalkBack for auth, search, booking, and management
-  journeys.
+      journeys.
 
 #### Resilience and polish
 
 - [ ] Replace generic spinners with layout-matched skeletons where useful.
 - [ ] Add designed empty, offline, partial-data, permission-denied, and retry
-  states.
+      states.
 - [ ] Add route-level error boundaries and safe structured logging.
 - [ ] Define query caching and stale-data indicators; never queue a booking while
-  offline.
+      offline.
 - [ ] Tune keyboard avoidance, safe areas, rotation, small phones, and tablets.
 - [ ] Apply purposeful transitions and shared motion tokens with reduced-motion
-  fallbacks.
+      fallbacks.
 
 #### Definition of done
 
@@ -836,38 +836,38 @@ device size, network state, and failure conditions.*
 
 ### Phase 6 — Production engineering and release confidence
 
-*Goal: every change is verified automatically and installable preview builds are
-easy to produce and diagnose.*
+_Goal: every change is verified automatically and installable preview builds are
+easy to produce and diagnose._
 
-*Depends on: Phase 5*
+_Depends on: Phase 5_
 
-*Estimated effort: two sessions*
+_Estimated effort: two sessions_
 
 #### Quality and performance
 
 - [ ] Define a test pyramid and minimum critical-path coverage; avoid percentage
-  targets that reward low-value snapshots.
+      targets that reward low-value snapshots.
 - [ ] Add CI jobs for install, formatting, lint, typecheck, unit/integration
-  tests, Firebase rules/functions tests, and `expo-doctor`.
+      tests, Firebase rules/functions tests, and `expo-doctor`.
 - [ ] Add scheduled dependency health checks and an Expo/RN upgrade policy.
 - [ ] Profile provider lists, search input, provider details, and booking on
-  representative iOS and Android devices.
+      representative iOS and Android devices.
 - [ ] Set measurable budgets for cold start, interaction latency, list frame
-  drops, image payloads, and JS bundle growth; record actual baseline/results.
+      drops, image payloads, and JS bundle growth; record actual baseline/results.
 
 #### Security and delivery
 
 - [ ] Enable App Check in monitor mode, verify legitimate traffic, then enforce
-  it for supported services.
+      it for supported services.
 - [ ] Add Crashlytics and Performance Monitoring with privacy-safe metadata.
 - [ ] Define analytics events for discovery and booking without recording health
-  or identity details.
+      or identity details.
 - [ ] Configure EAS development, preview, and production builds; use fingerprint
-  runtime versioning for update compatibility.
+      runtime versioning for update compatibility.
 - [ ] Configure signing through EAS credentials; never reuse the legacy Android
-  debug signing setup.
+      debug signing setup.
 - [ ] Produce installable iOS and Android preview builds and run the full smoke
-  checklist on real devices.
+      checklist on real devices.
 
 #### Definition of done
 
@@ -887,29 +887,29 @@ easy to produce and diagnose.*
 
 ### Phase 7 — Publish the portfolio case study
 
-*Goal: a reviewer can understand the product, architecture, tradeoffs, and proof
-of quality within minutes.*
+_Goal: a reviewer can understand the product, architecture, tradeoffs, and proof
+of quality within minutes._
 
-*Depends on: Phase 6*
+_Depends on: Phase 6_
 
-*Estimated effort: one session*
+_Estimated effort: one session_
 
 #### README and documentation
 
 - [ ] Replace the current README with a concise case-study structure.
 - [ ] Create a new original hero image, app icon, screenshot set, and short demo
-  video/GIF using fictional data.
+      video/GIF using fictional data.
 - [ ] Explain the 2021-to-2026 rebuild and link the `legacy-v1` tag.
 - [ ] Document the Expo/CNG decision and the native development-build model.
 - [ ] Include a small architecture diagram, feature list, stack, directory map,
-  setup steps, emulator seed instructions, scripts, test commands, preview build
-  link/QR, accessibility/localization notes, and privacy disclaimer.
+      setup steps, emulator seed instructions, scripts, test commands, preview build
+      link/QR, accessibility/localization notes, and privacy disclaimer.
 - [ ] Include measured performance and quality results only after they exist.
 - [ ] Credit the historical Figma inspiration without presenting the new UI as a
-  free-template implementation.
+      free-template implementation.
 - [ ] Remove the visitor badge and vague “production ready” wording.
 - [ ] Add `CONTRIBUTING.md`, license decision, and release notes if the repository
-  is intended for public reuse.
+      is intended for public reuse.
 
 #### Portfolio wording principles
 
@@ -938,29 +938,29 @@ of quality within minutes.*
 
 ## 11. Build order summary
 
-| Phase | User-visible outcome | Backend growth | Sessions |
-| --- | --- | --- | --- |
-| 0 | Safe historical baseline | Existing project audited | 1 |
-| 1 | Browse/search fictional providers in the modern app | Local fixture contracts | 2–3 |
-| 2 | Real accounts and live provider discovery | Users, providers, specialties, clinics | 2 |
-| 3 | Safe appointment booking | Slots, appointments, booking function | 2–3 |
-| 4 | Manage appointments and native follow-through | Status functions, saved providers, tokens | 2 |
-| 5 | RTL, accessibility, offline/error resilience | No major schema change | 2 |
-| 6 | Tested installable preview builds | App Check, observability, delivery | 2 |
-| 7 | Public portfolio case study | No schema change | 1 |
+| Phase | User-visible outcome                                | Backend growth                            | Sessions |
+| ----- | --------------------------------------------------- | ----------------------------------------- | -------- |
+| 0     | Safe historical baseline                            | Existing project audited                  | 1        |
+| 1     | Browse/search fictional providers in the modern app | Local fixture contracts                   | 2–3      |
+| 2     | Real accounts and live provider discovery           | Users, providers, specialties, clinics    | 2        |
+| 3     | Safe appointment booking                            | Slots, appointments, booking function     | 2–3      |
+| 4     | Manage appointments and native follow-through       | Status functions, saved providers, tokens | 2        |
+| 5     | RTL, accessibility, offline/error resilience        | No major schema change                    | 2        |
+| 6     | Tested installable preview builds                   | App Check, observability, delivery        | 2        |
+| 7     | Public portfolio case study                         | No schema change                          | 1        |
 
 ## 12. Schema evolution map
 
-| Collection | Phase 1 | Phase 2 | Phase 3 | Phase 4 |
-| --- | --- | --- | --- | --- |
-| `users` | — | ✓ | | + preferences validation |
-| `providers` | local fixture | ✓ | | |
-| `specialties` | local fixture | ✓ | | |
-| `clinics` | local fixture | ✓ | | |
-| `availabilitySlots` | local fixture | seed only | ✓ | + cancellation/reschedule transitions |
-| `appointments` | — | — | ✓ | + status transitions |
-| `savedProviders` | — | — | — | ✓ |
-| `deviceTokens` | — | — | — | ✓ |
+| Collection          | Phase 1       | Phase 2   | Phase 3 | Phase 4                               |
+| ------------------- | ------------- | --------- | ------- | ------------------------------------- |
+| `users`             | —             | ✓         |         | + preferences validation              |
+| `providers`         | local fixture | ✓         |         |                                       |
+| `specialties`       | local fixture | ✓         |         |                                       |
+| `clinics`           | local fixture | ✓         |         |                                       |
+| `availabilitySlots` | local fixture | seed only | ✓       | + cancellation/reschedule transitions |
+| `appointments`      | —             | —         | ✓       | + status transitions                  |
+| `savedProviders`    | —             | —         | —       | ✓                                     |
+| `deviceTokens`      | —             | —         | —       | ✓                                     |
 
 ## 13. Commit and verification policy
 
@@ -979,29 +979,29 @@ of quality within minutes.*
 
 ### Verification ladder
 
-| Change type | Required before commit |
-| --- | --- |
-| Documentation | Markdown/link review; commands checked against scripts |
-| Tokens/components | Typecheck, lint, focused tests, component catalogue review |
-| Screen/feature | Typecheck, lint, unit/integration tests, iOS/Android smoke |
-| Firebase rules/functions | Emulator tests including denied paths and concurrency |
-| Native integration/config | `expo-doctor`, clean prebuild, iOS and Android development build |
-| Phase boundary | Full CI, relevant E2E, device screenshots, roadmap status update |
-| Release | Real-device smoke, preview builds, privacy review, README verification |
+| Change type               | Required before commit                                                 |
+| ------------------------- | ---------------------------------------------------------------------- |
+| Documentation             | Markdown/link review; commands checked against scripts                 |
+| Tokens/components         | Typecheck, lint, focused tests, component catalogue review             |
+| Screen/feature            | Typecheck, lint, unit/integration tests, iOS/Android smoke             |
+| Firebase rules/functions  | Emulator tests including denied paths and concurrency                  |
+| Native integration/config | `expo-doctor`, clean prebuild, iOS and Android development build       |
+| Phase boundary            | Full CI, relevant E2E, device screenshots, roadmap status update       |
+| Release                   | Real-device smoke, preview builds, privacy review, README verification |
 
 ## 14. Risks and decisions needed during execution
 
-| Risk | Handling |
-| --- | --- |
-| Access to the old Firebase console is unavailable | Treat it as abandoned, create new projects, and document the old configuration without probing production data |
-| Old Firebase rules expose data | Disable/lock down the old project only after ownership and impact are confirmed |
-| Legacy app cannot build | Preserve source/tag and reconstruct behavior from source; do not spend the rebuild budget reviving RN 0.64 |
-| Expo SDK changes before Phase 1 | Recheck stable SDK/RN pairing and update this roadmap/ADR before scaffolding |
-| Arabic typography changes the visual system | Test glyph metrics before selecting custom fonts; system fonts are the safe default |
-| Firestore search is insufficient | Start with bounded client-side search for seeded demo scale; document Algolia/Typesense as a scale trigger, not a speculative dependency |
-| Appointment timezones/DST create edge cases | Store UTC plus IANA timezone, generate slots server-side, and test DST boundaries |
-| “Healthcare app” implies real-world safety/compliance | Keep data fictional, minimize health fields, and show a clear portfolio disclaimer |
-| Scope grows into two-sided marketplace | Keep provider/admin operations in seed/Admin tooling for this release |
+| Risk                                                  | Handling                                                                                                                                 |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Access to the old Firebase console is unavailable     | Treat it as abandoned, create new projects, and document the old configuration without probing production data                           |
+| Old Firebase rules expose data                        | Disable/lock down the old project only after ownership and impact are confirmed                                                          |
+| Legacy app cannot build                               | Preserve source/tag and reconstruct behavior from source; do not spend the rebuild budget reviving RN 0.64                               |
+| Expo SDK changes before Phase 1                       | Recheck stable SDK/RN pairing and update this roadmap/ADR before scaffolding                                                             |
+| Arabic typography changes the visual system           | Test glyph metrics before selecting custom fonts; system fonts are the safe default                                                      |
+| Firestore search is insufficient                      | Start with bounded client-side search for seeded demo scale; document Algolia/Typesense as a scale trigger, not a speculative dependency |
+| Appointment timezones/DST create edge cases           | Store UTC plus IANA timezone, generate slots server-side, and test DST boundaries                                                        |
+| “Healthcare app” implies real-world safety/compliance | Keep data fictional, minimize health fields, and show a clear portfolio disclaimer                                                       |
+| Scope grows into two-sided marketplace                | Keep provider/admin operations in seed/Admin tooling for this release                                                                    |
 
 ## 15. Completion checklist
 
@@ -1010,10 +1010,10 @@ The modernization is complete only when:
 - [ ] The current Expo SDK and New Architecture run on iOS and Android.
 - [ ] A user can discover, book, view, reschedule, and cancel an appointment.
 - [ ] Double-booking and cross-user data access are prevented by tested server
-  logic and rules.
+      logic and rules.
 - [ ] English/LTR and Arabic/RTL core journeys pass accessibility review.
 - [ ] Offline, loading, empty, error, permission-denied, and retry states are
-  designed and tested.
+      designed and tested.
 - [ ] CI, EAS preview builds, observability, App Check, and signing are configured.
 - [ ] Performance budgets have measured results, not aspirational numbers.
 - [ ] The README is a reproducible portfolio case study with current screenshots.
@@ -1022,6 +1022,7 @@ The modernization is complete only when:
 ## Current position
 
 Phase 0 is complete. **Phase 1: Ship a modern, browseable app** is in progress.
-The SDK 57 scaffold, development client, typed four-tab router, CNG prebuild,
-and credential-free EAS profiles are verified. Strict quality tooling and the
-test harness are next.
+The SDK 57 foundation now includes the development client, typed four-tab
+router, CNG prebuild, credential-free EAS profiles, strict static analysis,
+environment validation, pre-commit checks, and a passing component-test harness.
+The design foundations are next.
