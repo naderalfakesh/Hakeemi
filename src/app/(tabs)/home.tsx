@@ -6,6 +6,9 @@ export default function HomeRoute() {
   return (
     <HomeScreen
       onFindCare={() => router.push('/find-care')}
+      onSelectProvider={(providerId) =>
+        router.push({ pathname: '/providers/[providerId]', params: { providerId } })
+      }
       {...(__DEV__ ? { onOpenCatalogue: () => router.push('/dev/components') } : {})}
     />
   );

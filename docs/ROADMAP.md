@@ -624,9 +624,9 @@ _Estimated effort: two to three sessions_
 
 - [x] Implement onboarding/demo entry and the tab shell.
 - [x] Create typed local provider, specialty, clinic, and slot fixtures.
-- [ ] Implement Home, Find Care, provider results, and provider details.
+- [x] Implement Home, Find Care, provider results, and provider details.
 - [x] Make search and specialty filters functional against fixtures.
-- [ ] Add loading, empty, error, and retry variants to every data surface.
+- [x] Add loading, empty, error, and retry variants to every data surface.
 - [x] Use only serializable route parameters.
 
 #### Definition of done
@@ -1022,6 +1022,7 @@ The modernization is complete only when:
 ## Current position
 
 Phase 0 is complete. **Phase 1: Ship a modern, browseable app** is in progress.
-The SDK 57 foundation, quality gates, design system, explicit portfolio-demo
-entry, and four-tab shell are complete. Typed fictional fixtures and functional
-provider discovery are next.
+The Phase 1 product slice is implemented: explicit demo entry, Home
+recommendations, functional search and specialty filters, provider results, and
+deep-linkable provider profiles backed by a replaceable fictional repository.
+Native simulator smoke testing is next.

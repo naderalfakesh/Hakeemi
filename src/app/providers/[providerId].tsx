@@ -1,17 +1,23 @@
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
-import { PlaceholderScreen } from '@/components/navigation/placeholder-screen';
+import { ProviderDetailScreen } from '@/features/care/screens/provider-detail-screen';
 
 export default function ProviderRoute() {
-  const { providerId } = useLocalSearchParams<{ providerId: string }>();
+  const { providerId: rawProviderId } = useLocalSearchParams<{
+    providerId?: string | string[];
+  }>();
+  const providerId = Array.isArray(rawProviderId)
+    ? (rawProviderId[0] ?? '')
+    : (rawProviderId ?? '');
 
-  return (
-    <>
-      <Stack.Screen options={{ headerShown: true, title: 'Provider' }} />
-      <PlaceholderScreen
-        description={`The full fixture-backed profile for ${providerId} is the next focused checkpoint.`}
-        title="Provider profile"
-      />
-    </>
-  );
+  function handleBack() {
+    if (router.canGoBack()) {
+      router.back();
+      return;
+    }
+
+    router.replace('/find-care');
+  }
+
+  return <ProviderDetailScreen onBack={handleBack} providerId={providerId} />;
 }
