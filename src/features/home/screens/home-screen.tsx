@@ -1,9 +1,8 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useCallback, useMemo } from 'react';
 import { FlatList, StyleSheet, View, type ListRenderItem } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppText, Button, EmptyState, InlineError, Surface } from '@/components/ui';
+import { AppText, Button, DecorativeIcon, EmptyState, InlineError, Surface } from '@/components/ui';
 import { ProviderCard } from '@/features/care/components/provider-card';
 import { ProviderCardSkeleton } from '@/features/care/components/provider-card-skeleton';
 import type { CareRepository } from '@/features/care/domain/repository';
@@ -62,7 +61,11 @@ export function HomeScreen({
         ListFooterComponent={
           <View style={styles.footer}>
             <View style={styles.note}>
-              <Ionicons color={theme.colors.textSecondary} name="information-circle" size={20} />
+              <DecorativeIcon
+                color={theme.colors.textSecondary}
+                name="information-circle"
+                size={20}
+              />
               <AppText tone="secondary" variant="caption">
                 Hakeemi uses fictional data while the rebuilt Firebase environment is prepared.
               </AppText>
@@ -104,7 +107,7 @@ function HomeHeader({ onFindCare }: { onFindCare: () => void }) {
 
       <Surface padding="spacious" variant="brand">
         <View style={styles.featureIcon}>
-          <Ionicons color={theme.colors.brand} name="search" size={26} />
+          <DecorativeIcon color={theme.colors.brand} name="search" size={26} />
         </View>
         <AppText style={styles.featureTitle} variant="titleMedium">
           Find the right clinician
@@ -170,7 +173,7 @@ function HomeResultsState({
         </Button>
       }
       description="The demo repository has no featured providers right now."
-      icon={<Ionicons color={theme.colors.brand} name="people-outline" size={32} />}
+      icon={<DecorativeIcon color={theme.colors.brand} name="people-outline" size={32} />}
       title="No recommendations yet"
     />
   );

@@ -5,6 +5,7 @@ import { AppThemeProvider } from '@/theme';
 
 import { Button } from './button';
 import { Chip } from './chip';
+import { DecorativeIcon } from './decorative-icon';
 import { TextField } from './text-field';
 
 function renderWithTheme(element: ReactElement) {
@@ -43,5 +44,16 @@ describe('interactive primitives', () => {
 
     expect(view.getByLabelText('Email address')).toHaveProp('aria-invalid', true);
     expect(view.getByText('Enter a valid email address')).toBeOnTheScreen();
+  });
+
+  it('keeps decorative icons out of the accessibility tree', async () => {
+    const view = await renderWithTheme(
+      <DecorativeIcon color="#000" name="star" size={18} testID="decorative-icon" />,
+    );
+    expect(view.queryByTestId('decorative-icon')).toBeNull();
+    const icon = view.getByTestId('decorative-icon', { includeHiddenElements: true });
+
+    expect(icon).toHaveProp('accessibilityElementsHidden', true);
+    expect(icon).toHaveProp('importantForAccessibility', 'no');
   });
 });

@@ -1,9 +1,8 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useCallback, useMemo, useState } from 'react';
 import { FlatList, StyleSheet, View, type ListRenderItem } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppText, Button, EmptyState, Skeleton, TextField } from '@/components/ui';
+import { AppText, Button, DecorativeIcon, EmptyState, Skeleton, TextField } from '@/components/ui';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { ProviderCard } from '../components/provider-card';
@@ -141,7 +140,7 @@ function ResultsState({ hasFilters, onClear, onRetry, status }: ResultsStateProp
       <EmptyState
         action={<Button onPress={onRetry}>Try again</Button>}
         description="Check your connection and retry. Your search has not been lost."
-        icon={<Ionicons color={theme.colors.danger} name="cloud-offline-outline" size={32} />}
+        icon={<DecorativeIcon color={theme.colors.danger} name="cloud-offline-outline" size={32} />}
         title="Clinicians could not be loaded"
       />
     );
@@ -157,7 +156,7 @@ function ResultsState({ hasFilters, onClear, onRetry, status }: ResultsStateProp
         ) : undefined
       }
       description="Try another name, specialty, or language."
-      icon={<Ionicons color={theme.colors.brand} name="search-outline" size={32} />}
+      icon={<DecorativeIcon color={theme.colors.brand} name="search-outline" size={32} />}
       title="No clinicians match"
     />
   );

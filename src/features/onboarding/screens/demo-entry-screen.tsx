@@ -1,9 +1,8 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useMemo } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppText, Button, Surface } from '@/components/ui';
+import { AppText, Button, DecorativeIcon, Surface } from '@/components/ui';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 type DemoEntryScreenProps = {
@@ -23,7 +22,7 @@ export function DemoEntryScreen({ onContinue }: DemoEntryScreenProps) {
       >
         <View style={styles.brandRow}>
           <View accessibilityElementsHidden importantForAccessibility="no" style={styles.brandMark}>
-            <Ionicons color={theme.colors.textInverse} name="pulse" size={22} />
+            <DecorativeIcon color={theme.colors.textInverse} name="pulse" size={22} />
           </View>
           <AppText variant="titleSmall">Hakeemi</AppText>
           <AppText style={styles.rebuildLabel} tone="secondary" variant="caption">
@@ -48,7 +47,7 @@ export function DemoEntryScreen({ onContinue }: DemoEntryScreenProps) {
           </View>
           <Surface padding="compact" style={styles.providerCard} variant="raised">
             <View style={styles.providerAvatar}>
-              <Ionicons color={theme.colors.brand} name="person" size={24} />
+              <DecorativeIcon color={theme.colors.brand} name="person" size={24} />
             </View>
             <View style={styles.providerCopy}>
               <AppText variant="bodyStrong">Family medicine</AppText>
@@ -56,7 +55,7 @@ export function DemoEntryScreen({ onContinue }: DemoEntryScreenProps) {
                 Next available appointment
               </AppText>
             </View>
-            <Ionicons color={theme.colors.brand} name="arrow-forward" size={20} />
+            <DecorativeIcon color={theme.colors.brand} name="arrow-forward" size={20} />
           </Surface>
         </View>
 
@@ -95,7 +94,7 @@ function ProofPoint({ label }: { label: string }) {
   return (
     <View style={styles.proofPoint}>
       <View accessibilityElementsHidden importantForAccessibility="no" style={styles.proofIcon}>
-        <Ionicons color={theme.colors.brand} name="checkmark" size={16} />
+        <DecorativeIcon color={theme.colors.brand} name="checkmark" size={16} />
       </View>
       <AppText variant="bodyStrong">{label}</AppText>
     </View>

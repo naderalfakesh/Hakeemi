@@ -1,4 +1,3 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { Redirect } from 'expo-router';
 import { useMemo, useState, type ReactNode } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
@@ -8,6 +7,7 @@ import {
   AppText,
   Button,
   Chip,
+  DecorativeIcon,
   EmptyState,
   IconButton,
   InlineError,
@@ -60,10 +60,10 @@ export default function ComponentCatalogueScreen() {
           <Button disabled>Unavailable</Button>
           <View style={styles.inlineRow}>
             <IconButton accessibilityLabel="Search" variant="soft">
-              <Ionicons color={theme.colors.brand} name="search" size={22} />
+              <DecorativeIcon color={theme.colors.brand} name="search" size={22} />
             </IconButton>
             <IconButton accessibilityLabel="Close">
-              <Ionicons color={theme.colors.textPrimary} name="close" size={24} />
+              <DecorativeIcon color={theme.colors.textPrimary} name="close" size={24} />
             </IconButton>
           </View>
         </CatalogueSection>
@@ -113,7 +113,7 @@ export default function ComponentCatalogueScreen() {
           <EmptyState
             action={<Button variant="secondary">Browse clinicians</Button>}
             description="Appointments you book will appear here with the details you need."
-            icon={<Ionicons color={theme.colors.brand} name="calendar-outline" size={32} />}
+            icon={<DecorativeIcon color={theme.colors.brand} name="calendar-outline" size={32} />}
             title="No appointments yet"
           />
         </CatalogueSection>

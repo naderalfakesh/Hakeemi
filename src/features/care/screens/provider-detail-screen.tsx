@@ -1,9 +1,17 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { useMemo, type ComponentProps, type ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppText, Button, EmptyState, IconButton, Skeleton, Surface } from '@/components/ui';
+import {
+  AppText,
+  Button,
+  DecorativeIcon,
+  type DecorativeIconName,
+  EmptyState,
+  IconButton,
+  Skeleton,
+  Surface,
+} from '@/components/ui';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { ProviderAvatar } from '../components/provider-avatar';
@@ -46,7 +54,7 @@ export function ProviderDetailScreen({
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.topBar}>
           <IconButton accessibilityLabel="Back to clinicians" onPress={onBack} variant="soft">
-            <Ionicons color={theme.colors.brand} name="arrow-back" size={22} />
+            <DecorativeIcon color={theme.colors.brand} name="arrow-back" size={22} />
           </IconButton>
           <AppText tone="secondary" variant="labelLarge">
             Provider profile
@@ -71,7 +79,7 @@ export function ProviderDetailScreen({
         <View style={styles.statRow}>
           {provider.ratingSummary && (
             <Surface style={styles.stat} variant="muted">
-              <Ionicons color={theme.colors.warning} name="star" size={18} />
+              <DecorativeIcon color={theme.colors.warning} name="star" size={18} />
               <AppText variant="bodyStrong">{provider.ratingSummary.average.toFixed(1)}</AppText>
               <AppText tone="secondary" variant="caption">
                 {provider.ratingSummary.count} reviews
@@ -79,7 +87,7 @@ export function ProviderDetailScreen({
             </Surface>
           )}
           <Surface style={styles.stat} variant="muted">
-            <Ionicons color={theme.colors.brand} name="wallet-outline" size={18} />
+            <DecorativeIcon color={theme.colors.brand} name="wallet-outline" size={18} />
             <AppText variant="bodyStrong">{formatFee(provider.consultationFee)}</AppText>
             <AppText tone="secondary" variant="caption">
               Consultation
@@ -110,7 +118,7 @@ export function ProviderDetailScreen({
         </DetailSection>
 
         <Surface style={styles.disclosure} variant="plain">
-          <Ionicons color={theme.colors.textSecondary} name="information-circle" size={20} />
+          <DecorativeIcon color={theme.colors.textSecondary} name="information-circle" size={20} />
           <AppText tone="secondary" variant="caption">
             This fictional profile demonstrates discovery UX. Booking and live availability arrive
             after the secure Firebase rebuild.
@@ -155,7 +163,7 @@ function ProviderDetailState({ onBack, onRetry, providerId, status }: ProviderDe
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
       <View style={styles.stateBack}>
         <IconButton accessibilityLabel="Back to clinicians" onPress={onBack} variant="soft">
-          <Ionicons color={theme.colors.brand} name="arrow-back" size={22} />
+          <DecorativeIcon color={theme.colors.brand} name="arrow-back" size={22} />
         </IconButton>
       </View>
       <EmptyState
@@ -174,7 +182,7 @@ function ProviderDetailState({ onBack, onRetry, providerId, status }: ProviderDe
             : 'Check your connection and retry the profile.'
         }
         icon={
-          <Ionicons
+          <DecorativeIcon
             color={isMissing ? theme.colors.brand : theme.colors.danger}
             name={isMissing ? 'person-outline' : 'cloud-offline-outline'}
             size={34}
@@ -228,19 +236,13 @@ function DetailSection({ children, title }: { children: ReactNode; title: string
   );
 }
 
-function InfoRow({
-  icon,
-  label,
-}: {
-  icon: ComponentProps<typeof Ionicons>['name'];
-  label: string;
-}) {
+function InfoRow({ icon, label }: { icon: DecorativeIconName; label: string }) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   return (
     <View style={styles.infoRow}>
-      <Ionicons color={theme.colors.brand} name={icon} size={20} />
+      <DecorativeIcon color={theme.colors.brand} name={icon} size={20} />
       <AppText variant="bodyMedium">{label}</AppText>
     </View>
   );
@@ -252,7 +254,7 @@ function ClinicRow({ clinic }: { clinic: Clinic }) {
 
   return (
     <View style={styles.infoRow}>
-      <Ionicons color={theme.colors.brand} name="location-outline" size={20} />
+      <DecorativeIcon color={theme.colors.brand} name="location-outline" size={20} />
       <View style={styles.clinicCopy}>
         <AppText variant="bodyStrong">{clinic.name.en}</AppText>
         <AppText tone="secondary" variant="caption">

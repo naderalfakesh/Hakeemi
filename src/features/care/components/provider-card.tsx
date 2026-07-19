@@ -1,8 +1,7 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { memo, useCallback, useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { AppText } from '@/components/ui';
+import { AppText, DecorativeIcon } from '@/components/ui';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import type { AvailabilitySlot, Provider } from '../domain/types';
@@ -45,14 +44,14 @@ export const ProviderCard = memo(function ProviderCard({
           </AppText>
           {provider.ratingSummary && (
             <View style={styles.rating}>
-              <Ionicons color={theme.colors.warning} name="star" size={15} />
+              <DecorativeIcon color={theme.colors.warning} name="star" size={15} />
               <AppText variant="caption">
                 {provider.ratingSummary.average.toFixed(1)} · {provider.ratingSummary.count} reviews
               </AppText>
             </View>
           )}
         </View>
-        <Ionicons color={theme.colors.textSecondary} name="chevron-forward" size={20} />
+        <DecorativeIcon color={theme.colors.textSecondary} name="chevron-forward" size={20} />
       </View>
 
       <View style={styles.divider} />
@@ -60,7 +59,7 @@ export const ProviderCard = memo(function ProviderCard({
       {nextSlot ? (
         <View style={styles.availabilityRow}>
           <View style={styles.availabilityIcon}>
-            <Ionicons color={theme.colors.brand} name="calendar-outline" size={18} />
+            <DecorativeIcon color={theme.colors.brand} name="calendar-outline" size={18} />
           </View>
           <View style={styles.availabilityCopy}>
             <AppText tone="secondary" variant="caption">

@@ -1,13 +1,10 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { Tabs } from 'expo-router';
-import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
 
+import { DecorativeIcon, type DecorativeIconName } from '@/components/ui';
 import { useAppTheme } from '@/theme';
 
-type TabIconName = ComponentProps<typeof Ionicons>['name'];
-
-function tabBarIcon(activeName: TabIconName, inactiveName: TabIconName) {
+function tabBarIcon(activeName: DecorativeIconName, inactiveName: DecorativeIconName) {
   return function TabBarIcon({
     color,
     focused,
@@ -18,7 +15,11 @@ function tabBarIcon(activeName: TabIconName, inactiveName: TabIconName) {
     size: number;
   }) {
     return (
-      <Ionicons color={String(color)} name={focused ? activeName : inactiveName} size={size} />
+      <DecorativeIcon
+        color={String(color)}
+        name={focused ? activeName : inactiveName}
+        size={size}
+      />
     );
   };
 }

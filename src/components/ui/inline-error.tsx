@@ -1,10 +1,10 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useMemo } from 'react';
 import { StyleSheet, View, type ViewProps } from 'react-native';
 
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { AppText } from './app-text';
+import { DecorativeIcon } from './decorative-icon';
 
 type InlineErrorProps = Omit<ViewProps, 'children'> & {
   message: string;
@@ -21,13 +21,7 @@ export function InlineError({ message, style, ...props }: InlineErrorProps) {
       {...props}
       style={[styles.container, style]}
     >
-      <Ionicons
-        accessibilityElementsHidden
-        color={theme.colors.danger}
-        importantForAccessibility="no"
-        name="alert-circle"
-        size={18}
-      />
+      <DecorativeIcon color={theme.colors.danger} name="alert-circle" size={18} />
       <AppText tone="danger" variant="caption">
         {message}
       </AppText>

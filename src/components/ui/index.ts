@@ -1,6 +1,7 @@
 export { AppText, type TextTone, type TextVariant } from './app-text';
 export { Button, type ButtonVariant } from './button';
 export { Chip } from './chip';
+export { DecorativeIcon, type DecorativeIconName } from './decorative-icon';
 export { EmptyState } from './empty-state';
 export { IconButton } from './icon-button';
 export { InlineError } from './inline-error';
