@@ -67,7 +67,8 @@ export function HomeScreen({
                 size={20}
               />
               <AppText tone="secondary" variant="caption">
-                Hakeemi uses fictional data while the rebuilt Firebase environment is prepared.
+                All clinicians and availability are fictional portfolio data, served from the
+                rebuilt Firebase architecture on native builds.
               </AppText>
             </View>
             {onOpenCatalogue && (

@@ -2,6 +2,7 @@ import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 import { AppThemeProvider } from '@/theme';
 
+import { fixtureCareRepository } from '../data/fixture-care-repository';
 import type { CareRepository } from '../domain/repository';
 import { ProviderDetailScreen } from './provider-detail-screen';
 
@@ -9,7 +10,11 @@ describe('ProviderDetailScreen', () => {
   it('shows decision-making details from the fictional repository', async () => {
     const view = await render(
       <AppThemeProvider colorScheme="light">
-        <ProviderDetailScreen onBack={jest.fn()} providerId="lina-haddad" />
+        <ProviderDetailScreen
+          onBack={jest.fn()}
+          providerId="lina-haddad"
+          repository={fixtureCareRepository}
+        />
       </AppThemeProvider>,
     );
 
@@ -26,7 +31,11 @@ describe('ProviderDetailScreen', () => {
     const onBack = jest.fn();
     const view = await render(
       <AppThemeProvider colorScheme="dark">
-        <ProviderDetailScreen onBack={onBack} providerId="missing-provider" />
+        <ProviderDetailScreen
+          onBack={onBack}
+          providerId="missing-provider"
+          repository={fixtureCareRepository}
+        />
       </AppThemeProvider>,
     );
 

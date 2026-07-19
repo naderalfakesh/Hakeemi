@@ -2,6 +2,8 @@ import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 import { AppThemeProvider } from '@/theme';
 
+import { fixtureCareRepository } from '@/features/care/data/fixture-care-repository';
+
 import { HomeScreen } from './home-screen';
 
 describe('HomeScreen', () => {
@@ -9,7 +11,11 @@ describe('HomeScreen', () => {
     const onSelectProvider = jest.fn();
     const view = await render(
       <AppThemeProvider colorScheme="dark">
-        <HomeScreen onFindCare={jest.fn()} onSelectProvider={onSelectProvider} />
+        <HomeScreen
+          onFindCare={jest.fn()}
+          onSelectProvider={onSelectProvider}
+          repository={fixtureCareRepository}
+        />
       </AppThemeProvider>,
     );
 

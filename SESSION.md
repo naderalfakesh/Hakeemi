@@ -14,8 +14,13 @@
   routes are connected to a platform-safe Firebase Auth adapter.
 - Session/profile: one app-level provider restores Auth before navigation, and
   an emulator-tested callable creates the server-owned user profile idempotently.
+- Provider data: native builds now use a bounded React Native Firebase
+  repository with Zod-validated DTO mappers; Jest and the static web portfolio
+  export resolve an explicit deterministic fixture adapter.
+- Cloud verification: the new provider-list index is deployed and building;
+  the matching query shapes pass Emulator Suite authorization tests.
 - Billing boundary: Cloud Storage remains emulator-only; enabling it now
   requires the Blaze plan and an explicit billing decision.
-- Next action: add Firestore DTO mappers and replace the fixture care repository
-  behind the existing domain interface.
+- Next action: add TanStack Query caching and cursor pagination, then persist
+  locale/theme preferences behind the existing owner-only rules.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).

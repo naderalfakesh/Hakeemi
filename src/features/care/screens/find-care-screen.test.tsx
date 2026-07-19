@@ -2,6 +2,7 @@ import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 import { AppThemeProvider } from '@/theme';
 
+import { fixtureCareRepository } from '../data/fixture-care-repository';
 import type { CareRepository } from '../domain/repository';
 import { FindCareScreen } from './find-care-screen';
 
@@ -9,7 +10,7 @@ describe('FindCareScreen', () => {
   it('searches fictional clinicians by language', async () => {
     const view = await render(
       <AppThemeProvider colorScheme="light">
-        <FindCareScreen onSelectProvider={jest.fn()} />
+        <FindCareScreen onSelectProvider={jest.fn()} repository={fixtureCareRepository} />
       </AppThemeProvider>,
     );
 
@@ -31,7 +32,7 @@ describe('FindCareScreen', () => {
     const onSelectProvider = jest.fn();
     const view = await render(
       <AppThemeProvider colorScheme="dark">
-        <FindCareScreen onSelectProvider={onSelectProvider} />
+        <FindCareScreen onSelectProvider={onSelectProvider} repository={fixtureCareRepository} />
       </AppThemeProvider>,
     );
 

@@ -120,8 +120,8 @@ export function ProviderDetailScreen({
         <Surface style={styles.disclosure} variant="plain">
           <DecorativeIcon color={theme.colors.textSecondary} name="information-circle" size={20} />
           <AppText tone="secondary" variant="caption">
-            This fictional profile demonstrates discovery UX. Booking and live availability arrive
-            after the secure Firebase rebuild.
+            This fictional profile demonstrates discovery UX with Firebase-backed availability.
+            Booking will be added through a server-controlled workflow.
           </AppText>
         </Surface>
       </ScrollView>

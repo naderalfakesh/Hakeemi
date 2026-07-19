@@ -125,6 +125,24 @@ describe('Cloud Firestore rules', () => {
     await assertSucceeds(
       firestore.collection('providers').where('isActive', '==', true).orderBy('displayName').get(),
     );
+    await assertSucceeds(
+      firestore
+        .collection('providers')
+        .where('isActive', '==', true)
+        .where('specialtyIds', 'array-contains', 'family-medicine')
+        .orderBy('displayName')
+        .get(),
+    );
+    await assertSucceeds(firestore.collection('specialties').where('isActive', '==', true).get());
+    await assertSucceeds(firestore.collection('clinics').where('isActive', '==', true).get());
+    await assertSucceeds(
+      firestore
+        .collection('availabilitySlots')
+        .where('providerId', '==', 'lina-haddad')
+        .where('status', '==', 'available')
+        .orderBy('startsAt')
+        .get(),
+    );
   });
 
   it('does not expose inactive providers or unavailable slots', async () => {

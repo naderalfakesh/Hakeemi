@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { careRepository } from '../data/fixture-care-repository';
+import { careRepository } from '@/features/care/data/care-repository';
 import type { CareRepository } from '../domain/repository';
 import type { AvailabilitySlot, Provider, Specialty } from '../domain/types';
 

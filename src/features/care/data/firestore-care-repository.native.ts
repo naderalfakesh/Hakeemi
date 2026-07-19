@@ -1,0 +1,111 @@
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  limit,
+  orderBy,
+  query,
+  where,
+  type Firestore,
+  type QueryConstraint,
+} from '@react-native-firebase/firestore';
+
+import type { CareRepository } from '../domain/repository';
+import type { ProviderSearch, Specialty } from '../domain/types';
+import {
+  mapAvailabilitySlotDocument,
+  mapClinicDocument,
+  mapProviderDocument,
+  mapSpecialtyDocument,
+} from './firestore-care-mappers';
+import { selectProviders } from './selectors';
+
+const PROVIDER_RESULT_LIMIT = 50;
+const SLOT_RESULT_LIMIT = 12;
+
+export class FirestoreCareRepository implements CareRepository {
+  private specialtiesRequest: Promise<readonly Specialty[]> | null = null;
+
+  public constructor(private readonly firestore: Firestore = getFirestore()) {}
+
+  public async getClinic(id: string) {
+    const snapshot = await getDoc(doc(this.firestore, 'clinics', id));
+    return snapshot.exists() ? mapClinicDocument(snapshot.id, snapshot.data()) : null;
+  }
+
+  public async getProvider(id: string) {
+    const snapshot = await getDoc(doc(this.firestore, 'providers', id));
+    return snapshot.exists() ? mapProviderDocument(snapshot.id, snapshot.data()) : null;
+  }
+
+  public async listAvailableSlots(providerId: string) {
+    const snapshot = await getDocs(
+      query(
+        collection(this.firestore, 'availabilitySlots'),
+        where('providerId', '==', providerId),
+        where('status', '==', 'available'),
+        orderBy('startsAt', 'asc'),
+        limit(SLOT_RESULT_LIMIT),
+      ),
+    );
+
+    return snapshot.docs.map((document) =>
+      mapAvailabilitySlotDocument(document.id, document.data()),
+    );
+  }
+
+  public async listClinics() {
+    const snapshot = await getDocs(
+      query(collection(this.firestore, 'clinics'), where('isActive', '==', true)),
+    );
+
+    return snapshot.docs
+      .map((document) => mapClinicDocument(document.id, document.data()))
+      .sort((left, right) => left.name.en.localeCompare(right.name.en));
+  }
+
+  public async listProviders(search: ProviderSearch = {}) {
+    const constraints: QueryConstraint[] = [where('isActive', '==', true)];
+
+    if (search.specialtyId) {
+      constraints.push(where('specialtyIds', 'array-contains', search.specialtyId));
+    }
+
+    constraints.push(orderBy('displayName', 'asc'), limit(PROVIDER_RESULT_LIMIT));
+
+    const [providerSnapshot, specialties] = await Promise.all([
+      getDocs(query(collection(this.firestore, 'providers'), ...constraints)),
+      this.listSpecialties(),
+    ]);
+    const providers = providerSnapshot.docs.map((document) =>
+      mapProviderDocument(document.id, document.data()),
+    );
+
+    return selectProviders(providers, specialties, search);
+  }
+
+  public async listSpecialties() {
+    if (this.specialtiesRequest) {
+      return this.specialtiesRequest;
+    }
+
+    this.specialtiesRequest = this.fetchSpecialties().catch((error: unknown) => {
+      this.specialtiesRequest = null;
+      throw error;
+    });
+
+    return this.specialtiesRequest;
+  }
+
+  private async fetchSpecialties() {
+    const snapshot = await getDocs(
+      query(collection(this.firestore, 'specialties'), where('isActive', '==', true)),
+    );
+
+    return snapshot.docs
+      .map((document) => mapSpecialtyDocument(document.id, document.data()))
+      .sort((left, right) => left.sortOrder - right.sortOrder);
+  }
+}

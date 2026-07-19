@@ -40,4 +40,4 @@ export class FixtureCareRepository implements CareRepository {
   }
 }
 
-export const careRepository: CareRepository = new FixtureCareRepository();
+export const fixtureCareRepository: CareRepository = new FixtureCareRepository();

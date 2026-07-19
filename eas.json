@@ -8,7 +8,9 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_APP_ENV": "development"
+        "EXPO_PUBLIC_APP_ENV": "development",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "hakeemi-portfolio-dev",
+        "EXPO_PUBLIC_USE_FIREBASE_EMULATORS": "true"
       }
     },
     "development-simulator": {
@@ -20,7 +22,9 @@
     "preview": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_APP_ENV": "preview"
+        "EXPO_PUBLIC_APP_ENV": "preview",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "hakeemi-portfolio-dev",
+        "EXPO_PUBLIC_USE_FIREBASE_EMULATORS": "false"
       },
       "android": {
         "buildType": "apk"
@@ -29,7 +33,9 @@
     "production": {
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_APP_ENV": "production"
+        "EXPO_PUBLIC_APP_ENV": "production",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "hakeemi-portfolio-dev",
+        "EXPO_PUBLIC_USE_FIREBASE_EMULATORS": "false"
       }
     }
   }

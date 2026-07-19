@@ -676,9 +676,9 @@ _Estimated effort: two sessions_
 - [x] Implement email/password sign-up, sign-in, sign-out, password reset, and
       verification states with typed validation.
 - [x] Create the user profile through one idempotent server-controlled flow.
-- [ ] Add TanStack Query keys, Firebase adapters, DTO-to-domain mappers, and
-      provider pagination.
-- [ ] Replace local provider fixtures with Firestore repositories while keeping
+- [x] Add bounded Firebase adapters and DTO-to-domain mappers.
+- [ ] Add TanStack Query keys, caching, and provider cursor pagination.
+- [x] Replace local provider fixtures with Firestore repositories while keeping
       an explicit demo data adapter for tests/previews.
 - [ ] Persist locale/theme preferences without storing secrets in general
       storage.
@@ -1027,15 +1027,15 @@ The modernization is complete only when:
 ## Current position
 
 Phases 0 and 1 are complete. The Expo SDK 57 product slice builds and runs on
-current iOS and Android simulators. The verified guest journey covers demo
-entry, Home recommendations, functional provider search and specialty filters,
-and deep-linkable provider profiles backed by a replaceable fictional
-repository. Full results are recorded in `docs/phase-1-verification.md`.
+current iOS and Android simulators. Full results are recorded in
+`docs/phase-1-verification.md`.
 
 **Phase 2: Connect secure accounts and live provider data** is in progress. The
-new `hakeemi-portfolio-dev` project, emulator suite, rules tests, deterministic
-seed, and Expo CNG/React Native Firebase integration are complete. Native builds
-pass on an iOS Simulator and Android arm64, and the static web export keeps the
-native Firebase boundary isolated. Typed authentication and application-level
-session restoration are next; the inaccessible legacy project remains
-untouched.
+new `hakeemi-portfolio-dev` project contains the deterministic fictional seed,
+while the inaccessible legacy project remains untouched. Email/password Auth,
+application-level session restoration, and idempotent server-owned profile
+bootstrap are implemented. Native provider discovery now resolves a bounded
+React Native Firebase repository with runtime-validated DTO mappers; Jest and
+the static web export explicitly resolve the deterministic fixture repository.
+Rules tests cover the production discovery query shapes. TanStack Query cursor
+pagination and user preference persistence remain before Phase 2 can close.
