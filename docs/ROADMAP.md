@@ -1,6 +1,6 @@
 # Hakeemi Modernization Roadmap
 
-> Status: Phase 1 complete; Phase 2 ready
+> Status: Phase 2 in progress
 >
 > Baseline: `dade72b` on `master`
 >

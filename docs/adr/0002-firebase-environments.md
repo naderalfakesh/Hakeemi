@@ -17,6 +17,8 @@ network access, populated only with fictional data, and promoted deliberately.
 
 - Leave the legacy `hakeemi` project untouched.
 - Use `hakeemi-portfolio-dev` as the owned development project.
+- Place the development Firestore database and 2nd-generation Functions in
+  `me-central1` (Doha), close to the portfolio app's UAE audience.
 - Use the synthetic project ID `demo-hakeemi` for all Emulator Suite commands.
   Firebase reserves the `demo-` prefix for projects that cannot accidentally
   address live resources.
@@ -26,6 +28,9 @@ network access, populated only with fictional data, and promoted deliberately.
   uses ignored files; EAS environments will provide file variables later.
 - Keep Firestore and Storage default-deny. Client access is granted only for
   named paths and is verified against the Emulator Suite before deployment.
+- Keep Cloud Storage emulator-only until a billing account and budget alert are
+  deliberately approved. Since February 2026, Firebase requires the Blaze plan
+  to provision or access Cloud Storage buckets.
 - Use a Node.js 22 TypeScript Functions workspace, matching Firebase's current
   supported runtimes, even though the mobile workspace may run on Node.js 24.
 
@@ -37,6 +42,8 @@ network access, populated only with fictional data, and promoted deliberately.
   Expo Go is not a supported runtime for the native SDK.
 - A future production project will be separate from both development and the
   legacy backend.
+- Firestore and Authentication can be exercised against the development
+  project without enabling Cloud Storage billing.
 
 ## References
 
