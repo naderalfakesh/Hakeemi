@@ -105,6 +105,18 @@ and `10.0.2.2` on Android Emulator when
 `EXPO_PUBLIC_USE_FIREBASE_EMULATORS=true`. Production and preview environments
 must set it to `false`.
 
+The authenticated `bootstrapUserProfile` callable owns creation and
+reconciliation of `users/{uid}`. Firestore rules deny direct client creation and
+mutation. Its unit and emulator integration checks are available through:
+
+```sh
+npm run test:functions
+npm run firebase:profile:test
+```
+
+Cloud Functions remain emulator-only until a deliberate Blaze billing decision
+is made; no billing account is attached by this repository workflow.
+
 ## References
 
 - [Configure Authentication providers with Firebase CLI](https://firebase.google.com/docs/auth/configure-providers-cli)

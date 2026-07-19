@@ -2,6 +2,9 @@ import { getApp } from '@react-native-firebase/app';
 import {
   createUserWithEmailAndPassword,
   getAuth,
+  getIdToken,
+  onAuthStateChanged,
+  reload,
   sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
@@ -24,6 +27,22 @@ function mapUser(user: User): AuthUser {
     emailVerified: user.emailVerified,
     id: user.uid,
   };
+}
+
+export function observeAuthState(listener: (user: AuthUser | null) => void) {
+  return onAuthStateChanged(getFirebaseAuth(), (user) => listener(user ? mapUser(user) : null));
+}
+
+export async function getCurrentAuthUser() {
+  const user = getFirebaseAuth().currentUser;
+
+  if (!user) {
+    return null;
+  }
+
+  await reload(user);
+  await getIdToken(user, true);
+  return mapUser(user);
 }
 
 export async function signIn(input: SignInInput) {

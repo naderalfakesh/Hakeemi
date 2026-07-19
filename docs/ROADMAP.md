@@ -672,10 +672,10 @@ _Estimated effort: two sessions_
 
 #### Mobile
 
-- [ ] Add one application-level auth/session provider.
+- [x] Add one application-level auth/session provider.
 - [x] Implement email/password sign-up, sign-in, sign-out, password reset, and
       verification states with typed validation.
-- [ ] Create the user profile through one idempotent server-controlled flow.
+- [x] Create the user profile through one idempotent server-controlled flow.
 - [ ] Add TanStack Query keys, Firebase adapters, DTO-to-domain mappers, and
       provider pagination.
 - [ ] Replace local provider fixtures with Firestore repositories while keeping

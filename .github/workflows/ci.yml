@@ -54,3 +54,6 @@ jobs:
 
       - name: Test Firebase Security Rules
         run: npm run firebase:rules:test
+
+      - name: Test profile bootstrap contract
+        run: npm run firebase:profile:test

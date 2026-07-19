@@ -1,6 +1,15 @@
 import { createAuthUnavailableError } from '../domain/errors';
 import type { SignInInput, SignUpInput } from '../domain/types';
 
+export function observeAuthState(listener: (user: null) => void) {
+  listener(null);
+  return () => undefined;
+}
+
+export async function getCurrentAuthUser(): Promise<null> {
+  return null;
+}
+
 export async function signIn(_input: SignInInput): Promise<never> {
   throw createAuthUnavailableError();
 }

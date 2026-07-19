@@ -1,12 +1,20 @@
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 
 import { signIn } from '@/features/auth/data/firebase-auth';
+import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import type { SignInValues } from '@/features/auth/domain/schemas';
 import { SignInScreen } from '@/features/auth/screens/sign-in-screen';
 
 export default function SignInRoute() {
+  const session = useAuthSession();
+
+  if (session.status === 'authenticated') {
+    return <Redirect href={session.user?.emailVerified ? '/home' : '/auth/verify-email'} />;
+  }
+
   async function handleSignIn(values: SignInValues) {
     const user = await signIn(values);
+    await session.refreshSession();
 
     if (!user.emailVerified) {
       router.replace({

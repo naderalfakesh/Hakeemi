@@ -10,6 +10,7 @@
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -p tsconfig.json --watch",
     "seed": "npm run build && node lib/seed/run-seed.js",
+    "test": "npm run build && node --test lib/*.test.js",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
