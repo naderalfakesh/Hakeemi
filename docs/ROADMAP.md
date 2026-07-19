@@ -660,14 +660,14 @@ _Estimated effort: two sessions_
 
 #### Backend
 
-- [ ] Initialize Firebase configuration for Auth, Firestore, Functions, Storage,
+- [x] Initialize Firebase configuration for Auth, Firestore, Functions, Storage,
       indexes, rules, and Emulator Suite.
-- [ ] Create environment-safe React Native Firebase config plugins and
+- [x] Create environment-safe React Native Firebase config plugins and
       development build configuration.
-- [ ] Add deterministic fictional seed data for providers, specialties, clinics,
+- [x] Add deterministic fictional seed data for providers, specialties, clinics,
       and future slots.
-- [ ] Write default-deny Firestore and Storage rules.
-- [ ] Write rules tests for public provider reads, private user reads/writes, and
+- [x] Write default-deny Firestore and Storage rules.
+- [x] Write rules tests for public provider reads, private user reads/writes, and
       denied cross-user access.
 
 #### Mobile
@@ -694,9 +694,11 @@ _Estimated effort: two sessions_
 
 1. `build: add Firebase emulators and environment configuration`
 2. `test: add Firestore rules and authorization coverage`
-3. `feat: add typed authentication flows`
-4. `feat: add user profile bootstrap and session restoration`
-5. `feat: connect provider discovery to Firestore`
+3. `chore: add deterministic Firestore seed data`
+4. `build: configure React Native Firebase for Expo`
+5. `feat: add typed authentication flows`
+6. `feat: add user profile bootstrap and session restoration`
+7. `feat: connect provider discovery to Firestore`
 
 ### Phase 3 — Make booking trustworthy
 
@@ -1030,7 +1032,10 @@ entry, Home recommendations, functional provider search and specialty filters,
 and deep-linkable provider profiles backed by a replaceable fictional
 repository. Full results are recorded in `docs/phase-1-verification.md`.
 
-**Phase 2: Connect secure accounts and live provider data** is ready to begin
-with emulator-first Firebase scaffolding. Creating or linking an external
-Firebase development project remains a deliberate user-owned environment step;
-the inaccessible legacy project will not be reused.
+**Phase 2: Connect secure accounts and live provider data** is in progress. The
+new `hakeemi-portfolio-dev` project, emulator suite, rules tests, deterministic
+seed, and Expo CNG/React Native Firebase integration are complete. Native builds
+pass on an iOS Simulator and Android arm64, and the static web export keeps the
+native Firebase boundary isolated. Typed authentication and application-level
+session restoration are next; the inaccessible legacy project remains
+untouched.

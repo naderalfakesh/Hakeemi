@@ -89,6 +89,22 @@ Local native configuration lives under ignored `.firebase/development/` paths:
 EAS preview and production environments will supply equivalent files through
 file environment variables rather than source control.
 
+Expo CNG reads `GOOGLE_SERVICES_JSON` and `GOOGLE_SERVICES_INFO_PLIST` from the
+build environment and falls back to the ignored development files above. A
+clean native rebuild is required whenever an RNFirebase module is added or
+removed:
+
+```sh
+npx expo prebuild --clean
+npx expo run:ios
+npx expo run:android
+```
+
+The app connects Auth, Firestore, and Functions to `127.0.0.1` on iOS Simulator
+and `10.0.2.2` on Android Emulator when
+`EXPO_PUBLIC_USE_FIREBASE_EMULATORS=true`. Production and preview environments
+must set it to `false`.
+
 ## References
 
 - [Configure Authentication providers with Firebase CLI](https://firebase.google.com/docs/auth/configure-providers-cli)

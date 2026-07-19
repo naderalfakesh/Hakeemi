@@ -6,9 +6,11 @@
 - Development backend: `hakeemi-portfolio-dev`; the legacy `hakeemi` project is
   intentionally untouched.
 - Backend foundation: Auth, Firestore, native app registrations, rules, indexes,
-  emulator tests, and deterministic fictional seed tooling are configured.
+  emulator tests, and deterministic fictional seed tooling are configured. The
+  development project contains the 24-document fictional seed.
+- Native integration: Expo CNG configures React Native Firebase Auth, Firestore,
+  and Functions. iOS Simulator, Android arm64, and static web export checks pass.
 - Billing boundary: Cloud Storage remains emulator-only; enabling it now
   requires the Blaze plan and an explicit billing decision.
-- Next action: link React Native Firebase through Expo CNG, then add typed Auth
-  routes and application-level session restoration.
+- Next action: add typed Auth routes and one application-level session provider.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).

@@ -4,7 +4,10 @@ import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import '@/config/env';
+import { initializeFirebaseServices } from '@/services/firebase/initialize';
 import { AppThemeProvider, darkNavigationTheme, lightNavigationTheme, useAppTheme } from '@/theme';
+
+initializeFirebaseServices();
 
 function Navigation() {
   const theme = useAppTheme();
