@@ -50,3 +50,38 @@ export type BookAppointmentResult = {
   >;
   isReplay: boolean;
 };
+
+/**
+ * Lifecycle writes are deliberately kept behind callable functions.  The
+ * request ID makes a retry safe when the mobile client loses the response
+ * after the server has committed the transaction.
+ */
+export type AppointmentActionInput = {
+  appointmentId: string;
+  requestId: string;
+};
+
+export type CancelAppointmentInput = AppointmentActionInput;
+
+export type RescheduleAppointmentInput = AppointmentActionInput & {
+  slotId: string;
+};
+
+export type AppointmentActionResult = {
+  appointment: Pick<
+    Appointment,
+    | 'cancelledAt'
+    | 'cancelledBy'
+    | 'clinicId'
+    | 'endsAt'
+    | 'id'
+    | 'providerId'
+    | 'reasonCategory'
+    | 'slotId'
+    | 'startsAt'
+    | 'status'
+    | 'timezone'
+    | 'visitMode'
+  >;
+  isReplay: boolean;
+};

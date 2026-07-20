@@ -14,7 +14,7 @@ export class AppointmentActionError extends Error {
 export function createOfflineAppointmentError() {
   return new AppointmentActionError(
     'network',
-    'Booking needs an internet connection. Your choices are saved on this device.',
+    'Appointment changes need an internet connection. Your choices are saved on this device.',
   );
 }
 
@@ -26,28 +26,31 @@ export function toAppointmentActionError(error: unknown) {
   const code = readErrorCode(error);
 
   if (code.includes('unauthenticated')) {
-    return new AppointmentActionError('authentication', 'Sign in again before booking.');
+    return new AppointmentActionError(
+      'authentication',
+      'Sign in again before managing appointments.',
+    );
   }
 
   if (code.includes('already-exists')) {
     return new AppointmentActionError(
       'conflict',
-      'That time was just booked. Return to the provider and choose another.',
+      'That appointment changed. Refresh and try again.',
     );
   }
 
   if (code.includes('not-found')) {
-    return new AppointmentActionError('not-found', 'That appointment time no longer exists.');
+    return new AppointmentActionError('not-found', 'That appointment is no longer available.');
   }
 
   if (code.includes('invalid-argument')) {
-    return new AppointmentActionError('invalid', 'Review your booking choices and try again.');
+    return new AppointmentActionError('invalid', 'Review your appointment choices and try again.');
   }
 
   if (code.includes('failed-precondition')) {
     return new AppointmentActionError(
       'unavailable',
-      'That appointment can no longer be booked. Choose another time.',
+      'That appointment can no longer be changed. Choose another time or try again later.',
     );
   }
 
@@ -57,7 +60,7 @@ export function toAppointmentActionError(error: unknown) {
 
   return new AppointmentActionError(
     'unknown',
-    'The appointment could not be confirmed. Your choices are saved; please retry.',
+    'The appointment could not be updated. Your choices are saved; please retry.',
   );
 }
 

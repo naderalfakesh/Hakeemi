@@ -1,4 +1,8 @@
-import { AppointmentDataValidationError, mapAppointmentDocument } from './schemas';
+import {
+  AppointmentDataValidationError,
+  appointmentActionResultSchema,
+  mapAppointmentDocument,
+} from './schemas';
 
 const timestamp = (value: string) => ({ toDate: () => new Date(value) });
 
@@ -32,5 +36,27 @@ describe('appointment document mapper', () => {
     expect(() => mapAppointmentDocument('broken', { status: 'confirmed' })).toThrow(
       AppointmentDataValidationError,
     );
+  });
+
+  it('accepts lifecycle summaries with cancellation audit metadata', () => {
+    expect(
+      appointmentActionResultSchema.parse({
+        appointment: {
+          cancelledAt: '2030-01-01T08:00:00.000Z',
+          cancelledBy: 'patient',
+          clinicId: 'marsa-family-clinic',
+          endsAt: '2030-01-22T08:30:00.000Z',
+          id: 'appointment-1',
+          providerId: 'lina-haddad',
+          reasonCategory: 'routine_visit',
+          slotId: 'lina-slot',
+          startsAt: '2030-01-22T08:00:00.000Z',
+          status: 'cancelled',
+          timezone: 'Asia/Dubai',
+          visitMode: 'in_person',
+        },
+        isReplay: false,
+      }),
+    ).toMatchObject({ appointment: { cancelledBy: 'patient', status: 'cancelled' } });
   });
 });

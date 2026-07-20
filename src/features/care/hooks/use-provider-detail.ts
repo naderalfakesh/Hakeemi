@@ -25,6 +25,7 @@ export function useProviderDetail(providerId: string, repository?: CareRepositor
   const resolvedRepository = repository ?? careRepository;
   const [availabilityWindow] = useState(createAvailabilityWindow);
   const providerQuery = useQuery({
+    enabled: providerId.length > 0,
     queryKey: careQueryKeys.detail(providerId),
     queryFn: async (): Promise<Omit<ProviderDetailData, 'slots'> | null> => {
       const provider = await resolvedRepository.getProvider(providerId);
@@ -45,7 +46,8 @@ export function useProviderDetail(providerId: string, repository?: CareRepositor
     },
   });
   const availabilityQuery = useQuery({
-    enabled: providerQuery.data !== undefined && providerQuery.data !== null,
+    enabled:
+      providerId.length > 0 && providerQuery.data !== undefined && providerQuery.data !== null,
     queryKey: careQueryKeys.availability(providerId, availabilityWindow),
     queryFn: () => resolvedRepository.listAvailableSlots(providerId, availabilityWindow),
   });

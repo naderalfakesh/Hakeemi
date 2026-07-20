@@ -49,6 +49,26 @@ export const bookAppointmentResultSchema = z.object({
   isReplay: z.boolean(),
 });
 
+const appointmentActionSummarySchema = z.object({
+  cancelledAt: z.iso.datetime().nullable(),
+  cancelledBy: z.enum(['patient', 'provider', 'system']).nullable(),
+  clinicId: identifierSchema.nullable(),
+  endsAt: z.iso.datetime(),
+  id: identifierSchema,
+  providerId: identifierSchema,
+  reasonCategory: z.enum(appointmentReasonCategories).nullable(),
+  slotId: identifierSchema,
+  startsAt: z.iso.datetime(),
+  status: z.enum(['confirmed', 'cancelled', 'completed', 'no_show']),
+  timezone: z.string().min(1).max(64),
+  visitMode: visitModeSchema,
+});
+
+export const appointmentActionResultSchema = z.object({
+  appointment: appointmentActionSummarySchema,
+  isReplay: z.boolean(),
+});
+
 export class AppointmentDataValidationError extends Error {
   public override readonly name = 'AppointmentDataValidationError';
 

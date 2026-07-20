@@ -7,15 +7,22 @@ import {
   getDocs,
   getFirestore,
   limit,
-  orderBy,
   query,
   where,
 } from '@react-native-firebase/firestore';
 import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
 
 import type { AppointmentRepository } from '../domain/repository';
-import { bookAppointmentResultSchema, mapAppointmentDocument } from '../domain/schemas';
-import type { BookAppointmentInput } from '../domain/types';
+import {
+  appointmentActionResultSchema,
+  bookAppointmentResultSchema,
+  mapAppointmentDocument,
+} from '../domain/schemas';
+import type {
+  BookAppointmentInput,
+  CancelAppointmentInput,
+  RescheduleAppointmentInput,
+} from '../domain/types';
 
 const FUNCTIONS_REGION = 'me-central1';
 
@@ -37,6 +44,14 @@ class FirebaseAppointmentRepository implements AppointmentRepository {
     return bookAppointmentResultSchema.parse(response.data);
   }
 
+  public async cancel(input: CancelAppointmentInput) {
+    getUserId();
+    const callable = httpsCallable(getFunctions(getApp(), FUNCTIONS_REGION), 'cancelAppointment');
+    const response = await callable(input);
+
+    return appointmentActionResultSchema.parse(response.data);
+  }
+
   public async getAppointment(id: string) {
     getUserId();
     const snapshot = await getDoc(doc(getFirestore(getApp()), 'appointments', id));
@@ -49,13 +64,24 @@ class FirebaseAppointmentRepository implements AppointmentRepository {
       query(
         collection(getFirestore(getApp()), 'appointments'),
         where('patientId', '==', patientId),
-        where('status', '==', 'confirmed'),
-        orderBy('startsAt', 'asc'),
         limit(50),
       ),
     );
 
-    return snapshot.docs.map((document) => mapAppointmentDocument(document.id, document.data()));
+    return snapshot.docs
+      .map((document) => mapAppointmentDocument(document.id, document.data()))
+      .sort((left, right) => left.startsAt.localeCompare(right.startsAt));
+  }
+
+  public async reschedule(input: RescheduleAppointmentInput) {
+    getUserId();
+    const callable = httpsCallable(
+      getFunctions(getApp(), FUNCTIONS_REGION),
+      'rescheduleAppointment',
+    );
+    const response = await callable(input);
+
+    return appointmentActionResultSchema.parse(response.data);
   }
 }
 

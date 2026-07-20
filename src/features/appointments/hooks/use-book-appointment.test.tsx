@@ -31,8 +31,12 @@ const result: BookAppointmentResult = {
 function repository(book: jest.Mock): AppointmentRepository {
   return {
     book,
+    cancel: jest.fn().mockRejectedValue(new Error('Inject an appointment repository in tests.')),
     getAppointment: jest.fn().mockResolvedValue(null),
     listAppointments: jest.fn().mockResolvedValue([]),
+    reschedule: jest
+      .fn()
+      .mockRejectedValue(new Error('Inject an appointment repository in tests.')),
   };
 }
 

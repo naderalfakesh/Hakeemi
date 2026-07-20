@@ -1,20 +1,46 @@
-import { useMemo } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppText, Button, DecorativeIcon, EmptyState, Skeleton, Surface } from '@/components/ui';
+import {
+  AppText,
+  Button,
+  Chip,
+  DecorativeIcon,
+  EmptyState,
+  Skeleton,
+  Surface,
+} from '@/components/ui';
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
+import type { CareRepository } from '@/features/care/domain/repository';
 import { useAppTheme, type AppTheme } from '@/theme';
 
-import { useAppointments } from '../hooks/use-appointments';
+import type { AppointmentRepository } from '../domain/repository';
+import {
+  selectAppointments,
+  useAppointments,
+  type AppointmentFilter,
+} from '../hooks/use-appointments';
 import type { Appointment } from '../domain/types';
+
+const filters: readonly { key: AppointmentFilter; label: string }[] = [
+  { key: 'upcoming', label: 'Upcoming' },
+  { key: 'past', label: 'Past' },
+  { key: 'cancelled', label: 'Cancelled' },
+];
 
 export function AppointmentsScreen({
   onFindCare,
+  appointmentRepository,
+  careDataRepository,
   onSignIn,
+  onViewAppointment,
 }: {
+  appointmentRepository?: AppointmentRepository | undefined;
+  careDataRepository?: CareRepository | undefined;
   onFindCare: () => void;
   onSignIn: () => void;
+  onViewAppointment?: ((appointmentId: string) => void) | undefined;
 }) {
   const session = useAuthSession();
 
@@ -28,13 +54,31 @@ export function AppointmentsScreen({
     );
   }
 
-  return <AuthenticatedAppointments onFindCare={onFindCare} />;
+  return (
+    <AuthenticatedAppointments
+      appointmentRepository={appointmentRepository}
+      careDataRepository={careDataRepository}
+      onFindCare={onFindCare}
+      onViewAppointment={onViewAppointment}
+    />
+  );
 }
 
-function AuthenticatedAppointments({ onFindCare }: { onFindCare: () => void }) {
+function AuthenticatedAppointments({
+  appointmentRepository,
+  careDataRepository,
+  onFindCare,
+  onViewAppointment,
+}: {
+  appointmentRepository?: AppointmentRepository | undefined;
+  careDataRepository?: CareRepository | undefined;
+  onFindCare: () => void;
+  onViewAppointment?: ((appointmentId: string) => void) | undefined;
+}) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const appointmentsQuery = useAppointments();
+  const appointmentsQuery = useAppointments(appointmentRepository, careDataRepository);
+  const [filter, setFilter] = useState<AppointmentFilter>('upcoming');
 
   if (appointmentsQuery.isPending) {
     return (
@@ -45,6 +89,10 @@ function AuthenticatedAppointments({ onFindCare }: { onFindCare: () => void }) {
       >
         <View style={styles.content}>
           <Skeleton height={38} width="60%" />
+          <View style={styles.filterRow}>
+            <Skeleton height={44} radius="sm" width={112} />
+            <Skeleton height={44} radius="sm" width={92} />
+          </View>
           <Skeleton height={150} radius="lg" width="100%" />
         </View>
       </SafeAreaView>
@@ -61,15 +109,8 @@ function AuthenticatedAppointments({ onFindCare }: { onFindCare: () => void }) {
     );
   }
 
-  if (appointmentsQuery.data.length === 0) {
-    return (
-      <AppointmentState
-        action={<Button onPress={onFindCare}>Find a clinician</Button>}
-        description="Choose a fictional provider and a real available slot to test the booking flow."
-        title="No appointments yet"
-      />
-    );
-  }
+  const visibleAppointments = selectAppointments(appointmentsQuery.data ?? [], filter);
+  const filterLabel = filters.find((candidate) => candidate.key === filter)?.label ?? 'Upcoming';
 
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
@@ -79,16 +120,48 @@ function AuthenticatedAppointments({ onFindCare }: { onFindCare: () => void }) {
             Appointments
           </AppText>
           <AppText tone="secondary" variant="bodyLarge">
-            Upcoming confirmed visits for this account.
+            Keep upcoming care close and revisit your appointment history.
           </AppText>
         </View>
-        {appointmentsQuery.data.map(({ appointment, provider }) => (
-          <AppointmentCard
-            appointment={appointment}
-            key={appointment.id}
-            providerName={provider?.displayName ?? 'Provider'}
+
+        <ScrollView
+          contentContainerStyle={styles.filterRow}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        >
+          {filters.map((candidate) => (
+            <Chip
+              key={candidate.key}
+              label={candidate.label}
+              onPress={() => setFilter(candidate.key)}
+              selected={candidate.key === filter}
+            />
+          ))}
+        </ScrollView>
+
+        {visibleAppointments.length === 0 ? (
+          <EmptyState
+            action={<Button onPress={onFindCare}>Find a clinician</Button>}
+            description={emptyDescription(filter)}
+            icon={
+              <DecorativeIcon
+                color={theme.colors.brand}
+                name={filter === 'cancelled' ? 'close-circle-outline' : 'calendar-outline'}
+                size={34}
+              />
+            }
+            title={`No ${filterLabel.toLowerCase()} appointments`}
           />
-        ))}
+        ) : (
+          visibleAppointments.map(({ appointment, provider }) => (
+            <AppointmentCard
+              appointment={appointment}
+              key={appointment.id}
+              onPress={onViewAppointment ? () => onViewAppointment(appointment.id) : undefined}
+              providerName={provider?.displayName ?? 'Provider'}
+            />
+          ))
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -96,39 +169,53 @@ function AuthenticatedAppointments({ onFindCare }: { onFindCare: () => void }) {
 
 function AppointmentCard({
   appointment,
+  onPress,
   providerName,
 }: {
   appointment: Appointment;
+  onPress?: (() => void) | undefined;
   providerName: string;
 }) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const statusTone = appointment.status === 'confirmed' ? 'success' : 'secondary';
 
   return (
-    <Surface padding="spacious" style={styles.card} variant="raised">
-      <View style={styles.statusRow}>
-        <View style={styles.statusDot} />
-        <AppText tone="success" variant="labelSmall">
-          CONFIRMED
-        </AppText>
-      </View>
-      <AppText variant="titleSmall">{providerName}</AppText>
-      <View style={styles.detailRow}>
-        <DecorativeIcon color={theme.colors.brand} name="calendar-outline" size={20} />
-        <AppText variant="bodyStrong">{formatAppointment(appointment)}</AppText>
-      </View>
-      <View style={styles.detailRow}>
-        <DecorativeIcon
-          color={theme.colors.brand}
-          name={appointment.visitMode === 'video' ? 'videocam-outline' : 'location-outline'}
-          size={20}
-        />
-        <AppText tone="secondary" variant="bodyMedium">
-          {appointment.visitMode === 'video' ? 'Video visit' : 'In-person visit'} ·{' '}
-          {appointment.timezone}
-        </AppText>
-      </View>
-    </Surface>
+    <Pressable
+      accessibilityLabel={`Open appointment with ${providerName}`}
+      accessibilityRole={onPress ? 'button' : undefined}
+      disabled={!onPress}
+      onPress={onPress}
+      style={({ pressed }) => [styles.cardPressable, pressed && styles.cardPressed]}
+    >
+      <Surface padding="spacious" style={styles.card} variant="raised">
+        <View style={styles.statusRow}>
+          <View style={[styles.statusDot, { backgroundColor: statusColor(theme, appointment) }]} />
+          <AppText tone={statusTone} variant="labelSmall">
+            {statusLabel(appointment.status)}
+          </AppText>
+          {onPress && (
+            <DecorativeIcon color={theme.colors.textSecondary} name="chevron-forward" size={17} />
+          )}
+        </View>
+        <AppText variant="titleSmall">{providerName}</AppText>
+        <View style={styles.detailRow}>
+          <DecorativeIcon color={theme.colors.brand} name="calendar-outline" size={20} />
+          <AppText variant="bodyStrong">{formatAppointment(appointment)}</AppText>
+        </View>
+        <View style={styles.detailRow}>
+          <DecorativeIcon
+            color={theme.colors.brand}
+            name={appointment.visitMode === 'video' ? 'videocam-outline' : 'location-outline'}
+            size={20}
+          />
+          <AppText tone="secondary" variant="bodyMedium">
+            {appointment.visitMode === 'video' ? 'Video visit' : 'In-person visit'} ·{' '}
+            {appointment.timezone}
+          </AppText>
+        </View>
+      </Surface>
+    </Pressable>
   );
 }
 
@@ -153,6 +240,30 @@ function AppointmentState({
       />
     </SafeAreaView>
   );
+}
+
+function emptyDescription(filter: AppointmentFilter) {
+  if (filter === 'cancelled') {
+    return 'Cancelled visits will stay here so your care history remains clear.';
+  }
+
+  if (filter === 'past') {
+    return 'Completed visits and appointments you missed will appear here.';
+  }
+
+  return 'Choose a clinician and a real available slot to plan your next visit.';
+}
+
+function statusLabel(status: Appointment['status']) {
+  return status === 'no_show' ? 'NO SHOW' : status.replace('_', ' ').toUpperCase();
+}
+
+function statusColor(theme: AppTheme, appointment: Appointment) {
+  if (appointment.status === 'confirmed') {
+    return theme.colors.success;
+  }
+
+  return appointment.status === 'cancelled' ? theme.colors.warning : theme.colors.textSecondary;
 }
 
 function formatAppointment(appointment: Appointment) {
@@ -182,6 +293,17 @@ function createStyles(theme: AppTheme) {
       gap: theme.spacing.xs,
       marginBottom: theme.spacing.sm,
     },
+    filterRow: {
+      gap: theme.spacing.xs,
+      paddingBottom: theme.spacing.xxs,
+    },
+    cardPressable: {
+      borderRadius: theme.radii.lg,
+    },
+    cardPressed: {
+      opacity: 0.86,
+      transform: [{ scale: 0.99 }],
+    },
     card: {
       gap: theme.spacing.sm,
     },
@@ -191,7 +313,6 @@ function createStyles(theme: AppTheme) {
       gap: theme.spacing.xs,
     },
     statusDot: {
-      backgroundColor: theme.colors.success,
       borderRadius: theme.radii.full,
       height: 8,
       width: 8,
