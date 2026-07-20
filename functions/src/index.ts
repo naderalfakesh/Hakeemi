@@ -8,6 +8,12 @@ import {
   parseBookAppointmentRequest,
   reserveAppointment,
 } from './appointments/book-appointment.js';
+import {
+  cancelAppointment as cancelAppointmentTransaction,
+  parseCancelAppointmentRequest,
+  parseRescheduleAppointmentRequest,
+  rescheduleAppointment as rescheduleAppointmentTransaction,
+} from './appointments/manage-appointments.js';
 
 const FUNCTIONS_REGION = 'me-central1';
 
@@ -71,6 +77,34 @@ export const bookAppointment = onCall(async (request) => {
   }
 
   return reserveAppointment(firestore, auth.uid, parseBookAppointmentRequest(request.data));
+});
+
+export const cancelAppointment = onCall(async (request) => {
+  const auth = request.auth;
+
+  if (!auth) {
+    throw new HttpsError('unauthenticated', 'Sign in before cancelling an appointment.');
+  }
+
+  return cancelAppointmentTransaction(
+    firestore,
+    auth.uid,
+    parseCancelAppointmentRequest(request.data),
+  );
+});
+
+export const rescheduleAppointment = onCall(async (request) => {
+  const auth = request.auth;
+
+  if (!auth) {
+    throw new HttpsError('unauthenticated', 'Sign in before rescheduling an appointment.');
+  }
+
+  return rescheduleAppointmentTransaction(
+    firestore,
+    auth.uid,
+    parseRescheduleAppointmentRequest(request.data),
+  );
 });
 
 function readTokenText(value: unknown) {

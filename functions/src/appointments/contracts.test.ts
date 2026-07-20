@@ -7,6 +7,10 @@ import {
   appointmentDocumentSchema,
   availabilitySlotDocumentSchema,
   bookAppointmentRequestSchema,
+  cancelAppointmentRequestSchema,
+  cancelAppointmentResultSchema,
+  rescheduleAppointmentRequestSchema,
+  rescheduleAppointmentResultSchema,
 } from './contracts.js';
 
 const startsAt = Timestamp.fromDate(new Date('2030-01-01T08:00:00.000Z'));
@@ -73,6 +77,40 @@ describe('booking contracts', () => {
     );
   });
 
+  it('accepts management requests only with UUID operation keys', () => {
+    const requestId = '018f47a2-65d1-7b21-9c43-ec2870b39f10';
+
+    assert.deepEqual(
+      cancelAppointmentRequestSchema.parse({ appointmentId: 'appointment-1', requestId }),
+      {
+        appointmentId: 'appointment-1',
+        requestId,
+      },
+    );
+    assert.deepEqual(
+      rescheduleAppointmentRequestSchema.parse({
+        appointmentId: 'appointment-1',
+        requestId,
+        slotId: 'lina-slot-2',
+      }),
+      { appointmentId: 'appointment-1', requestId, slotId: 'lina-slot-2' },
+    );
+
+    assert.throws(() =>
+      cancelAppointmentRequestSchema.parse({
+        appointmentId: 'appointment-1',
+        requestId: 'retry-me',
+      }),
+    );
+    assert.throws(() =>
+      rescheduleAppointmentRequestSchema.parse({
+        appointmentId: 'appointment-1',
+        requestId,
+        slotId: 'lina slot',
+      }),
+    );
+  });
+
   it('rejects malformed request IDs and free-text reasons', () => {
     assert.throws(() =>
       bookAppointmentRequestSchema.parse({ requestId: 'retry-me', slotId: 'lina-slot' }),
@@ -128,6 +166,48 @@ describe('booking contracts', () => {
         cancelledAt: auditTimestamp,
         cancelledBy: 'patient',
       }),
+    );
+  });
+
+  it('validates management result summaries and lifecycle statuses', () => {
+    const appointment = {
+      cancelledAt: null,
+      cancelledBy: null,
+      clinicId: 'marsa-family-clinic',
+      endsAt: endsAt.toDate().toISOString(),
+      id: 'appointment-1',
+      providerId: 'lina-haddad',
+      reasonCategory: 'routine_visit',
+      slotId: 'lina-slot',
+      startsAt: startsAt.toDate().toISOString(),
+      status: 'confirmed' as const,
+      timezone: 'Asia/Dubai',
+      visitMode: 'in_person' as const,
+    };
+
+    assert.deepEqual(rescheduleAppointmentResultSchema.parse({ appointment, isReplay: false }), {
+      appointment,
+      isReplay: false,
+    });
+    assert.deepEqual(
+      cancelAppointmentResultSchema.parse({
+        appointment: {
+          ...appointment,
+          cancelledAt: auditTimestamp.toDate().toISOString(),
+          cancelledBy: 'patient',
+          status: 'cancelled',
+        },
+        isReplay: false,
+      }),
+      {
+        appointment: {
+          ...appointment,
+          cancelledAt: auditTimestamp.toDate().toISOString(),
+          cancelledBy: 'patient',
+          status: 'cancelled',
+        },
+        isReplay: false,
+      },
     );
   });
 });

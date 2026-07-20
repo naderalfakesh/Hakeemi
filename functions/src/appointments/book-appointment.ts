@@ -148,7 +148,7 @@ export async function reserveAppointment(
   });
 }
 
-function parseStoredSlot(input: unknown) {
+export function parseStoredSlot(input: unknown) {
   const parsedSlot = availabilitySlotDocumentSchema.safeParse(input);
 
   if (!parsedSlot.success) {
@@ -158,7 +158,7 @@ function parseStoredSlot(input: unknown) {
   return parsedSlot.data;
 }
 
-function parseStoredAppointment(input: unknown) {
+export function parseStoredAppointment(input: unknown) {
   const parsedAppointment = appointmentDocumentSchema.safeParse(input);
 
   if (!parsedAppointment.success) {
@@ -168,7 +168,7 @@ function parseStoredAppointment(input: unknown) {
   return parsedAppointment.data;
 }
 
-function validateAvailableSlot(slot: ReturnType<typeof parseStoredSlot>, now: Timestamp) {
+export function validateAvailableSlot(slot: ReturnType<typeof parseStoredSlot>, now: Timestamp) {
   if (slot.status !== 'available') {
     throw new HttpsError('already-exists', 'This appointment slot is no longer available.');
   }
@@ -187,7 +187,7 @@ function validateAvailableSlot(slot: ReturnType<typeof parseStoredSlot>, now: Ti
   }
 }
 
-async function validateSlotOwnership(
+export async function validateSlotOwnership(
   transaction: Transaction,
   firestore: Firestore,
   slot: ReturnType<typeof parseStoredSlot>,

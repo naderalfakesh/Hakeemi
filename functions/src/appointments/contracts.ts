@@ -56,6 +56,52 @@ export const bookAppointmentResultSchema = z
   })
   .strict();
 
+const appointmentSummarySchema = z
+  .object({
+    cancelledAt: z.string().datetime().nullable(),
+    cancelledBy: z.enum(['patient', 'provider', 'system']).nullable(),
+    clinicId: documentIdSchema.nullable(),
+    endsAt: z.string().datetime(),
+    id: documentIdSchema,
+    providerId: documentIdSchema,
+    reasonCategory: z.enum(APPOINTMENT_REASON_CATEGORIES).nullable(),
+    slotId: documentIdSchema,
+    startsAt: z.string().datetime(),
+    status: z.enum(APPOINTMENT_STATUSES),
+    timezone: z.string().trim().min(1).max(64),
+    visitMode: z.enum(VISIT_MODES),
+  })
+  .strict();
+
+export const cancelAppointmentRequestSchema = z
+  .object({
+    appointmentId: documentIdSchema,
+    requestId: requestIdSchema,
+  })
+  .strict();
+
+export const cancelAppointmentResultSchema = z
+  .object({
+    appointment: appointmentSummarySchema,
+    isReplay: z.boolean(),
+  })
+  .strict();
+
+export const rescheduleAppointmentRequestSchema = z
+  .object({
+    appointmentId: documentIdSchema,
+    requestId: requestIdSchema,
+    slotId: documentIdSchema,
+  })
+  .strict();
+
+export const rescheduleAppointmentResultSchema = z
+  .object({
+    appointment: appointmentSummarySchema,
+    isReplay: z.boolean(),
+  })
+  .strict();
+
 export const availabilitySlotDocumentSchema = z
   .object({
     appointmentId: documentIdSchema.nullable(),
@@ -179,3 +225,7 @@ export type AppointmentDocument = z.infer<typeof appointmentDocumentSchema>;
 export type AvailabilitySlotDocument = z.infer<typeof availabilitySlotDocumentSchema>;
 export type BookAppointmentRequest = z.infer<typeof bookAppointmentRequestSchema>;
 export type BookAppointmentResult = z.infer<typeof bookAppointmentResultSchema>;
+export type CancelAppointmentRequest = z.infer<typeof cancelAppointmentRequestSchema>;
+export type CancelAppointmentResult = z.infer<typeof cancelAppointmentResultSchema>;
+export type RescheduleAppointmentRequest = z.infer<typeof rescheduleAppointmentRequestSchema>;
+export type RescheduleAppointmentResult = z.infer<typeof rescheduleAppointmentResultSchema>;
