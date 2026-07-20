@@ -912,19 +912,19 @@ _Estimated effort: one session_
 
 #### README and documentation
 
-- [ ] Replace the current README with a concise case-study structure.
+- [x] Replace the current README with a concise case-study structure.
 - [ ] Create a new original hero image, app icon, screenshot set, and short demo
       video/GIF using fictional data.
-- [ ] Explain the 2021-to-2026 rebuild and link the `legacy-v1` tag.
-- [ ] Document the Expo/CNG decision and the native development-build model.
+- [x] Explain the 2021-to-2026 rebuild and link the `legacy-v1` tag.
+- [x] Document the Expo/CNG decision and the native development-build model.
 - [ ] Include a small architecture diagram, feature list, stack, directory map,
       setup steps, emulator seed instructions, scripts, test commands, preview build
       link/QR, accessibility/localization notes, and privacy disclaimer.
 - [ ] Include measured performance and quality results only after they exist.
-- [ ] Credit the historical Figma inspiration without presenting the new UI as a
+- [x] Credit the historical Figma inspiration without presenting the new UI as a
       free-template implementation.
-- [ ] Remove the visitor badge and vague “production ready” wording.
-- [ ] Add `CONTRIBUTING.md`, license decision, and release notes if the repository
+- [x] Remove the visitor badge and vague “production ready” wording.
+- [x] Add `CONTRIBUTING.md`, license decision, and release notes if the repository
       is intended for public reuse.
 
 #### Portfolio wording principles

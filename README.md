@@ -5,9 +5,13 @@
 > Hakeemi is a technical portfolio project. It uses fictional clinicians and
 > patient data and is not a healthcare service or clinical product.
 
-| Cloud-backed discovery                                                                                             | Provider details                                                                                                   | Account preferences                                                                                                                    |
-| ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
-| <img src="docs/images/find-care-cloud.png" alt="Find Care showing a cloud-backed cardiology result" width="260" /> | <img src="docs/images/provider-detail-cloud.png" alt="Provider detail with clinic and availability" width="260" /> | <img src="docs/images/profile-preferences-dark.png" alt="Authenticated profile with synchronized dark-mode preferences" width="260" /> |
+| Cloud-backed discovery                                                                                             | Arabic RTL discovery                                                                                                                     | Provider details                                                                                                   |
+| ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| <img src="docs/images/find-care-cloud.png" alt="Find Care showing a cloud-backed cardiology result" width="260" /> | <img src="docs/images/find-care-arabic-rtl-native.png" alt="Find Care fully localized in Arabic with mirrored RTL layout" width="260" /> | <img src="docs/images/provider-detail-cloud.png" alt="Provider detail with clinic and availability" width="260" /> |
+
+| Arabic provider profile                                                                                                                              | Dark mode, Arabic                                                                                       | Account preferences                                                                                                                    |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| <img src="docs/images/provider-detail-arabic-rtl-native.png" alt="Provider profile in Arabic with mirrored layout and localized data" width="260" /> | <img src="docs/images/home-arabic-dark-native.png" alt="Home screen in Arabic dark mode" width="260" /> | <img src="docs/images/profile-preferences-dark.png" alt="Authenticated profile with synchronized dark-mode preferences" width="260" /> |
 
 ## The rebuild
 
@@ -25,10 +29,13 @@ trade-off and escape hatch are recorded in
 [`ADR 0001`](docs/adr/0001-expo-cng.md).
 
 The modernization is delivered as small, independently reviewable commits.
-Phases 0–3 are complete, and the Phase 4 appointment-management, calendar,
-notification-plumbing, scheduled-reminder, and haptics checkpoints are complete.
-Saved providers are complete; the remaining Phase 4 slice is native management
-E2E. See the [roadmap](docs/ROADMAP.md) for the complete sequence.
+Phases 0–4 are complete — discovery, accounts, transactional booking, and
+appointment management, including a native iOS book→reschedule→cancel journey
+recorded with screenshots. Phase 5 shipped full Arabic localization with
+native RTL layout, bilingual provider data, offline-aware caching, and
+accessibility polish; spoken VoiceOver/TalkBack passes on hardware are the
+remaining sign-off. See the [roadmap](docs/ROADMAP.md) for the complete
+sequence.
 
 ## What works today
 
@@ -65,14 +72,25 @@ E2E. See the [roadmap](docs/ROADMAP.md) for the complete sequence.
   shortlist from Profile.
 - Owner-only language and theme preferences with optimistic updates, rollback,
   Firestore synchronization, and live dark-mode application.
+- Full Arabic localization: every screen reads from typed bilingual string
+  catalogs (including accessibility labels and validation messages), provider
+  catalog data is bilingual with English fallback, plural rules follow CLDR
+  even where Hermes lacks `Intl.PluralRules`, and selecting Arabic persists a
+  native RTL layout with mirrored navigation and directional icons.
+- Offline-aware reads: discovery and appointments keep serving cached results
+  when a refresh fails and announce staleness through a localized, polite live
+  region; bookings are still never queued offline.
+- Dynamic Type up to a 2× cap with intact layouts, reduced-motion-aware
+  navigation transitions, localized accessibility hints on destructive
+  actions, and 44 pt touch targets.
 - Deterministic fictional seed data, default-deny Firebase rules, composite
   indexes, and repeatable Emulator Suite tests.
 - Explicit fixture adapters for Jest and the static web portfolio export; no
   native SDK is silently replaced on iOS or Android.
 
-Arabic RTL completion and native management E2E remain planned work. Calendar
-and notification permission flows still need a native interactive release-signoff
-run.
+Spoken VoiceOver/TalkBack passes, Android-hardware E2E, and the
+calendar/notification permission dialogs still need an interactive
+release-signoff run on devices.
 
 ## Architecture
 
@@ -115,16 +133,23 @@ until enabling Firebase billing is an explicit decision.
 
 The current milestone has been exercised beyond unit tests:
 
-- iOS CNG development build: successful, with native Firebase modules linked.
+- iOS CNG development build: successful, with native Firebase modules linked;
+  interactive Arabic/RTL and management journeys recorded on the simulator,
+  and the same build verified on an iPad simulator.
 - Android arm64 debug APK: successful.
 - Static web export: 21 routes generated, including appointment detail.
-- Application tests: 31 suites and 78 tests passing.
+- Application tests: 34 suites and 107 tests passing, including Arabic-locale
+  renders for every screen area.
 - Firebase authorization: 14 Emulator Suite rules tests passing.
 - Callable integration: booking, appointment-management, notification-token,
   and scheduled-reminder Auth, Firestore, Pub/Sub, and Functions emulator
   suites passing.
 - Strict type checks: application, Firebase tooling, and Functions passing.
 - Expo Doctor: 20/20 checks passing.
+
+The [testing strategy](docs/testing-strategy.md) defines the test pyramid and
+the critical-path coverage gate, and [analytics events](docs/analytics-events.md)
+fixes the privacy-safe telemetry contract before any instrumentation exists.
 
 The [Phase 2 verification record](docs/phase-2-verification.md) includes the
 tested flows, environment boundaries, cleanup, screenshots, and known
@@ -225,3 +250,9 @@ Its visual assets are reference-only because no license was retained in the
 repository. The modern interface and screenshots are newly implemented; the
 [legacy baseline](docs/legacy-baseline.md) records provenance, recovery, and
 the original architecture audit.
+
+## Contributing and license
+
+Contributions follow [CONTRIBUTING.md](CONTRIBUTING.md) — fictional data only,
+single-line conventional commits, and `npm run validate` before review. The
+code is available under the [MIT License](LICENSE).

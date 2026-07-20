@@ -142,4 +142,10 @@
   `dependency-health` workflow runs expo-doctor, SDK alignment, outdated
   reports, and a high-severity audit; `docs/analytics-events.md` fixes the
   privacy-safe analytics contract before any instrumentation.
+- Portfolio docs: the README now leads with the Arabic/RTL evidence set and
+  the completed Phase 0–4 + Phase 5 story, `CONTRIBUTING.md` codifies the
+  working agreements (fictional data, bilingual strings, conventional
+  commits, validate-before-review), and the repository carries an MIT
+  `LICENSE`. Remaining Phase 7 items need external assets: hero image, demo
+  video, and an EAS preview link/QR.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).
