@@ -1,9 +1,11 @@
 # Current Session
 
-- Current phase: Phase 3 in progress — trustworthy appointment booking.
+- Current phase: Phase 4 next — appointment management and native
+  follow-through. Phase 3 is complete.
 - Legacy baseline: `dade72b`, preserved by the `legacy-v1` tag.
 - Phase 1 proof: [`docs/phase-1-verification.md`](docs/phase-1-verification.md).
 - Phase 2 proof: [`docs/phase-2-verification.md`](docs/phase-2-verification.md).
+- Phase 3 proof: [`docs/phase-3-verification.md`](docs/phase-3-verification.md).
 - Development backend: `hakeemi-portfolio-dev`; the legacy `hakeemi` project is
   intentionally untouched.
 - Backend foundation: Auth, Firestore, native app registrations, rules, indexes,
@@ -47,6 +49,18 @@
 - Mobile availability: discovery and provider details now share cached,
   Zod-validated availability queries bounded to a stable 14-day window; the
   provider screen presents all returned times with visit mode and timezone.
-- Next action: build the authenticated date/time, visit detail, review, and
-  confirmation journey on top of the proven booking callable.
+- Mobile booking: a safe AsyncStorage draft survives authentication, booking is
+  blocked offline rather than queued, and typed details/review/confirmation
+  routes invoke the idempotent callable with a stable Expo Crypto request ID.
+- Appointment proof: iOS completed the full sign-up-to-confirmation journey,
+  restored the owner appointment after process restart, and Android API 36.1
+  built, installed, loaded Firestore availability, and rendered the slot actions.
+- Interactive emulator identity: native journeys use the local
+  `hakeemi-portfolio-dev` namespace to match the ignored service files;
+  automated rules and contention tests stay isolated on `demo-hakeemi`.
+- Phase 3 quality: 26 app suites/62 tests, 7 Functions unit tests, 6 booking
+  callable integration tests, 14 rules tests, 20 static routes, and Expo Doctor
+  20/20 all pass.
+- Next action: implement atomic cancellation and rescheduling before expanding
+  the Appointments experience.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).

@@ -518,7 +518,8 @@ transactions as atomic and retryable on concurrent edits:
 
 ### Backend environments
 
-- Emulator-only `demo-*` project IDs for local tests and seeded screenshots.
+- A project-matched `hakeemi-portfolio-dev` namespace for interactive native
+  emulator journeys; synthetic `demo-*` IDs for isolated automated tests.
 - Separate Firebase development and production projects if a hosted demo is
   published.
 - EAS environment/file secrets for native configuration files; no service
@@ -703,7 +704,10 @@ _Estimated effort: two sessions_
 6. `feat: add user profile bootstrap and session restoration`
 7. `feat: connect provider discovery to Firestore`
 
-### Phase 3 — Make booking trustworthy
+### Phase 3 — Make booking trustworthy ✅
+
+_Completed: 2026-07-20, final implementation commit `b05f2b0`. See
+`docs/phase-3-verification.md`._
 
 _Goal: an authenticated patient can book one real available slot and receive a
 reliable confirmation without double-booking._
@@ -727,12 +731,12 @@ _Estimated effort: two to three sessions_
 #### Mobile
 
 - [x] Query availability by provider and bounded date window.
-- [ ] Build the date/time, visit detail, review, and confirmation screens.
-- [ ] Show timezone and visit mode at each decision point.
-- [ ] Prevent submission when offline; preserve safe draft choices locally.
-- [ ] Use a mutation state machine with disabled duplicate submission, clear
+- [x] Build the date/time, visit detail, review, and confirmation screens.
+- [x] Show timezone and visit mode at each decision point.
+- [x] Prevent submission when offline; preserve safe draft choices locally.
+- [x] Use a mutation state machine with disabled duplicate submission, clear
       errors, and post-success cache reconciliation.
-- [ ] Show the confirmed appointment in the Appointments tab.
+- [x] Show the confirmed appointment in the Appointments tab.
 
 #### Definition of done
 
@@ -1017,7 +1021,7 @@ The modernization is complete only when:
 
 - [x] The current Expo SDK and New Architecture run on iOS and Android.
 - [ ] A user can discover, book, view, reschedule, and cancel an appointment.
-- [ ] Double-booking and cross-user data access are prevented by tested server
+- [x] Double-booking and cross-user data access are prevented by tested server
       logic and rules.
 - [ ] English/LTR and Arabic/RTL core journeys pass accessibility review.
 - [ ] Offline, loading, empty, error, permission-denied, and retry states are
@@ -1029,16 +1033,18 @@ The modernization is complete only when:
 
 ## Current position
 
-Phases 0 through 2 are complete. The Expo SDK 57 product slice builds and runs
+Phases 0 through 3 are complete. The Expo SDK 57 product slice builds and runs
 on current iOS and Android simulators. Phase 1 platform proof is recorded in
-`docs/phase-1-verification.md`; the cloud-backed discovery, native account,
-server-owned profile, preference synchronization, and cold-restoration evidence
-is recorded in `docs/phase-2-verification.md`.
+`docs/phase-1-verification.md`; cloud-backed discovery, native accounts,
+server-owned profiles, and synchronized preferences are recorded in
+`docs/phase-2-verification.md`; transactional booking and durable confirmation
+are recorded in `docs/phase-3-verification.md`.
 
 The new `hakeemi-portfolio-dev` project contains the deterministic fictional
-seed, while the inaccessible legacy project remains untouched. All provider
-indexes are ready, the full Auth/profile lifecycle passes against the Emulator
-Suite, and disposable cloud and emulator verification data was removed after
-the checks. Cloud Functions and Storage deployment remain an explicit Blaze-plan
-boundary. The next product phase is **Phase 3: Make booking trustworthy** after
-the current README is rewritten as an accurate portfolio case study.
+seed, while the inaccessible legacy project remains untouched. The booking
+callable prevents double reservations, safe mobile drafts survive
+authentication, and owner appointments survive a native process restart.
+Disposable emulator verification data was removed after the checks. Cloud
+Functions and Storage deployment remain an explicit Blaze-plan boundary. The
+next product phase is **Phase 4: Manage appointments and native
+follow-through**.
