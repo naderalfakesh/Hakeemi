@@ -18,6 +18,7 @@ import type { CareRepository } from '@/features/care/domain/repository';
 import { careRepository } from '@/features/care/data/care-repository';
 import { formatAvailability } from '@/features/care/presentation/formatters';
 import { useProviderDetail } from '@/features/care/hooks/use-provider-detail';
+import { useAppLocale } from '@/localization/locale-provider';
 import { addAppointmentToCalendar } from '@/services/calendar/calendar';
 import { triggerHaptic } from '@/services/haptics/haptics';
 import { useAppTheme, type AppTheme } from '@/theme';
@@ -84,6 +85,7 @@ function AuthenticatedAppointmentDetail({
   onFindCare: () => void;
 }) {
   const theme = useAppTheme();
+  const { intlLocale } = useAppLocale();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const detailQuery = useAppointmentDetail(appointmentId, appointmentRepository);
   const providerId = detailQuery.data?.providerId ?? '';
@@ -194,7 +196,7 @@ function AuthenticatedAppointmentDetail({
         <Surface padding="spacious" style={styles.summary} variant="brand">
           <DetailRow
             icon="calendar-outline"
-            label={formatAppointment(appointment)}
+            label={formatAppointment(appointment, intlLocale)}
             tone="primary"
           />
           <DetailRow
@@ -244,8 +246,8 @@ function AuthenticatedAppointmentDetail({
           <Surface padding="compact" style={styles.notice} variant="muted">
             <DecorativeIcon color={theme.colors.warning} name="information-circle" size={20} />
             <AppText tone="secondary" variant="bodyMedium">
-              Cancelled on {formatDate(appointment.cancelledAt)}. You can choose a new visit from
-              Find care.
+              Cancelled on {formatDate(appointment.cancelledAt, intlLocale)}. You can choose a new
+              visit from Find care.
             </AppText>
           </Surface>
         )}
@@ -480,16 +482,16 @@ function statusColor(theme: AppTheme, appointment: Appointment) {
   return appointment.status === 'cancelled' ? theme.colors.warning : theme.colors.textSecondary;
 }
 
-function formatAppointment(appointment: Appointment) {
-  return new Intl.DateTimeFormat('en-AE', {
+function formatAppointment(appointment: Appointment, locale = 'en-AE') {
+  return new Intl.DateTimeFormat(locale, {
     dateStyle: 'full',
     timeStyle: 'short',
     timeZone: appointment.timezone,
   }).format(new Date(appointment.startsAt));
 }
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat('en-AE', { dateStyle: 'medium' }).format(new Date(value));
+function formatDate(value: string, locale = 'en-AE') {
+  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(new Date(value));
 }
 
 function createStyles(theme: AppTheme) {

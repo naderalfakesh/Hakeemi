@@ -13,6 +13,7 @@ import {
 } from '@/components/ui';
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import type { CareRepository } from '@/features/care/domain/repository';
+import { useAppLocale } from '@/localization/locale-provider';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import type { AppointmentRepository } from '../domain/repository';
@@ -177,6 +178,7 @@ function AppointmentCard({
   providerName: string;
 }) {
   const theme = useAppTheme();
+  const { intlLocale } = useAppLocale();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const statusTone = appointment.status === 'confirmed' ? 'success' : 'secondary';
 
@@ -201,7 +203,7 @@ function AppointmentCard({
         <AppText variant="titleSmall">{providerName}</AppText>
         <View style={styles.detailRow}>
           <DecorativeIcon color={theme.colors.brand} name="calendar-outline" size={20} />
-          <AppText variant="bodyStrong">{formatAppointment(appointment)}</AppText>
+          <AppText variant="bodyStrong">{formatAppointment(appointment, intlLocale)}</AppText>
         </View>
         <View style={styles.detailRow}>
           <DecorativeIcon
@@ -266,8 +268,8 @@ function statusColor(theme: AppTheme, appointment: Appointment) {
   return appointment.status === 'cancelled' ? theme.colors.warning : theme.colors.textSecondary;
 }
 
-function formatAppointment(appointment: Appointment) {
-  return new Intl.DateTimeFormat('en-AE', {
+function formatAppointment(appointment: Appointment, locale = 'en-AE') {
+  return new Intl.DateTimeFormat(locale, {
     dateStyle: 'medium',
     timeStyle: 'short',
     timeZone: appointment.timezone,

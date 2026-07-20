@@ -12,6 +12,7 @@ import {
   Skeleton,
   Surface,
 } from '@/components/ui';
+import { useAppLocale } from '@/localization/locale-provider';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { ProviderAvatar } from '../components/provider-avatar';
@@ -42,6 +43,7 @@ export function ProviderDetailScreen({
   isProviderSaved = false,
 }: ProviderDetailScreenProps) {
   const theme = useAppTheme();
+  const { intlLocale } = useAppLocale();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { retry, state } = useProviderDetail(providerId, repository);
 
@@ -128,7 +130,7 @@ export function ProviderDetailScreen({
           </Surface>
         </View>
 
-        <AvailabilitySection onChooseSlot={onChooseSlot} slots={slots} />
+        <AvailabilitySection locale={intlLocale} onChooseSlot={onChooseSlot} slots={slots} />
 
         <DetailSection title="About">
           <AppText tone="secondary" variant="bodyLarge">
@@ -228,9 +230,11 @@ function ProviderDetailState({ onBack, onRetry, providerId, status }: ProviderDe
 }
 
 function AvailabilitySection({
+  locale,
   onChooseSlot,
   slots,
 }: {
+  locale: 'ar-AE' | 'en-AE';
   onChooseSlot: (slot: AvailabilitySlot) => void;
   slots: readonly AvailabilitySlot[];
 }) {
@@ -255,13 +259,13 @@ function AvailabilitySection({
           {slots.slice(0, 6).map((slot) => (
             <View key={slot.id} style={styles.slotRow}>
               <View style={styles.slotTime}>
-                <AppText variant="bodyStrong">{formatAvailability(slot)}</AppText>
+                <AppText variant="bodyStrong">{formatAvailability(slot, locale)}</AppText>
                 <AppText tone="secondary" variant="caption">
                   {formatVisitMode(slot.visitMode)}
                 </AppText>
               </View>
               <Button
-                accessibilityLabel={`Choose ${formatAvailability(slot)}`}
+                accessibilityLabel={`Choose ${formatAvailability(slot, locale)}`}
                 onPress={() => onChooseSlot(slot)}
                 variant="secondary"
               >

@@ -2,6 +2,7 @@ import { memo, useCallback, useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText, DecorativeIcon } from '@/components/ui';
+import { useAppLocale } from '@/localization/locale-provider';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import type { AvailabilitySlot, Provider } from '../domain/types';
@@ -22,6 +23,7 @@ export const ProviderCard = memo(function ProviderCard({
   specialtyName,
 }: ProviderCardProps) {
   const theme = useAppTheme();
+  const { intlLocale } = useAppLocale();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const handlePress = useCallback(() => onPress(provider.id), [onPress, provider.id]);
 
@@ -65,7 +67,7 @@ export const ProviderCard = memo(function ProviderCard({
             <AppText tone="secondary" variant="caption">
               Next available
             </AppText>
-            <AppText variant="bodyStrong">{formatAvailability(nextSlot)}</AppText>
+            <AppText variant="bodyStrong">{formatAvailability(nextSlot, intlLocale)}</AppText>
           </View>
           <AppText tone="brand" variant="caption">
             {formatVisitMode(nextSlot.visitMode)}

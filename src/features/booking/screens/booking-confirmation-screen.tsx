@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppText, Button, DecorativeIcon, Surface } from '@/components/ui';
 import type { Appointment } from '@/features/appointments/domain/types';
 import type { Provider } from '@/features/care/domain/types';
+import { useAppLocale } from '@/localization/locale-provider';
 import { triggerHaptic } from '@/services/haptics/haptics';
 import { useAppTheme, type AppTheme } from '@/theme';
 
@@ -20,6 +21,7 @@ export function BookingConfirmationScreen({
   provider: Provider | null;
 }) {
   const theme = useAppTheme();
+  const { intlLocale } = useAppLocale();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   useEffect(() => {
@@ -43,7 +45,7 @@ export function BookingConfirmationScreen({
 
         <Surface padding="spacious" style={styles.card} variant="brand">
           <AppText variant="titleSmall">{provider?.displayName ?? 'Confirmed provider'}</AppText>
-          <AppText variant="bodyStrong">{formatAppointment(appointment)}</AppText>
+          <AppText variant="bodyStrong">{formatAppointment(appointment, intlLocale)}</AppText>
           <AppText tone="secondary" variant="bodyMedium">
             {appointment.visitMode === 'video' ? 'Video visit' : 'In-person visit'} ·{' '}
             {appointment.timezone}
@@ -64,8 +66,8 @@ export function BookingConfirmationScreen({
   );
 }
 
-function formatAppointment(appointment: Appointment) {
-  return new Intl.DateTimeFormat('en-AE', {
+function formatAppointment(appointment: Appointment, locale = 'en-AE') {
+  return new Intl.DateTimeFormat(locale, {
     dateStyle: 'full',
     timeStyle: 'short',
     timeZone: appointment.timezone,

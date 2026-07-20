@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { StyleSheet, Text, type TextProps, type TextStyle } from 'react-native';
 
 import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppLocale } from '@/localization/locale-provider';
 
 export type TextTone = 'brand' | 'danger' | 'inverse' | 'primary' | 'secondary' | 'success';
 export type TextVariant = keyof AppTheme['typeScale'];
@@ -31,16 +32,22 @@ export function AppText({
   ...props
 }: AppTextProps) {
   const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme, tone, variant), [theme, tone, variant]);
+  const { isRTL } = useAppLocale();
+  const styles = useMemo(
+    () => createStyles(theme, tone, variant, isRTL),
+    [isRTL, theme, tone, variant],
+  );
 
   return <Text allowFontScaling {...props} style={[styles.text, style]} />;
 }
 
-function createStyles(theme: AppTheme, tone: TextTone, variant: TextVariant) {
+function createStyles(theme: AppTheme, tone: TextTone, variant: TextVariant, isRTL: boolean) {
   return StyleSheet.create({
     text: {
       ...theme.typeScale[variant],
       color: getToneColor(theme, tone),
+      textAlign: isRTL ? 'right' : 'left',
+      writingDirection: isRTL ? 'rtl' : 'ltr',
     } as TextStyle,
   });
 }

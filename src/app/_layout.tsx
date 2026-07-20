@@ -6,6 +6,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import '@/config/env';
 import { AppText } from '@/components/ui';
+import { ErrorBoundaryScreen } from '@/components/navigation/error-boundary-screen';
 import { AuthSessionProvider, useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { BookingDraftProvider } from '@/features/booking/context/booking-draft-provider';
 import { NotificationRegistrationProvider } from '@/features/notifications/context/notification-registration-provider';
@@ -17,8 +18,15 @@ import { initializeFirebaseServices } from '@/services/firebase/initialize';
 import { subscribeToAppointmentNotificationOpen } from '@/services/notifications/notifications';
 import { AppQueryProvider } from '@/services/query/query-provider';
 import { AppThemeProvider, darkNavigationTheme, lightNavigationTheme, useAppTheme } from '@/theme';
+import { logSafeError } from '@/services/logging/safe-logger';
+import { AppLocaleProvider } from '@/localization/locale-provider';
 
 initializeFirebaseServices();
+
+export function ErrorBoundary({ error, retry }: { error: Error; retry: () => void }) {
+  logSafeError('route-boundary', error);
+  return <ErrorBoundaryScreen error={error} onRetry={retry} />;
+}
 
 function Navigation() {
   const theme = useAppTheme();
@@ -87,9 +95,11 @@ function AppShell() {
   const { preferences } = useAppPreferences();
 
   return (
-    <AppThemeProvider preference={preferences.theme}>
-      <Navigation />
-    </AppThemeProvider>
+    <AppLocaleProvider locale={preferences.locale}>
+      <AppThemeProvider preference={preferences.theme}>
+        <Navigation />
+      </AppThemeProvider>
+    </AppLocaleProvider>
   );
 }
 
