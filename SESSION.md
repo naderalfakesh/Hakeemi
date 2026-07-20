@@ -1,7 +1,7 @@
 # Current Session
 
-- Current phase: Phase 4 next — appointment management and native
-  follow-through. Phase 3 is complete.
+- Current phase: Phase 4 in progress — native follow-through remains after the
+  appointment-management checkpoint.
 - Legacy baseline: `dade72b`, preserved by the `legacy-v1` tag.
 - Phase 1 proof: [`docs/phase-1-verification.md`](docs/phase-1-verification.md).
 - Phase 2 proof: [`docs/phase-2-verification.md`](docs/phase-2-verification.md).
@@ -55,12 +55,19 @@
 - Appointment proof: iOS completed the full sign-up-to-confirmation journey,
   restored the owner appointment after process restart, and Android API 36.1
   built, installed, loaded Firestore availability, and rendered the slot actions.
+- Appointment management: transactional cancellation and same-provider
+  rescheduling now release/reserve slots atomically, enforce a 15-minute policy,
+  preserve audit metadata, and use server-only idempotency receipts.
+- Appointment experience: upcoming, past, cancelled, and detail routes are
+  available with offline-aware cancel/reschedule hooks and tested confirmation
+  states. Calendar, reminders, and native management E2E remain open.
 - Interactive emulator identity: native journeys use the local
   `hakeemi-portfolio-dev` namespace to match the ignored service files;
   automated rules and contention tests stay isolated on `demo-hakeemi`.
-- Phase 3 quality: 26 app suites/62 tests, 7 Functions unit tests, 6 booking
-  callable integration tests, 14 rules tests, 20 static routes, and Expo Doctor
-  20/20 all pass.
-- Next action: implement atomic cancellation and rescheduling before expanding
-  the Appointments experience.
+- Phase 4 management quality: 28 app suites/69 tests, 9 Functions unit tests, 5
+  appointment-management callable integration tests, 14 rules tests, 21 static
+  routes, and Expo Doctor 20/20 all pass.
+- Next action: add calendar permission education/integration, notification
+  registration and deep links, then verify management journeys on iOS and
+  Android.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).

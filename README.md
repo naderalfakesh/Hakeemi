@@ -25,8 +25,8 @@ trade-off and escape hatch are recorded in
 [`ADR 0001`](docs/adr/0001-expo-cng.md).
 
 The modernization is delivered as small, independently reviewable commits.
-Phase 2 is complete and Phase 3 is in progress: the transaction-safe booking
-backend is implemented and the guided mobile flow is next. See the
+Phases 0–3 are complete, and the Phase 4 appointment-management checkpoint is
+complete. Native calendar/reminder follow-through is the next slice. See the
 [roadmap](docs/ROADMAP.md) for the complete sequence.
 
 ## What works today
@@ -41,6 +41,11 @@ backend is implemented and the guided mobile flow is next. See the
   profile idempotently.
 - An authenticated, idempotent booking Function that prevents two requests from
   reserving the same slot in tested Firestore transactions.
+- Authenticated appointment management with atomic cancellation and
+  same-provider rescheduling, a 15-minute lead-time policy, audit timestamps,
+  and server-only idempotency receipts.
+- Upcoming, past, cancelled, and deep-linkable appointment detail screens with
+  offline-aware lifecycle actions and safe reschedule choices.
 - Owner-only language and theme preferences with optimistic updates, rollback,
   Firestore synchronization, and live dark-mode application.
 - Deterministic fictional seed data, default-deny Firebase rules, composite
@@ -48,8 +53,9 @@ backend is implemented and the guided mobile flow is next. See the
 - Explicit fixture adapters for Jest and the static web portfolio export; no
   native SDK is silently replaced on iOS or Android.
 
-The booking UI, appointment management, Arabic RTL translation, notifications,
-and calendar integration are planned work and are not presented as complete.
+Native calendar permissions, notification registration/deep links, haptics,
+Arabic RTL completion, and native management E2E remain planned work. They are
+not presented as complete.
 
 ## Architecture
 
@@ -62,7 +68,7 @@ flowchart LR
     Native --> Cloud["Firebase development project"]
     Native --> Emulator["Firebase Emulator Suite"]
     Cloud --> Data["Auth, Firestore, indexes and rules"]
-    Emulator --> Functions["Callable profile Function"]
+    Emulator --> Functions["Callable profile and appointment Functions"]
 ```
 
 Feature code owns domain types and behavior; platform adapters own SDK details.
@@ -94,10 +100,11 @@ The current milestone has been exercised beyond unit tests:
 
 - iOS CNG development build: successful, with native Firebase modules linked.
 - Android arm64 debug APK: successful.
-- Static web export: 17 routes generated.
-- Application tests: 20 suites and 50 tests passing.
-- Firebase authorization: 13 Emulator Suite rules tests passing.
-- Callable integration: Auth, Firestore, and Functions emulators passing.
+- Static web export: 21 routes generated, including appointment detail.
+- Application tests: 28 suites and 69 tests passing.
+- Firebase authorization: 14 Emulator Suite rules tests passing.
+- Callable integration: booking and appointment-management Auth, Firestore,
+  and Functions emulator suites passing.
 - Strict type checks: application, Firebase tooling, and Functions passing.
 - Expo Doctor: 20/20 checks passing.
 

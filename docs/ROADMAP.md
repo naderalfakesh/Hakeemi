@@ -1,6 +1,6 @@
 # Hakeemi Modernization Roadmap
 
-> Status: Phase 3 in progress
+> Status: Phase 4 in progress
 >
 > Baseline: `dade72b` on `master`
 >
@@ -765,16 +765,16 @@ _Estimated effort: two sessions_
 
 #### Backend
 
-- [ ] Implement atomic `cancelAppointment` and `rescheduleAppointment`
+- [x] Implement atomic `cancelAppointment` and `rescheduleAppointment`
       functions with policy validation and audit timestamps.
 - [ ] Implement device-token registration and scheduled reminder delivery.
 - [ ] Prevent reminder payloads and logs from including sensitive fields.
-- [ ] Add indexes and tests for upcoming/history queries and status transitions.
+- [x] Add indexes and tests for upcoming/history queries and status transitions.
 
 #### Mobile
 
-- [ ] Implement upcoming, past, cancelled, and appointment-detail states.
-- [ ] Add cancellation and rescheduling with clear consequences and optimistic
+- [x] Implement upcoming, past, cancelled, and appointment-detail states.
+- [x] Add cancellation and rescheduling with clear consequences and optimistic
       feedback only where rollback is safe.
 - [ ] Add saved providers as an owner-only subcollection.
 - [ ] Add calendar permission education and “Add to calendar” through an Expo
@@ -1033,7 +1033,8 @@ The modernization is complete only when:
 
 ## Current position
 
-Phases 0 through 3 are complete. The Expo SDK 57 product slice builds and runs
+Phases 0 through 3 are complete, and the Phase 4 appointment-management
+checkpoint is complete. The Expo SDK 57 product slice builds and runs
 on current iOS and Android simulators. Phase 1 platform proof is recorded in
 `docs/phase-1-verification.md`; cloud-backed discovery, native accounts,
 server-owned profiles, and synchronized preferences are recorded in
@@ -1043,8 +1044,10 @@ are recorded in `docs/phase-3-verification.md`.
 The new `hakeemi-portfolio-dev` project contains the deterministic fictional
 seed, while the inaccessible legacy project remains untouched. The booking
 callable prevents double reservations, safe mobile drafts survive
-authentication, and owner appointments survive a native process restart.
+authentication, owner appointments survive a native process restart, and
+management callables atomically transition appointment/slot state with
+server-only operation receipts.
 Disposable emulator verification data was removed after the checks. Cloud
 Functions and Storage deployment remain an explicit Blaze-plan boundary. The
-next product phase is **Phase 4: Manage appointments and native
-follow-through**.
+remaining Phase 4 work is **native follow-through**: calendar permissions,
+reminders, notification deep links, haptics, and iOS/Android management E2E.
