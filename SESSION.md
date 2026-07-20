@@ -1,7 +1,7 @@
 # Current Session
 
-- Current phase: Phase 4 in progress — scheduled reminders and native E2E
-  follow-through remain after the calendar/notification checkpoint.
+- Current phase: Phase 4 in progress — native E2E follow-through remains after
+  the calendar/notification/reminder checkpoint.
 - Legacy baseline: `dade72b`, preserved by the `legacy-v1` tag.
 - Phase 1 proof: [`docs/phase-1-verification.md`](docs/phase-1-verification.md).
 - Phase 2 proof: [`docs/phase-2-verification.md`](docs/phase-2-verification.md).
@@ -67,13 +67,27 @@
   education, native FCM token registration uses a callable Function with token
   refresh updates, and typed appointment reminder payloads route to the detail
   screen after Auth restoration.
+- Reminder delivery: a Pub/Sub-backed scheduled Function sends generic
+  privacy-safe reminders in a bounded 24-hour window, records idempotent
+  delivery receipts, and disables invalid device tokens without logging or
+  sending sensitive details.
+- Haptics: successful booking and destructive appointment confirmation use
+  restrained native haptics with deterministic web/Jest adapters.
+- Saved clinicians: authenticated users can bookmark active providers into an
+  owner-only Firestore subcollection, toggle the bookmark from provider detail,
+  and remove entries from the Profile shortlist with optimistic rollback.
 - Interactive emulator identity: native journeys use the local
   `hakeemi-portfolio-dev` namespace to match the ignored service files;
   automated rules and contention tests stay isolated on `demo-hakeemi`.
-- Phase 4 management quality: 29 app suites/74 tests, 9 Functions unit tests, 5
-  appointment-management and 2 notification-token callable integration tests,
-  14 rules tests, 21 static routes, and Expo Doctor 20/20 all pass.
-- Next action: add scheduled reminder delivery with sensitive-field-safe
-  payloads and restrained haptics, then verify calendar/notification and
-  management journeys natively on iOS and Android.
+- Phase 4 management quality: 29 app suites/76 tests, 12 Functions unit tests,
+  5 appointment-management, 2 notification-token, and 1 appointment-reminder
+  callable integration tests, 14 rules tests, 21 static routes, and Expo Doctor
+  20/20 all pass.
+- Next action: verify calendar/notification and management journeys natively on
+  iOS and Android, then continue the inclusive/resilient Phase 5 pass.
+- Phase 5 foundation: the root route now recovers from render failures with
+  privacy-safe development logging, AppText keeps Dynamic Type enabled and
+  applies RTL writing direction, and date/time formatters follow the selected
+  English/Arabic locale. Full Arabic copy and assistive-technology evidence
+  remain open.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).

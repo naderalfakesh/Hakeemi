@@ -1,11 +1,11 @@
-# Phase 4 Verification — Appointment Management and Calendar Checkpoint
+# Phase 4 Verification — Appointment Management and Native Follow-through
 
 > Verified: 2026-07-20
 >
 > Scope: atomic cancellation/rescheduling, the authenticated appointment
-> management experience, native calendar follow-through, and notification
-> registration/routing plumbing. Scheduled delivery and native management E2E
-> are intentionally not claimed as complete yet.
+> management experience, native calendar follow-through, notification
+> registration/routing plumbing, scheduled delivery, and restrained haptics.
+> Native management E2E is intentionally not claimed as complete yet.
 
 ## Outcome
 
@@ -57,15 +57,24 @@ occupied targets, request-key conflicts, owner isolation, and no partial moves.
 - FCM notification data is parsed through a strict appointment-reminder
   contract and routes only to `/appointments/[appointmentId]`, including a
   pending handoff while Auth restores.
+- A Pub/Sub-backed scheduled Function scans the bounded upcoming window every
+  15 minutes, sends generic FCM content, and records a server-only idempotency
+  receipt so retries do not send a second reminder.
+- Reminder data contains only an appointment ID and event type. Provider,
+  patient, email, token, and visit details are excluded from payloads and
+  structured logs; invalid registration tokens are disabled after send.
+- Booking success and destructive confirmation trigger native success/warning
+  haptics, with deterministic no-op adapters on web and Jest.
 
 ## Quality evidence
 
 | Check                                       | Result                                      |
 | ------------------------------------------- | ------------------------------------------- |
-| Application tests                           | 29 suites, 74 tests passed                  |
-| Functions unit tests                        | 9 tests passed                              |
+| Application tests                           | 29 suites, 76 tests passed                  |
+| Functions unit tests                        | 12 tests passed                             |
 | Appointment-management callable integration | 5 tests passed                              |
 | Notification-token callable integration     | 2 tests passed                              |
+| Appointment-reminder integration            | 1 test passed                               |
 | Strict TypeScript                           | App, Firebase tooling, and Functions passed |
 | Lint and formatting                         | Passed                                      |
 | Static web export                           | 21 routes, including appointment detail     |
@@ -73,7 +82,6 @@ occupied targets, request-key conflicts, owner isolation, and no partial moves.
 
 ## Remaining Phase 4 work
 
-Scheduled reminder delivery, sensitive-field-safe payload handling, restrained
-haptics, and a native iOS/Android management E2E journey remain. Calendar and
-notification permission behavior still need a native interactive run before
-release sign-off.
+An authenticated saved-clinician shortlist is now complete. A native iOS/Android
+management E2E journey remains. Calendar and notification permission behavior
+still need a native interactive run before release sign-off.

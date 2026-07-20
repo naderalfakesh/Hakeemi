@@ -25,10 +25,10 @@ trade-off and escape hatch are recorded in
 [`ADR 0001`](docs/adr/0001-expo-cng.md).
 
 The modernization is delivered as small, independently reviewable commits.
-Phases 0–3 are complete, and the Phase 4 appointment-management, calendar, and
-notification-plumbing checkpoints are complete. Scheduled reminder delivery
-and native management E2E are the next slices. See the [roadmap](docs/ROADMAP.md)
-for the complete sequence.
+Phases 0–3 are complete, and the Phase 4 appointment-management, calendar,
+notification-plumbing, scheduled-reminder, and haptics checkpoints are complete.
+Saved providers are complete; the remaining Phase 4 slice is native management
+E2E. See the [roadmap](docs/ROADMAP.md) for the complete sequence.
 
 ## What works today
 
@@ -54,6 +54,15 @@ for the complete sequence.
   register through a callable Function, refresh safely, and route typed
   appointment reminder taps to appointment details. Web/Jest stay unavailable
   by design.
+- A scheduled Cloud Function sends generic, privacy-safe appointment reminders
+  in a 24-hour window, records an idempotent delivery receipt, and disables
+  invalid device tokens without putting provider, patient, or appointment
+  details in FCM payloads or logs.
+- Successful booking and destructive appointment confirmation use restrained
+  native haptics with deterministic web/Jest no-op adapters.
+- Authenticated users can save active clinicians to an owner-only Firestore
+  subcollection, toggle the bookmark from a provider profile, and manage the
+  shortlist from Profile.
 - Owner-only language and theme preferences with optimistic updates, rollback,
   Firestore synchronization, and live dark-mode application.
 - Deterministic fictional seed data, default-deny Firebase rules, composite
@@ -61,9 +70,9 @@ for the complete sequence.
 - Explicit fixture adapters for Jest and the static web portfolio export; no
   native SDK is silently replaced on iOS or Android.
 
-Scheduled reminder delivery, haptics, Arabic RTL completion, and native
-management E2E remain planned work. Calendar and notification permission flows
-still need a native interactive release-signoff run.
+Arabic RTL completion and native management E2E remain planned work. Calendar
+and notification permission flows still need a native interactive release-signoff
+run.
 
 ## Architecture
 
@@ -91,16 +100,16 @@ until enabling Firebase billing is an explicit decision.
 
 ## Technology
 
-| Area                 | Choice                                                                                            |
-| -------------------- | ------------------------------------------------------------------------------------------------- |
-| Runtime              | Expo SDK 57, React Native 0.86, React 19.2, New Architecture                                      |
-| Navigation           | Expo Router with typed routes and static web export                                               |
-| Native services      | React Native Firebase App, Auth, Firestore, Functions, Messaging; Expo Calendar and Notifications |
-| Server state         | TanStack Query with stable keys, retries, caching, and cursor pages                               |
-| Forms and validation | React Hook Form and Zod                                                                           |
-| Backend              | Firebase Auth, Firestore, Cloud Functions, Security Rules, Emulator Suite                         |
-| Quality              | Strict TypeScript, Jest, React Native Testing Library, ESLint, Prettier, Expo Doctor              |
-| Native lifecycle     | Expo CNG, config plugins, development builds, and EAS profiles                                    |
+| Area                 | Choice                                                                                                      |
+| -------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Runtime              | Expo SDK 57, React Native 0.86, React 19.2, New Architecture                                                |
+| Navigation           | Expo Router with typed routes and static web export                                                         |
+| Native services      | React Native Firebase App, Auth, Firestore, Functions, Messaging; Expo Calendar, Notifications, and Haptics |
+| Server state         | TanStack Query with stable keys, retries, caching, and cursor pages                                         |
+| Forms and validation | React Hook Form and Zod                                                                                     |
+| Backend              | Firebase Auth, Firestore, Cloud Functions, Security Rules, Emulator Suite                                   |
+| Quality              | Strict TypeScript, Jest, React Native Testing Library, ESLint, Prettier, Expo Doctor                        |
+| Native lifecycle     | Expo CNG, config plugins, development builds, and EAS profiles                                              |
 
 ## Quality evidence
 
@@ -111,15 +120,18 @@ The current milestone has been exercised beyond unit tests:
 - Static web export: 21 routes generated, including appointment detail.
 - Application tests: 29 suites and 74 tests passing.
 - Firebase authorization: 14 Emulator Suite rules tests passing.
-- Callable integration: booking, appointment-management, and notification-token
-  Auth, Firestore, and Functions emulator suites passing.
+- Callable integration: booking, appointment-management, notification-token,
+  and scheduled-reminder Auth, Firestore, Pub/Sub, and Functions emulator
+  suites passing.
 - Strict type checks: application, Firebase tooling, and Functions passing.
 - Expo Doctor: 20/20 checks passing.
 
 The [Phase 2 verification record](docs/phase-2-verification.md) includes the
 tested flows, environment boundaries, cleanup, screenshots, and known
 non-blocking warnings. [Phase 1 evidence](docs/phase-1-verification.md) records
-the rebuilt UI foundation and native baseline.
+the rebuilt UI foundation and native baseline. The [Phase 4 record](docs/phase-4-verification.md)
+and [Phase 5 foundation record](docs/phase-5-verification.md) document the
+appointment follow-through and inclusive/resilient platform work.
 
 ## Project structure
 

@@ -769,8 +769,8 @@ _Estimated effort: two sessions_
       functions with policy validation and audit timestamps.
 - [x] Implement owner-scoped device-token registration through a callable
       Function.
-- [ ] Implement scheduled reminder delivery.
-- [ ] Prevent reminder payloads and logs from including sensitive fields.
+- [x] Implement scheduled reminder delivery.
+- [x] Prevent reminder payloads and logs from including sensitive fields.
 - [x] Add indexes and tests for upcoming/history queries and status transitions.
 
 #### Mobile
@@ -778,18 +778,20 @@ _Estimated effort: two sessions_
 - [x] Implement upcoming, past, cancelled, and appointment-detail states.
 - [x] Add cancellation and rescheduling with clear consequences and optimistic
       feedback only where rollback is safe.
-- [ ] Add saved providers as an owner-only subcollection.
+- [x] Add saved providers as an owner-only subcollection.
 - [x] Add calendar permission education and “Add to calendar” through an Expo
       native API, with unavailable web/Jest adapters.
 - [x] Add notification permission education, token refresh handling, and typed
       deep links into appointment details.
-- [ ] Add restrained haptics to successful booking and destructive confirmation.
+- [x] Add restrained haptics to successful booking and destructive confirmation.
 
 #### Definition of done
 
 - Cancel and reschedule are atomic and reflected across slots and appointments.
 - Calendar and notification denial leave the core app fully usable.
 - Notification taps open the correct appointment route.
+- Saved clinician references are owner-scoped, optimistic in the UI, and remain
+  removable from the authenticated profile shortlist.
 - E2E covers booking, rescheduling, cancellation, and signed-out isolation.
 
 #### Commit checkpoints
@@ -798,7 +800,7 @@ _Estimated effort: two sessions_
 2. `feat: add appointment management experience`
 3. `feat: add saved providers`
 4. `feat: add appointment calendar follow-through`
-5. `feat: add scheduled appointment reminders`
+5. `feat(functions): deliver privacy-safe appointment reminders`
 6. `test(e2e): cover appointment management`
 
 ### Phase 5 — Make the experience inclusive and resilient
@@ -1035,9 +1037,10 @@ The modernization is complete only when:
 
 ## Current position
 
-Phases 0 through 3 are complete, and the Phase 4 appointment-management and
-calendar checkpoints are complete. The Expo SDK 57 product slice builds and runs
-on current iOS and Android simulators. Phase 1 platform proof is recorded in
+Phases 0 through 3 are complete, and the Phase 4 appointment-management,
+calendar, notification, scheduled-reminder, and haptics checkpoints are
+complete. The Expo SDK 57 product slice builds and runs on current iOS and
+Android simulators. Phase 1 platform proof is recorded in
 `docs/phase-1-verification.md`; cloud-backed discovery, native accounts,
 server-owned profiles, and synchronized preferences are recorded in
 `docs/phase-2-verification.md`; transactional booking and durable confirmation
@@ -1052,9 +1055,16 @@ server-only operation receipts. Confirmed appointment details can request
 calendar access and create a non-sensitive event through the native Expo
 adapter; web and Jest intentionally report the unavailable state. Optional
 notification permission, owner-scoped FCM token registration, refresh handling,
-and typed appointment notification routing are also in place.
+typed appointment notification routing, scheduled generic reminders, idempotent
+delivery receipts, and native haptics are also in place.
 Disposable emulator verification data was removed after the checks. Cloud
 Functions and Storage deployment remain an explicit Blaze-plan boundary. The
-remaining Phase 4 work is **native follow-through**: scheduled reminders,
-haptics, and iOS/Android management E2E. Calendar and notification permission
-flows still need a native interactive release-signoff run.
+remaining Phase 4 work is **native follow-through**: an iOS/Android management
+E2E journey. Calendar and notification permission flows still need a native
+interactive release-signoff run.
+
+Phase 5 has started with a recoverable route error boundary, privacy-safe
+development logging, font scaling, RTL-aware text direction, and locale-aware
+date/time formatting. The inclusive/resilient foundation is recorded in
+`docs/phase-5-verification.md`; full Arabic copy, assistive-technology journeys,
+and manual device-size/offline evidence remain open.
