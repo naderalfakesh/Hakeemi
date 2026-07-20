@@ -40,6 +40,9 @@
 - Booking implementation: the authenticated `bookAppointment` callable now
   derives a deterministic appointment ID and atomically validates and reserves
   one server-owned slot. ADR 0003 records the retry and contention guarantees.
-- Next action: prove booking success, contention, idempotent replay, time bounds,
-  invalid ownership, unauthenticated access, and forged input in tests.
+- Booking verification: a dedicated callable integration suite now covers
+  success, safe replay, request-key conflicts, simultaneous contention, time
+  bounds, provider ownership, missing slots, forged identity, and anonymous
+  access.
+- Next action: connect bounded provider availability reads to the mobile domain.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).

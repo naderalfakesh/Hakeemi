@@ -715,13 +715,13 @@ _Estimated effort: two to three sessions_
 #### Backend
 
 - [x] Implement `availabilitySlots` and `appointments` indexes and rules.
-- [ ] Implement `bookAppointment` as an authenticated callable Cloud Function
+- [x] Implement `bookAppointment` as an authenticated callable Cloud Function
       using a Firestore transaction.
-- [ ] Validate slot ownership, status, time bounds, and allowed request fields on
+- [x] Validate slot ownership, status, time bounds, and allowed request fields on
       the server.
-- [ ] Make idempotency/retry behavior explicit so a repeated client request does
+- [x] Make idempotency/retry behavior explicit so a repeated client request does
       not create duplicate appointments.
-- [ ] Add unit/integration tests for success, contention, duplicate attempts,
+- [x] Add unit/integration tests for success, contention, duplicate attempts,
       expired slots, unauthenticated calls, and forged patient IDs.
 
 #### Mobile

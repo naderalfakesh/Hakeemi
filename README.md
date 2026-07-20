@@ -25,8 +25,9 @@ trade-off and escape hatch are recorded in
 [`ADR 0001`](docs/adr/0001-expo-cng.md).
 
 The modernization is delivered as small, independently reviewable commits.
-Phase 2 is complete; transaction-safe appointment booking is the next product
-milestone. See the [roadmap](docs/ROADMAP.md) for the complete sequence.
+Phase 2 is complete and Phase 3 is in progress: the transaction-safe booking
+backend is implemented and the guided mobile flow is next. See the
+[roadmap](docs/ROADMAP.md) for the complete sequence.
 
 ## What works today
 
@@ -38,6 +39,8 @@ milestone. See the [roadmap](docs/ROADMAP.md) for the complete sequence.
   sign-out, and cold-start session restoration.
 - A callable Function that creates the authenticated user's server-owned
   profile idempotently.
+- An authenticated, idempotent booking Function that prevents two requests from
+  reserving the same slot in tested Firestore transactions.
 - Owner-only language and theme preferences with optimistic updates, rollback,
   Firestore synchronization, and live dark-mode application.
 - Deterministic fictional seed data, default-deny Firebase rules, composite
@@ -45,8 +48,8 @@ milestone. See the [roadmap](docs/ROADMAP.md) for the complete sequence.
 - Explicit fixture adapters for Jest and the static web portfolio export; no
   native SDK is silently replaced on iOS or Android.
 
-Booking, appointment management, Arabic RTL translation, notifications, and
-calendar integration are planned work and are not presented as complete.
+The booking UI, appointment management, Arabic RTL translation, notifications,
+and calendar integration are planned work and are not presented as complete.
 
 ## Architecture
 
