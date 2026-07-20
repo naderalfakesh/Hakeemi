@@ -232,6 +232,8 @@ describe('Cloud Firestore rules', () => {
     await assertFails(alice.doc('users/alice').set({ displayName: 'Alice' }));
     await assertFails(alice.doc('users/alice').update({ displayName: 'Changed' }));
     await assertFails(alice.doc('users/alice').delete());
+    await assertFails(alice.doc('users/alice/deviceTokens/token-1').get());
+    await assertFails(alice.doc('users/alice/deviceTokens/token-1').set({ token: 'secret' }));
   });
 
   it('allows a user to write only validated application preferences', async () => {

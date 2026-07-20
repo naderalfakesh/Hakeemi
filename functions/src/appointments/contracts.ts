@@ -13,6 +13,8 @@ export const APPOINTMENT_STATUSES = ['confirmed', 'cancelled', 'completed', 'no_
 
 export const SLOT_STATUSES = ['available', 'held', 'booked', 'blocked'] as const;
 export const VISIT_MODES = ['in_person', 'video'] as const;
+export const NOTIFICATION_PLATFORMS = ['android', 'ios'] as const;
+export const SUPPORTED_LOCALES = ['ar', 'en'] as const;
 
 const documentIdSchema = z
   .string()
@@ -99,6 +101,22 @@ export const rescheduleAppointmentResultSchema = z
   .object({
     appointment: appointmentSummarySchema,
     isReplay: z.boolean(),
+  })
+  .strict();
+
+export const registerDeviceTokenRequestSchema = z
+  .object({
+    enabled: z.boolean().default(true),
+    locale: z.enum(SUPPORTED_LOCALES),
+    platform: z.enum(NOTIFICATION_PLATFORMS),
+    token: z.string().trim().min(16).max(4096),
+  })
+  .strict();
+
+export const registerDeviceTokenResultSchema = z
+  .object({
+    enabled: z.boolean(),
+    tokenId: z.string().regex(/^[0-9a-f]{64}$/),
   })
   .strict();
 
@@ -229,3 +247,5 @@ export type CancelAppointmentRequest = z.infer<typeof cancelAppointmentRequestSc
 export type CancelAppointmentResult = z.infer<typeof cancelAppointmentResultSchema>;
 export type RescheduleAppointmentRequest = z.infer<typeof rescheduleAppointmentRequestSchema>;
 export type RescheduleAppointmentResult = z.infer<typeof rescheduleAppointmentResultSchema>;
+export type RegisterDeviceTokenRequest = z.infer<typeof registerDeviceTokenRequestSchema>;
+export type RegisterDeviceTokenResult = z.infer<typeof registerDeviceTokenResultSchema>;

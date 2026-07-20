@@ -14,6 +14,10 @@ import {
   parseRescheduleAppointmentRequest,
   rescheduleAppointment as rescheduleAppointmentTransaction,
 } from './appointments/manage-appointments.js';
+import {
+  parseRegisterDeviceTokenRequest,
+  registerDeviceToken as registerDeviceTokenTransaction,
+} from './notifications/register-device-token.js';
 
 const FUNCTIONS_REGION = 'me-central1';
 
@@ -104,6 +108,20 @@ export const rescheduleAppointment = onCall(async (request) => {
     firestore,
     auth.uid,
     parseRescheduleAppointmentRequest(request.data),
+  );
+});
+
+export const registerDeviceToken = onCall(async (request) => {
+  const auth = request.auth;
+
+  if (!auth) {
+    throw new HttpsError('unauthenticated', 'Sign in before enabling notifications.');
+  }
+
+  return registerDeviceTokenTransaction(
+    firestore,
+    auth.uid,
+    parseRegisterDeviceTokenRequest(request.data),
   );
 });
 

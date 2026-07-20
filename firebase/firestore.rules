@@ -71,6 +71,10 @@ service cloud.firestore {
         allow update: if false;
         allow delete: if isOwner(userId);
       }
+
+      match /deviceTokens/{tokenId} {
+        allow read, write: if false;
+      }
     }
 
     match /appointments/{appointmentId} {
