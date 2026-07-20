@@ -1,5 +1,16 @@
 import { Stack } from 'expo-router';
 
+import { useAppMotion } from '@/theme';
+
 export default function BookingLayout() {
-  return <Stack screenOptions={{ headerShown: false }} />;
+  const { prefersReducedMotion } = useAppMotion();
+
+  return (
+    <Stack
+      screenOptions={{
+        animation: prefersReducedMotion ? 'none' : 'default',
+        headerShown: false,
+      }}
+    />
+  );
 }

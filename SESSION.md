@@ -105,9 +105,15 @@
   results when a refresh fails and surface a localized `StaleDataNotice`
   (offline or refresh-failed, with last update time) through a polite live
   region; error states remain for loads with no cached data. Recorded in ADR 0004. Bookings are still never queued offline.
+- Motion and scaling polish: a shared `useAppMotion` hook exposes motion
+  tokens plus the reduce-motion preference, and the root/auth/booking stacks
+  switch to instant transitions when reduced motion is on. `AppText` caps
+  Dynamic Type at 2× to protect dense rows, destructive/confirm actions
+  (cancel, confirm cancellation, reschedule, confirm booking) carry localized
+  accessibility hints, and the saved-clinician row meets the 44 pt target.
 - Phase 5 open items: assistive-technology journeys, native-speaker Arabic copy
-  review, provider-data localization (bios/credentials/languages), motion
-  tokens with reduced-motion fallbacks, and device-size evidence.
+  review, provider-data localization (bios/credentials/languages), and
+  device-size/rotation/keyboard evidence on small phones and tablets.
 - Phase 6 quality gate: GitHub Actions now runs the app, Firebase, Functions,
   rules, booking, management, notification-token, and scheduled-reminder
   contracts; EAS profiles remain explicit but signing/preview artifacts require

@@ -273,7 +273,11 @@ function AuthenticatedAppointmentDetail({
             >
               {showReschedule ? strings.keepCurrentTime : strings.reschedule}
             </Button>
-            <Button onPress={() => setConfirmingCancel((visible) => !visible)} variant="danger">
+            <Button
+              accessibilityHint={strings.cancelAppointmentHint}
+              onPress={() => setConfirmingCancel((visible) => !visible)}
+              variant="danger"
+            >
               {strings.cancelAppointment}
             </Button>
           </View>
@@ -290,6 +294,7 @@ function AuthenticatedAppointmentDetail({
                 {strings.keepAppointment}
               </Button>
               <Button
+                accessibilityHint={strings.confirmCancellationHint}
                 busy={cancelMutation.status === 'pending'}
                 onPress={() => void confirmCancel()}
                 variant="danger"
@@ -386,6 +391,7 @@ function RescheduleSection({
                 </AppText>
               </View>
               <Button
+                accessibilityHint={strings.moveHereHint}
                 busy={submitting}
                 disabled={submitting}
                 onPress={() => onSelect(slot.id)}

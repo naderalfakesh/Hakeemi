@@ -9,3 +9,4 @@ export {
   type ThemePreference,
 } from './themes';
 export { motion, radii, sizes, spacing, typeScale, zIndices } from './tokens';
+export { useAppMotion } from './use-app-motion';

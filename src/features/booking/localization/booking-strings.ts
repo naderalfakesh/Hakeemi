@@ -26,6 +26,7 @@ const en = {
   },
   review: {
     confirmAppointment: 'Confirm appointment',
+    confirmAppointmentHint: 'Reserves the selected time through a secure transaction.',
     disclaimer:
       'Portfolio demonstration only. This creates an appointment against fictional provider data.',
     offlineBody: 'Your choices are saved. Reconnect before confirming; bookings are never queued.',
@@ -82,6 +83,7 @@ export const bookingStrings: LocalizedStrings<typeof en> = {
     },
     review: {
       confirmAppointment: 'تأكيد الموعد',
+      confirmAppointmentHint: 'يحجز الوقت المحدد عبر معاملة آمنة.',
       disclaimer:
         'عرض توضيحي لأغراض الملف المهني فقط، وينشئ هذا موعدًا باستخدام بيانات مقدمي رعاية خيالية.',
       offlineBody:

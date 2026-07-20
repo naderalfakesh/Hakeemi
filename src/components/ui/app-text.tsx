@@ -38,7 +38,9 @@ export function AppText({
     [isRTL, theme, tone, variant],
   );
 
-  return <Text allowFontScaling {...props} style={[styles.text, style]} />;
+  return (
+    <Text allowFontScaling maxFontSizeMultiplier={2} {...props} style={[styles.text, style]} />
+  );
 }
 
 function createStyles(theme: AppTheme, tone: TextTone, variant: TextVariant, isRTL: boolean) {

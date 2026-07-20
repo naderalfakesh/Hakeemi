@@ -55,11 +55,36 @@
 - Each screen area carries at least one Arabic-locale render test, and
   dedicated suites cover direction sync and icon mirroring.
 
+## Offline-aware caching and staleness
+
+- Discovery and the appointment list keep serving cached results when a
+  refresh fails; the designed error states remain reserved for loads with no
+  cached data at all.
+- A shared `StaleDataNotice` announces offline or refresh-failed staleness in
+  the active locale with the last successful update time, through a polite
+  accessibility live region. A shared `useIsOffline` hook treats an unknown
+  network state as online so the notice never flashes during startup.
+- Bookings, cancellations, and reschedules still refuse to run offline and are
+  never queued. The policy is recorded in ADR 0004.
+
+## Motion, scaling, and target polish
+
+- `useAppMotion` exposes the shared motion tokens plus the platform
+  reduce-motion preference; the root, auth, and booking stacks fall back to
+  instant transitions when reduced motion is requested, matching the skeleton
+  shimmer's existing behavior.
+- `AppText` keeps Dynamic Type enabled and caps scaling at 2× so dense rows
+  (status pills, slot rows, chips) grow without breaking layout.
+- Destructive and committing actions — cancel appointment, confirm
+  cancellation, reschedule ("Move here"), and confirm booking — carry
+  localized `accessibilityHint`s describing their outcome.
+- The saved-clinician row in the profile meets the 44 pt minimum touch target.
+
 ## Quality evidence
 
 | Check              | Result                         |
 | ------------------ | ------------------------------ |
-| Application tests  | 33 suites, 98 tests passed     |
+| Application tests  | 34 suites, 103 tests passed    |
 | App lint/typecheck | Passed (ESLint, tsc, Prettier) |
 | Static web export  | 21 routes exported             |
 | Expo Doctor        | 20/20 checks passed            |
@@ -67,10 +92,9 @@
 
 ## Remaining Phase 5 work
 
-The remaining pass should add stale-data indicators, verify keyboard
-avoidance/safe areas on small phones and tablets, apply shared motion tokens
-with reduced-motion fallbacks beyond skeletons, and run English/LTR plus
-Arabic/RTL auth, discovery, booking, and management journeys on devices with
-Dynamic Type, VoiceOver, and TalkBack. A native-speaker review of the Arabic
-copy and provider-data localization (bios, credentials, languages) also remain
-open before Phase 5 can be marked complete.
+The remaining pass should run English/LTR plus Arabic/RTL auth, discovery,
+booking, and management journeys on devices with Dynamic Type, VoiceOver, and
+TalkBack, and gather keyboard/safe-area/rotation evidence on small phones and
+tablets. A native-speaker review of the Arabic copy and provider-data
+localization (bios, credentials, languages) also remain open before Phase 5
+can be marked complete.

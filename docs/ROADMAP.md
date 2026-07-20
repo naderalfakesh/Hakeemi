@@ -832,7 +832,7 @@ _Estimated effort: two sessions_
 - [x] Define query caching and stale-data indicators; never queue a booking while
       offline.
 - [ ] Tune keyboard avoidance, safe areas, rotation, small phones, and tablets.
-- [ ] Apply purposeful transitions and shared motion tokens with reduced-motion
+- [x] Apply purposeful transitions and shared motion tokens with reduced-motion
       fallbacks.
 
 #### Definition of done

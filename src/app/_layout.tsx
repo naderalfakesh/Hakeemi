@@ -18,7 +18,13 @@ import {
 import { initializeFirebaseServices } from '@/services/firebase/initialize';
 import { subscribeToAppointmentNotificationOpen } from '@/services/notifications/notifications';
 import { AppQueryProvider } from '@/services/query/query-provider';
-import { AppThemeProvider, darkNavigationTheme, lightNavigationTheme, useAppTheme } from '@/theme';
+import {
+  AppThemeProvider,
+  darkNavigationTheme,
+  lightNavigationTheme,
+  useAppMotion,
+  useAppTheme,
+} from '@/theme';
 import { logSafeError } from '@/services/logging/safe-logger';
 import { syncNativeLayoutDirection } from '@/localization/layout-direction';
 import { AppLocaleProvider } from '@/localization/locale-provider';
@@ -35,6 +41,7 @@ function Navigation() {
   const theme = useAppTheme();
   const session = useAuthSession();
   const strings = useStrings(navigationStrings);
+  const { prefersReducedMotion } = useAppMotion();
   const navigationTheme = theme.mode === 'dark' ? darkNavigationTheme : lightNavigationTheme;
 
   if (session.status === 'restoring') {
@@ -53,7 +60,12 @@ function Navigation() {
 
   return (
     <NavigationThemeProvider value={navigationTheme}>
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack
+        screenOptions={{
+          animation: prefersReducedMotion ? 'none' : 'default',
+          headerShown: false,
+        }}
+      />
       <NotificationNavigationBridge />
       <StatusBar style={theme.mode === 'dark' ? 'light' : 'dark'} />
     </NavigationThemeProvider>

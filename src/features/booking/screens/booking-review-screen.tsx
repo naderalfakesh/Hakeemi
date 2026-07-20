@@ -56,7 +56,12 @@ export function BookingReviewScreen({
 
       {error && <InlineError message={error} />}
 
-      <Button busy={isSubmitting} disabled={isOffline} onPress={onConfirm}>
+      <Button
+        accessibilityHint={strings.review.confirmAppointmentHint}
+        busy={isSubmitting}
+        disabled={isOffline}
+        onPress={onConfirm}
+      >
         {strings.review.confirmAppointment}
       </Button>
       <AppText style={styles.disclaimer} tone="secondary" variant="caption">

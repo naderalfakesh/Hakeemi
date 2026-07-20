@@ -506,6 +506,8 @@ function createStyles(theme: AppTheme) {
     savedProviderCopy: {
       flex: 1,
       gap: theme.spacing.xxs,
+      justifyContent: 'center',
+      minHeight: theme.sizes.minimumTouchTarget,
     },
     notificationHeading: {
       alignItems: 'center',
