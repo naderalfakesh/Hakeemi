@@ -4,6 +4,10 @@ import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { setGlobalOptions } from 'firebase-functions/v2/options';
 
 import { reconcileUserProfile, type AuthIdentity } from './profile.js';
+import {
+  parseBookAppointmentRequest,
+  reserveAppointment,
+} from './appointments/book-appointment.js';
 
 const FUNCTIONS_REGION = 'me-central1';
 
@@ -57,6 +61,16 @@ export const bootstrapUserProfile = onCall(async (request) => {
   });
 
   return profile;
+});
+
+export const bookAppointment = onCall(async (request) => {
+  const auth = request.auth;
+
+  if (!auth) {
+    throw new HttpsError('unauthenticated', 'Sign in before booking an appointment.');
+  }
+
+  return reserveAppointment(firestore, auth.uid, parseBookAppointmentRequest(request.data));
 });
 
 function readTokenText(value: unknown) {

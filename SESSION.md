@@ -37,5 +37,9 @@
 - Booking contract: executable server schemas now define valid request, slot,
   and appointment records; slot and appointment rules require bounded reads and
   keep all lifecycle writes server-controlled.
-- Next action: implement the idempotent `bookAppointment` Firestore transaction.
+- Booking implementation: the authenticated `bookAppointment` callable now
+  derives a deterministic appointment ID and atomically validates and reserves
+  one server-owned slot. ADR 0003 records the retry and contention guarantees.
+- Next action: prove booking success, contention, idempotent replay, time bounds,
+  invalid ownership, unauthenticated access, and forged input in tests.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).

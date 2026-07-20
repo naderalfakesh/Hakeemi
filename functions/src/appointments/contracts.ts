@@ -36,6 +36,26 @@ export const bookAppointmentRequestSchema = z
   })
   .strict();
 
+export const bookAppointmentResultSchema = z
+  .object({
+    appointment: z
+      .object({
+        clinicId: documentIdSchema.nullable(),
+        endsAt: z.string().datetime(),
+        id: documentIdSchema,
+        providerId: documentIdSchema,
+        reasonCategory: z.enum(APPOINTMENT_REASON_CATEGORIES).nullable(),
+        slotId: documentIdSchema,
+        startsAt: z.string().datetime(),
+        status: z.literal('confirmed'),
+        timezone: z.string().trim().min(1).max(64),
+        visitMode: z.enum(VISIT_MODES),
+      })
+      .strict(),
+    isReplay: z.boolean(),
+  })
+  .strict();
+
 export const availabilitySlotDocumentSchema = z
   .object({
     appointmentId: documentIdSchema.nullable(),
@@ -53,10 +73,20 @@ export const availabilitySlotDocumentSchema = z
   })
   .strict()
   .superRefine((slot, context) => {
-    if (slot.endsAt.toMillis() <= slot.startsAt.toMillis()) {
+    const durationMilliseconds = slot.endsAt.toMillis() - slot.startsAt.toMillis();
+
+    if (durationMilliseconds <= 0) {
       context.addIssue({
         code: 'custom',
         message: 'Slot end must be later than its start.',
+        path: ['endsAt'],
+      });
+    }
+
+    if (durationMilliseconds > 180 * 60 * 1_000) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Slots cannot be longer than 180 minutes.',
         path: ['endsAt'],
       });
     }
@@ -148,3 +178,4 @@ export const appointmentDocumentSchema = z
 export type AppointmentDocument = z.infer<typeof appointmentDocumentSchema>;
 export type AvailabilitySlotDocument = z.infer<typeof availabilitySlotDocumentSchema>;
 export type BookAppointmentRequest = z.infer<typeof bookAppointmentRequestSchema>;
+export type BookAppointmentResult = z.infer<typeof bookAppointmentResultSchema>;
