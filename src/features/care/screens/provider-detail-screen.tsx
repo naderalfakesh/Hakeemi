@@ -23,15 +23,23 @@ import { formatAvailability, formatFee, formatVisitMode } from '../presentation/
 type ProviderDetailScreenProps = {
   onBack: () => void;
   onChooseSlot: (slot: AvailabilitySlot) => void;
+  onSignInToSave?: (() => void) | undefined;
+  onToggleSavedProvider?: ((providerId: string) => void) | undefined;
   providerId: string;
   repository?: CareRepository;
+  savedProviderStatus?: 'error' | 'loading' | 'ready' | 'saving' | 'unavailable' | undefined;
+  isProviderSaved?: boolean;
 };
 
 export function ProviderDetailScreen({
   onBack,
   onChooseSlot,
+  onSignInToSave,
+  onToggleSavedProvider,
   providerId,
   repository,
+  savedProviderStatus = 'unavailable',
+  isProviderSaved = false,
 }: ProviderDetailScreenProps) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
@@ -61,6 +69,29 @@ export function ProviderDetailScreen({
           <AppText tone="secondary" variant="labelLarge">
             Provider profile
           </AppText>
+          <View style={styles.topBarSpacer} />
+          <IconButton
+            accessibilityLabel={
+              isProviderSaved
+                ? `Remove ${provider.displayName} from saved clinicians`
+                : `Save ${provider.displayName}`
+            }
+            disabled={savedProviderStatus === 'saving' || savedProviderStatus === 'loading'}
+            onPress={() => {
+              if (onToggleSavedProvider) {
+                onToggleSavedProvider(provider.id);
+              } else {
+                onSignInToSave?.();
+              }
+            }}
+            variant="soft"
+          >
+            <DecorativeIcon
+              color={theme.colors.brand}
+              name={isProviderSaved ? 'bookmark' : 'bookmark-outline'}
+              size={22}
+            />
+          </IconButton>
         </View>
 
         <View style={styles.identity}>
@@ -304,6 +335,9 @@ function createStyles(theme: AppTheme) {
       alignItems: 'center',
       flexDirection: 'row',
       gap: theme.spacing.sm,
+    },
+    topBarSpacer: {
+      flex: 1,
     },
     identity: {
       alignItems: 'center',

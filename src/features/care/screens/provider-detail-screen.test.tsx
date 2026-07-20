@@ -35,6 +35,30 @@ describe('ProviderDetailScreen', () => {
     );
   });
 
+  it('exposes an accessible saved-provider toggle', async () => {
+    const onToggleSavedProvider = jest.fn();
+    const view = await render(
+      <TestAppProviders colorScheme="light">
+        <ProviderDetailScreen
+          isProviderSaved={false}
+          onBack={jest.fn()}
+          onChooseSlot={jest.fn()}
+          onToggleSavedProvider={onToggleSavedProvider}
+          providerId="lina-haddad"
+          repository={fixtureCareRepository}
+          savedProviderStatus="ready"
+        />
+      </TestAppProviders>,
+    );
+
+    await waitFor(() =>
+      expect(view.getByRole('header', { name: 'Dr. Lina Haddad' })).toBeVisible(),
+    );
+    await fireEvent.press(view.getByRole('button', { name: 'Save Dr. Lina Haddad' }));
+
+    expect(onToggleSavedProvider).toHaveBeenCalledWith('lina-haddad');
+  });
+
   it('provides a safe way back when a provider is missing', async () => {
     const onBack = jest.fn();
     const view = await render(

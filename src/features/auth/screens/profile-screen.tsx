@@ -1,8 +1,20 @@
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppText, Button, Chip, DecorativeIcon, InlineError, Surface } from '@/components/ui';
+import {
+  AppText,
+  Button,
+  Chip,
+  DecorativeIcon,
+  EmptyState,
+  IconButton,
+  InlineError,
+  Surface,
+} from '@/components/ui';
+import type { Provider } from '@/features/care/domain/types';
+import { ProviderAvatar } from '@/features/care/components/provider-avatar';
+import type { SavedProvidersStatus } from '@/features/care/hooks/use-saved-providers';
 import type { ProfileStatus } from '@/features/auth/context/auth-session-provider';
 import type { UserProfile } from '@/features/auth/domain/profile';
 import type { AuthUser } from '@/features/auth/domain/types';
@@ -20,6 +32,9 @@ type ProfileScreenProps = {
   onRetryProfile: () => Promise<void>;
   onSignIn: () => void;
   onSignOut: () => Promise<void>;
+  onOpenSavedProvider?: ((providerId: string) => void) | undefined;
+  onRetrySavedProviders?: (() => void) | undefined;
+  onToggleSavedProvider?: ((providerId: string) => void) | undefined;
   onUpdatePreferences: (preferences: AppPreferences) => void;
   preferences: AppPreferences;
   preferencesError: string | null;
@@ -29,6 +44,8 @@ type ProfileScreenProps = {
   profile: UserProfile | null;
   profileError: string | null;
   profileStatus: ProfileStatus;
+  savedProviders?: readonly Provider[] | undefined;
+  savedProvidersStatus?: SavedProvidersStatus | undefined;
   user: AuthUser | null;
 };
 
@@ -39,6 +56,9 @@ export function ProfileScreen({
   onRetryProfile,
   onSignIn,
   onSignOut,
+  onOpenSavedProvider,
+  onRetrySavedProviders,
+  onToggleSavedProvider,
   onUpdatePreferences,
   preferences,
   preferencesError,
@@ -48,6 +68,8 @@ export function ProfileScreen({
   profile,
   profileError,
   profileStatus,
+  savedProviders = [],
+  savedProvidersStatus = 'unavailable',
   user,
 }: ProfileScreenProps) {
   const theme = useAppTheme();
@@ -229,6 +251,14 @@ export function ProfileScreen({
               )}
             </Surface>
 
+            <SavedProvidersSection
+              onOpenProvider={onOpenSavedProvider}
+              onRemoveProvider={onToggleSavedProvider}
+              onRetry={onRetrySavedProviders}
+              providers={savedProviders}
+              status={savedProvidersStatus}
+            />
+
             {signOutError && <InlineError message={signOutError} />}
             <Button busy={isSigningOut} onPress={() => void handleSignOut()} variant="secondary">
               Sign out
@@ -256,6 +286,98 @@ export function ProfileScreen({
         </AppText>
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function SavedProvidersSection({
+  onOpenProvider,
+  onRemoveProvider,
+  onRetry,
+  providers,
+  status,
+}: {
+  onOpenProvider?: ((providerId: string) => void) | undefined;
+  onRemoveProvider?: ((providerId: string) => void) | undefined;
+  onRetry?: (() => void) | undefined;
+  providers: readonly Provider[];
+  status: SavedProvidersStatus;
+}) {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
+  return (
+    <Surface padding="spacious" style={styles.savedProvidersCard} variant="plain">
+      <View style={styles.savedProvidersHeading}>
+        <View style={styles.savedProvidersTitle}>
+          <DecorativeIcon color={theme.colors.brand} name="bookmark-outline" size={22} />
+          <AppText variant="titleSmall">Saved clinicians</AppText>
+        </View>
+        <AppText tone="secondary" variant="bodyMedium">
+          Keep a shortlist for your next appointment.
+        </AppText>
+      </View>
+
+      {status === 'unavailable' && (
+        <AppText tone="secondary" variant="bodyMedium">
+          Saving clinicians is available in the iOS and Android development builds.
+        </AppText>
+      )}
+      {status === 'loading' && (
+        <AppText accessibilityLiveRegion="polite" tone="secondary" variant="bodyMedium">
+          Loading your saved clinicians…
+        </AppText>
+      )}
+      {status === 'saving' && (
+        <AppText accessibilityLiveRegion="polite" tone="secondary" variant="bodyMedium">
+          Updating your saved list…
+        </AppText>
+      )}
+      {status === 'error' && (
+        <>
+          <InlineError message="Your saved clinicians could not be loaded." />
+          <Button onPress={onRetry} variant="secondary">
+            Retry saved clinicians
+          </Button>
+        </>
+      )}
+      {status === 'ready' && providers.length === 0 && (
+        <EmptyState
+          description="Tap the bookmark on a clinician profile to keep it here."
+          icon={<DecorativeIcon color={theme.colors.brand} name="bookmark-outline" size={30} />}
+          title="No saved clinicians yet"
+        />
+      )}
+      {status === 'ready' && providers.length > 0 && (
+        <View style={styles.savedProvidersList}>
+          {providers.map((provider) => (
+            <View key={provider.id} style={styles.savedProviderRow}>
+              <ProviderAvatar name={provider.displayName} providerId={provider.id} />
+              <Pressable
+                accessibilityLabel={`Open saved clinician ${provider.displayName}`}
+                accessibilityRole="button"
+                disabled={!onOpenProvider}
+                onPress={() => onOpenProvider?.(provider.id)}
+                style={styles.savedProviderCopy}
+              >
+                <AppText numberOfLines={1} variant="bodyStrong">
+                  {provider.displayName}
+                </AppText>
+                <AppText numberOfLines={1} tone="secondary" variant="caption">
+                  {provider.credentialSummary}
+                </AppText>
+              </Pressable>
+              <IconButton
+                accessibilityLabel={`Remove ${provider.displayName} from saved clinicians`}
+                onPress={() => onRemoveProvider?.(provider.id)}
+                variant="soft"
+              >
+                <DecorativeIcon color={theme.colors.brand} name="bookmark" size={20} />
+              </IconButton>
+            </View>
+          ))}
+        </View>
+      )}
+    </Surface>
   );
 }
 
@@ -349,6 +471,33 @@ function createStyles(theme: AppTheme) {
     },
     notificationCard: {
       gap: theme.spacing.md,
+    },
+    savedProvidersCard: {
+      gap: theme.spacing.md,
+    },
+    savedProvidersHeading: {
+      gap: theme.spacing.xxs,
+    },
+    savedProvidersTitle: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      gap: theme.spacing.sm,
+    },
+    savedProvidersList: {
+      gap: theme.spacing.sm,
+    },
+    savedProviderRow: {
+      alignItems: 'center',
+      borderBottomColor: theme.colors.borderSubtle,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      flexDirection: 'row',
+      gap: theme.spacing.sm,
+      minHeight: theme.sizes.controlHeight,
+      paddingBottom: theme.spacing.sm,
+    },
+    savedProviderCopy: {
+      flex: 1,
+      gap: theme.spacing.xxs,
     },
     notificationHeading: {
       alignItems: 'center',

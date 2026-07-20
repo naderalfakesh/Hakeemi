@@ -1,10 +1,27 @@
 import { fireEvent, render } from '@testing-library/react-native';
 
 import { AppThemeProvider } from '@/theme';
+import type { Provider } from '@/features/care/domain/types';
 
 import { ProfileScreen } from './profile-screen';
 
 const noop = jest.fn().mockResolvedValue(undefined);
+const savedProvider: Provider = {
+  bio: 'A fictional clinician profile.',
+  clinicIds: ['marsa-family-clinic'],
+  consultationFee: { amount: 340, currency: 'AED' },
+  credentialSummary: 'MBBS · Family medicine',
+  displayName: 'Dr. Lina Haddad',
+  id: 'lina-haddad',
+  image: null,
+  isActive: true,
+  isFeatured: true,
+  languages: ['English', 'Arabic'],
+  ratingSummary: { average: 4.8, count: 126 },
+  slug: 'lina-haddad',
+  specialtyIds: ['family-medicine'],
+  visitModes: ['in_person', 'video'],
+};
 
 describe('ProfileScreen', () => {
   beforeEach(() => {
@@ -88,5 +105,46 @@ describe('ProfileScreen', () => {
     expect(onUpdatePreferences).toHaveBeenCalledWith({ locale: 'en', theme: 'dark' });
     await fireEvent.press(view.getByRole('button', { name: 'Sign out' }));
     expect(onSignOut).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows saved clinicians and removes one from the shortlist', async () => {
+    const onToggleSavedProvider = jest.fn();
+    const view = await render(
+      <AppThemeProvider colorScheme="light">
+        <ProfileScreen
+          onCreateAccount={noop}
+          onEnableNotifications={noop}
+          onRetryPreferences={noop}
+          onRetryProfile={noop}
+          onRetrySavedProviders={noop}
+          onSignIn={noop}
+          onSignOut={noop}
+          onToggleSavedProvider={onToggleSavedProvider}
+          onUpdatePreferences={noop}
+          preferences={{ locale: 'en', theme: 'system' }}
+          preferencesError={null}
+          preferencesStatus="ready"
+          notificationError={null}
+          notificationStatus="registered"
+          profile={null}
+          profileError={null}
+          profileStatus="ready"
+          savedProviders={[savedProvider]}
+          savedProvidersStatus="ready"
+          user={{
+            displayName: 'Demo Patient',
+            email: 'demo@example.test',
+            emailVerified: true,
+            id: 'demo-user',
+          }}
+        />
+      </AppThemeProvider>,
+    );
+
+    expect(view.getByText('Saved clinicians')).toBeOnTheScreen();
+    await fireEvent.press(
+      view.getByRole('button', { name: 'Remove Dr. Lina Haddad from saved clinicians' }),
+    );
+    expect(onToggleSavedProvider).toHaveBeenCalledWith('lina-haddad');
   });
 });

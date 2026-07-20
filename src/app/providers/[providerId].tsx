@@ -4,6 +4,7 @@ import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { useBookingDraft } from '@/features/booking/context/booking-draft-provider';
 import { ProviderDetailScreen } from '@/features/care/screens/provider-detail-screen';
 import type { AvailabilitySlot } from '@/features/care/domain/types';
+import { useSavedProviders } from '@/features/care/hooks/use-saved-providers';
 
 export default function ProviderRoute() {
   const { providerId: rawProviderId } = useLocalSearchParams<{
@@ -14,6 +15,7 @@ export default function ProviderRoute() {
     : (rawProviderId ?? '');
   const session = useAuthSession();
   const bookingDraft = useBookingDraft();
+  const savedProviders = useSavedProviders(session.user);
 
   function handleBack() {
     if (router.canGoBack()) {
@@ -45,7 +47,11 @@ export default function ProviderRoute() {
     <ProviderDetailScreen
       onBack={handleBack}
       onChooseSlot={(slot) => void handleChooseSlot(slot)}
+      onSignInToSave={() => router.push('/auth/sign-in')}
+      onToggleSavedProvider={session.user ? savedProviders.toggle : undefined}
       providerId={providerId}
+      savedProviderStatus={savedProviders.status}
+      isProviderSaved={savedProviders.isSaved(providerId)}
     />
   );
 }
