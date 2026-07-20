@@ -20,7 +20,7 @@ jobs:
   validate:
     name: Validate app
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
 
     steps:
       - name: Check out repository
@@ -57,3 +57,15 @@ jobs:
 
       - name: Test profile bootstrap contract
         run: npm run firebase:profile:test
+
+      - name: Test appointment booking contract
+        run: npm run firebase:booking:test
+
+      - name: Test appointment management contract
+        run: npm run firebase:appointment-management:test
+
+      - name: Test notification token contract
+        run: npm run firebase:notification-token:test
+
+      - name: Test scheduled reminder delivery
+        run: npm run firebase:appointment-reminders:test

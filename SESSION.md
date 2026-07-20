@@ -90,4 +90,8 @@
   applies RTL writing direction, and date/time formatters follow the selected
   English/Arabic locale. Full Arabic copy and assistive-technology evidence
   remain open.
+- Phase 6 quality gate: GitHub Actions now runs the app, Firebase, Functions,
+  rules, booking, management, notification-token, and scheduled-reminder
+  contracts; EAS profiles remain explicit but signing/preview artifacts require
+  external Expo and Apple/Google credentials.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).

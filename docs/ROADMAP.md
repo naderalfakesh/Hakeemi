@@ -863,7 +863,7 @@ _Estimated effort: two sessions_
 
 - [ ] Define a test pyramid and minimum critical-path coverage; avoid percentage
       targets that reward low-value snapshots.
-- [ ] Add CI jobs for install, formatting, lint, typecheck, unit/integration
+- [x] Add CI jobs for install, formatting, lint, typecheck, unit/integration
       tests, Firebase rules/functions tests, and `expo-doctor`.
 - [ ] Add scheduled dependency health checks and an Expo/RN upgrade policy.
 - [ ] Profile provider lists, search input, provider details, and booking on

@@ -131,7 +131,8 @@ tested flows, environment boundaries, cleanup, screenshots, and known
 non-blocking warnings. [Phase 1 evidence](docs/phase-1-verification.md) records
 the rebuilt UI foundation and native baseline. The [Phase 4 record](docs/phase-4-verification.md)
 and [Phase 5 foundation record](docs/phase-5-verification.md) document the
-appointment follow-through and inclusive/resilient platform work.
+appointment follow-through and inclusive/resilient platform work. The [Phase 6
+record](docs/phase-6-verification.md) documents the CI and EAS release boundary.
 
 ## Project structure
 
