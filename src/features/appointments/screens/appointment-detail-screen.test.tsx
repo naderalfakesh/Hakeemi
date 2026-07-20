@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { fixtureCareRepository } from '@/features/care/data/fixture-care-repository';
@@ -10,6 +10,10 @@ import { AppointmentDetailScreen } from './appointment-detail-screen';
 
 jest.mock('@/features/auth/context/auth-session-provider', () => ({
   useAuthSession: jest.fn(),
+}));
+
+jest.mock('@/services/connectivity/connectivity', () => ({
+  hasInternetConnection: jest.fn().mockResolvedValue(true),
 }));
 
 const mockedUseAuthSession = jest.mocked(useAuthSession);
@@ -98,10 +102,14 @@ describe('AppointmentDetailScreen', () => {
     await waitFor(() =>
       expect(view.getByRole('header', { name: 'Dr. Lina Haddad' })).toBeVisible(),
     );
-    fireEvent.press(view.getByRole('button', { name: 'Cancel appointment' }));
-    expect(view.getByText('Cancel this appointment?')).toBeVisible();
+    await act(async () =>
+      fireEvent.press(view.getByRole('button', { name: 'Cancel appointment' })),
+    );
+    await waitFor(() => expect(view.getByText('Cancel this appointment?')).toBeVisible());
 
-    fireEvent.press(view.getByRole('button', { name: 'Confirm cancellation' }));
+    await act(async () =>
+      fireEvent.press(view.getByRole('button', { name: 'Confirm cancellation' })),
+    );
     await waitFor(() =>
       expect(cancel).toHaveBeenCalledWith({
         appointmentId: appointment.id,
@@ -126,11 +134,11 @@ describe('AppointmentDetailScreen', () => {
     );
 
     await waitFor(() => expect(view.getByRole('button', { name: 'Reschedule' })).toBeVisible());
-    fireEvent.press(view.getByRole('button', { name: 'Reschedule' }));
+    await act(async () => fireEvent.press(view.getByRole('button', { name: 'Reschedule' })));
     await waitFor(() => expect(view.getByText('Choose a new time')).toBeVisible());
 
     const moveButtons = view.getAllByRole('button', { name: 'Move here' });
-    fireEvent.press(moveButtons[0]!);
+    await act(async () => fireEvent.press(moveButtons[0]!));
     await waitFor(() => expect(reschedule).toHaveBeenCalled());
     expect(reschedule.mock.calls[0]?.[0]).toMatchObject({
       appointmentId: appointment.id,
