@@ -767,7 +767,9 @@ _Estimated effort: two sessions_
 
 - [x] Implement atomic `cancelAppointment` and `rescheduleAppointment`
       functions with policy validation and audit timestamps.
-- [ ] Implement device-token registration and scheduled reminder delivery.
+- [x] Implement owner-scoped device-token registration through a callable
+      Function.
+- [ ] Implement scheduled reminder delivery.
 - [ ] Prevent reminder payloads and logs from including sensitive fields.
 - [x] Add indexes and tests for upcoming/history queries and status transitions.
 
@@ -779,8 +781,8 @@ _Estimated effort: two sessions_
 - [ ] Add saved providers as an owner-only subcollection.
 - [x] Add calendar permission education and “Add to calendar” through an Expo
       native API, with unavailable web/Jest adapters.
-- [ ] Add notification permission education, token refresh handling, and deep
-      links into appointment details.
+- [x] Add notification permission education, token refresh handling, and typed
+      deep links into appointment details.
 - [ ] Add restrained haptics to successful booking and destructive confirmation.
 
 #### Definition of done
@@ -796,7 +798,7 @@ _Estimated effort: two sessions_
 2. `feat: add appointment management experience`
 3. `feat: add saved providers`
 4. `feat: add appointment calendar follow-through`
-5. `feat: add appointment reminders and deep links`
+5. `feat: add scheduled appointment reminders`
 6. `test(e2e): cover appointment management`
 
 ### Phase 5 — Make the experience inclusive and resilient
@@ -1048,9 +1050,11 @@ authentication, owner appointments survive a native process restart, and
 management callables atomically transition appointment/slot state with
 server-only operation receipts. Confirmed appointment details can request
 calendar access and create a non-sensitive event through the native Expo
-adapter; web and Jest intentionally report the unavailable state.
+adapter; web and Jest intentionally report the unavailable state. Optional
+notification permission, owner-scoped FCM token registration, refresh handling,
+and typed appointment notification routing are also in place.
 Disposable emulator verification data was removed after the checks. Cloud
 Functions and Storage deployment remain an explicit Blaze-plan boundary. The
-remaining Phase 4 work is **native follow-through**: reminders, notification
-deep links, haptics, and iOS/Android management E2E. Calendar still needs a
-native interactive release-signoff run.
+remaining Phase 4 work is **native follow-through**: scheduled reminders,
+haptics, and iOS/Android management E2E. Calendar and notification permission
+flows still need a native interactive release-signoff run.

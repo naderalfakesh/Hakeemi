@@ -3,9 +3,9 @@
 > Verified: 2026-07-20
 >
 > Scope: atomic cancellation/rescheduling, the authenticated appointment
-> management experience, and the native calendar follow-through. Notification
-> delivery and native management E2E are intentionally not claimed as complete
-> yet.
+> management experience, native calendar follow-through, and notification
+> registration/routing plumbing. Scheduled delivery and native management E2E
+> are intentionally not claimed as complete yet.
 
 ## Outcome
 
@@ -51,14 +51,21 @@ occupied targets, request-key conflicts, owner isolation, and no partial moves.
 - Native uses `expo-calendar` with a config-plugin permission explanation;
   web and Jest use explicit unavailable adapters so the portfolio export stays
   deterministic.
+- The Profile screen explains optional appointment reminders and requests
+  notification permission only after an explicit tap. Native FCM tokens are
+  registered through a callable Function; web and Jest report unavailable.
+- FCM notification data is parsed through a strict appointment-reminder
+  contract and routes only to `/appointments/[appointmentId]`, including a
+  pending handoff while Auth restores.
 
 ## Quality evidence
 
 | Check                                       | Result                                      |
 | ------------------------------------------- | ------------------------------------------- |
-| Application tests                           | 28 suites, 70 tests passed                  |
+| Application tests                           | 29 suites, 74 tests passed                  |
 | Functions unit tests                        | 9 tests passed                              |
 | Appointment-management callable integration | 5 tests passed                              |
+| Notification-token callable integration     | 2 tests passed                              |
 | Strict TypeScript                           | App, Firebase tooling, and Functions passed |
 | Lint and formatting                         | Passed                                      |
 | Static web export                           | 21 routes, including appointment detail     |
@@ -66,7 +73,7 @@ occupied targets, request-key conflicts, owner isolation, and no partial moves.
 
 ## Remaining Phase 4 work
 
-Notification permission and token registration, reminder delivery/deep links,
-restrained haptics, and a native iOS/Android management E2E journey remain the
-next implementation slice. Calendar behavior still needs to be exercised in a
-native interactive run before release sign-off.
+Scheduled reminder delivery, sensitive-field-safe payload handling, restrained
+haptics, and a native iOS/Android management E2E journey remain. Calendar and
+notification permission behavior still need a native interactive run before
+release sign-off.

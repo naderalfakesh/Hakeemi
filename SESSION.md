@@ -1,7 +1,7 @@
 # Current Session
 
-- Current phase: Phase 4 in progress — notification and native E2E follow-through
-  remain after the calendar checkpoint.
+- Current phase: Phase 4 in progress — scheduled reminders and native E2E
+  follow-through remain after the calendar/notification checkpoint.
 - Legacy baseline: `dade72b`, preserved by the `legacy-v1` tag.
 - Phase 1 proof: [`docs/phase-1-verification.md`](docs/phase-1-verification.md).
 - Phase 2 proof: [`docs/phase-2-verification.md`](docs/phase-2-verification.md).
@@ -62,12 +62,17 @@
   available with offline-aware cancel/reschedule hooks and tested confirmation
   states. Confirmed detail screens can add a non-sensitive event through the
   native Expo calendar adapter; web/Jest report an unavailable calendar.
+- Notification experience: the Profile screen has explicit optional permission
+  education, native FCM token registration uses a callable Function with token
+  refresh updates, and typed appointment reminder payloads route to the detail
+  screen after Auth restoration.
 - Interactive emulator identity: native journeys use the local
   `hakeemi-portfolio-dev` namespace to match the ignored service files;
   automated rules and contention tests stay isolated on `demo-hakeemi`.
-- Phase 4 management quality: 28 app suites/70 tests, 9 Functions unit tests, 5
-  appointment-management callable integration tests, 14 rules tests, 21 static
-  routes, and Expo Doctor 20/20 all pass.
-- Next action: add notification registration/deep links and restrained haptics,
-  then verify calendar and management journeys natively on iOS and Android.
+- Phase 4 management quality: 29 app suites/74 tests, 9 Functions unit tests, 5
+  appointment-management and 2 notification-token callable integration tests,
+  14 rules tests, 21 static routes, and Expo Doctor 20/20 all pass.
+- Next action: add scheduled reminder delivery with sensitive-field-safe
+  payloads and restrained haptics, then verify calendar/notification and
+  management journeys natively on iOS and Android.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).
