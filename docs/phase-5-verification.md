@@ -109,9 +109,36 @@
 - Fixture search matches both locales, so Arabic queries (for example
   «طب القلب») find providers in the portfolio web export as well.
 
+## Native Arabic/RTL simulator verification
+
+An interactive iOS Simulator run (iPhone 17 Pro, development build against the
+seeded local emulators) verified the Arabic journey end to end:
+
+- Signing in, opening the profile, and selecting «العربية» localized the whole
+  UI immediately and showed the layout-direction restart hint; relaunching the
+  app applied full native RTL — mirrored tab bar, mirrored cards and rows,
+  back arrows and chevrons pointing with the reading direction, and
+  logical-offset onboarding decor.
+- Home, discovery, and provider detail rendered bilingual catalog data
+  («د. لينا حداد»، «طب الأسرة»، «خبرة 12 عامًا»), locale-aware dates
+  («ثلاثاء، 21 يوليو، 9:30 ص»), Arabic currency, and grammatically correct
+  counts («71 مراجعةً»، «6 أطباء»).
+- Evidence: `docs/images/home-arabic-rtl-native.png`,
+  `docs/images/find-care-arabic-rtl-native.png`,
+  `docs/images/provider-detail-arabic-rtl-native.png`.
+
+The run also surfaced and fixed two native-only defects:
+
+- Hermes ships without `Intl.PluralRules`, which crashed the first native
+  screen that rendered a plural count. `formatLocalizedCount` now falls back
+  to the CLDR rules for Arabic and English when the constructor is missing,
+  with a Jest test asserting parity against the Intl path.
+- The route-level error boundary crashed while rendering because it mounted
+  above `AppThemeProvider` when the root layout failed; `ErrorBoundaryScreen`
+  now provides its own theme scope, so the recovery card renders anywhere.
+
 ## Remaining Phase 5 work
 
-The remaining pass should run English/LTR plus Arabic/RTL auth, discovery,
-booking, and management journeys on devices with Dynamic Type, VoiceOver, and
-TalkBack, and gather keyboard/safe-area/rotation evidence on small phones and
-tablets before Phase 5 can be marked complete.
+The remaining pass should run VoiceOver and TalkBack across auth, discovery,
+booking, and management journeys, and gather keyboard/safe-area/rotation
+evidence on small phones and tablets before Phase 5 can be marked complete.

@@ -122,7 +122,14 @@
   catalog, seed schema, and search terms (Arabic names/languages/specialties)
   are updated, and `hakeemi-portfolio-dev` was reseeded with the 24-document
   bilingual catalog.
-- Phase 5 open items: assistive-technology journeys on devices and
+- Native Arabic/RTL proof: an interactive iOS Simulator journey (dev build +
+  seeded emulators) verified the language switch, restart hint, full RTL
+  mirroring after relaunch, bilingual provider data, Arabic dates/currency,
+  and correct plural forms. Screenshots live in `docs/images/*arabic-rtl*`.
+  The run surfaced and fixed two native-only defects: Hermes lacks
+  `Intl.PluralRules` (CLDR fallback added with parity tests) and the route
+  error boundary crashed outside `AppThemeProvider` (now self-themed).
+- Phase 5 open items: VoiceOver/TalkBack journeys and
   device-size/rotation/keyboard evidence on small phones and tablets.
 - Phase 6 quality gate: GitHub Actions now runs the app, Firebase, Functions,
   rules, booking, management, notification-token, and scheduled-reminder

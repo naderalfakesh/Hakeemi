@@ -56,3 +56,4 @@ coverage/
 
 # Cloud Functions build output
 /functions/lib
+pubsub-debug.log*

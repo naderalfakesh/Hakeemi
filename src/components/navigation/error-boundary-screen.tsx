@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText, Button, DecorativeIcon, Surface } from '@/components/ui';
 import { useStrings } from '@/localization/use-strings';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { AppThemeProvider, useAppTheme, type AppTheme } from '@/theme';
 
 import { navigationStrings } from './navigation-strings';
 
@@ -13,7 +13,20 @@ type ErrorBoundaryScreenProps = {
   onRetry: () => void;
 };
 
-export function ErrorBoundaryScreen({ error, onRetry }: ErrorBoundaryScreenProps) {
+/**
+ * The route-level boundary can mount above the app providers when the root
+ * layout itself fails, so this screen provides its own theme scope instead of
+ * assuming one exists.
+ */
+export function ErrorBoundaryScreen(props: ErrorBoundaryScreenProps) {
+  return (
+    <AppThemeProvider>
+      <ErrorBoundaryContent {...props} />
+    </AppThemeProvider>
+  );
+}
+
+function ErrorBoundaryContent({ error, onRetry }: ErrorBoundaryScreenProps) {
   const theme = useAppTheme();
   const strings = useStrings(navigationStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
