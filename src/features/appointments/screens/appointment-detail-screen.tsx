@@ -19,6 +19,7 @@ import { careRepository } from '@/features/care/data/care-repository';
 import { formatAvailability } from '@/features/care/presentation/formatters';
 import { useProviderDetail } from '@/features/care/hooks/use-provider-detail';
 import { useAppLocale } from '@/localization/locale-provider';
+import { useStrings } from '@/localization/use-strings';
 import { addAppointmentToCalendar } from '@/services/calendar/calendar';
 import { triggerHaptic } from '@/services/haptics/haptics';
 import { useAppTheme, type AppTheme } from '@/theme';
@@ -28,6 +29,9 @@ import { useAppointmentDetail } from '../hooks/use-appointment-detail';
 import { useRescheduleAppointment } from '../hooks/use-reschedule-appointment';
 import type { AppointmentRepository } from '../domain/repository';
 import type { Appointment } from '../domain/types';
+import { appointmentDetailStrings } from '../localization/appointment-detail-strings';
+import { appointmentStatusStrings } from '../localization/appointment-status-strings';
+import { localizeAppointmentError } from '../localization/appointment-error-strings';
 
 export function AppointmentDetailScreen({
   appointmentId,
@@ -45,14 +49,15 @@ export function AppointmentDetailScreen({
   onFindCare: () => void;
 }) {
   const session = useAuthSession();
+  const strings = useStrings(appointmentDetailStrings);
 
   if (session.status !== 'authenticated') {
     return (
       <DetailState
-        action={<Button onPress={onBack}>Back to appointments</Button>}
-        description="Sign in to access private appointment details."
+        action={<Button onPress={onBack}>{strings.backToAppointments}</Button>}
+        description={strings.signInDescription}
         onBack={onBack}
-        title="Sign in to continue"
+        title={strings.signInTitle}
       />
     );
   }
@@ -85,7 +90,9 @@ function AuthenticatedAppointmentDetail({
   onFindCare: () => void;
 }) {
   const theme = useAppTheme();
-  const { intlLocale } = useAppLocale();
+  const { intlLocale, locale } = useAppLocale();
+  const strings = useStrings(appointmentDetailStrings);
+  const statusStrings = useStrings(appointmentStatusStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
   const detailQuery = useAppointmentDetail(appointmentId, appointmentRepository);
   const providerId = detailQuery.data?.providerId ?? '';
@@ -103,10 +110,10 @@ function AuthenticatedAppointmentDetail({
   if (detailQuery.isError) {
     return (
       <DetailState
-        action={<Button onPress={() => void detailQuery.refetch()}>Try again</Button>}
-        description="Check your connection and try again."
+        action={<Button onPress={() => void detailQuery.refetch()}>{strings.tryAgain}</Button>}
+        description={strings.checkConnection}
         onBack={onBack}
-        title="Appointment unavailable"
+        title={strings.unavailableTitle}
       />
     );
   }
@@ -116,10 +123,10 @@ function AuthenticatedAppointmentDetail({
   if (!appointment) {
     return (
       <DetailState
-        action={<Button onPress={onBack}>Back to appointments</Button>}
-        description="This appointment may have been removed or is not owned by this account."
+        action={<Button onPress={onBack}>{strings.backToAppointments}</Button>}
+        description={strings.notFoundDescription}
         onBack={onBack}
-        title="Appointment not found"
+        title={strings.notFoundTitle}
       />
     );
   }
@@ -178,11 +185,15 @@ function AuthenticatedAppointmentDetail({
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.topBar}>
-          <IconButton accessibilityLabel="Back to appointments" onPress={onBack} variant="soft">
+          <IconButton
+            accessibilityLabel={strings.backToAppointments}
+            onPress={onBack}
+            variant="soft"
+          >
             <DecorativeIcon color={theme.colors.brand} name="arrow-back" size={22} />
           </IconButton>
           <AppText tone="secondary" variant="labelLarge">
-            Appointment details
+            {strings.appointmentDetails}
           </AppText>
         </View>
 
@@ -201,10 +212,10 @@ function AuthenticatedAppointmentDetail({
           />
           <DetailRow
             icon={appointment.visitMode === 'video' ? 'videocam-outline' : 'location-outline'}
-            label={`${appointment.visitMode === 'video' ? 'Video visit' : 'In-person visit'} · ${appointment.timezone}`}
+            label={`${statusStrings.visitModeLabels[appointment.visitMode]} · ${appointment.timezone}`}
           />
           <AppText selectable tone="secondary" variant="caption">
-            Reference {appointment.id.slice(-10).toUpperCase()}
+            {strings.reference(appointment.id.slice(-10).toUpperCase())}
           </AppText>
         </Surface>
 
@@ -212,7 +223,7 @@ function AuthenticatedAppointmentDetail({
           <View style={styles.calendarSection}>
             <Button
               accessibilityLabel={
-                calendarState.status === 'added' ? 'Added to calendar' : 'Add to calendar'
+                calendarState.status === 'added' ? strings.addedToCalendar : strings.addToCalendar
               }
               busy={calendarState.status === 'adding'}
               disabled={calendarState.status === 'added'}
@@ -222,21 +233,21 @@ function AuthenticatedAppointmentDetail({
               onPress={() => void addToCalendar()}
               variant="secondary"
             >
-              {calendarState.status === 'added' ? 'Added to calendar' : 'Add to calendar'}
+              {calendarState.status === 'added' ? strings.addedToCalendar : strings.addToCalendar}
             </Button>
             {calendarState.status === 'denied' && (
               <AppText tone="secondary" variant="caption">
-                Calendar access was declined. You can still manage this appointment here.
+                {strings.calendarDenied}
               </AppText>
             )}
             {calendarState.status === 'unavailable' && (
               <AppText tone="secondary" variant="caption">
-                No writable calendar is available on this device.
+                {strings.calendarUnavailable}
               </AppText>
             )}
             {calendarState.status === 'error' && (
               <AppText tone="danger" variant="caption">
-                The appointment could not be added. Try again or use the device calendar directly.
+                {strings.calendarError}
               </AppText>
             )}
           </View>
@@ -246,8 +257,7 @@ function AuthenticatedAppointmentDetail({
           <Surface padding="compact" style={styles.notice} variant="muted">
             <DecorativeIcon color={theme.colors.warning} name="information-circle" size={20} />
             <AppText tone="secondary" variant="bodyMedium">
-              Cancelled on {formatDate(appointment.cancelledAt, intlLocale)}. You can choose a new
-              visit from Find care.
+              {strings.cancelledOn(formatDate(appointment.cancelledAt, intlLocale))}
             </AppText>
           </Surface>
         )}
@@ -261,31 +271,30 @@ function AuthenticatedAppointmentDetail({
               }}
               variant="secondary"
             >
-              {showReschedule ? 'Keep current time' : 'Reschedule'}
+              {showReschedule ? strings.keepCurrentTime : strings.reschedule}
             </Button>
             <Button onPress={() => setConfirmingCancel((visible) => !visible)} variant="danger">
-              Cancel appointment
+              {strings.cancelAppointment}
             </Button>
           </View>
         )}
 
         {confirmingCancel && canManage && (
           <Surface padding="spacious" style={styles.confirmation} variant="muted">
-            <AppText variant="titleSmall">Cancel this appointment?</AppText>
+            <AppText variant="titleSmall">{strings.cancelConfirmTitle}</AppText>
             <AppText tone="secondary" variant="bodyMedium">
-              This releases the time for another patient. Cancellation is final, but you can book a
-              new visit at any time.
+              {strings.cancelConfirmDescription}
             </AppText>
             <View style={styles.inlineActions}>
               <Button onPress={() => setConfirmingCancel(false)} variant="tertiary">
-                Keep appointment
+                {strings.keepAppointment}
               </Button>
               <Button
                 busy={cancelMutation.status === 'pending'}
                 onPress={() => void confirmCancel()}
                 variant="danger"
               >
-                Confirm cancellation
+                {strings.confirmCancellation}
               </Button>
             </View>
           </Surface>
@@ -300,18 +309,18 @@ function AuthenticatedAppointmentDetail({
           />
         )}
 
-        {actionError && <InlineError message={actionError.message} />}
+        {actionError && <InlineError message={localizeAppointmentError(actionError, locale)} />}
 
         {!canManage && appointment.status !== 'cancelled' && (
           <Surface padding="compact" variant="muted">
             <AppText tone="secondary" variant="bodyMedium">
-              This visit is in your history and can no longer be changed.
+              {strings.historyNotice}
             </AppText>
           </Surface>
         )}
 
         <Button onPress={onFindCare} variant="tertiary">
-          Find another clinician
+          {strings.findAnotherClinician}
         </Button>
       </ScrollView>
     </SafeAreaView>
@@ -330,6 +339,9 @@ function RescheduleSection({
   submitting: boolean;
 }) {
   const theme = useAppTheme();
+  const { locale } = useAppLocale();
+  const strings = useStrings(appointmentDetailStrings);
+  const statusStrings = useStrings(appointmentStatusStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   if (providerState.status === 'loading') {
@@ -345,7 +357,7 @@ function RescheduleSection({
     return (
       <Surface padding="compact" variant="muted">
         <AppText tone="secondary" variant="bodyMedium">
-          New times could not be loaded. Try again in a moment.
+          {strings.rescheduleLoadError}
         </AppText>
       </Surface>
     );
@@ -355,23 +367,22 @@ function RescheduleSection({
 
   return (
     <Surface padding="spacious" style={styles.reschedule} variant="plain">
-      <AppText variant="titleSmall">Choose a new time</AppText>
+      <AppText variant="titleSmall">{strings.chooseNewTime}</AppText>
       <AppText tone="secondary" variant="bodyMedium">
-        Select another available time with the same clinician. Your current appointment stays in
-        place until the change succeeds.
+        {strings.rescheduleDescription}
       </AppText>
       {slots.length === 0 ? (
         <AppText tone="secondary" variant="bodyMedium">
-          No other times are available in the next 14 days.
+          {strings.noOtherTimes}
         </AppText>
       ) : (
         <View style={styles.slotList}>
           {slots.map((slot) => (
             <View key={slot.id} style={styles.slotRow}>
               <View style={styles.slotCopy}>
-                <AppText variant="bodyStrong">{formatAvailability(slot)}</AppText>
+                <AppText variant="bodyStrong">{formatAvailability(slot, locale)}</AppText>
                 <AppText tone="secondary" variant="caption">
-                  {slot.visitMode === 'video' ? 'Video visit' : 'In-person visit'} · {slot.timezone}
+                  {statusStrings.visitModeLabels[slot.visitMode]} · {slot.timezone}
                 </AppText>
               </View>
               <Button
@@ -380,7 +391,7 @@ function RescheduleSection({
                 onPress={() => onSelect(slot.id)}
                 variant="secondary"
               >
-                Move here
+                {strings.moveHere}
               </Button>
             </View>
           ))}
@@ -392,12 +403,13 @@ function RescheduleSection({
 
 function StatusPill({ appointment }: { appointment: Appointment }) {
   const theme = useAppTheme();
+  const statusStrings = useStrings(appointmentStatusStrings);
   return (
     <View
       style={[createStyles(theme).statusPill, { backgroundColor: statusColor(theme, appointment) }]}
     >
       <AppText tone="inverse" variant="labelSmall">
-        {statusLabel(appointment.status)}
+        {statusStrings.statusLabels[appointment.status]}
       </AppText>
     </View>
   );
@@ -426,9 +438,14 @@ function DetailRow({
 
 function DetailLoading() {
   const theme = useAppTheme();
+  const strings = useStrings(appointmentDetailStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
   return (
-    <SafeAreaView accessibilityLabel="Loading appointment" edges={['top']} style={styles.safeArea}>
+    <SafeAreaView
+      accessibilityLabel={strings.loadingAppointment}
+      edges={['top']}
+      style={styles.safeArea}
+    >
       <View style={styles.loadingContent}>
         <Skeleton height={48} radius="md" width={48} />
         <Skeleton height={36} width="68%" />
@@ -451,11 +468,12 @@ function DetailState({
   title: string;
 }) {
   const theme = useAppTheme();
+  const strings = useStrings(appointmentDetailStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
       <View style={styles.stateBack}>
-        <IconButton accessibilityLabel="Back to appointments" onPress={onBack} variant="soft">
+        <IconButton accessibilityLabel={strings.backToAppointments} onPress={onBack} variant="soft">
           <DecorativeIcon color={theme.colors.brand} name="arrow-back" size={22} />
         </IconButton>
       </View>
@@ -467,10 +485,6 @@ function DetailState({
       />
     </SafeAreaView>
   );
-}
-
-function statusLabel(status: Appointment['status']) {
-  return status === 'no_show' ? 'NO SHOW' : status.replace('_', ' ').toUpperCase();
 }
 
 type CalendarState = { status: 'idle' | 'adding' | 'added' | 'denied' | 'unavailable' | 'error' };

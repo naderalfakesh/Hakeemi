@@ -3,9 +3,11 @@ import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button, DecorativeIcon, EmptyState, IconButton, Skeleton } from '@/components/ui';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import type { BookingSelectionState } from '../hooks/use-booking-selection';
+import { bookingStrings } from '../localization/booking-strings';
 
 export function BookingRouteState({
   onBack,
@@ -17,11 +19,16 @@ export function BookingRouteState({
   status: Exclude<BookingSelectionState['status'], 'success'>;
 }) {
   const theme = useAppTheme();
+  const strings = useStrings(bookingStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   if (status === 'loading') {
     return (
-      <SafeAreaView accessibilityLabel="Loading booking" edges={['top']} style={styles.safeArea}>
+      <SafeAreaView
+        accessibilityLabel={strings.routeState.loadingLabel}
+        edges={['top']}
+        style={styles.safeArea}
+      >
         <View style={styles.loading}>
           <Skeleton height={48} radius="md" width={48} />
           <Skeleton height={34} width="70%" />
@@ -36,22 +43,20 @@ export function BookingRouteState({
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
       <View style={styles.back}>
-        <IconButton accessibilityLabel="Back" onPress={onBack} variant="soft">
+        <IconButton accessibilityLabel={strings.backLabel} onPress={onBack} variant="soft">
           <DecorativeIcon color={theme.colors.brand} name="arrow-back" size={22} />
         </IconButton>
       </View>
       <EmptyState
         action={
           isError ? (
-            <Button onPress={onRetry}>Try again</Button>
+            <Button onPress={onRetry}>{strings.routeState.tryAgain}</Button>
           ) : (
-            <Button onPress={onBack}>Choose another time</Button>
+            <Button onPress={onBack}>{strings.routeState.chooseAnotherTime}</Button>
           )
         }
         description={
-          isError
-            ? 'The provider and appointment time could not be loaded.'
-            : 'This appointment time is no longer available in the current booking window.'
+          isError ? strings.routeState.errorDescription : strings.routeState.notFoundDescription
         }
         icon={
           <DecorativeIcon
@@ -60,7 +65,7 @@ export function BookingRouteState({
             size={34}
           />
         }
-        title={isError ? 'Booking could not be loaded' : 'Choose another time'}
+        title={isError ? strings.routeState.errorTitle : strings.routeState.chooseAnotherTime}
       />
     </SafeAreaView>
   );

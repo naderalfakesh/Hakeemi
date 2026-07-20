@@ -1,7 +1,9 @@
 import { Tabs } from 'expo-router';
 import type { ColorValue } from 'react-native';
 
+import { navigationStrings } from '@/components/navigation/navigation-strings';
 import { DecorativeIcon, type DecorativeIconName } from '@/components/ui';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme } from '@/theme';
 
 function tabBarIcon(activeName: DecorativeIconName, inactiveName: DecorativeIconName) {
@@ -26,6 +28,7 @@ function tabBarIcon(activeName: DecorativeIconName, inactiveName: DecorativeIcon
 
 export default function TabLayout() {
   const theme = useAppTheme();
+  const strings = useStrings(navigationStrings);
 
   return (
     <Tabs
@@ -46,28 +49,28 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Home',
+          title: strings.tabs.home,
           tabBarIcon: tabBarIcon('home', 'home-outline'),
         }}
       />
       <Tabs.Screen
         name="find-care"
         options={{
-          title: 'Find care',
+          title: strings.tabs.findCare,
           tabBarIcon: tabBarIcon('search', 'search-outline'),
         }}
       />
       <Tabs.Screen
         name="appointments"
         options={{
-          title: 'Appointments',
+          title: strings.tabs.appointments,
           tabBarIcon: tabBarIcon('calendar', 'calendar-outline'),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          title: strings.tabs.profile,
           tabBarIcon: tabBarIcon('person', 'person-outline'),
         }}
       />

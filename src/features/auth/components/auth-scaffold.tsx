@@ -3,7 +3,10 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 're
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText, DecorativeIcon, IconButton } from '@/components/ui';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
+
+import { authScaffoldStrings } from '../localization/auth-strings';
 
 type AuthScaffoldProps = {
   children: ReactNode;
@@ -16,6 +19,7 @@ type AuthScaffoldProps = {
 export function AuthScaffold({ children, eyebrow, onBack, subtitle, title }: AuthScaffoldProps) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const strings = useStrings(authScaffoldStrings);
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
@@ -29,7 +33,7 @@ export function AuthScaffold({ children, eyebrow, onBack, subtitle, title }: Aut
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <IconButton accessibilityLabel="Go back" onPress={onBack} variant="soft">
+          <IconButton accessibilityLabel={strings.goBack} onPress={onBack} variant="soft">
             <DecorativeIcon color={theme.colors.brand} name="arrow-back" size={22} />
           </IconButton>
 
@@ -48,7 +52,7 @@ export function AuthScaffold({ children, eyebrow, onBack, subtitle, title }: Aut
           {children}
 
           <AppText style={styles.disclaimer} tone="secondary" variant="caption">
-            Portfolio demonstration only. Do not enter real medical information.
+            {strings.disclaimer}
           </AppText>
         </ScrollView>
       </KeyboardAvoidingView>

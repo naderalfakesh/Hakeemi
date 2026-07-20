@@ -21,9 +21,13 @@ import type { AuthUser } from '@/features/auth/domain/types';
 import type { NotificationRegistrationStatus } from '@/features/notifications/context/notification-registration-provider';
 import type { PreferencesStatus } from '@/features/preferences/context/app-preferences-provider';
 import type { AppPreferences } from '@/features/preferences/domain/preferences';
+import { isLayoutDirectionPendingRestart } from '@/localization/layout-direction';
+import { useAppLocale } from '@/localization/locale-provider';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
-import { toAuthActionError } from '../domain/errors';
+import { localizeAuthError } from '../localization/auth-error-strings';
+import { profileStrings } from '../localization/profile-strings';
 
 type ProfileScreenProps = {
   onCreateAccount: () => void;
@@ -74,6 +78,8 @@ export function ProfileScreen({
 }: ProfileScreenProps) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const { locale } = useAppLocale();
+  const strings = useStrings(profileStrings);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState<string>();
 
@@ -84,13 +90,13 @@ export function ProfileScreen({
     try {
       await onSignOut();
     } catch (error) {
-      setSignOutError(toAuthActionError(error).message);
+      setSignOutError(localizeAuthError(error, locale));
     } finally {
       setIsSigningOut(false);
     }
   }
 
-  const displayName = profile?.displayName ?? user?.displayName ?? 'Hakeemi member';
+  const displayName = profile?.displayName ?? user?.displayName ?? strings.memberFallback;
   const email = profile?.email ?? user?.email;
 
   return (
@@ -98,10 +104,10 @@ export function ProfileScreen({
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.heading}>
           <AppText tone="secondary" variant="labelLarge">
-            YOUR ACCOUNT
+            {strings.eyebrow}
           </AppText>
           <AppText accessibilityRole="header" variant="display">
-            Profile
+            {strings.title}
           </AppText>
         </View>
 
@@ -128,31 +134,28 @@ export function ProfileScreen({
                   size={20}
                 />
                 <AppText tone={user.emailVerified ? 'success' : 'secondary'} variant="caption">
-                  {user.emailVerified ? 'Email verified' : 'Email verification pending'}
+                  {user.emailVerified ? strings.emailVerified : strings.emailVerificationPending}
                 </AppText>
               </View>
             </Surface>
 
             <Surface padding="spacious" style={styles.statusCard} variant="plain">
-              <AppText variant="titleSmall">Secure profile sync</AppText>
+              <AppText variant="titleSmall">{strings.secureProfileSync}</AppText>
               {profileStatus === 'loading' && (
                 <AppText tone="secondary" variant="bodyMedium">
-                  Confirming your server-managed profile…
+                  {strings.profileLoading}
                 </AppText>
               )}
               {profileStatus === 'ready' && (
                 <AppText tone="secondary" variant="bodyMedium">
-                  Your account profile was created through an idempotent Cloud Function; direct
-                  client writes are denied by Firestore rules.
+                  {strings.profileReady}
                 </AppText>
               )}
               {profileStatus === 'error' && (
                 <>
-                  <InlineError
-                    message={profileError ?? 'The secure profile could not be synchronized.'}
-                  />
+                  <InlineError message={profileError ?? strings.profileErrorFallback} />
                   <Button onPress={() => void onRetryProfile()} variant="secondary">
-                    Retry profile sync
+                    {strings.retryProfileSync}
                   </Button>
                 </>
               )}
@@ -160,54 +163,60 @@ export function ProfileScreen({
 
             <Surface padding="spacious" style={styles.preferenceCard} variant="plain">
               <View style={styles.preferenceHeading}>
-                <AppText variant="titleSmall">Synced app preferences</AppText>
+                <AppText variant="titleSmall">{strings.syncedPreferences}</AppText>
                 <AppText tone="secondary" variant="bodyMedium">
-                  These non-sensitive choices follow your account across native devices.
+                  {strings.preferencesSubtitle}
                 </AppText>
               </View>
 
               <PreferenceChoices
                 disabled={preferencesStatus !== 'ready'}
-                label="Appearance"
+                label={strings.appearance}
                 onChange={(themePreference) =>
                   onUpdatePreferences({ ...preferences, theme: themePreference })
                 }
                 options={[
-                  { label: 'Use device', value: 'system' },
-                  { label: 'Light', value: 'light' },
-                  { label: 'Dark', value: 'dark' },
+                  { label: strings.appearanceSystem, value: 'system' },
+                  { label: strings.appearanceLight, value: 'light' },
+                  { label: strings.appearanceDark, value: 'dark' },
                 ]}
                 value={preferences.theme}
               />
 
               <PreferenceChoices
                 disabled={preferencesStatus !== 'ready'}
-                label="Preferred language"
-                onChange={(locale) => onUpdatePreferences({ ...preferences, locale })}
+                label={strings.preferredLanguage}
+                onChange={(preferredLocale) =>
+                  onUpdatePreferences({ ...preferences, locale: preferredLocale })
+                }
                 options={[
-                  { label: 'English', value: 'en' },
-                  { label: 'العربية', value: 'ar' },
+                  { label: strings.languageEnglish, value: 'en' },
+                  { label: strings.languageArabic, value: 'ar' },
                 ]}
                 value={preferences.locale}
               />
 
+              {isLayoutDirectionPendingRestart(preferences.locale) && (
+                <AppText accessibilityLiveRegion="polite" tone="secondary" variant="caption">
+                  {strings.languageRestartHint}
+                </AppText>
+              )}
+
               {preferencesStatus === 'loading' && (
                 <AppText tone="secondary" variant="caption">
-                  Loading your preferences…
+                  {strings.loadingPreferences}
                 </AppText>
               )}
               {preferencesStatus === 'saving' && (
                 <AppText accessibilityLiveRegion="polite" tone="secondary" variant="caption">
-                  Saving preferences…
+                  {strings.savingPreferences}
                 </AppText>
               )}
               {preferencesStatus === 'error' && (
                 <>
-                  <InlineError
-                    message={preferencesError ?? 'Your preferences could not be synchronized.'}
-                  />
+                  <InlineError message={preferencesError ?? strings.preferencesErrorFallback} />
                   <Button onPress={onRetryPreferences} variant="secondary">
-                    Retry preferences
+                    {strings.retryPreferences}
                   </Button>
                 </>
               )}
@@ -216,37 +225,36 @@ export function ProfileScreen({
             <Surface padding="spacious" style={styles.notificationCard} variant="brand">
               <View style={styles.notificationHeading}>
                 <DecorativeIcon color={theme.colors.brand} name="notifications-outline" size={24} />
-                <AppText variant="titleSmall">Appointment reminders</AppText>
+                <AppText variant="titleSmall">{strings.appointmentReminders}</AppText>
               </View>
               {notificationStatus === 'registered' && (
                 <AppText tone="secondary" variant="bodyMedium">
-                  Reminders are enabled on this device. You can change permission in system
-                  settings.
+                  {strings.remindersRegistered}
                 </AppText>
               )}
               {notificationStatus === 'denied' && (
                 <AppText tone="secondary" variant="bodyMedium">
-                  Notifications are off. You can enable them later from system settings.
+                  {strings.remindersDenied}
                 </AppText>
               )}
               {notificationStatus === 'unavailable' && (
                 <AppText tone="secondary" variant="bodyMedium">
-                  Reminders are available in the iOS and Android development builds.
+                  {strings.remindersUnavailable}
                 </AppText>
               )}
               {notificationStatus === 'error' && (
-                <InlineError message={notificationError ?? 'Notifications could not be enabled.'} />
+                <InlineError message={notificationError ?? strings.notificationErrorFallback} />
               )}
               {(notificationStatus === 'idle' ||
                 notificationStatus === 'denied' ||
                 notificationStatus === 'error') && (
                 <Button onPress={() => void onEnableNotifications()} variant="secondary">
-                  {notificationStatus === 'idle' ? 'Enable reminders' : 'Try again'}
+                  {notificationStatus === 'idle' ? strings.enableReminders : strings.retryReminders}
                 </Button>
               )}
               {notificationStatus === 'requesting' && (
                 <Button busy onPress={() => undefined} variant="secondary">
-                  Enabling reminders…
+                  {strings.enablingReminders}
                 </Button>
               )}
             </Surface>
@@ -261,7 +269,7 @@ export function ProfileScreen({
 
             {signOutError && <InlineError message={signOutError} />}
             <Button busy={isSigningOut} onPress={() => void handleSignOut()} variant="secondary">
-              Sign out
+              {strings.signOut}
             </Button>
           </>
         ) : (
@@ -269,20 +277,19 @@ export function ProfileScreen({
             <View style={styles.guestIcon}>
               <DecorativeIcon color={theme.colors.brand} name="person-outline" size={30} />
             </View>
-            <AppText variant="titleMedium">You’re exploring as a guest</AppText>
+            <AppText variant="titleMedium">{strings.guestTitle}</AppText>
             <AppText tone="secondary" variant="bodyLarge">
-              Sign in to demonstrate secure session restoration, profile ownership, and account
-              recovery.
+              {strings.guestSubtitle}
             </AppText>
-            <Button onPress={onSignIn}>Sign in</Button>
+            <Button onPress={onSignIn}>{strings.signIn}</Button>
             <Button onPress={onCreateAccount} variant="secondary">
-              Create an account
+              {strings.createAccount}
             </Button>
           </Surface>
         )}
 
         <AppText style={styles.disclaimer} tone="secondary" variant="caption">
-          Fictional portfolio environment. Never enter real patient or medical information.
+          {strings.disclaimer}
         </AppText>
       </ScrollView>
     </SafeAreaView>
@@ -304,47 +311,48 @@ function SavedProvidersSection({
 }) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const strings = useStrings(profileStrings);
 
   return (
     <Surface padding="spacious" style={styles.savedProvidersCard} variant="plain">
       <View style={styles.savedProvidersHeading}>
         <View style={styles.savedProvidersTitle}>
           <DecorativeIcon color={theme.colors.brand} name="bookmark-outline" size={22} />
-          <AppText variant="titleSmall">Saved clinicians</AppText>
+          <AppText variant="titleSmall">{strings.savedCliniciansTitle}</AppText>
         </View>
         <AppText tone="secondary" variant="bodyMedium">
-          Keep a shortlist for your next appointment.
+          {strings.savedCliniciansSubtitle}
         </AppText>
       </View>
 
       {status === 'unavailable' && (
         <AppText tone="secondary" variant="bodyMedium">
-          Saving clinicians is available in the iOS and Android development builds.
+          {strings.savedCliniciansUnavailable}
         </AppText>
       )}
       {status === 'loading' && (
         <AppText accessibilityLiveRegion="polite" tone="secondary" variant="bodyMedium">
-          Loading your saved clinicians…
+          {strings.savedCliniciansLoading}
         </AppText>
       )}
       {status === 'saving' && (
         <AppText accessibilityLiveRegion="polite" tone="secondary" variant="bodyMedium">
-          Updating your saved list…
+          {strings.savedCliniciansSaving}
         </AppText>
       )}
       {status === 'error' && (
         <>
-          <InlineError message="Your saved clinicians could not be loaded." />
+          <InlineError message={strings.savedCliniciansError} />
           <Button onPress={onRetry} variant="secondary">
-            Retry saved clinicians
+            {strings.retrySavedClinicians}
           </Button>
         </>
       )}
       {status === 'ready' && providers.length === 0 && (
         <EmptyState
-          description="Tap the bookmark on a clinician profile to keep it here."
+          description={strings.savedCliniciansEmptyDescription}
           icon={<DecorativeIcon color={theme.colors.brand} name="bookmark-outline" size={30} />}
-          title="No saved clinicians yet"
+          title={strings.savedCliniciansEmptyTitle}
         />
       )}
       {status === 'ready' && providers.length > 0 && (
@@ -353,7 +361,7 @@ function SavedProvidersSection({
             <View key={provider.id} style={styles.savedProviderRow}>
               <ProviderAvatar name={provider.displayName} providerId={provider.id} />
               <Pressable
-                accessibilityLabel={`Open saved clinician ${provider.displayName}`}
+                accessibilityLabel={strings.savedCliniciansOpen(provider.displayName)}
                 accessibilityRole="button"
                 disabled={!onOpenProvider}
                 onPress={() => onOpenProvider?.(provider.id)}
@@ -367,7 +375,7 @@ function SavedProvidersSection({
                 </AppText>
               </Pressable>
               <IconButton
-                accessibilityLabel={`Remove ${provider.displayName} from saved clinicians`}
+                accessibilityLabel={strings.savedCliniciansRemove(provider.displayName)}
                 onPress={() => onRemoveProvider?.(provider.id)}
                 variant="soft"
               >

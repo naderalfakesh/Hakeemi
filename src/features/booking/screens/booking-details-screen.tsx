@@ -3,12 +3,15 @@ import { StyleSheet, View } from 'react-native';
 
 import { AppText, Button, Chip, InlineError, Surface } from '@/components/ui';
 import type { AppointmentReasonCategory } from '@/features/appointments/domain/types';
+import { useAppLocale } from '@/localization/locale-provider';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { BookingScaffold } from '../components/booking-scaffold';
 import { BookingSummary } from '../components/booking-summary';
 import type { BookingSelection } from '../hooks/use-booking-selection';
-import { reasonCategoryOptions } from '../presentation/formatters';
+import { bookingStrings } from '../localization/booking-strings';
+import { getReasonCategoryOptions } from '../presentation/formatters';
 
 export function BookingDetailsScreen({
   error,
@@ -28,22 +31,25 @@ export function BookingDetailsScreen({
   selection: BookingSelection;
 }) {
   const theme = useAppTheme();
+  const { locale } = useAppLocale();
+  const strings = useStrings(bookingStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const reasonCategoryOptions = useMemo(() => getReasonCategoryOptions(locale), [locale]);
 
   return (
     <BookingScaffold
       onBack={onBack}
-      step="STEP 1 OF 2"
-      subtitle="Your selected appointment is held only when you confirm on the next screen."
-      title="Visit details"
+      step={strings.stepOf(1, 2)}
+      subtitle={strings.details.subtitle}
+      title={strings.details.title}
     >
       <BookingSummary reasonCategory={reasonCategory} selection={selection} />
 
       <Surface padding="spacious" style={styles.reasonCard} variant="plain">
         <View style={styles.reasonHeading}>
-          <AppText variant="titleSmall">What is this visit for?</AppText>
+          <AppText variant="titleSmall">{strings.details.reasonQuestion}</AppText>
           <AppText tone="secondary" variant="bodyMedium">
-            Choose a broad category only. Hakeemi does not collect symptoms or medical notes.
+            {strings.details.reasonHelp}
           </AppText>
         </View>
         <View style={styles.chips}>
@@ -60,7 +66,7 @@ export function BookingDetailsScreen({
 
       {error && <InlineError message={error} />}
       <Button busy={isSaving} onPress={onContinue}>
-        Review appointment
+        {strings.details.reviewAppointment}
       </Button>
     </BookingScaffold>
   );

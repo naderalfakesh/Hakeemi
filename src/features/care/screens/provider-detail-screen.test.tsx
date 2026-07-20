@@ -1,5 +1,6 @@
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
+import { AppLocaleProvider } from '@/localization/locale-provider';
 import { TestAppProviders } from '@/test/test-app-providers';
 
 import { fixtureCareRepository } from '../data/fixture-care-repository';
@@ -107,5 +108,30 @@ describe('ProviderDetailScreen', () => {
     await waitFor(() =>
       expect(view.getByRole('header', { name: 'Provider not found' })).toBeVisible(),
     );
+  });
+
+  it('renders Arabic copy when the app locale is Arabic', async () => {
+    const view = await render(
+      <TestAppProviders colorScheme="light">
+        <AppLocaleProvider locale="ar">
+          <ProviderDetailScreen
+            onBack={jest.fn()}
+            onChooseSlot={jest.fn()}
+            providerId="lina-haddad"
+            repository={fixtureCareRepository}
+          />
+        </AppLocaleProvider>
+      </TestAppProviders>,
+    );
+
+    await waitFor(() =>
+      expect(view.getByRole('header', { name: 'Dr. Lina Haddad' })).toBeVisible(),
+    );
+
+    expect(view.getByText('طب الأسرة')).toBeOnTheScreen();
+    expect(view.getByText('المواعيد المتاحة')).toBeOnTheScreen();
+    expect(view.getByText('الاستشارة')).toBeOnTheScreen();
+    expect(view.getByLabelText('2 موعدان متاحان')).toBeOnTheScreen();
+    expect(view.getByLabelText('حفظ Dr. Lina Haddad')).toBeOnTheScreen();
   });
 });

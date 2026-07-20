@@ -5,6 +5,7 @@ import {
   clinicFixtures,
   buildAvailabilityFixtures,
 } from '@/features/care/data/fixtures';
+import { AppLocaleProvider } from '@/localization/locale-provider';
 import { TestAppProviders } from '@/test/test-app-providers';
 import { triggerHaptic } from '@/services/haptics/haptics';
 
@@ -50,6 +51,28 @@ describe('guided booking screens', () => {
     expect(onReasonCategoryChange).toHaveBeenCalledWith('follow_up');
     expect(onContinue).toHaveBeenCalledTimes(1);
     expect(view.getByText(/does not collect symptoms/iu)).toBeOnTheScreen();
+  });
+
+  it('renders the details step in Arabic', async () => {
+    const view = await render(
+      <TestAppProviders>
+        <AppLocaleProvider locale="ar">
+          <BookingDetailsScreen
+            error={null}
+            isSaving={false}
+            onBack={jest.fn()}
+            onContinue={jest.fn()}
+            onReasonCategoryChange={jest.fn()}
+            reasonCategory={null}
+            selection={selection}
+          />
+        </AppLocaleProvider>
+      </TestAppProviders>,
+    );
+
+    expect(view.getByRole('header', { name: 'تفاصيل الزيارة' })).toBeOnTheScreen();
+    expect(view.getByRole('button', { name: 'زيارة متابعة' })).toBeOnTheScreen();
+    expect(view.getByRole('button', { name: 'مراجعة الموعد' })).toBeOnTheScreen();
   });
 
   it('explains saved choices and disables confirmation while offline', async () => {

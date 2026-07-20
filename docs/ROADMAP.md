@@ -814,9 +814,9 @@ _Estimated effort: two sessions_
 
 #### Localization and accessibility
 
-- [ ] Complete English and Arabic copy, plural rules, date/time formatting, and
+- [x] Complete English and Arabic copy, plural rules, date/time formatting, and
       locale persistence.
-- [ ] Mirror layout intentionally for RTL; verify icons whose meaning must not
+- [x] Mirror layout intentionally for RTL; verify icons whose meaning must not
       mirror.
 - [ ] Test Dynamic Type/font scaling, screen reader order/labels, focus after
       navigation, 44 pt targets, contrast, reduced motion, and reduced transparency.
@@ -1065,6 +1065,12 @@ interactive release-signoff run.
 
 Phase 5 has started with a recoverable route error boundary, privacy-safe
 development logging, font scaling, RTL-aware text direction, and locale-aware
-date/time formatting. The inclusive/resilient foundation is recorded in
-`docs/phase-5-verification.md`; full Arabic copy, assistive-technology journeys,
-and manual device-size/offline evidence remain open.
+date/time formatting. The full Arabic UI copy now ships through typed
+bilingual string catalogs covering every screen, validation message, error
+mapping, and accessibility label, with Arabic plural rules for all counts.
+Selecting Arabic persists the native RTL layout direction through
+`I18nManager` with a restart hint, directional icons mirror automatically,
+and onboarding decor uses logical offsets. The inclusive/resilient work is
+recorded in `docs/phase-5-verification.md`; assistive-technology journeys,
+a native-speaker Arabic copy review, provider-data localization, stale-data
+indicators, and manual device-size/offline evidence remain open.

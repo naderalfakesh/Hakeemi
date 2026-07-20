@@ -12,13 +12,20 @@ import {
   Skeleton,
   Surface,
 } from '@/components/ui';
+import { formatLocalizedCount } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { ProviderAvatar } from '../components/provider-avatar';
 import type { CareRepository } from '../domain/repository';
 import type { AvailabilitySlot, Clinic } from '../domain/types';
 import { useProviderDetail } from '../hooks/use-provider-detail';
+import {
+  availableAppointmentCountLabels,
+  providerDetailStrings,
+  reviewCountLabels,
+} from '../localization/care-strings';
 import { formatAvailability, formatFee, formatVisitMode } from '../presentation/formatters';
 
 type ProviderDetailScreenProps = {
@@ -43,7 +50,8 @@ export function ProviderDetailScreen({
   isProviderSaved = false,
 }: ProviderDetailScreenProps) {
   const theme = useAppTheme();
-  const { intlLocale, locale } = useAppLocale();
+  const { locale } = useAppLocale();
+  const strings = useStrings(providerDetailStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { retry, state } = useProviderDetail(providerId, repository);
 
@@ -65,18 +73,18 @@ export function ProviderDetailScreen({
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.topBar}>
-          <IconButton accessibilityLabel="Back to clinicians" onPress={onBack} variant="soft">
+          <IconButton accessibilityLabel={strings.backToClinicians} onPress={onBack} variant="soft">
             <DecorativeIcon color={theme.colors.brand} name="arrow-back" size={22} />
           </IconButton>
           <AppText tone="secondary" variant="labelLarge">
-            Provider profile
+            {strings.providerProfile}
           </AppText>
           <View style={styles.topBarSpacer} />
           <IconButton
             accessibilityLabel={
               isProviderSaved
-                ? `Remove ${provider.displayName} from saved clinicians`
-                : `Save ${provider.displayName}`
+                ? strings.removeFromSaved(provider.displayName)
+                : strings.save(provider.displayName)
             }
             disabled={savedProviderStatus === 'saving' || savedProviderStatus === 'loading'}
             onPress={() => {
@@ -117,36 +125,36 @@ export function ProviderDetailScreen({
               <DecorativeIcon color={theme.colors.warning} name="star" size={18} />
               <AppText variant="bodyStrong">{provider.ratingSummary.average.toFixed(1)}</AppText>
               <AppText tone="secondary" variant="caption">
-                {provider.ratingSummary.count} reviews
+                {formatLocalizedCount(provider.ratingSummary.count, locale, reviewCountLabels)}
               </AppText>
             </Surface>
           )}
           <Surface style={styles.stat} variant="muted">
             <DecorativeIcon color={theme.colors.brand} name="wallet-outline" size={18} />
-            <AppText variant="bodyStrong">{formatFee(provider.consultationFee)}</AppText>
+            <AppText variant="bodyStrong">{formatFee(provider.consultationFee, locale)}</AppText>
             <AppText tone="secondary" variant="caption">
-              Consultation
+              {strings.consultation}
             </AppText>
           </Surface>
         </View>
 
-        <AvailabilitySection locale={intlLocale} onChooseSlot={onChooseSlot} slots={slots} />
+        <AvailabilitySection locale={locale} onChooseSlot={onChooseSlot} slots={slots} />
 
-        <DetailSection title="About">
+        <DetailSection title={strings.about}>
           <AppText tone="secondary" variant="bodyLarge">
             {provider.bio}
           </AppText>
         </DetailSection>
 
-        <DetailSection title="Visit options">
+        <DetailSection title={strings.visitOptions}>
           <InfoRow
             icon="videocam-outline"
-            label={provider.visitModes.map(formatVisitMode).join(' · ')}
+            label={provider.visitModes.map((mode) => formatVisitMode(mode, locale)).join(' · ')}
           />
           <InfoRow icon="language-outline" label={provider.languages.join(' · ')} />
         </DetailSection>
 
-        <DetailSection title="Clinics">
+        <DetailSection title={strings.clinics}>
           {clinics.map((clinic) => (
             <ClinicRow clinic={clinic} key={clinic.id} locale={locale} />
           ))}
@@ -155,8 +163,7 @@ export function ProviderDetailScreen({
         <Surface style={styles.disclosure} variant="plain">
           <DecorativeIcon color={theme.colors.textSecondary} name="information-circle" size={20} />
           <AppText tone="secondary" variant="caption">
-            This fictional profile demonstrates discovery UX with Firebase-backed availability.
-            Confirmed bookings are protected by a server-controlled transaction.
+            {strings.disclosure}
           </AppText>
         </Surface>
       </ScrollView>
@@ -173,12 +180,13 @@ type ProviderDetailStateProps = {
 
 function ProviderDetailState({ onBack, onRetry, providerId, status }: ProviderDetailStateProps) {
   const theme = useAppTheme();
+  const strings = useStrings(providerDetailStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   if (status === 'loading') {
     return (
       <SafeAreaView
-        accessibilityLabel="Loading provider profile"
+        accessibilityLabel={strings.loadingProfile}
         edges={['top']}
         style={styles.safeArea}
       >
@@ -197,7 +205,7 @@ function ProviderDetailState({ onBack, onRetry, providerId, status }: ProviderDe
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
       <View style={styles.stateBack}>
-        <IconButton accessibilityLabel="Back to clinicians" onPress={onBack} variant="soft">
+        <IconButton accessibilityLabel={strings.backToClinicians} onPress={onBack} variant="soft">
           <DecorativeIcon color={theme.colors.brand} name="arrow-back" size={22} />
         </IconButton>
       </View>
@@ -205,17 +213,13 @@ function ProviderDetailState({ onBack, onRetry, providerId, status }: ProviderDe
         action={
           isMissing ? (
             <Button onPress={onBack} variant="secondary">
-              Browse clinicians
+              {strings.browseClinicians}
             </Button>
           ) : (
-            <Button onPress={onRetry}>Try again</Button>
+            <Button onPress={onRetry}>{strings.tryAgain}</Button>
           )
         }
-        description={
-          isMissing
-            ? `No active fictional provider matches “${providerId}”.`
-            : 'Check your connection and retry the profile.'
-        }
+        description={isMissing ? strings.notFoundDescription(providerId) : strings.errorDescription}
         icon={
           <DecorativeIcon
             color={isMissing ? theme.colors.brand : theme.colors.danger}
@@ -223,7 +227,7 @@ function ProviderDetailState({ onBack, onRetry, providerId, status }: ProviderDe
             size={34}
           />
         }
-        title={isMissing ? 'Provider not found' : 'Profile could not be loaded'}
+        title={isMissing ? strings.notFoundTitle : strings.errorTitle}
       />
     </SafeAreaView>
   );
@@ -234,42 +238,48 @@ function AvailabilitySection({
   onChooseSlot,
   slots,
 }: {
-  locale: 'ar-AE' | 'en-AE';
+  locale: 'ar' | 'en';
   onChooseSlot: (slot: AvailabilitySlot) => void;
   slots: readonly AvailabilitySlot[];
 }) {
   const theme = useAppTheme();
+  const strings = useStrings(providerDetailStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   return (
     <Surface padding="spacious" variant="brand">
       <AppText tone="brand" variant="caption">
-        Next 14 days
+        {strings.next14Days}
       </AppText>
       <AppText style={styles.availabilityTitle} variant="titleMedium">
-        Available appointments
+        {strings.availableAppointments}
       </AppText>
       <AppText tone="secondary" variant="bodyMedium">
-        {slots.length > 0
-          ? 'Times are shown in Gulf Standard Time. Choose an available time to continue.'
-          : 'No appointments are available in this window. Check again soon.'}
+        {slots.length > 0 ? strings.timezoneNote : strings.noAppointments}
       </AppText>
       {slots.length > 0 && (
-        <View accessibilityLabel={`${slots.length} available appointments`} style={styles.slotList}>
+        <View
+          accessibilityLabel={formatLocalizedCount(
+            slots.length,
+            locale,
+            availableAppointmentCountLabels,
+          )}
+          style={styles.slotList}
+        >
           {slots.slice(0, 6).map((slot) => (
             <View key={slot.id} style={styles.slotRow}>
               <View style={styles.slotTime}>
                 <AppText variant="bodyStrong">{formatAvailability(slot, locale)}</AppText>
                 <AppText tone="secondary" variant="caption">
-                  {formatVisitMode(slot.visitMode)}
+                  {formatVisitMode(slot.visitMode, locale)}
                 </AppText>
               </View>
               <Button
-                accessibilityLabel={`Choose ${formatAvailability(slot, locale)}`}
+                accessibilityLabel={strings.chooseSlot(formatAvailability(slot, locale))}
                 onPress={() => onChooseSlot(slot)}
                 variant="secondary"
               >
-                Choose
+                {strings.choose}
               </Button>
             </View>
           ))}

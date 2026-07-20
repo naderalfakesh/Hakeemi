@@ -3,11 +3,13 @@ import { StyleSheet, View } from 'react-native';
 
 import { AppText, Button, DecorativeIcon, InlineError, Surface } from '@/components/ui';
 import type { AppointmentReasonCategory } from '@/features/appointments/domain/types';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { BookingScaffold } from '../components/booking-scaffold';
 import { BookingSummary } from '../components/booking-summary';
 import type { BookingSelection } from '../hooks/use-booking-selection';
+import { bookingStrings } from '../localization/booking-strings';
 
 export function BookingReviewScreen({
   error,
@@ -27,15 +29,16 @@ export function BookingReviewScreen({
   selection: BookingSelection;
 }) {
   const theme = useAppTheme();
+  const strings = useStrings(bookingStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
   const isOffline = isOnline === false;
 
   return (
     <BookingScaffold
       onBack={onBack}
-      step="STEP 2 OF 2"
-      subtitle="Nothing is booked until the secure transaction succeeds."
-      title="Review and confirm"
+      step={strings.stepOf(2, 2)}
+      subtitle={strings.review.subtitle}
+      title={strings.review.title}
     >
       <BookingSummary reasonCategory={reasonCategory} selection={selection} showReason />
 
@@ -43,9 +46,9 @@ export function BookingReviewScreen({
         <Surface padding="compact" style={styles.notice} variant="plain">
           <DecorativeIcon color={theme.colors.warning} name="cloud-offline-outline" size={22} />
           <View style={styles.noticeCopy}>
-            <AppText variant="bodyStrong">You are offline</AppText>
+            <AppText variant="bodyStrong">{strings.review.offlineTitle}</AppText>
             <AppText tone="secondary" variant="caption">
-              Your choices are saved. Reconnect before confirming; bookings are never queued.
+              {strings.review.offlineBody}
             </AppText>
           </View>
         </Surface>
@@ -54,10 +57,10 @@ export function BookingReviewScreen({
       {error && <InlineError message={error} />}
 
       <Button busy={isSubmitting} disabled={isOffline} onPress={onConfirm}>
-        Confirm appointment
+        {strings.review.confirmAppointment}
       </Button>
       <AppText style={styles.disclaimer} tone="secondary" variant="caption">
-        Portfolio demonstration only. This creates an appointment against fictional provider data.
+        {strings.review.disclaimer}
       </AppText>
     </BookingScaffold>
   );

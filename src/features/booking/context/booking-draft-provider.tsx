@@ -17,10 +17,12 @@ import { bookingDraftSchema, createBookingDraft, type BookingDraft } from '../do
 
 type BookingDraftStatus = 'error' | 'loading' | 'ready' | 'saving';
 
+export type BookingDraftErrorCode = 'restore-failed' | 'save-failed';
+
 type BookingDraftContextValue = {
   clear: () => Promise<void>;
   draft: BookingDraft | null;
-  error: string | null;
+  error: BookingDraftErrorCode | null;
   selectSlot: (providerId: string, slotId: string) => Promise<BookingDraft>;
   setReasonCategory: (reasonCategory: AppointmentReasonCategory | null) => Promise<void>;
   status: BookingDraftStatus;
@@ -39,7 +41,7 @@ export function BookingDraftProvider({
 }) {
   const [draft, setDraft] = useState<BookingDraft | null>(null);
   const [status, setStatus] = useState<BookingDraftStatus>('loading');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<BookingDraftErrorCode | null>(null);
   const draftRef = useRef<BookingDraft | null>(null);
 
   const applyDraft = useCallback((nextDraft: BookingDraft | null) => {
@@ -60,7 +62,7 @@ export function BookingDraftProvider({
       })
       .catch(() => {
         if (isActive) {
-          setError('A previous booking draft could not be restored.');
+          setError('restore-failed');
           setStatus('error');
         }
       });
@@ -85,7 +87,7 @@ export function BookingDraftProvider({
 
         setStatus('ready');
       } catch {
-        setError('Your booking choices could not be saved on this device.');
+        setError('save-failed');
         setStatus('error');
       }
     },

@@ -2,8 +2,14 @@ import { createContext, useContext, type ReactNode } from 'react';
 
 export type AppLocale = 'ar' | 'en';
 
+export type IntlLocale = 'ar-AE' | 'en-AE';
+
+export function toIntlLocale(locale: AppLocale): IntlLocale {
+  return locale === 'ar' ? 'ar-AE' : 'en-AE';
+}
+
 type AppLocaleContextValue = {
-  intlLocale: 'ar-AE' | 'en-AE';
+  intlLocale: IntlLocale;
   isRTL: boolean;
   locale: AppLocale;
 };
@@ -24,7 +30,7 @@ export function AppLocaleProvider({
   locale: AppLocale;
 }) {
   const value: AppLocaleContextValue = {
-    intlLocale: locale === 'ar' ? 'ar-AE' : 'en-AE',
+    intlLocale: toIntlLocale(locale),
     isRTL: locale === 'ar',
     locale,
   };

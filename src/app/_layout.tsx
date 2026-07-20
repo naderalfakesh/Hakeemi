@@ -7,6 +7,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import '@/config/env';
 import { AppText } from '@/components/ui';
 import { ErrorBoundaryScreen } from '@/components/navigation/error-boundary-screen';
+import { navigationStrings } from '@/components/navigation/navigation-strings';
 import { AuthSessionProvider, useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { BookingDraftProvider } from '@/features/booking/context/booking-draft-provider';
 import { NotificationRegistrationProvider } from '@/features/notifications/context/notification-registration-provider';
@@ -19,7 +20,9 @@ import { subscribeToAppointmentNotificationOpen } from '@/services/notifications
 import { AppQueryProvider } from '@/services/query/query-provider';
 import { AppThemeProvider, darkNavigationTheme, lightNavigationTheme, useAppTheme } from '@/theme';
 import { logSafeError } from '@/services/logging/safe-logger';
+import { syncNativeLayoutDirection } from '@/localization/layout-direction';
 import { AppLocaleProvider } from '@/localization/locale-provider';
+import { useStrings } from '@/localization/use-strings';
 
 initializeFirebaseServices();
 
@@ -31,17 +34,18 @@ export function ErrorBoundary({ error, retry }: { error: Error; retry: () => voi
 function Navigation() {
   const theme = useAppTheme();
   const session = useAuthSession();
+  const strings = useStrings(navigationStrings);
   const navigationTheme = theme.mode === 'dark' ? darkNavigationTheme : lightNavigationTheme;
 
   if (session.status === 'restoring') {
     return (
       <View
-        accessibilityLabel="Restoring account session"
+        accessibilityLabel={strings.restoringSession.accessibilityLabel}
         style={[styles.loading, { backgroundColor: theme.colors.canvas }]}
       >
         <ActivityIndicator color={theme.colors.brand} size="large" />
         <AppText tone="secondary" variant="bodyMedium">
-          Restoring your session…
+          {strings.restoringSession.message}
         </AppText>
       </View>
     );
@@ -93,6 +97,10 @@ function NotificationNavigationBridge() {
 
 function AppShell() {
   const { preferences } = useAppPreferences();
+
+  useEffect(() => {
+    syncNativeLayoutDirection(preferences.locale);
+  }, [preferences.locale]);
 
   return (
     <AppLocaleProvider locale={preferences.locale}>

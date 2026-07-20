@@ -3,7 +3,10 @@ import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText, Button, DecorativeIcon, Surface } from '@/components/ui';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
+
+import { navigationStrings } from './navigation-strings';
 
 type ErrorBoundaryScreenProps = {
   error: Error;
@@ -12,6 +15,7 @@ type ErrorBoundaryScreenProps = {
 
 export function ErrorBoundaryScreen({ error, onRetry }: ErrorBoundaryScreenProps) {
   const theme = useAppTheme();
+  const strings = useStrings(navigationStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   return (
@@ -22,13 +26,12 @@ export function ErrorBoundaryScreen({ error, onRetry }: ErrorBoundaryScreenProps
             <DecorativeIcon color={theme.colors.danger} name="alert-circle-outline" size={32} />
           </View>
           <AppText accessibilityRole="header" variant="titleMedium">
-            Hakeemi needs a fresh start
+            {strings.errorBoundary.title}
           </AppText>
           <AppText tone="secondary" variant="bodyLarge">
-            This screen could not finish loading. Your account and appointments are safe; try again
-            or return to the home screen.
+            {strings.errorBoundary.body}
           </AppText>
-          <Button onPress={onRetry}>Try again</Button>
+          <Button onPress={onRetry}>{strings.errorBoundary.tryAgain}</Button>
           {__DEV__ && (
             <AppText selectable tone="secondary" variant="caption">
               {error.name}

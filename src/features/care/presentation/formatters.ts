@@ -1,7 +1,31 @@
+import type { AppLocale } from '@/localization/locale-provider';
+import { toIntlLocale } from '@/localization/locale-provider';
+import type { LocalizedStrings } from '@/localization/use-strings';
+
 import type { AvailabilitySlot, Money, VisitMode } from '../domain/types';
 
-export function formatAvailability(slot: AvailabilitySlot, locale = 'en-AE') {
-  return new Intl.DateTimeFormat(locale, {
+const formatterStrings: LocalizedStrings<{
+  feeOnRequest: string;
+  visitMode: Record<VisitMode, string>;
+}> = {
+  ar: {
+    feeOnRequest: 'الرسوم عند الطلب',
+    visitMode: {
+      in_person: 'زيارة حضورية',
+      video: 'زيارة عبر الفيديو',
+    },
+  },
+  en: {
+    feeOnRequest: 'Fee on request',
+    visitMode: {
+      in_person: 'In person',
+      video: 'Video visit',
+    },
+  },
+};
+
+export function formatAvailability(slot: AvailabilitySlot, locale: AppLocale = 'en') {
+  return new Intl.DateTimeFormat(toIntlLocale(locale), {
     day: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
@@ -11,18 +35,18 @@ export function formatAvailability(slot: AvailabilitySlot, locale = 'en-AE') {
   }).format(new Date(slot.startsAt));
 }
 
-export function formatFee(fee: Money | null, locale = 'en-AE') {
+export function formatFee(fee: Money | null, locale: AppLocale = 'en') {
   if (!fee) {
-    return 'Fee on request';
+    return formatterStrings[locale].feeOnRequest;
   }
 
-  return new Intl.NumberFormat(locale, {
+  return new Intl.NumberFormat(toIntlLocale(locale), {
     currency: fee.currency,
     maximumFractionDigits: 0,
     style: 'currency',
   }).format(fee.amount);
 }
 
-export function formatVisitMode(mode: VisitMode) {
-  return mode === 'video' ? 'Video visit' : 'In person';
+export function formatVisitMode(mode: VisitMode, locale: AppLocale = 'en') {
+  return formatterStrings[locale].visitMode[mode];
 }

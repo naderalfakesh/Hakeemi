@@ -8,7 +8,9 @@ import { ProviderCardSkeleton } from '@/features/care/components/provider-card-s
 import type { CareRepository } from '@/features/care/domain/repository';
 import type { Provider } from '@/features/care/domain/types';
 import { useProviderDiscovery } from '@/features/care/hooks/use-provider-discovery';
+import { homeStrings } from '@/features/home/localization/home-strings';
 import { useAppLocale } from '@/localization/locale-provider';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 type HomeScreenProps = {
@@ -26,6 +28,7 @@ export function HomeScreen({
 }: HomeScreenProps) {
   const theme = useAppTheme();
   const { locale } = useAppLocale();
+  const strings = useStrings(homeStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { retry, state } = useProviderDiscovery({
     query: '',
@@ -50,10 +53,10 @@ export function HomeScreen({
         nextSlot={discovery?.nextSlots.get(item.id) ?? null}
         onPress={onSelectProvider}
         provider={item}
-        specialtyName={specialtyNames.get(item.specialtyIds[0] ?? '') ?? 'Clinician'}
+        specialtyName={specialtyNames.get(item.specialtyIds[0] ?? '') ?? strings.clinicianFallback}
       />
     ),
-    [discovery?.nextSlots, onSelectProvider, specialtyNames],
+    [discovery?.nextSlots, onSelectProvider, specialtyNames, strings],
   );
 
   return (
@@ -71,13 +74,12 @@ export function HomeScreen({
                 size={20}
               />
               <AppText tone="secondary" variant="caption">
-                All clinicians and availability are fictional portfolio data, served from the
-                rebuilt Firebase architecture on native builds.
+                {strings.fictionalDataNote}
               </AppText>
             </View>
             {onOpenCatalogue && (
               <Button onPress={onOpenCatalogue} variant="tertiary">
-                Open component catalogue
+                {strings.openCatalogue}
               </Button>
             )}
           </View>
@@ -97,16 +99,17 @@ export function HomeScreen({
 
 function HomeHeader({ onFindCare }: { onFindCare: () => void }) {
   const theme = useAppTheme();
+  const strings = useStrings(homeStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   return (
     <View style={styles.header}>
       <View style={styles.heading}>
         <AppText tone="secondary" variant="labelLarge">
-          Portfolio demo
+          {strings.portfolioDemo}
         </AppText>
         <AppText accessibilityRole="header" variant="display">
-          What would help today?
+          {strings.greeting}
         </AppText>
       </View>
 
@@ -115,23 +118,23 @@ function HomeHeader({ onFindCare }: { onFindCare: () => void }) {
           <DecorativeIcon color={theme.colors.brand} name="search" size={26} />
         </View>
         <AppText style={styles.featureTitle} variant="titleMedium">
-          Find the right clinician
+          {strings.featureTitle}
         </AppText>
         <AppText style={styles.featureDescription} tone="secondary" variant="bodyLarge">
-          Search by specialty and compare the details that matter before choosing.
+          {strings.featureDescription}
         </AppText>
-        <Button onPress={onFindCare}>Find care</Button>
+        <Button onPress={onFindCare}>{strings.findCare}</Button>
       </Surface>
 
       <View style={styles.sectionHeading}>
         <View>
-          <AppText variant="titleMedium">Available soon</AppText>
+          <AppText variant="titleMedium">{strings.availableSoon}</AppText>
           <AppText tone="secondary" variant="bodyMedium">
-            Featured fictional clinicians
+            {strings.featuredClinicians}
           </AppText>
         </View>
         <Button onPress={onFindCare} variant="tertiary">
-          See all
+          {strings.seeAll}
         </Button>
       </View>
     </View>
@@ -148,11 +151,12 @@ function HomeResultsState({
   status: 'error' | 'loading' | 'success';
 }) {
   const theme = useAppTheme();
+  const strings = useStrings(homeStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   if (status === 'loading') {
     return (
-      <View accessibilityLabel="Loading featured clinicians" style={styles.loadingCards}>
+      <View accessibilityLabel={strings.loadingFeatured} style={styles.loadingCards}>
         <ProviderCardSkeleton />
         <ProviderCardSkeleton />
       </View>
@@ -162,9 +166,9 @@ function HomeResultsState({
   if (status === 'error') {
     return (
       <Surface style={styles.errorSurface} variant="plain">
-        <InlineError message="Featured clinicians could not be loaded." />
+        <InlineError message={strings.errorMessage} />
         <Button onPress={onRetry} variant="secondary">
-          Try again
+          {strings.tryAgain}
         </Button>
       </Surface>
     );
@@ -174,12 +178,12 @@ function HomeResultsState({
     <EmptyState
       action={
         <Button onPress={onFindCare} variant="secondary">
-          Browse all clinicians
+          {strings.browseAllClinicians}
         </Button>
       }
-      description="The demo repository has no featured providers right now."
+      description={strings.emptyDescription}
       icon={<DecorativeIcon color={theme.colors.brand} name="people-outline" size={32} />}
-      title="No recommendations yet"
+      title={strings.emptyTitle}
     />
   );
 }

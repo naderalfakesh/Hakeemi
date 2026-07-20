@@ -3,7 +3,10 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText, Button, DecorativeIcon, Surface } from '@/components/ui';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
+
+import { onboardingStrings } from '../localization/onboarding-strings';
 
 type DemoEntryScreenProps = {
   onContinue: () => void;
@@ -12,6 +15,7 @@ type DemoEntryScreenProps = {
 
 export function DemoEntryScreen({ onContinue, onSignIn }: DemoEntryScreenProps) {
   const theme = useAppTheme();
+  const strings = useStrings(onboardingStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   return (
@@ -25,9 +29,9 @@ export function DemoEntryScreen({ onContinue, onSignIn }: DemoEntryScreenProps) 
           <View accessibilityElementsHidden importantForAccessibility="no" style={styles.brandMark}>
             <DecorativeIcon color={theme.colors.textInverse} name="pulse" size={22} />
           </View>
-          <AppText variant="titleSmall">Hakeemi</AppText>
+          <AppText variant="titleSmall">{strings.brandWordmark}</AppText>
           <AppText style={styles.rebuildLabel} tone="secondary" variant="caption">
-            Rebuilt in 2026
+            {strings.rebuiltIn}
           </AppText>
         </View>
 
@@ -39,11 +43,11 @@ export function DemoEntryScreen({ onContinue, onSignIn }: DemoEntryScreenProps) 
           <View style={styles.ambientOrb} />
           <View style={styles.previewCopy}>
             <AppText tone="secondary" variant="caption">
-              Earliest visit
+              {strings.earliestVisit}
             </AppText>
             <AppText variant="display">09:30</AppText>
             <AppText tone="secondary" variant="bodyMedium">
-              Tuesday · Video visit
+              {strings.previewSchedule}
             </AppText>
           </View>
           <Surface padding="compact" style={styles.providerCard} variant="raised">
@@ -51,9 +55,9 @@ export function DemoEntryScreen({ onContinue, onSignIn }: DemoEntryScreenProps) 
               <DecorativeIcon color={theme.colors.brand} name="person" size={24} />
             </View>
             <View style={styles.providerCopy}>
-              <AppText variant="bodyStrong">Family medicine</AppText>
+              <AppText variant="bodyStrong">{strings.familyMedicine}</AppText>
               <AppText tone="secondary" variant="caption">
-                Next available appointment
+                {strings.nextAvailableAppointment}
               </AppText>
             </View>
             <DecorativeIcon color={theme.colors.brand} name="arrow-forward" size={20} />
@@ -62,28 +66,27 @@ export function DemoEntryScreen({ onContinue, onSignIn }: DemoEntryScreenProps) 
 
         <View style={styles.message}>
           <AppText accessibilityRole="header" variant="display">
-            Care, without the runaround.
+            {strings.headline}
           </AppText>
           <AppText tone="secondary" variant="bodyLarge">
-            Browse a fictional care network, compare availability, and follow a calm booking
-            experience built to show modern React Native product engineering.
+            {strings.subheadline}
           </AppText>
         </View>
 
         <View style={styles.proofList}>
-          <ProofPoint label="See useful availability before opening a profile" />
-          <ProofPoint label="Understand every step before confirming a visit" />
+          <ProofPoint label={strings.proofAvailability} />
+          <ProofPoint label={strings.proofSteps} />
         </View>
 
         <View style={styles.actions}>
-          <Button accessibilityLabel="Explore the Hakeemi portfolio demo" onPress={onContinue}>
-            Explore the demo
+          <Button accessibilityLabel={strings.exploreDemoAccessibilityLabel} onPress={onContinue}>
+            {strings.exploreDemo}
           </Button>
           <Button onPress={onSignIn} variant="secondary">
-            Sign in
+            {strings.signIn}
           </Button>
           <AppText style={styles.disclaimer} tone="secondary" variant="caption">
-            Portfolio demonstration only. No real clinicians, medical services, or patient data.
+            {strings.disclaimer}
           </AppText>
         </View>
       </ScrollView>
@@ -148,9 +151,9 @@ function createStyles(theme: AppTheme) {
     ambientOrb: {
       backgroundColor: theme.colors.brandSoft,
       borderRadius: theme.radii.full,
+      end: -60,
       height: 210,
       position: 'absolute',
-      right: -60,
       top: -72,
       width: 210,
     },
@@ -160,10 +163,10 @@ function createStyles(theme: AppTheme) {
     providerCard: {
       alignItems: 'center',
       bottom: theme.spacing.lg,
+      end: theme.spacing.lg,
       flexDirection: 'row',
-      left: theme.spacing.lg,
       position: 'absolute',
-      right: theme.spacing.lg,
+      start: theme.spacing.lg,
     },
     providerAvatar: {
       alignItems: 'center',

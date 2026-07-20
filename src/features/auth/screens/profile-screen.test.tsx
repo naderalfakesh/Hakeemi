@@ -1,5 +1,6 @@
 import { fireEvent, render } from '@testing-library/react-native';
 
+import { AppLocaleProvider } from '@/localization/locale-provider';
 import { AppThemeProvider } from '@/theme';
 import type { Provider } from '@/features/care/domain/types';
 
@@ -146,5 +147,51 @@ describe('ProfileScreen', () => {
       view.getByRole('button', { name: 'Remove Dr. Lina Haddad from saved clinicians' }),
     );
     expect(onToggleSavedProvider).toHaveBeenCalledWith('lina-haddad');
+  });
+
+  it('renders Arabic copy for a signed-in member', async () => {
+    const view = await render(
+      <AppLocaleProvider locale="ar">
+        <AppThemeProvider colorScheme="light">
+          <ProfileScreen
+            onCreateAccount={noop}
+            onEnableNotifications={noop}
+            onRetryPreferences={noop}
+            onRetryProfile={noop}
+            onRetrySavedProviders={noop}
+            onSignIn={noop}
+            onSignOut={noop}
+            onToggleSavedProvider={noop}
+            onUpdatePreferences={noop}
+            preferences={{ locale: 'ar', theme: 'system' }}
+            preferencesError={null}
+            preferencesStatus="ready"
+            notificationError={null}
+            notificationStatus="registered"
+            profile={null}
+            profileError={null}
+            profileStatus="ready"
+            savedProviders={[savedProvider]}
+            savedProvidersStatus="ready"
+            user={{
+              displayName: 'Demo Patient',
+              email: 'demo@example.test',
+              emailVerified: true,
+              id: 'demo-user',
+            }}
+          />
+        </AppThemeProvider>
+      </AppLocaleProvider>,
+    );
+
+    expect(view.getByRole('header', { name: 'الملف الشخصي' })).toBeOnTheScreen();
+    expect(view.getByText('تم التحقق من البريد الإلكتروني')).toBeOnTheScreen();
+    expect(view.getByText('الأطباء المحفوظون')).toBeOnTheScreen();
+    expect(view.getByText('العربية')).toBeOnTheScreen();
+    expect(view.getByText('English')).toBeOnTheScreen();
+    expect(
+      view.getByRole('button', { name: 'إزالة Dr. Lina Haddad من الأطباء المحفوظين' }),
+    ).toBeOnTheScreen();
+    expect(view.getByRole('button', { name: 'تسجيل الخروج' })).toBeOnTheScreen();
   });
 });

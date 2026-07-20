@@ -2,10 +2,13 @@ import { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { AppText, Button, DecorativeIcon, InlineError, Surface } from '@/components/ui';
+import { useAppLocale } from '@/localization/locale-provider';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { AuthScaffold } from '../components/auth-scaffold';
-import { toAuthActionError } from '../domain/errors';
+import { localizeAuthError } from '../localization/auth-error-strings';
+import { verifyEmailStrings } from '../localization/auth-strings';
 
 type VerifyEmailScreenProps = {
   email: string;
@@ -24,6 +27,8 @@ export function VerifyEmailScreen({
 }: VerifyEmailScreenProps) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const { locale } = useAppLocale();
+  const strings = useStrings(verifyEmailStrings);
   const [isResending, setIsResending] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [message, setMessage] = useState<string>();
@@ -36,9 +41,9 @@ export function VerifyEmailScreen({
 
     try {
       await onResend();
-      setMessage('A fresh verification email was sent.');
+      setMessage(strings.resendConfirmation);
     } catch (error) {
-      setSubmissionError(toAuthActionError(error).message);
+      setSubmissionError(localizeAuthError(error, locale));
     } finally {
       setIsResending(false);
     }
@@ -52,7 +57,7 @@ export function VerifyEmailScreen({
     try {
       await onContinue();
     } catch (error) {
-      setSubmissionError(toAuthActionError(error).message);
+      setSubmissionError(localizeAuthError(error, locale));
     } finally {
       setIsChecking(false);
     }
@@ -60,16 +65,16 @@ export function VerifyEmailScreen({
 
   return (
     <AuthScaffold
-      eyebrow="ONE LAST STEP"
+      eyebrow={strings.eyebrow}
       onBack={onBack}
-      subtitle="Verification keeps the demo account recoverable and prevents mistyped addresses."
-      title="Verify your email"
+      subtitle={strings.subtitle}
+      title={strings.title}
     >
       <Surface padding="spacious" style={styles.card} variant="brand">
         <View style={styles.icon}>
           <DecorativeIcon color={theme.colors.brand} name="mail-unread-outline" size={30} />
         </View>
-        <AppText variant="bodyLarge">We sent a verification link to:</AppText>
+        <AppText variant="bodyLarge">{strings.sentTo}</AppText>
         <AppText selectable variant="bodyStrong">
           {email}
         </AppText>
@@ -82,17 +87,17 @@ export function VerifyEmailScreen({
         {submissionError && <InlineError message={submissionError} />}
 
         <Button busy={isChecking} onPress={() => void handleContinue()}>
-          Continue to Hakeemi
+          {strings.continueToHakeemi}
         </Button>
         <Button busy={isResending} onPress={() => void handleResend()} variant="secondary">
-          Resend email
+          {strings.resendEmail}
         </Button>
         <Button
           disabled={isResending}
           onPress={() => void onUseAnotherAccount()}
           variant="tertiary"
         >
-          Use another account
+          {strings.useAnotherAccount}
         </Button>
       </Surface>
     </AuthScaffold>

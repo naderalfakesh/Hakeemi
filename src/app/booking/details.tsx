@@ -5,13 +5,16 @@ import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { BookingRouteState } from '@/features/booking/components/booking-route-state';
 import { useBookingDraft } from '@/features/booking/context/booking-draft-provider';
 import { useBookingSelection } from '@/features/booking/hooks/use-booking-selection';
+import { bookingStrings } from '@/features/booking/localization/booking-strings';
 import { BookingDetailsScreen } from '@/features/booking/screens/booking-details-screen';
+import { useStrings } from '@/localization/use-strings';
 
 export default function BookingDetailsRoute() {
   const { providerId, slotId } = useBookingParams();
   const session = useAuthSession();
   const bookingDraft = useBookingDraft();
   const selection = useBookingSelection(providerId, slotId);
+  const strings = useStrings(bookingStrings);
 
   useEffect(() => {
     if (
@@ -64,7 +67,7 @@ export default function BookingDetailsRoute() {
 
   return (
     <BookingDetailsScreen
-      error={bookingDraft.error}
+      error={bookingDraft.error ? strings.draftErrors[bookingDraft.error] : null}
       isSaving={bookingDraft.status === 'saving'}
       onBack={() => router.replace(`/providers/${providerId}`)}
       onContinue={() =>

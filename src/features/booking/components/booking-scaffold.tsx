@@ -3,7 +3,10 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText, DecorativeIcon, IconButton } from '@/components/ui';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
+
+import { bookingStrings } from '../localization/booking-strings';
 
 export function BookingScaffold({
   children,
@@ -19,6 +22,7 @@ export function BookingScaffold({
   title: string;
 }) {
   const theme = useAppTheme();
+  const strings = useStrings(bookingStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   return (
@@ -29,7 +33,7 @@ export function BookingScaffold({
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topBar}>
-          <IconButton accessibilityLabel="Back" onPress={onBack} variant="soft">
+          <IconButton accessibilityLabel={strings.backLabel} onPress={onBack} variant="soft">
             <DecorativeIcon color={theme.colors.brand} name="arrow-back" size={22} />
           </IconButton>
           <AppText tone="secondary" variant="labelLarge">

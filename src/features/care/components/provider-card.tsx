@@ -2,10 +2,13 @@ import { memo, useCallback, useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText, DecorativeIcon } from '@/components/ui';
+import { formatLocalizedCount } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import type { AvailabilitySlot, Provider } from '../domain/types';
+import { providerCardStrings, reviewCountLabels } from '../localization/care-strings';
 import { formatAvailability, formatVisitMode } from '../presentation/formatters';
 import { ProviderAvatar } from './provider-avatar';
 
@@ -23,13 +26,14 @@ export const ProviderCard = memo(function ProviderCard({
   specialtyName,
 }: ProviderCardProps) {
   const theme = useAppTheme();
-  const { intlLocale } = useAppLocale();
+  const { locale } = useAppLocale();
+  const strings = useStrings(providerCardStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
   const handlePress = useCallback(() => onPress(provider.id), [onPress, provider.id]);
 
   return (
     <Pressable
-      accessibilityLabel={`View profile for ${provider.displayName}`}
+      accessibilityLabel={strings.viewProfileFor(provider.displayName)}
       accessibilityRole="button"
       android_ripple={{ color: theme.colors.brandSoft }}
       onPress={handlePress}
@@ -48,7 +52,8 @@ export const ProviderCard = memo(function ProviderCard({
             <View style={styles.rating}>
               <DecorativeIcon color={theme.colors.warning} name="star" size={15} />
               <AppText variant="caption">
-                {provider.ratingSummary.average.toFixed(1)} · {provider.ratingSummary.count} reviews
+                {provider.ratingSummary.average.toFixed(1)} ·{' '}
+                {formatLocalizedCount(provider.ratingSummary.count, locale, reviewCountLabels)}
               </AppText>
             </View>
           )}
@@ -65,17 +70,17 @@ export const ProviderCard = memo(function ProviderCard({
           </View>
           <View style={styles.availabilityCopy}>
             <AppText tone="secondary" variant="caption">
-              Next available
+              {strings.nextAvailable}
             </AppText>
-            <AppText variant="bodyStrong">{formatAvailability(nextSlot, intlLocale)}</AppText>
+            <AppText variant="bodyStrong">{formatAvailability(nextSlot, locale)}</AppText>
           </View>
           <AppText tone="brand" variant="caption">
-            {formatVisitMode(nextSlot.visitMode)}
+            {formatVisitMode(nextSlot.visitMode, locale)}
           </AppText>
         </View>
       ) : (
         <AppText tone="secondary" variant="caption">
-          Contact the clinic for availability
+          {strings.contactClinic}
         </AppText>
       )}
     </Pressable>

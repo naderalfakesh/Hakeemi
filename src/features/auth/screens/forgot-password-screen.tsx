@@ -4,11 +4,15 @@ import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 
 import { AppText, Button, DecorativeIcon, InlineError, Surface, TextField } from '@/components/ui';
+import { useAppLocale } from '@/localization/locale-provider';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { AuthScaffold } from '../components/auth-scaffold';
-import { toAuthActionError } from '../domain/errors';
-import { passwordResetSchema, type PasswordResetValues } from '../domain/schemas';
+import { createPasswordResetSchema, type PasswordResetValues } from '../domain/schemas';
+import { localizeAuthError } from '../localization/auth-error-strings';
+import { forgotPasswordStrings } from '../localization/auth-strings';
+import { authValidationStrings } from '../localization/auth-validation-strings';
 
 type ForgotPasswordScreenProps = {
   onBack: () => void;
@@ -23,6 +27,13 @@ export function ForgotPasswordScreen({
 }: ForgotPasswordScreenProps) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const { locale } = useAppLocale();
+  const strings = useStrings(forgotPasswordStrings);
+  const validationMessages = useStrings(authValidationStrings);
+  const resolver = useMemo(
+    () => zodResolver(createPasswordResetSchema(validationMessages)),
+    [validationMessages],
+  );
   const [submissionError, setSubmissionError] = useState<string>();
   const [requestedEmail, setRequestedEmail] = useState<string>();
   const {
@@ -31,7 +42,7 @@ export function ForgotPasswordScreen({
     handleSubmit,
   } = useForm<PasswordResetValues>({
     defaultValues: { email: '' },
-    resolver: zodResolver(passwordResetSchema),
+    resolver,
   });
 
   const submit = handleSubmit(async (values) => {
@@ -41,16 +52,16 @@ export function ForgotPasswordScreen({
       await onSubmit(values);
       setRequestedEmail(values.email);
     } catch (error) {
-      setSubmissionError(toAuthActionError(error).message);
+      setSubmissionError(localizeAuthError(error, locale));
     }
   });
 
   return (
     <AuthScaffold
-      eyebrow="ACCOUNT RECOVERY"
+      eyebrow={strings.eyebrow}
       onBack={onBack}
-      subtitle="We keep the response neutral so an email address cannot be used to discover accounts."
-      title="Reset your password"
+      subtitle={strings.subtitle}
+      title={strings.title}
     >
       {requestedEmail ? (
         <Surface padding="spacious" style={styles.success} variant="brand">
@@ -58,13 +69,12 @@ export function ForgotPasswordScreen({
             <DecorativeIcon color={theme.colors.success} name="mail-outline" size={28} />
           </View>
           <AppText accessibilityRole="header" variant="titleMedium">
-            Check your inbox
+            {strings.checkInbox}
           </AppText>
           <AppText tone="secondary" variant="bodyMedium">
-            If an account exists for {requestedEmail}, Firebase has sent password reset
-            instructions.
+            {strings.resetSent(requestedEmail)}
           </AppText>
-          <Button onPress={onBackToSignIn}>Back to sign in</Button>
+          <Button onPress={onBackToSignIn}>{strings.backToSignIn}</Button>
         </Surface>
       ) : (
         <Surface padding="spacious" style={styles.form} variant="raised">
@@ -78,11 +88,11 @@ export function ForgotPasswordScreen({
                 autoCorrect={false}
                 error={fieldState.error?.message}
                 keyboardType="email-address"
-                label="Email"
+                label={strings.emailLabel}
                 onBlur={field.onBlur}
                 onChangeText={field.onChange}
                 onSubmitEditing={() => void submit()}
-                placeholder="you@example.com"
+                placeholder={strings.emailPlaceholder}
                 returnKeyType="send"
                 textContentType="emailAddress"
                 value={field.value}
@@ -93,7 +103,7 @@ export function ForgotPasswordScreen({
           {submissionError && <InlineError message={submissionError} />}
 
           <Button busy={isSubmitting} onPress={() => void submit()}>
-            Send reset instructions
+            {strings.sendResetInstructions}
           </Button>
         </Surface>
       )}

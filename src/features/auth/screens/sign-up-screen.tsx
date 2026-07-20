@@ -4,11 +4,15 @@ import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
 
 import { Button, InlineError, Surface, TextField } from '@/components/ui';
+import { useAppLocale } from '@/localization/locale-provider';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { AuthScaffold } from '../components/auth-scaffold';
-import { toAuthActionError } from '../domain/errors';
-import { signUpSchema, type SignUpValues } from '../domain/schemas';
+import { createSignUpSchema, type SignUpValues } from '../domain/schemas';
+import { localizeAuthError } from '../localization/auth-error-strings';
+import { signUpStrings } from '../localization/auth-strings';
+import { authValidationStrings } from '../localization/auth-validation-strings';
 
 type SignUpScreenProps = {
   onBack: () => void;
@@ -19,6 +23,13 @@ type SignUpScreenProps = {
 export function SignUpScreen({ onBack, onSignIn, onSubmit }: SignUpScreenProps) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const { locale } = useAppLocale();
+  const strings = useStrings(signUpStrings);
+  const validationMessages = useStrings(authValidationStrings);
+  const resolver = useMemo(
+    () => zodResolver(createSignUpSchema(validationMessages)),
+    [validationMessages],
+  );
   const [submissionError, setSubmissionError] = useState<string>();
   const {
     control,
@@ -26,7 +37,7 @@ export function SignUpScreen({ onBack, onSignIn, onSubmit }: SignUpScreenProps) 
     handleSubmit,
   } = useForm<SignUpValues>({
     defaultValues: { confirmPassword: '', displayName: '', email: '', password: '' },
-    resolver: zodResolver(signUpSchema),
+    resolver,
   });
 
   const submit = handleSubmit(async (values) => {
@@ -35,16 +46,16 @@ export function SignUpScreen({ onBack, onSignIn, onSubmit }: SignUpScreenProps) 
     try {
       await onSubmit(values);
     } catch (error) {
-      setSubmissionError(toAuthActionError(error).message);
+      setSubmissionError(localizeAuthError(error, locale));
     }
   });
 
   return (
     <AuthScaffold
-      eyebrow="YOUR HAKEEMI"
+      eyebrow={strings.eyebrow}
       onBack={onBack}
-      subtitle="Use fictional details for this portfolio environment."
-      title="Create your account"
+      subtitle={strings.subtitle}
+      title={strings.title}
     >
       <Surface padding="spacious" style={styles.form} variant="raised">
         <Controller
@@ -55,10 +66,10 @@ export function SignUpScreen({ onBack, onSignIn, onSubmit }: SignUpScreenProps) 
               autoCapitalize="words"
               autoComplete="name"
               error={fieldState.error?.message}
-              label="Name"
+              label={strings.nameLabel}
               onBlur={field.onBlur}
               onChangeText={field.onChange}
-              placeholder="Demo Patient"
+              placeholder={strings.namePlaceholder}
               textContentType="name"
               value={field.value}
             />
@@ -74,10 +85,10 @@ export function SignUpScreen({ onBack, onSignIn, onSubmit }: SignUpScreenProps) 
               autoCorrect={false}
               error={fieldState.error?.message}
               keyboardType="email-address"
-              label="Email"
+              label={strings.emailLabel}
               onBlur={field.onBlur}
               onChangeText={field.onChange}
-              placeholder="demo@example.com"
+              placeholder={strings.emailPlaceholder}
               textContentType="emailAddress"
               value={field.value}
             />
@@ -91,8 +102,8 @@ export function SignUpScreen({ onBack, onSignIn, onSubmit }: SignUpScreenProps) 
               autoCapitalize="none"
               autoComplete="new-password"
               error={fieldState.error?.message}
-              hint="At least 8 characters"
-              label="Password"
+              hint={strings.passwordHint}
+              label={strings.passwordLabel}
               onBlur={field.onBlur}
               onChangeText={field.onChange}
               secureTextEntry
@@ -109,7 +120,7 @@ export function SignUpScreen({ onBack, onSignIn, onSubmit }: SignUpScreenProps) 
               autoCapitalize="none"
               autoComplete="new-password"
               error={fieldState.error?.message}
-              label="Confirm password"
+              label={strings.confirmPasswordLabel}
               onBlur={field.onBlur}
               onChangeText={field.onChange}
               onSubmitEditing={() => void submit()}
@@ -124,10 +135,10 @@ export function SignUpScreen({ onBack, onSignIn, onSubmit }: SignUpScreenProps) 
         {submissionError && <InlineError message={submissionError} />}
 
         <Button busy={isSubmitting} onPress={() => void submit()}>
-          Create account
+          {strings.createAccount}
         </Button>
         <Button disabled={isSubmitting} onPress={onSignIn} variant="tertiary">
-          I already have an account
+          {strings.alreadyHaveAccount}
         </Button>
       </Surface>
     </AuthScaffold>

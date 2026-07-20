@@ -1,38 +1,54 @@
 import { z } from 'zod';
 
-const emailSchema = z
-  .string()
-  .trim()
-  .min(1, 'Enter your email address.')
-  .email('Enter a valid email address.')
-  .toLowerCase();
+export type AuthValidationMessages = {
+  confirmPasswordRequired: string;
+  emailInvalid: string;
+  emailRequired: string;
+  nameMaxLength: string;
+  nameMinLength: string;
+  passwordMinLength: string;
+  passwordRequired: string;
+  passwordsDoNotMatch: string;
+};
 
-const passwordSchema = z.string().min(1, 'Enter your password.');
-const newPasswordSchema = passwordSchema.min(8, 'Use at least 8 characters.');
+function createEmailSchema(messages: AuthValidationMessages) {
+  return z
+    .string()
+    .trim()
+    .min(1, messages.emailRequired)
+    .email(messages.emailInvalid)
+    .toLowerCase();
+}
 
-export const signInSchema = z.object({
-  email: emailSchema,
-  password: passwordSchema,
-});
+function createPasswordSchema(messages: AuthValidationMessages) {
+  return z.string().min(1, messages.passwordRequired);
+}
 
-export const signUpSchema = z
-  .object({
-    confirmPassword: z.string().min(1, 'Confirm your password.'),
-    displayName: z
-      .string()
-      .trim()
-      .min(2, 'Enter at least 2 characters.')
-      .max(80, 'Keep your name under 80 characters.'),
-    email: emailSchema,
-    password: newPasswordSchema,
-  })
-  .refine(({ confirmPassword, password }) => confirmPassword === password, {
-    message: 'Passwords do not match.',
-    path: ['confirmPassword'],
+export function createSignInSchema(messages: AuthValidationMessages) {
+  return z.object({
+    email: createEmailSchema(messages),
+    password: createPasswordSchema(messages),
   });
+}
 
-export const passwordResetSchema = z.object({ email: emailSchema });
+export function createSignUpSchema(messages: AuthValidationMessages) {
+  return z
+    .object({
+      confirmPassword: z.string().min(1, messages.confirmPasswordRequired),
+      displayName: z.string().trim().min(2, messages.nameMinLength).max(80, messages.nameMaxLength),
+      email: createEmailSchema(messages),
+      password: createPasswordSchema(messages).min(8, messages.passwordMinLength),
+    })
+    .refine(({ confirmPassword, password }) => confirmPassword === password, {
+      message: messages.passwordsDoNotMatch,
+      path: ['confirmPassword'],
+    });
+}
 
-export type PasswordResetValues = z.infer<typeof passwordResetSchema>;
-export type SignInValues = z.infer<typeof signInSchema>;
-export type SignUpValues = z.infer<typeof signUpSchema>;
+export function createPasswordResetSchema(messages: AuthValidationMessages) {
+  return z.object({ email: createEmailSchema(messages) });
+}
+
+export type PasswordResetValues = z.infer<ReturnType<typeof createPasswordResetSchema>>;
+export type SignInValues = z.infer<ReturnType<typeof createSignInSchema>>;
+export type SignUpValues = z.infer<ReturnType<typeof createSignUpSchema>>;

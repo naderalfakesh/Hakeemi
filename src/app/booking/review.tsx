@@ -2,11 +2,13 @@ import * as Network from 'expo-network';
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
 
 import { useBookAppointment } from '@/features/appointments/hooks/use-book-appointment';
+import { localizeAppointmentError } from '@/features/appointments/localization/appointment-error-strings';
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { BookingRouteState } from '@/features/booking/components/booking-route-state';
 import { useBookingDraft } from '@/features/booking/context/booking-draft-provider';
 import { useBookingSelection } from '@/features/booking/hooks/use-booking-selection';
 import { BookingReviewScreen } from '@/features/booking/screens/booking-review-screen';
+import { useAppLocale } from '@/localization/locale-provider';
 
 export default function BookingReviewRoute() {
   const params = useLocalSearchParams<{
@@ -20,6 +22,7 @@ export default function BookingReviewRoute() {
   const selection = useBookingSelection(providerId, slotId);
   const booking = useBookAppointment();
   const networkState = Network.useNetworkState();
+  const { locale } = useAppLocale();
   const draft = draftContext.draft;
 
   if (session.status === 'anonymous') {
@@ -86,7 +89,7 @@ export default function BookingReviewRoute() {
 
   return (
     <BookingReviewScreen
-      error={booking.error?.message ?? null}
+      error={booking.error ? localizeAppointmentError(booking.error, locale) : null}
       isOnline={isOnline}
       isSubmitting={booking.status === 'pending'}
       onBack={() => router.back()}

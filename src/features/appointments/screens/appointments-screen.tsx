@@ -14,6 +14,7 @@ import {
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import type { CareRepository } from '@/features/care/domain/repository';
 import { useAppLocale } from '@/localization/locale-provider';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import type { AppointmentRepository } from '../domain/repository';
@@ -23,12 +24,10 @@ import {
   type AppointmentFilter,
 } from '../hooks/use-appointments';
 import type { Appointment } from '../domain/types';
+import { appointmentStatusStrings } from '../localization/appointment-status-strings';
+import { appointmentsStrings } from '../localization/appointments-strings';
 
-const filters: readonly { key: AppointmentFilter; label: string }[] = [
-  { key: 'upcoming', label: 'Upcoming' },
-  { key: 'past', label: 'Past' },
-  { key: 'cancelled', label: 'Cancelled' },
-];
+const filterKeys: readonly AppointmentFilter[] = ['upcoming', 'past', 'cancelled'];
 
 export function AppointmentsScreen({
   onFindCare,
@@ -44,13 +43,14 @@ export function AppointmentsScreen({
   onViewAppointment?: ((appointmentId: string) => void) | undefined;
 }) {
   const session = useAuthSession();
+  const strings = useStrings(appointmentsStrings);
 
   if (session.status !== 'authenticated') {
     return (
       <AppointmentState
-        action={<Button onPress={onSignIn}>Sign in</Button>}
-        description="Sign in to view appointments saved to your account."
-        title="Your appointments stay private"
+        action={<Button onPress={onSignIn}>{strings.signIn}</Button>}
+        description={strings.signInDescription}
+        title={strings.signInTitle}
       />
     );
   }
@@ -77,6 +77,7 @@ function AuthenticatedAppointments({
   onViewAppointment?: ((appointmentId: string) => void) | undefined;
 }) {
   const theme = useAppTheme();
+  const strings = useStrings(appointmentsStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
   const appointmentsQuery = useAppointments(appointmentRepository, careDataRepository);
   const [filter, setFilter] = useState<AppointmentFilter>('upcoming');
@@ -84,7 +85,7 @@ function AuthenticatedAppointments({
   if (appointmentsQuery.isPending) {
     return (
       <SafeAreaView
-        accessibilityLabel="Loading appointments"
+        accessibilityLabel={strings.loadingAppointments}
         edges={['top']}
         style={styles.safeArea}
       >
@@ -103,25 +104,26 @@ function AuthenticatedAppointments({
   if (appointmentsQuery.isError) {
     return (
       <AppointmentState
-        action={<Button onPress={() => void appointmentsQuery.refetch()}>Try again</Button>}
-        description="Your private appointment list could not be loaded."
-        title="Appointments unavailable"
+        action={
+          <Button onPress={() => void appointmentsQuery.refetch()}>{strings.tryAgain}</Button>
+        }
+        description={strings.errorDescription}
+        title={strings.errorTitle}
       />
     );
   }
 
   const visibleAppointments = selectAppointments(appointmentsQuery.data ?? [], filter);
-  const filterLabel = filters.find((candidate) => candidate.key === filter)?.label ?? 'Upcoming';
 
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.heading}>
           <AppText accessibilityRole="header" variant="titleLarge">
-            Appointments
+            {strings.title}
           </AppText>
           <AppText tone="secondary" variant="bodyLarge">
-            Keep upcoming care close and revisit your appointment history.
+            {strings.subtitle}
           </AppText>
         </View>
 
@@ -130,20 +132,20 @@ function AuthenticatedAppointments({
           horizontal
           showsHorizontalScrollIndicator={false}
         >
-          {filters.map((candidate) => (
+          {filterKeys.map((candidate) => (
             <Chip
-              key={candidate.key}
-              label={candidate.label}
-              onPress={() => setFilter(candidate.key)}
-              selected={candidate.key === filter}
+              key={candidate}
+              label={strings.filterLabels[candidate]}
+              onPress={() => setFilter(candidate)}
+              selected={candidate === filter}
             />
           ))}
         </ScrollView>
 
         {visibleAppointments.length === 0 ? (
           <EmptyState
-            action={<Button onPress={onFindCare}>Find a clinician</Button>}
-            description={emptyDescription(filter)}
+            action={<Button onPress={onFindCare}>{strings.findClinician}</Button>}
+            description={strings.emptyDescriptions[filter]}
             icon={
               <DecorativeIcon
                 color={theme.colors.brand}
@@ -151,7 +153,7 @@ function AuthenticatedAppointments({
                 size={34}
               />
             }
-            title={`No ${filterLabel.toLowerCase()} appointments`}
+            title={strings.emptyTitles[filter]}
           />
         ) : (
           visibleAppointments.map(({ appointment, provider }) => (
@@ -159,7 +161,7 @@ function AuthenticatedAppointments({
               appointment={appointment}
               key={appointment.id}
               onPress={onViewAppointment ? () => onViewAppointment(appointment.id) : undefined}
-              providerName={provider?.displayName ?? 'Provider'}
+              providerName={provider?.displayName ?? strings.providerFallback}
             />
           ))
         )}
@@ -179,12 +181,14 @@ function AppointmentCard({
 }) {
   const theme = useAppTheme();
   const { intlLocale } = useAppLocale();
+  const strings = useStrings(appointmentsStrings);
+  const statusStrings = useStrings(appointmentStatusStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
   const statusTone = appointment.status === 'confirmed' ? 'success' : 'secondary';
 
   return (
     <Pressable
-      accessibilityLabel={`Open appointment with ${providerName}`}
+      accessibilityLabel={strings.openAppointmentWith(providerName)}
       accessibilityRole={onPress ? 'button' : undefined}
       disabled={!onPress}
       onPress={onPress}
@@ -194,7 +198,7 @@ function AppointmentCard({
         <View style={styles.statusRow}>
           <View style={[styles.statusDot, { backgroundColor: statusColor(theme, appointment) }]} />
           <AppText tone={statusTone} variant="labelSmall">
-            {statusLabel(appointment.status)}
+            {statusStrings.statusLabels[appointment.status]}
           </AppText>
           {onPress && (
             <DecorativeIcon color={theme.colors.textSecondary} name="chevron-forward" size={17} />
@@ -212,8 +216,7 @@ function AppointmentCard({
             size={20}
           />
           <AppText tone="secondary" variant="bodyMedium">
-            {appointment.visitMode === 'video' ? 'Video visit' : 'In-person visit'} ·{' '}
-            {appointment.timezone}
+            {statusStrings.visitModeLabels[appointment.visitMode]} · {appointment.timezone}
           </AppText>
         </View>
       </Surface>
@@ -242,22 +245,6 @@ function AppointmentState({
       />
     </SafeAreaView>
   );
-}
-
-function emptyDescription(filter: AppointmentFilter) {
-  if (filter === 'cancelled') {
-    return 'Cancelled visits will stay here so your care history remains clear.';
-  }
-
-  if (filter === 'past') {
-    return 'Completed visits and appointments you missed will appear here.';
-  }
-
-  return 'Choose a clinician and a real available slot to plan your next visit.';
-}
-
-function statusLabel(status: Appointment['status']) {
-  return status === 'no_show' ? 'NO SHOW' : status.replace('_', ' ').toUpperCase();
 }
 
 function statusColor(theme: AppTheme, appointment: Appointment) {

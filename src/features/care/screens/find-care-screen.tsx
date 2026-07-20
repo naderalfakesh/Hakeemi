@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppText, Button, DecorativeIcon, EmptyState, Skeleton, TextField } from '@/components/ui';
 import { formatLocalizedCount } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { ProviderCard } from '../components/provider-card';
@@ -13,6 +14,7 @@ import { SpecialtyFilter } from '../components/specialty-filter';
 import type { CareRepository } from '../domain/repository';
 import type { Provider } from '../domain/types';
 import { useProviderDiscovery } from '../hooks/use-provider-discovery';
+import { clinicianCountLabels, findCareStrings } from '../localization/care-strings';
 
 type FindCareScreenProps = {
   onSelectProvider: (providerId: string) => void;
@@ -22,6 +24,7 @@ type FindCareScreenProps = {
 export function FindCareScreen({ onSelectProvider, repository }: FindCareScreenProps) {
   const theme = useAppTheme();
   const { locale } = useAppLocale();
+  const strings = useStrings(findCareStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [query, setQuery] = useState('');
   const [specialtyId, setSpecialtyId] = useState<string | null>(null);
@@ -48,10 +51,10 @@ export function FindCareScreen({ onSelectProvider, repository }: FindCareScreenP
         nextSlot={data?.nextSlots.get(item.id) ?? null}
         onPress={onSelectProvider}
         provider={item}
-        specialtyName={specialtyNames.get(item.specialtyIds[0] ?? '') ?? 'Clinician'}
+        specialtyName={specialtyNames.get(item.specialtyIds[0] ?? '') ?? strings.clinicianFallback}
       />
     ),
-    [data?.nextSlots, onSelectProvider, specialtyNames],
+    [data?.nextSlots, onSelectProvider, specialtyNames, strings],
   );
 
   return (
@@ -69,18 +72,18 @@ export function FindCareScreen({ onSelectProvider, repository }: FindCareScreenP
           <View style={styles.header}>
             <View style={styles.heading}>
               <AppText accessibilityRole="header" variant="display">
-                Find care
+                {strings.title}
               </AppText>
               <AppText tone="secondary" variant="bodyLarge">
-                Search by clinician, specialty, or language.
+                {strings.subtitle}
               </AppText>
             </View>
             <TextField
-              accessibilityLabel="Search clinicians"
+              accessibilityLabel={strings.searchAccessibilityLabel}
               autoCapitalize="none"
-              label="Search"
+              label={strings.searchLabel}
               onChangeText={setQuery}
-              placeholder="Try cardiology or Arabic"
+              placeholder={strings.searchPlaceholder}
               returnKeyType="search"
               value={query}
             />
@@ -99,10 +102,7 @@ export function FindCareScreen({ onSelectProvider, repository }: FindCareScreenP
             )}
             {data && data.providers.length > 0 && (
               <AppText tone="secondary" variant="caption">
-                {formatLocalizedCount(data.providers.length, locale, {
-                  ar: { one: 'طبيب', other: 'أطباء' },
-                  en: { one: 'clinician', other: 'clinicians' },
-                })}
+                {formatLocalizedCount(data.providers.length, locale, clinicianCountLabels)}
               </AppText>
             )}
           </View>
@@ -111,7 +111,7 @@ export function FindCareScreen({ onSelectProvider, repository }: FindCareScreenP
           data && data.providers.length > 0 && (hasMore || isLoadingMore) ? (
             <View style={styles.pagination}>
               <Button busy={isLoadingMore} onPress={loadMore} variant="secondary">
-                {isLoadingMore ? 'Loading more clinicians' : 'Load more clinicians'}
+                {isLoadingMore ? strings.loadingMoreClinicians : strings.loadMoreClinicians}
               </Button>
             </View>
           ) : null
@@ -143,11 +143,12 @@ type ResultsStateProps = {
 
 function ResultsState({ hasFilters, onClear, onRetry, status }: ResultsStateProps) {
   const theme = useAppTheme();
+  const strings = useStrings(findCareStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   if (status === 'loading') {
     return (
-      <View accessibilityLabel="Loading clinicians" style={styles.loadingCards}>
+      <View accessibilityLabel={strings.loadingClinicians} style={styles.loadingCards}>
         <ProviderCardSkeleton />
         <ProviderCardSkeleton />
         <ProviderCardSkeleton />
@@ -158,10 +159,10 @@ function ResultsState({ hasFilters, onClear, onRetry, status }: ResultsStateProp
   if (status === 'error') {
     return (
       <EmptyState
-        action={<Button onPress={onRetry}>Try again</Button>}
-        description="Check your connection and retry. Your search has not been lost."
+        action={<Button onPress={onRetry}>{strings.tryAgain}</Button>}
+        description={strings.errorDescription}
         icon={<DecorativeIcon color={theme.colors.danger} name="cloud-offline-outline" size={32} />}
-        title="Clinicians could not be loaded"
+        title={strings.errorTitle}
       />
     );
   }
@@ -171,13 +172,13 @@ function ResultsState({ hasFilters, onClear, onRetry, status }: ResultsStateProp
       action={
         hasFilters ? (
           <Button onPress={onClear} variant="secondary">
-            Clear search and filters
+            {strings.clearFilters}
           </Button>
         ) : undefined
       }
-      description="Try another name, specialty, or language."
+      description={strings.emptyDescription}
       icon={<DecorativeIcon color={theme.colors.brand} name="search-outline" size={32} />}
-      title="No clinicians match"
+      title={strings.emptyTitle}
     />
   );
 }

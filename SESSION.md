@@ -79,7 +79,7 @@
 - Interactive emulator identity: native journeys use the local
   `hakeemi-portfolio-dev` namespace to match the ignored service files;
   automated rules and contention tests stay isolated on `demo-hakeemi`.
-- Phase 4 management quality: 31 app suites/78 tests, 12 Functions unit tests,
+- Phase 4 management quality: 33 app suites/98 tests, 12 Functions unit tests,
   5 appointment-management, 2 notification-token, and 1 appointment-reminder
   callable integration tests, 14 rules tests, 21 static routes, and Expo Doctor
   20/20 all pass.
@@ -89,8 +89,22 @@
   privacy-safe development logging, AppText keeps Dynamic Type enabled and
   applies RTL writing direction, and date/time formatters follow the selected
   English/Arabic locale; clinician counts and catalog labels now use Arabic
-  plural/field data as well. Full Arabic copy and assistive-technology evidence
-  remain open.
+  plural/field data as well.
+- Arabic localization: every screen reads copy from typed bilingual
+  `LocalizedStrings` bundles via `useStrings` — including accessibility labels,
+  validation schemas (message-parameterized factories), and auth/appointment
+  error mappings localized at the presentation layer. Arabic plural rules cover
+  clinician, review, and availability counts. English output stayed
+  byte-identical.
+- RTL layout: choosing Arabic persists the native direction through
+  `I18nManager.allowRTL/forceRTL` (with rollback if toggled back before
+  restart) and shows a restart hint under the language preference; directional
+  arrows/chevrons mirror inside `DecorativeIcon`; onboarding decor uses logical
+  `start`/`end` offsets. Web keeps LTR layout with RTL text direction.
+- Phase 5 open items: assistive-technology journeys, native-speaker Arabic copy
+  review, provider-data localization (bios/credentials/languages), stale-data
+  indicators, motion tokens with reduced-motion fallbacks, and device-size
+  evidence.
 - Phase 6 quality gate: GitHub Actions now runs the app, Firebase, Functions,
   rules, booking, management, notification-token, and scheduled-reminder
   contracts; EAS profiles remain explicit but signing/preview artifacts require

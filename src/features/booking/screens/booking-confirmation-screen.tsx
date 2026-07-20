@@ -6,8 +6,11 @@ import { AppText, Button, DecorativeIcon, Surface } from '@/components/ui';
 import type { Appointment } from '@/features/appointments/domain/types';
 import type { Provider } from '@/features/care/domain/types';
 import { useAppLocale } from '@/localization/locale-provider';
+import { useStrings } from '@/localization/use-strings';
 import { triggerHaptic } from '@/services/haptics/haptics';
 import { useAppTheme, type AppTheme } from '@/theme';
+
+import { bookingStrings } from '../localization/booking-strings';
 
 export function BookingConfirmationScreen({
   appointment,
@@ -22,6 +25,7 @@ export function BookingConfirmationScreen({
 }) {
   const theme = useAppTheme();
   const { intlLocale } = useAppLocale();
+  const strings = useStrings(bookingStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   useEffect(() => {
@@ -36,29 +40,35 @@ export function BookingConfirmationScreen({
         </View>
         <View style={styles.heading}>
           <AppText accessibilityRole="header" style={styles.centered} variant="titleLarge">
-            Appointment confirmed
+            {strings.confirmation.title}
           </AppText>
           <AppText style={styles.centered} tone="secondary" variant="bodyLarge">
-            Your time is reserved and available from the Appointments tab.
+            {strings.confirmation.subtitle}
           </AppText>
         </View>
 
         <Surface padding="spacious" style={styles.card} variant="brand">
-          <AppText variant="titleSmall">{provider?.displayName ?? 'Confirmed provider'}</AppText>
+          <AppText variant="titleSmall">
+            {provider?.displayName ?? strings.confirmation.confirmedProviderFallback}
+          </AppText>
           <AppText variant="bodyStrong">{formatAppointment(appointment, intlLocale)}</AppText>
           <AppText tone="secondary" variant="bodyMedium">
-            {appointment.visitMode === 'video' ? 'Video visit' : 'In-person visit'} ·{' '}
-            {appointment.timezone}
+            {strings.confirmation.visitMeta(
+              appointment.visitMode === 'video'
+                ? strings.confirmation.videoVisit
+                : strings.confirmation.inPersonVisit,
+              appointment.timezone,
+            )}
           </AppText>
           <AppText selectable tone="secondary" variant="caption">
-            Reference {appointment.id.slice(-10).toUpperCase()}
+            {strings.confirmation.reference(appointment.id.slice(-10).toUpperCase())}
           </AppText>
         </Surface>
 
         <View style={styles.actions}>
-          <Button onPress={onViewAppointments}>View appointments</Button>
+          <Button onPress={onViewAppointments}>{strings.confirmation.viewAppointments}</Button>
           <Button onPress={onFindCare} variant="secondary">
-            Find another clinician
+            {strings.confirmation.findAnotherClinician}
           </Button>
         </View>
       </View>

@@ -1,5 +1,6 @@
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
+import { AppLocaleProvider } from '@/localization/locale-provider';
 import { TestAppProviders } from '@/test/test-app-providers';
 
 import { fixtureCareRepository } from '../data/fixture-care-repository';
@@ -73,5 +74,25 @@ describe('FindCareScreen', () => {
     await waitFor(() =>
       expect(view.getByRole('header', { name: 'No clinicians match' })).toBeVisible(),
     );
+  });
+
+  it('renders Arabic copy when the app locale is Arabic', async () => {
+    const view = await render(
+      <TestAppProviders colorScheme="light">
+        <AppLocaleProvider locale="ar">
+          <FindCareScreen onSelectProvider={jest.fn()} repository={fixtureCareRepository} />
+        </AppLocaleProvider>
+      </TestAppProviders>,
+    );
+
+    await waitFor(() =>
+      expect(
+        view.getByRole('button', { name: 'عرض الملف الشخصي للطبيب Dr. Lina Haddad' }),
+      ).toBeVisible(),
+    );
+
+    expect(view.getByRole('header', { name: 'ابحث عن رعاية' })).toBeVisible();
+    expect(view.getByLabelText('البحث عن الأطباء')).toBeOnTheScreen();
+    expect(view.getByRole('button', { name: 'طب القلب' })).toBeVisible();
   });
 });

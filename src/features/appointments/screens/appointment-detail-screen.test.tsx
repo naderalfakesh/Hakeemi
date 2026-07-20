@@ -2,6 +2,7 @@ import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { fixtureCareRepository } from '@/features/care/data/fixture-care-repository';
+import { AppLocaleProvider } from '@/localization/locale-provider';
 import { addAppointmentToCalendar } from '@/services/calendar/calendar';
 import { triggerHaptic } from '@/services/haptics/haptics';
 import { TestAppProviders } from '@/test/test-app-providers';
@@ -217,5 +218,30 @@ describe('AppointmentDetailScreen', () => {
       appointmentId: appointment.id,
       requestId: 'request-2',
     });
+  });
+
+  it('renders localized appointment details in Arabic', async () => {
+    const view = await render(
+      <TestAppProviders>
+        <AppLocaleProvider locale="ar">
+          <AppointmentDetailScreen
+            appointmentId={appointment.id}
+            appointmentRepository={repository()}
+            careDataRepository={fixtureCareRepository}
+            onBack={jest.fn()}
+            onFindCare={jest.fn()}
+          />
+        </AppLocaleProvider>
+      </TestAppProviders>,
+    );
+
+    await waitFor(() =>
+      expect(view.getByRole('header', { name: 'Dr. Lina Haddad' })).toBeVisible(),
+    );
+    expect(view.getByText('تفاصيل الموعد')).toBeVisible();
+    expect(view.getByText('مؤكد')).toBeVisible();
+    expect(view.getByRole('button', { name: 'إضافة إلى التقويم' })).toBeVisible();
+    expect(view.getByRole('button', { name: 'إلغاء الموعد' })).toBeVisible();
+    expect(view.getByRole('button', { name: 'ابحث عن طبيب آخر' })).toBeVisible();
   });
 });

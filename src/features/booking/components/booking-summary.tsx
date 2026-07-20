@@ -3,9 +3,12 @@ import { StyleSheet, View } from 'react-native';
 
 import { AppText, DecorativeIcon, Surface } from '@/components/ui';
 import { formatFee } from '@/features/care/presentation/formatters';
+import { useAppLocale } from '@/localization/locale-provider';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import type { BookingSelection } from '../hooks/use-booking-selection';
+import { bookingStrings } from '../localization/booking-strings';
 import { formatBookingSlot, formatReasonCategory } from '../presentation/formatters';
 import type { AppointmentReasonCategory } from '@/features/appointments/domain/types';
 
@@ -19,35 +22,43 @@ export function BookingSummary({
   showReason?: boolean;
 }) {
   const theme = useAppTheme();
+  const { locale } = useAppLocale();
+  const strings = useStrings(bookingStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   return (
     <Surface padding="spacious" style={styles.card} variant="raised">
-      <SummaryRow icon="person-outline" label="Clinician" value={selection.provider.displayName} />
+      <SummaryRow
+        icon="person-outline"
+        label={strings.summary.clinician}
+        value={selection.provider.displayName}
+      />
       <SummaryRow
         icon="time-outline"
-        label="Appointment"
-        value={formatBookingSlot(selection.slot)}
+        label={strings.summary.appointment}
+        value={formatBookingSlot(selection.slot, locale)}
       />
       <SummaryRow
         icon={selection.slot.visitMode === 'video' ? 'videocam-outline' : 'location-outline'}
-        label={selection.slot.visitMode === 'video' ? 'Visit mode' : 'Clinic'}
-        value={selection.clinic?.name.en ?? 'Video visit'}
+        label={
+          selection.slot.visitMode === 'video' ? strings.summary.visitMode : strings.summary.clinic
+        }
+        value={selection.clinic?.name[locale] ?? strings.summary.videoVisit}
       />
       <SummaryRow
         icon="wallet-outline"
-        label="Consultation"
-        value={formatFee(selection.provider.consultationFee)}
+        label={strings.summary.consultation}
+        value={formatFee(selection.provider.consultationFee, locale)}
       />
       {showReason && (
         <SummaryRow
           icon="document-text-outline"
-          label="Visit category"
-          value={formatReasonCategory(reasonCategory)}
+          label={strings.summary.visitCategory}
+          value={formatReasonCategory(reasonCategory, locale)}
         />
       )}
       <AppText tone="secondary" variant="caption">
-        Timezone: {selection.slot.timezone}
+        {strings.summary.timezone(selection.slot.timezone)}
       </AppText>
     </Surface>
   );

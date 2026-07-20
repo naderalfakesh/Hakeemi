@@ -4,10 +4,14 @@ import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 
 import { Button, InlineError, Surface, TextField } from '@/components/ui';
+import { useAppLocale } from '@/localization/locale-provider';
+import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
-import { toAuthActionError } from '../domain/errors';
-import { signInSchema, type SignInValues } from '../domain/schemas';
+import { createSignInSchema, type SignInValues } from '../domain/schemas';
+import { localizeAuthError } from '../localization/auth-error-strings';
+import { signInStrings } from '../localization/auth-strings';
+import { authValidationStrings } from '../localization/auth-validation-strings';
 import { AuthScaffold } from '../components/auth-scaffold';
 
 type SignInScreenProps = {
@@ -27,6 +31,13 @@ export function SignInScreen({
 }: SignInScreenProps) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const { locale } = useAppLocale();
+  const strings = useStrings(signInStrings);
+  const validationMessages = useStrings(authValidationStrings);
+  const resolver = useMemo(
+    () => zodResolver(createSignInSchema(validationMessages)),
+    [validationMessages],
+  );
   const [submissionError, setSubmissionError] = useState<string>();
   const {
     control,
@@ -34,7 +45,7 @@ export function SignInScreen({
     handleSubmit,
   } = useForm<SignInValues>({
     defaultValues: { email: '', password: '' },
-    resolver: zodResolver(signInSchema),
+    resolver,
   });
 
   const submit = handleSubmit(async (values) => {
@@ -43,16 +54,16 @@ export function SignInScreen({
     try {
       await onSubmit(values);
     } catch (error) {
-      setSubmissionError(toAuthActionError(error).message);
+      setSubmissionError(localizeAuthError(error, locale));
     }
   });
 
   return (
     <AuthScaffold
-      eyebrow="SECURE ACCOUNT"
+      eyebrow={strings.eyebrow}
       onBack={onBack}
-      subtitle="Restore appointments and preferences across your devices."
-      title="Welcome back"
+      subtitle={strings.subtitle}
+      title={strings.title}
     >
       <Surface padding="spacious" style={styles.form} variant="raised">
         <Controller
@@ -65,10 +76,10 @@ export function SignInScreen({
               autoCorrect={false}
               error={fieldState.error?.message}
               keyboardType="email-address"
-              label="Email"
+              label={strings.emailLabel}
               onBlur={field.onBlur}
               onChangeText={field.onChange}
-              placeholder="you@example.com"
+              placeholder={strings.emailPlaceholder}
               textContentType="emailAddress"
               value={field.value}
             />
@@ -82,7 +93,7 @@ export function SignInScreen({
               autoCapitalize="none"
               autoComplete="current-password"
               error={fieldState.error?.message}
-              label="Password"
+              label={strings.passwordLabel}
               onBlur={field.onBlur}
               onChangeText={field.onChange}
               onSubmitEditing={() => void submit()}
@@ -97,19 +108,19 @@ export function SignInScreen({
         {submissionError && <InlineError message={submissionError} />}
 
         <Button busy={isSubmitting} onPress={() => void submit()}>
-          Sign in
+          {strings.signIn}
         </Button>
         <Button disabled={isSubmitting} onPress={onForgotPassword} variant="tertiary">
-          Forgot password?
+          {strings.forgotPassword}
         </Button>
       </Surface>
 
       <View style={styles.secondaryActions}>
         <Button disabled={isSubmitting} onPress={onCreateAccount} variant="secondary">
-          Create an account
+          {strings.createAccount}
         </Button>
         <Button disabled={isSubmitting} onPress={onContinueAsGuest} variant="tertiary">
-          Continue as guest
+          {strings.continueAsGuest}
         </Button>
       </View>
     </AuthScaffold>
