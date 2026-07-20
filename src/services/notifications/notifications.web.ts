@@ -7,3 +7,7 @@ export async function registerForAppointmentNotifications(
 }
 
 export function stopNotificationTokenRefresh() {}
+
+export function subscribeToAppointmentNotificationOpen(_listener: (appointmentId: string) => void) {
+  return () => undefined;
+}

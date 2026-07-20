@@ -10,3 +10,7 @@ export function registerForAppointmentNotifications(
 ): Promise<NotificationSetupResult>;
 
 export function stopNotificationTokenRefresh(): void;
+
+export function subscribeToAppointmentNotificationOpen(
+  listener: (appointmentId: string) => void,
+): () => void;

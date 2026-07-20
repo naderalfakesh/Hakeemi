@@ -68,7 +68,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           'Allow Hakeemi to add fictional appointments to your calendar.',
       },
     ],
-    'expo-notifications',
+    [
+      'expo-notifications',
+      {
+        color: '#0B6B69',
+        enableBackgroundRemoteNotifications: true,
+        icon: './assets/images/android-icon-monochrome.png',
+      },
+    ],
     '@react-native-firebase/messaging',
     'expo-font',
   ],

@@ -1,5 +1,6 @@
-import { Stack, ThemeProvider as NavigationThemeProvider } from 'expo-router';
+import { Stack, ThemeProvider as NavigationThemeProvider, useRouter, type Href } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useCallback, useEffect, useRef } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -13,6 +14,7 @@ import {
   useAppPreferences,
 } from '@/features/preferences/context/app-preferences-provider';
 import { initializeFirebaseServices } from '@/services/firebase/initialize';
+import { subscribeToAppointmentNotificationOpen } from '@/services/notifications/notifications';
 import { AppQueryProvider } from '@/services/query/query-provider';
 import { AppThemeProvider, darkNavigationTheme, lightNavigationTheme, useAppTheme } from '@/theme';
 
@@ -40,9 +42,45 @@ function Navigation() {
   return (
     <NavigationThemeProvider value={navigationTheme}>
       <Stack screenOptions={{ headerShown: false }} />
+      <NotificationNavigationBridge />
       <StatusBar style={theme.mode === 'dark' ? 'light' : 'dark'} />
     </NavigationThemeProvider>
   );
+}
+
+function NotificationNavigationBridge() {
+  const router = useRouter();
+  const session = useAuthSession();
+  const pendingAppointmentId = useRef<string | null>(null);
+  const openAppointment = useCallback(
+    (appointmentId: string) => {
+      if (session.status !== 'authenticated') {
+        pendingAppointmentId.current = appointmentId;
+        return;
+      }
+
+      router.push({
+        pathname: '/appointments/[appointmentId]',
+        params: { appointmentId },
+      } as unknown as Href);
+    },
+    [router, session.status],
+  );
+
+  useEffect(() => subscribeToAppointmentNotificationOpen(openAppointment), [openAppointment]);
+
+  useEffect(() => {
+    if (session.status === 'authenticated' && pendingAppointmentId.current) {
+      const appointmentId = pendingAppointmentId.current;
+      pendingAppointmentId.current = null;
+      router.push({
+        pathname: '/appointments/[appointmentId]',
+        params: { appointmentId },
+      } as unknown as Href);
+    }
+  }, [router, session.status]);
+
+  return null;
 }
 
 function AppShell() {
