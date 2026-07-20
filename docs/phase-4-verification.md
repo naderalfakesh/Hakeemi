@@ -70,7 +70,7 @@ occupied targets, request-key conflicts, owner isolation, and no partial moves.
 
 | Check                                       | Result                                      |
 | ------------------------------------------- | ------------------------------------------- |
-| Application tests                           | 29 suites, 76 tests passed                  |
+| Application tests                           | 31 suites, 78 tests passed                  |
 | Functions unit tests                        | 12 tests passed                             |
 | Appointment-management callable integration | 5 tests passed                              |
 | Notification-token callable integration     | 2 tests passed                              |

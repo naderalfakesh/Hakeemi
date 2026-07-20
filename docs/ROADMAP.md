@@ -825,10 +825,10 @@ _Estimated effort: two sessions_
 
 #### Resilience and polish
 
-- [ ] Replace generic spinners with layout-matched skeletons where useful.
-- [ ] Add designed empty, offline, partial-data, permission-denied, and retry
+- [x] Replace generic spinners with layout-matched skeletons where useful.
+- [x] Add designed empty, offline, partial-data, permission-denied, and retry
       states.
-- [ ] Add route-level error boundaries and safe structured logging.
+- [x] Add route-level error boundaries and safe structured logging.
 - [ ] Define query caching and stale-data indicators; never queue a booking while
       offline.
 - [ ] Tune keyboard avoidance, safe areas, rotation, small phones, and tablets.

@@ -118,7 +118,7 @@ The current milestone has been exercised beyond unit tests:
 - iOS CNG development build: successful, with native Firebase modules linked.
 - Android arm64 debug APK: successful.
 - Static web export: 21 routes generated, including appointment detail.
-- Application tests: 29 suites and 74 tests passing.
+- Application tests: 31 suites and 78 tests passing.
 - Firebase authorization: 14 Emulator Suite rules tests passing.
 - Callable integration: booking, appointment-management, notification-token,
   and scheduled-reminder Auth, Firestore, Pub/Sub, and Functions emulator

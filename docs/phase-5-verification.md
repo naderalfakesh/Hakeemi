@@ -22,12 +22,18 @@
 - Existing skeletons already stop their pulse animation when reduced motion is
   enabled; safe-area and keyboard-avoidance primitives remain in the shared
   route scaffolds.
+- Discovery, appointment management, calendar, notification, and auth flows
+  expose designed empty, offline, permission-denied, retry, and partial-data
+  states. TanStack Query provides bounded caching and mutations refuse to queue
+  booking while offline.
+- Arabic-aware plural rules drive clinician counts, and specialty/clinic labels
+  read the localized catalog fields rather than always selecting English.
 
 ## Quality evidence
 
 | Check              | Result                         |
 | ------------------ | ------------------------------ |
-| Application tests  | 29 suites, 76 tests passed     |
+| Application tests  | 31 suites, 78 tests passed     |
 | App lint/typecheck | Passed                         |
 | Root error path    | Recoverable boundary component |
 

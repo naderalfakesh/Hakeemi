@@ -79,7 +79,7 @@
 - Interactive emulator identity: native journeys use the local
   `hakeemi-portfolio-dev` namespace to match the ignored service files;
   automated rules and contention tests stay isolated on `demo-hakeemi`.
-- Phase 4 management quality: 29 app suites/76 tests, 12 Functions unit tests,
+- Phase 4 management quality: 31 app suites/78 tests, 12 Functions unit tests,
   5 appointment-management, 2 notification-token, and 1 appointment-reminder
   callable integration tests, 14 rules tests, 21 static routes, and Expo Doctor
   20/20 all pass.
@@ -88,7 +88,8 @@
 - Phase 5 foundation: the root route now recovers from render failures with
   privacy-safe development logging, AppText keeps Dynamic Type enabled and
   applies RTL writing direction, and date/time formatters follow the selected
-  English/Arabic locale. Full Arabic copy and assistive-technology evidence
+  English/Arabic locale; clinician counts and catalog labels now use Arabic
+  plural/field data as well. Full Arabic copy and assistive-technology evidence
   remain open.
 - Phase 6 quality gate: GitHub Actions now runs the app, Firebase, Functions,
   rules, booking, management, notification-token, and scheduled-reminder
