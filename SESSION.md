@@ -31,6 +31,9 @@
 - Native verification: cloud discovery/filter/detail, emulator-backed sign-up,
   idempotent profile bootstrap, owner preference writes, dark/Arabic sync, and
   cold-process restoration all pass. Disposable verification data was removed.
-- Next action: rewrite the README as the current portfolio case study, then
-  begin the transaction-backed booking phase.
+- Portfolio documentation: the README now presents the rebuilt product,
+  evidence, architecture decisions, backend safeguards, and reproducible setup
+  without claiming planned features as complete.
+- Next action: begin Phase 3 with the transaction-backed booking domain and
+  authorization contract.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).
