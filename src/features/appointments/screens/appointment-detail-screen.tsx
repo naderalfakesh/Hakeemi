@@ -18,6 +18,7 @@ import type { CareRepository } from '@/features/care/domain/repository';
 import { careRepository } from '@/features/care/data/care-repository';
 import { formatAvailability } from '@/features/care/presentation/formatters';
 import { useProviderDetail } from '@/features/care/hooks/use-provider-detail';
+import { addAppointmentToCalendar } from '@/services/calendar/calendar';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { useCancelAppointment } from '../hooks/use-cancel-appointment';
@@ -90,6 +91,7 @@ function AuthenticatedAppointmentDetail({
   const rescheduleMutation = useRescheduleAppointment({ repository: appointmentRepository });
   const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [showReschedule, setShowReschedule] = useState(false);
+  const [calendarState, setCalendarState] = useState<CalendarState>({ status: 'idle' });
 
   if (detailQuery.isPending) {
     return <DetailLoading />;
@@ -128,6 +130,24 @@ function AuthenticatedAppointmentDetail({
   const canManage =
     appointment.status === 'confirmed' && new Date(appointment.startsAt) > new Date();
   const actionError = cancelMutation.error ?? rescheduleMutation.error;
+
+  async function addToCalendar() {
+    setCalendarState({ status: 'adding' });
+
+    try {
+      const result = await addAppointmentToCalendar({
+        endsAt: appointmentRecord.endsAt,
+        providerName,
+        startsAt: appointmentRecord.startsAt,
+        timezone: appointmentRecord.timezone,
+        visitMode: appointmentRecord.visitMode,
+      });
+
+      setCalendarState(result.status === 'added' ? { status: 'added' } : result);
+    } catch {
+      setCalendarState({ status: 'error' });
+    }
+  }
 
   async function cancel() {
     await cancelMutation.cancel({
@@ -179,6 +199,40 @@ function AuthenticatedAppointmentDetail({
             Reference {appointment.id.slice(-10).toUpperCase()}
           </AppText>
         </Surface>
+
+        {appointment.status === 'confirmed' && (
+          <View style={styles.calendarSection}>
+            <Button
+              accessibilityLabel={
+                calendarState.status === 'added' ? 'Added to calendar' : 'Add to calendar'
+              }
+              busy={calendarState.status === 'adding'}
+              disabled={calendarState.status === 'added'}
+              leading={
+                <DecorativeIcon color={theme.colors.brand} name="calendar-outline" size={18} />
+              }
+              onPress={() => void addToCalendar()}
+              variant="secondary"
+            >
+              {calendarState.status === 'added' ? 'Added to calendar' : 'Add to calendar'}
+            </Button>
+            {calendarState.status === 'denied' && (
+              <AppText tone="secondary" variant="caption">
+                Calendar access was declined. You can still manage this appointment here.
+              </AppText>
+            )}
+            {calendarState.status === 'unavailable' && (
+              <AppText tone="secondary" variant="caption">
+                No writable calendar is available on this device.
+              </AppText>
+            )}
+            {calendarState.status === 'error' && (
+              <AppText tone="danger" variant="caption">
+                The appointment could not be added. Try again or use the device calendar directly.
+              </AppText>
+            )}
+          </View>
+        )}
 
         {appointment.status === 'cancelled' && appointment.cancelledAt && (
           <Surface padding="compact" style={styles.notice} variant="muted">
@@ -411,6 +465,8 @@ function statusLabel(status: Appointment['status']) {
   return status === 'no_show' ? 'NO SHOW' : status.replace('_', ' ').toUpperCase();
 }
 
+type CalendarState = { status: 'idle' | 'adding' | 'added' | 'denied' | 'unavailable' | 'error' };
+
 function statusColor(theme: AppTheme, appointment: Appointment) {
   if (appointment.status === 'confirmed') {
     return theme.colors.success;
@@ -459,6 +515,7 @@ function createStyles(theme: AppTheme) {
       paddingVertical: theme.spacing.xxs,
     },
     summary: { gap: theme.spacing.md },
+    calendarSection: { gap: theme.spacing.xs },
     detailRow: { alignItems: 'center', flexDirection: 'row', gap: theme.spacing.sm },
     notice: { alignItems: 'flex-start', flexDirection: 'row', gap: theme.spacing.sm },
     actions: { gap: theme.spacing.sm },

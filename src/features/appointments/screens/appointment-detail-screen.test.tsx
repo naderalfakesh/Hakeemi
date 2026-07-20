@@ -2,6 +2,7 @@ import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { fixtureCareRepository } from '@/features/care/data/fixture-care-repository';
+import { addAppointmentToCalendar } from '@/services/calendar/calendar';
 import { TestAppProviders } from '@/test/test-app-providers';
 
 import type { AppointmentRepository } from '../domain/repository';
@@ -16,7 +17,12 @@ jest.mock('@/services/connectivity/connectivity', () => ({
   hasInternetConnection: jest.fn().mockResolvedValue(true),
 }));
 
+jest.mock('@/services/calendar/calendar', () => ({
+  addAppointmentToCalendar: jest.fn().mockResolvedValue({ eventId: 'event-1', status: 'added' }),
+}));
+
 const mockedUseAuthSession = jest.mocked(useAuthSession);
+const mockedAddAppointmentToCalendar = jest.mocked(addAppointmentToCalendar);
 
 const appointment: Appointment = {
   cancelledAt: null,
@@ -67,6 +73,8 @@ function repository(overrides: Partial<AppointmentRepository> = {}): Appointment
 
 describe('AppointmentDetailScreen', () => {
   beforeEach(() => {
+    jest.clearAllMocks();
+    mockedAddAppointmentToCalendar.mockResolvedValue({ eventId: 'event-1', status: 'added' });
     mockedUseAuthSession.mockReturnValue({
       profile: null,
       profileError: null,
@@ -82,6 +90,63 @@ describe('AppointmentDetailScreen', () => {
         id: 'patient-1',
       },
     });
+  });
+
+  it('adds a confirmed appointment to the device calendar', async () => {
+    const view = await render(
+      <TestAppProviders>
+        <AppointmentDetailScreen
+          appointmentId={appointment.id}
+          appointmentRepository={repository()}
+          careDataRepository={fixtureCareRepository}
+          onBack={jest.fn()}
+          onFindCare={jest.fn()}
+        />
+      </TestAppProviders>,
+    );
+
+    await waitFor(() =>
+      expect(view.getByRole('button', { name: 'Add to calendar' })).toBeVisible(),
+    );
+    await act(async () => fireEvent.press(view.getByRole('button', { name: 'Add to calendar' })));
+
+    await waitFor(() =>
+      expect(mockedAddAppointmentToCalendar).toHaveBeenCalledWith({
+        endsAt: appointment.endsAt,
+        providerName: 'Dr. Lina Haddad',
+        startsAt: appointment.startsAt,
+        timezone: appointment.timezone,
+        visitMode: appointment.visitMode,
+      }),
+    );
+    await waitFor(() => expect(view.getByText('Added to calendar')).toBeVisible());
+  });
+
+  it('keeps appointment management available when calendar access is denied', async () => {
+    mockedAddAppointmentToCalendar.mockResolvedValue({ status: 'denied' });
+    const view = await render(
+      <TestAppProviders>
+        <AppointmentDetailScreen
+          appointmentId={appointment.id}
+          appointmentRepository={repository()}
+          careDataRepository={fixtureCareRepository}
+          onBack={jest.fn()}
+          onFindCare={jest.fn()}
+        />
+      </TestAppProviders>,
+    );
+
+    await waitFor(() =>
+      expect(view.getByRole('button', { name: 'Add to calendar' })).toBeVisible(),
+    );
+    await act(async () => fireEvent.press(view.getByRole('button', { name: 'Add to calendar' })));
+
+    await waitFor(() =>
+      expect(
+        view.getByText('Calendar access was declined. You can still manage this appointment here.'),
+      ).toBeVisible(),
+    );
+    expect(view.getByRole('button', { name: 'Cancel appointment' })).toBeVisible();
   });
 
   it('shows appointment actions and sends cancellation through the repository', async () => {

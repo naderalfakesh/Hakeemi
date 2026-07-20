@@ -60,6 +60,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         imageWidth: 76,
       },
     ],
+    [
+      'expo-calendar',
+      {
+        calendarPermission: 'Allow Hakeemi to add fictional appointments to your calendar.',
+        writeOnlyCalendarPermission:
+          'Allow Hakeemi to add fictional appointments to your calendar.',
+      },
+    ],
     'expo-font',
   ],
   experiments: {
