@@ -1024,15 +1024,15 @@ _Estimated effort: one session_
 The modernization is complete only when:
 
 - [x] The current Expo SDK and New Architecture run on iOS and Android.
-- [ ] A user can discover, book, view, reschedule, and cancel an appointment.
+- [x] A user can discover, book, view, reschedule, and cancel an appointment.
 - [x] Double-booking and cross-user data access are prevented by tested server
       logic and rules.
 - [ ] English/LTR and Arabic/RTL core journeys pass accessibility review.
-- [ ] Offline, loading, empty, error, permission-denied, and retry states are
+- [x] Offline, loading, empty, error, permission-denied, and retry states are
       designed and tested.
 - [ ] CI, EAS preview builds, observability, App Check, and signing are configured.
 - [ ] Performance budgets have measured results, not aspirational numbers.
-- [ ] The README is a reproducible portfolio case study with current screenshots.
+- [x] The README is a reproducible portfolio case study with current screenshots.
 - [ ] All phases and hashes are recorded here and the working tree is clean.
 
 ## Current position
