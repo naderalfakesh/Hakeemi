@@ -1,7 +1,9 @@
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
+import { getMessaging } from 'firebase-admin/messaging';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { setGlobalOptions } from 'firebase-functions/v2/options';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
 
 import { reconcileUserProfile, type AuthIdentity } from './profile.js';
 import {
@@ -18,6 +20,7 @@ import {
   parseRegisterDeviceTokenRequest,
   registerDeviceToken as registerDeviceTokenTransaction,
 } from './notifications/register-device-token.js';
+import { sendAppointmentReminders as deliverAppointmentReminders } from './notifications/send-appointment-reminders.js';
 
 const FUNCTIONS_REGION = 'me-central1';
 
@@ -124,6 +127,16 @@ export const registerDeviceToken = onCall(async (request) => {
     parseRegisterDeviceTokenRequest(request.data),
   );
 });
+
+export const sendAppointmentReminders = onSchedule(
+  {
+    schedule: 'every 15 minutes',
+    timeZone: 'Etc/UTC',
+  },
+  async () => {
+    await deliverAppointmentReminders(firestore, getMessaging());
+  },
+);
 
 function readTokenText(value: unknown) {
   return typeof value === 'string' && value.trim() ? value.trim() : null;

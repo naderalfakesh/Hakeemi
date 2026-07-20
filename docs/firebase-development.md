@@ -24,7 +24,7 @@ development, preview, and production builds cannot be mixed accidentally.
 
 ## Local backend
 
-Run all emulators with:
+Run all emulators, including Pub/Sub for scheduled reminder functions, with:
 
 ```sh
 npm run firebase:emulators

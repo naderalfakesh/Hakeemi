@@ -309,6 +309,8 @@ describe('Cloud Firestore rules', () => {
 
     await assertFails(alice.doc('admin/private').get());
     await assertFails(alice.doc('admin/private').set({ enabled: true }));
+    await assertFails(alice.doc('appointmentReminders/reminder-1').get());
+    await assertFails(alice.doc('appointmentReminders/reminder-1').set({ status: 'sent' }));
   });
 });
 

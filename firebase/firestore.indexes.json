@@ -62,6 +62,14 @@
         { "fieldPath": "status", "order": "ASCENDING" },
         { "fieldPath": "startsAt", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "appointments",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "startsAt", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
