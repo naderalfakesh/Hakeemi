@@ -95,4 +95,29 @@ describe('FindCareScreen', () => {
     expect(view.getByLabelText('البحث عن الأطباء')).toBeOnTheScreen();
     expect(view.getByRole('button', { name: 'طب القلب' })).toBeVisible();
   });
+
+  it('shows an offline notice above cached results', async () => {
+    const network = jest.requireMock('expo-network') as {
+      useNetworkState: jest.Mock;
+    };
+    network.useNetworkState.mockReturnValue({ isConnected: false, isInternetReachable: false });
+
+    try {
+      const view = await render(
+        <TestAppProviders colorScheme="light">
+          <FindCareScreen onSelectProvider={jest.fn()} repository={fixtureCareRepository} />
+        </TestAppProviders>,
+      );
+
+      await waitFor(() =>
+        expect(
+          view.getByRole('button', { name: 'View profile for Dr. Lina Haddad' }),
+        ).toBeVisible(),
+      );
+
+      expect(view.getByText(/Offline — showing saved results\./)).toBeOnTheScreen();
+    } finally {
+      network.useNetworkState.mockReturnValue({ isConnected: true, isInternetReachable: true });
+    }
+  });
 });

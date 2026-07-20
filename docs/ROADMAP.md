@@ -829,7 +829,7 @@ _Estimated effort: two sessions_
 - [x] Add designed empty, offline, partial-data, permission-denied, and retry
       states.
 - [x] Add route-level error boundaries and safe structured logging.
-- [ ] Define query caching and stale-data indicators; never queue a booking while
+- [x] Define query caching and stale-data indicators; never queue a booking while
       offline.
 - [ ] Tune keyboard avoidance, safe areas, rotation, small phones, and tablets.
 - [ ] Apply purposeful transitions and shared motion tokens with reduced-motion

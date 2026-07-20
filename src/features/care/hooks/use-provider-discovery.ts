@@ -69,9 +69,15 @@ export function useProviderDiscovery({
   });
   const hasSlotError = slotQueries.some((slotQuery) => slotQuery.isError);
   const hasPendingSlot = slotQueries.some((slotQuery) => slotQuery.isPending);
+  const isMissingData =
+    (providersQuery.isError && providersQuery.data === undefined) ||
+    (specialtiesQuery.isError && specialtiesQuery.data === undefined) ||
+    slotQueries.some((slotQuery) => slotQuery.isError && slotQuery.data === undefined);
+  const isRefreshFailed =
+    !isMissingData && (providersQuery.isError || specialtiesQuery.isError || hasSlotError);
   let state: ProviderDiscoveryState;
 
-  if (providersQuery.isError || specialtiesQuery.isError || hasSlotError) {
+  if (isMissingData) {
     state = { status: 'error' };
   } else if (providersQuery.isPending || specialtiesQuery.isPending || hasPendingSlot) {
     state = { status: 'loading' };
@@ -92,7 +98,7 @@ export function useProviderDiscovery({
       data: {
         nextSlots,
         providers,
-        specialties: specialtiesQuery.data,
+        specialties: specialtiesQuery.data ?? [],
       },
     };
   }
@@ -116,6 +122,8 @@ export function useProviderDiscovery({
   return {
     hasMore: providersQuery.hasNextPage,
     isLoadingMore: providersQuery.isFetchingNextPage,
+    isRefreshFailed,
+    lastUpdatedAt: providersQuery.dataUpdatedAt || null,
     loadMore,
     retry,
     state,

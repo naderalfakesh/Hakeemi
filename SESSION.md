@@ -101,10 +101,13 @@
   restart) and shows a restart hint under the language preference; directional
   arrows/chevrons mirror inside `DecorativeIcon`; onboarding decor uses logical
   `start`/`end` offsets. Web keeps LTR layout with RTL text direction.
+- Offline-aware caching: discovery and the appointment list keep cached
+  results when a refresh fails and surface a localized `StaleDataNotice`
+  (offline or refresh-failed, with last update time) through a polite live
+  region; error states remain for loads with no cached data. Recorded in ADR 0004. Bookings are still never queued offline.
 - Phase 5 open items: assistive-technology journeys, native-speaker Arabic copy
-  review, provider-data localization (bios/credentials/languages), stale-data
-  indicators, motion tokens with reduced-motion fallbacks, and device-size
-  evidence.
+  review, provider-data localization (bios/credentials/languages), motion
+  tokens with reduced-motion fallbacks, and device-size evidence.
 - Phase 6 quality gate: GitHub Actions now runs the app, Firebase, Functions,
   rules, booking, management, notification-token, and scheduled-reminder
   contracts; EAS profiles remain explicit but signing/preview artifacts require

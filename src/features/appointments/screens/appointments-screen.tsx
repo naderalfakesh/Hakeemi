@@ -9,12 +9,14 @@ import {
   DecorativeIcon,
   EmptyState,
   Skeleton,
+  StaleDataNotice,
   Surface,
 } from '@/components/ui';
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import type { CareRepository } from '@/features/care/domain/repository';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
+import { useIsOffline } from '@/services/connectivity/use-is-offline';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import type { AppointmentRepository } from '../domain/repository';
@@ -80,6 +82,7 @@ function AuthenticatedAppointments({
   const strings = useStrings(appointmentsStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
   const appointmentsQuery = useAppointments(appointmentRepository, careDataRepository);
+  const isOffline = useIsOffline();
   const [filter, setFilter] = useState<AppointmentFilter>('upcoming');
 
   if (appointmentsQuery.isPending) {
@@ -101,7 +104,7 @@ function AuthenticatedAppointments({
     );
   }
 
-  if (appointmentsQuery.isError) {
+  if (appointmentsQuery.isError && appointmentsQuery.data === undefined) {
     return (
       <AppointmentState
         action={
@@ -113,6 +116,7 @@ function AuthenticatedAppointments({
     );
   }
 
+  const staleReason = isOffline ? 'offline' : appointmentsQuery.isError ? 'refresh-failed' : null;
   const visibleAppointments = selectAppointments(appointmentsQuery.data ?? [], filter);
 
   return (
@@ -126,6 +130,10 @@ function AuthenticatedAppointments({
             {strings.subtitle}
           </AppText>
         </View>
+
+        {staleReason && (
+          <StaleDataNotice reason={staleReason} updatedAt={appointmentsQuery.dataUpdatedAt} />
+        )}
 
         <ScrollView
           contentContainerStyle={styles.filterRow}

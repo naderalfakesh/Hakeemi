@@ -6,5 +6,6 @@ export { EmptyState } from './empty-state';
 export { IconButton } from './icon-button';
 export { InlineError } from './inline-error';
 export { Skeleton } from './skeleton';
+export { StaleDataNotice, type StaleDataReason } from './stale-data-notice';
 export { Surface } from './surface';
 export { TextField } from './text-field';

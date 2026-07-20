@@ -48,4 +48,41 @@ describe('useProviderDiscovery', () => {
       }),
     );
   });
+
+  it('keeps cached results and flags the failed refresh instead of erroring', async () => {
+    const listProviderPage = jest
+      .fn()
+      .mockResolvedValueOnce({ items: [providerFixtures[0]], nextCursor: null })
+      .mockRejectedValue(new Error('offline'));
+    const listSpecialties = jest
+      .fn()
+      .mockResolvedValueOnce(specialtyFixtures)
+      .mockRejectedValue(new Error('offline'));
+    const repository: CareRepository = {
+      getClinic: jest.fn().mockResolvedValue(null),
+      getProvider: jest.fn().mockResolvedValue(null),
+      listAvailableSlots: jest.fn().mockResolvedValue([]),
+      listClinics: jest.fn().mockResolvedValue([]),
+      listProviderPage,
+      listSpecialties,
+    };
+    const { result } = await renderHook(
+      () => useProviderDiscovery({ query: '', repository, specialtyId: null }),
+      { wrapper: TestAppProviders },
+    );
+
+    await waitFor(() => expect(result.current.state.status).toBe('success'));
+    expect(result.current.isRefreshFailed).toBe(false);
+
+    await act(async () => result.current.retry());
+
+    await waitFor(() => expect(result.current.isRefreshFailed).toBe(true));
+    expect(result.current.state.status).toBe('success');
+    expect(
+      result.current.state.status === 'success'
+        ? result.current.state.data.providers.map(({ id }) => id)
+        : [],
+    ).toEqual([providerFixtures[0].id]);
+    expect(result.current.lastUpdatedAt).toEqual(expect.any(Number));
+  });
 });

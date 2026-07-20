@@ -2,10 +2,19 @@ import { useCallback, useMemo, useState } from 'react';
 import { FlatList, StyleSheet, View, type ListRenderItem } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppText, Button, DecorativeIcon, EmptyState, Skeleton, TextField } from '@/components/ui';
+import {
+  AppText,
+  Button,
+  DecorativeIcon,
+  EmptyState,
+  Skeleton,
+  StaleDataNotice,
+  TextField,
+} from '@/components/ui';
 import { formatLocalizedCount } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
+import { useIsOffline } from '@/services/connectivity/use-is-offline';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { ProviderCard } from '../components/provider-card';
@@ -28,12 +37,15 @@ export function FindCareScreen({ onSelectProvider, repository }: FindCareScreenP
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [query, setQuery] = useState('');
   const [specialtyId, setSpecialtyId] = useState<string | null>(null);
-  const { hasMore, isLoadingMore, loadMore, retry, state } = useProviderDiscovery({
-    query,
-    specialtyId,
-    ...(repository ? { repository } : {}),
-  });
+  const { hasMore, isLoadingMore, isRefreshFailed, lastUpdatedAt, loadMore, retry, state } =
+    useProviderDiscovery({
+      query,
+      specialtyId,
+      ...(repository ? { repository } : {}),
+    });
+  const isOffline = useIsOffline();
   const data = state.status === 'success' ? state.data : null;
+  const staleReason = isOffline ? 'offline' : isRefreshFailed ? 'refresh-failed' : null;
   const specialtyNames = useMemo(
     () =>
       new Map(
@@ -99,6 +111,9 @@ export function FindCareScreen({ onSelectProvider, repository }: FindCareScreenP
                 <Skeleton height={44} width={132} />
                 <Skeleton height={44} width={104} />
               </View>
+            )}
+            {data && staleReason && (
+              <StaleDataNotice reason={staleReason} updatedAt={lastUpdatedAt} />
             )}
             {data && data.providers.length > 0 && (
               <AppText tone="secondary" variant="caption">
