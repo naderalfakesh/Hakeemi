@@ -23,7 +23,7 @@ const en: AppointmentStatusStrings = {
 export const appointmentStatusStrings: LocalizedStrings<AppointmentStatusStrings> = {
   ar: {
     statusLabels: {
-      cancelled: 'ملغي',
+      cancelled: 'ملغى',
       completed: 'مكتمل',
       confirmed: 'مؤكد',
       no_show: 'لم يحضر',

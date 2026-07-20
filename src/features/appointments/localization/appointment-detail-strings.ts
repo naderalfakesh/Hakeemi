@@ -64,7 +64,7 @@ export const appointmentDetailStrings: LocalizedStrings<typeof en> = {
     keepAppointment: 'الاحتفاظ بالموعد',
     keepCurrentTime: 'الاحتفاظ بالوقت الحالي',
     loadingAppointment: 'جارٍ تحميل الموعد',
-    moveHere: 'الانتقال إلى هنا',
+    moveHere: 'النقل إلى هنا',
     moveHereHint: 'ينقل هذا الموعد إلى الوقت المحدد.',
     noOtherTimes: 'لا تتوفر أوقات أخرى خلال الأيام الأربعة عشر القادمة.',
     notFoundDescription: 'ربما أُزيل هذا الموعد أو أنه لا يخص هذا الحساب.',

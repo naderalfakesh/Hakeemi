@@ -31,7 +31,7 @@ export const findCareStrings: LocalizedStrings<typeof findCareEn> = {
     loadingMoreClinicians: 'جارٍ تحميل المزيد من الأطباء',
     searchAccessibilityLabel: 'البحث عن الأطباء',
     searchLabel: 'بحث',
-    searchPlaceholder: 'جرّب أمراض القلب أو اللغة العربية',
+    searchPlaceholder: 'جرّب طب القلب أو اللغة العربية',
     subtitle: 'ابحث حسب الطبيب أو التخصص أو اللغة.',
     title: 'ابحث عن رعاية',
     tryAgain: 'حاول مرة أخرى',
@@ -69,8 +69,8 @@ export const providerCardStrings: LocalizedStrings<typeof providerCardEn> = {
 export const reviewCountLabels = {
   ar: {
     few: 'مراجعات',
-    many: 'مراجعة',
-    one: 'مراجعة',
+    many: 'مراجعةً',
+    one: 'مراجعة واحدة',
     other: 'مراجعة',
     two: 'مراجعتان',
     zero: 'مراجعات',
@@ -111,7 +111,7 @@ export const providerDetailStrings: LocalizedStrings<typeof providerDetailEn> = 
     availableAppointments: 'المواعيد المتاحة',
     backToClinicians: 'العودة إلى الأطباء',
     browseClinicians: 'تصفح الأطباء',
-    choose: 'اختيار',
+    choose: 'اختر',
     chooseSlot: (time) => `اختر ${time}`,
     clinics: 'العيادات',
     consultation: 'الاستشارة',

@@ -35,7 +35,7 @@ export const homeStrings: LocalizedStrings<typeof homeEn> = {
     fictionalDataNote:
       'جميع الأطباء والمواعيد بيانات خيالية لأغراض العرض، مقدَّمة من بنية Firebase المعاد بناؤها في إصدارات التطبيق الأصلية.',
     findCare: 'ابحث عن رعاية',
-    greeting: 'ما الذي يساعدك اليوم؟',
+    greeting: 'كيف يمكننا مساعدتك اليوم؟',
     loadingFeatured: 'جارٍ تحميل الأطباء المميزين',
     openCatalogue: 'فتح كتالوج المكونات',
     portfolioDemo: 'عرض تجريبي',

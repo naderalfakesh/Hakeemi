@@ -47,7 +47,7 @@ describe('HomeScreen', () => {
       ).toBeVisible(),
     );
 
-    expect(view.getByRole('header', { name: 'ما الذي يساعدك اليوم؟' })).toBeVisible();
+    expect(view.getByRole('header', { name: 'كيف يمكننا مساعدتك اليوم؟' })).toBeVisible();
     expect(view.getAllByText('طب الأسرة').length).toBeGreaterThan(0);
   });
 });

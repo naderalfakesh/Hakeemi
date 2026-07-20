@@ -36,7 +36,7 @@ export const signInStrings: LocalizedStrings<typeof signInEn> = {
     forgotPassword: 'هل نسيت كلمة المرور؟',
     passwordLabel: 'كلمة المرور',
     signIn: 'تسجيل الدخول',
-    subtitle: 'استعد مواعيدك وتفضيلاتك عبر جميع أجهزتك.',
+    subtitle: 'استرجع مواعيدك وتفضيلاتك على جميع أجهزتك.',
     title: 'مرحبًا بعودتك',
   },
   en: signInEn,

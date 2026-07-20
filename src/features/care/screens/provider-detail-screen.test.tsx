@@ -131,7 +131,7 @@ describe('ProviderDetailScreen', () => {
     expect(view.getByText('طب الأسرة')).toBeOnTheScreen();
     expect(view.getByText('المواعيد المتاحة')).toBeOnTheScreen();
     expect(view.getByText('الاستشارة')).toBeOnTheScreen();
-    expect(view.getByLabelText('2 موعدان متاحان')).toBeOnTheScreen();
+    expect(view.getByLabelText('موعدان متاحان')).toBeOnTheScreen();
     expect(view.getByLabelText('حفظ Dr. Lina Haddad')).toBeOnTheScreen();
   });
 });

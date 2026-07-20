@@ -10,6 +10,14 @@ export function formatLocalizedCount(
   labels: { ar: PluralLabels; en: PluralLabels },
 ) {
   const category = new Intl.PluralRules(locale === 'ar' ? 'ar-AE' : 'en-AE').select(count);
-  const label = labels[locale][category] ?? labels[locale].other;
+  const categoryLabel = labels[locale][category];
+  const label = categoryLabel ?? labels[locale].other;
+
+  // Arabic singular and dual forms already encode the quantity, so a numeral
+  // in front of them reads as redundant ("2 طبيبان").
+  if (locale === 'ar' && categoryLabel && (category === 'one' || category === 'two')) {
+    return label;
+  }
+
   return `${count} ${label}`;
 }
