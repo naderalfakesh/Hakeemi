@@ -1,5 +1,6 @@
 import { FixtureCareRepository } from './fixture-care-repository';
 import { clinicFixtures, providerFixtures, specialtyFixtures } from './fixtures';
+import { createAvailabilityWindow } from '../domain/availability';
 
 describe('fictional care fixtures', () => {
   it('uses unique identifiers and valid relationships', () => {
@@ -24,7 +25,7 @@ describe('fictional care fixtures', () => {
   it('builds future availability relative to the repository clock', async () => {
     const now = new Date('2026-07-19T08:00:00.000Z');
     const repository = new FixtureCareRepository(() => now);
-    const slots = await repository.listAvailableSlots('lina-haddad');
+    const slots = await repository.listAvailableSlots('lina-haddad', createAvailabilityWindow(now));
 
     expect(slots).toHaveLength(2);
     expect(slots.every((slot) => new Date(slot.startsAt) > now)).toBe(true);

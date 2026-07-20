@@ -44,5 +44,9 @@
   success, safe replay, request-key conflicts, simultaneous contention, time
   bounds, provider ownership, missing slots, forged identity, and anonymous
   access.
-- Next action: connect bounded provider availability reads to the mobile domain.
+- Mobile availability: discovery and provider details now share cached,
+  Zod-validated availability queries bounded to a stable 14-day window; the
+  provider screen presents all returned times with visit mode and timezone.
+- Next action: build the authenticated date/time, visit detail, review, and
+  confirmation journey on top of the proven booking callable.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).

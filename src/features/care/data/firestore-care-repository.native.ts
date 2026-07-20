@@ -15,7 +15,8 @@ import {
 } from '@react-native-firebase/firestore';
 
 import type { CareRepository, ProviderPageCursor } from '../domain/repository';
-import type { ProviderSearch, Specialty } from '../domain/types';
+import { parseAvailabilityWindow } from '../domain/availability';
+import type { AvailabilityWindow, ProviderSearch, Specialty } from '../domain/types';
 import {
   mapAvailabilitySlotDocument,
   mapClinicDocument,
@@ -27,7 +28,7 @@ import { createProviderCursor, parseProviderCursor } from './provider-cursor';
 
 const DEFAULT_PROVIDER_PAGE_SIZE = 12;
 const MAX_PROVIDER_PAGE_SIZE = 20;
-const SLOT_RESULT_LIMIT = 12;
+const SLOT_RESULT_LIMIT = 31;
 
 export class FirestoreCareRepository implements CareRepository {
   private specialtiesRequest: Promise<readonly Specialty[]> | null = null;
@@ -44,12 +45,15 @@ export class FirestoreCareRepository implements CareRepository {
     return snapshot.exists() ? mapProviderDocument(snapshot.id, snapshot.data()) : null;
   }
 
-  public async listAvailableSlots(providerId: string) {
+  public async listAvailableSlots(providerId: string, window: AvailabilityWindow) {
+    const { endsBefore, startsAtOrAfter } = parseAvailabilityWindow(window);
     const snapshot = await getDocs(
       query(
         collection(this.firestore, 'availabilitySlots'),
         where('providerId', '==', providerId),
         where('status', '==', 'available'),
+        where('startsAt', '>=', startsAtOrAfter),
+        where('startsAt', '<', endsBefore),
         orderBy('startsAt', 'asc'),
         limit(SLOT_RESULT_LIMIT),
       ),

@@ -1,5 +1,6 @@
 import type { CareRepository } from '../domain/repository';
-import type { Provider, ProviderSearch } from '../domain/types';
+import { parseAvailabilityWindow } from '../domain/availability';
+import type { AvailabilityWindow, Provider, ProviderSearch } from '../domain/types';
 import {
   buildAvailabilityFixtures,
   clinicFixtures,
@@ -22,10 +23,18 @@ export class FixtureCareRepository implements CareRepository {
     return providerFixtures.find((provider) => provider.id === id && provider.isActive) ?? null;
   }
 
-  public async listAvailableSlots(providerId: string) {
+  public async listAvailableSlots(providerId: string, window: AvailabilityWindow) {
+    const { endsBefore, startsAtOrAfter } = parseAvailabilityWindow(window);
+
     return buildAvailabilityFixtures(this.now())
-      .filter((slot) => slot.providerId === providerId)
-      .sort((left, right) => left.startsAt.localeCompare(right.startsAt));
+      .filter(
+        (slot) =>
+          slot.providerId === providerId &&
+          new Date(slot.startsAt) >= startsAtOrAfter &&
+          new Date(slot.startsAt) < endsBefore,
+      )
+      .sort((left, right) => left.startsAt.localeCompare(right.startsAt))
+      .slice(0, 31);
   }
 
   public async listClinics() {

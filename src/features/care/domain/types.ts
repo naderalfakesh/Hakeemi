@@ -67,6 +67,11 @@ export type AvailabilitySlot = {
   visitMode: VisitMode;
 };
 
+export type AvailabilityWindow = {
+  endsBefore: string;
+  startsAtOrAfter: string;
+};
+
 export type ProviderSearch = {
   query?: string;
   specialtyId?: string;

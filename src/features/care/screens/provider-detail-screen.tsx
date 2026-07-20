@@ -121,7 +121,7 @@ export function ProviderDetailScreen({
           <DecorativeIcon color={theme.colors.textSecondary} name="information-circle" size={20} />
           <AppText tone="secondary" variant="caption">
             This fictional profile demonstrates discovery UX with Firebase-backed availability.
-            Booking will be added through a server-controlled workflow.
+            Confirmed bookings are protected by a server-controlled transaction.
           </AppText>
         </Surface>
       </ScrollView>
@@ -201,22 +201,28 @@ function AvailabilitySection({ slots }: { slots: readonly AvailabilitySlot[] }) 
   return (
     <Surface padding="spacious" variant="brand">
       <AppText tone="brand" variant="caption">
-        Demo availability
+        Next 14 days
       </AppText>
       <AppText style={styles.availabilityTitle} variant="titleMedium">
-        {slots[0] ? formatAvailability(slots[0]) : 'Contact the clinic'}
+        Available appointments
       </AppText>
       <AppText tone="secondary" variant="bodyMedium">
-        {slots[0]
-          ? `${formatVisitMode(slots[0].visitMode)} · Times shown in Gulf Standard Time`
-          : 'No fixture slots are currently available.'}
+        {slots.length > 0
+          ? 'Times are shown in Gulf Standard Time. Choose a time in the next step.'
+          : 'No appointments are available in this window. Check again soon.'}
       </AppText>
-      {slots.length > 1 && (
-        <View style={styles.moreSlots}>
-          {slots.slice(1, 3).map((slot) => (
-            <AppText key={slot.id} tone="secondary" variant="caption">
-              Also available {formatAvailability(slot)}
-            </AppText>
+      {slots.length > 0 && (
+        <View accessibilityLabel={`${slots.length} available appointments`} style={styles.slotList}>
+          {slots.slice(0, 6).map((slot) => (
+            <View key={slot.id} style={styles.slotRow}>
+              <View style={styles.slotTime}>
+                <AppText variant="bodyStrong">{formatAvailability(slot)}</AppText>
+                <AppText tone="secondary" variant="caption">
+                  {formatVisitMode(slot.visitMode)}
+                </AppText>
+              </View>
+              <DecorativeIcon color={theme.colors.brand} name="time-outline" size={20} />
+            </View>
           ))}
         </View>
       )}
@@ -307,9 +313,25 @@ function createStyles(theme: AppTheme) {
       marginBottom: theme.spacing.xxs,
       marginTop: theme.spacing.sm,
     },
-    moreSlots: {
-      gap: theme.spacing.xxs,
+    slotList: {
+      gap: theme.spacing.sm,
       marginTop: theme.spacing.md,
+    },
+    slotRow: {
+      alignItems: 'center',
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.borderSubtle,
+      borderRadius: theme.radii.md,
+      borderWidth: 1,
+      flexDirection: 'row',
+      gap: theme.spacing.sm,
+      justifyContent: 'space-between',
+      minHeight: theme.sizes.controlHeight,
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+    },
+    slotTime: {
+      flex: 1,
     },
     section: {
       gap: theme.spacing.sm,

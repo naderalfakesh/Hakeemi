@@ -1,4 +1,4 @@
-import type { ProviderSearch } from '../domain/types';
+import type { AvailabilityWindow, ProviderSearch } from '../domain/types';
 
 function normalizedSearch(search: ProviderSearch) {
   return {
@@ -9,7 +9,8 @@ function normalizedSearch(search: ProviderSearch) {
 
 export const careQueryKeys = {
   all: ['care'] as const,
-  availability: (providerId: string) => ['care', 'availability', providerId] as const,
+  availability: (providerId: string, window: AvailabilityWindow) =>
+    ['care', 'availability', providerId, window] as const,
   detail: (providerId: string) => ['care', 'provider', providerId] as const,
   discovery: (search: ProviderSearch) =>
     ['care', 'provider-discovery', normalizedSearch(search)] as const,

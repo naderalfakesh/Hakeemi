@@ -726,7 +726,7 @@ _Estimated effort: two to three sessions_
 
 #### Mobile
 
-- [ ] Query availability by provider and bounded date window.
+- [x] Query availability by provider and bounded date window.
 - [ ] Build the date/time, visit detail, review, and confirmation screens.
 - [ ] Show timezone and visit mode at each decision point.
 - [ ] Prevent submission when offline; preserve safe draft choices locally.

@@ -1,9 +1,10 @@
 import { useInfiniteQuery, useQueries, useQuery } from '@tanstack/react-query';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { careRepository } from '@/features/care/data/care-repository';
 
 import { careQueryKeys } from '../data/query-keys';
+import { createAvailabilityWindow } from '../domain/availability';
 import type { CareRepository, ProviderPageCursor } from '../domain/repository';
 import type { AvailabilitySlot, Provider, Specialty } from '../domain/types';
 
@@ -29,6 +30,7 @@ export function useProviderDiscovery({
   repository = careRepository,
   specialtyId,
 }: ProviderDiscoveryOptions) {
+  const [availabilityWindow] = useState(createAvailabilityWindow);
   const search = useMemo(
     () => ({ query, ...(specialtyId ? { specialtyId } : {}) }),
     [query, specialtyId],
@@ -61,8 +63,8 @@ export function useProviderDiscovery({
   }, [providersQuery.data?.pages]);
   const slotQueries = useQueries({
     queries: providers.map((provider) => ({
-      queryKey: careQueryKeys.availability(provider.id),
-      queryFn: () => repository.listAvailableSlots(provider.id),
+      queryKey: careQueryKeys.availability(provider.id, availabilityWindow),
+      queryFn: () => repository.listAvailableSlots(provider.id, availabilityWindow),
     })),
   });
   const hasSlotError = slotQueries.some((slotQuery) => slotQuery.isError);

@@ -12,10 +12,11 @@ describe('useProviderDiscovery', () => {
       .fn()
       .mockResolvedValueOnce({ items: [providerFixtures[0]], nextCursor: 'next-page' })
       .mockResolvedValueOnce({ items: [providerFixtures[1]], nextCursor: null });
+    const listAvailableSlots = jest.fn().mockResolvedValue([]);
     const repository: CareRepository = {
       getClinic: jest.fn().mockResolvedValue(null),
       getProvider: jest.fn().mockResolvedValue(null),
-      listAvailableSlots: jest.fn().mockResolvedValue([]),
+      listAvailableSlots,
       listClinics: jest.fn().mockResolvedValue([]),
       listProviderPage,
       listSpecialties: jest.fn().mockResolvedValue(specialtyFixtures),
@@ -39,5 +40,12 @@ describe('useProviderDiscovery', () => {
     );
     expect(result.current.hasMore).toBe(false);
     expect(listProviderPage).toHaveBeenNthCalledWith(2, { query: '' }, 'next-page', 12);
+    expect(listAvailableSlots).toHaveBeenCalledWith(
+      providerFixtures[0].id,
+      expect.objectContaining({
+        endsBefore: expect.any(String),
+        startsAtOrAfter: expect.any(String),
+      }),
+    );
   });
 });

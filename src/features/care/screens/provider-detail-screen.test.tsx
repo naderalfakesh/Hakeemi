@@ -24,7 +24,8 @@ describe('ProviderDetailScreen', () => {
 
     expect(view.getByText('Marsa Family Clinic')).toBeOnTheScreen();
     expect(view.getByText(/AED\s*340/iu)).toBeOnTheScreen();
-    expect(view.getByText(/Times shown in Gulf Standard Time/iu)).toBeOnTheScreen();
+    expect(view.getByText(/Times are shown in Gulf Standard Time/iu)).toBeOnTheScreen();
+    expect(view.getByLabelText('2 available appointments')).toBeOnTheScreen();
   });
 
   it('provides a safe way back when a provider is missing', async () => {
