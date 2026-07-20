@@ -169,9 +169,11 @@ Seed fictional provider data from another terminal:
 npm run firebase:seed:emulator
 ```
 
-Use the reserved `demo-hakeemi` emulator project for automated tests. Cloud
-commands must always name `hakeemi-portfolio-dev` explicitly; the repository
-does not contain a `.firebaserc`. The
+Interactive emulators use `hakeemi-portfolio-dev` so their namespace matches the
+ignored native Firebase configuration. Automated authorization and contention
+tests still use the reserved `demo-hakeemi` project. Cloud commands must always
+name `hakeemi-portfolio-dev` explicitly; the repository does not contain a
+`.firebaserc`. The
 [Firebase development guide](docs/firebase-development.md) documents service
 ports, deployment safeguards, native configuration, and the billing boundary.
 

@@ -30,11 +30,17 @@ Run all emulators with:
 npm run firebase:emulators
 ```
 
+The interactive suite deliberately uses the `hakeemi-portfolio-dev` namespace
+because the ignored iOS and Android service files identify that project. All
+services used by the app are connected to localhost before any reads or writes;
+keep the full suite running while using this command.
+
 The services bind to all local interfaces so iOS Simulator and Android Emulator
 can connect. The Emulator UI and hub remain bound to `127.0.0.1`. Do not expose
 these ports on an untrusted network.
 
-Authorization tests use the reserved synthetic project ID `demo-hakeemi`:
+Automated authorization, profile, and booking tests use the reserved synthetic
+project ID `demo-hakeemi`:
 
 ```sh
 npm run firebase:rules:test

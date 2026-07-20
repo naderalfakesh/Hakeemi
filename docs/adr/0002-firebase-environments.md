@@ -19,9 +19,13 @@ network access, populated only with fictional data, and promoted deliberately.
 - Use `hakeemi-portfolio-dev` as the owned development project.
 - Place the development Firestore database and 2nd-generation Functions in
   `me-central1` (Doha), close to the portfolio app's UAE audience.
-- Use the synthetic project ID `demo-hakeemi` for all Emulator Suite commands.
-  Firebase reserves the `demo-` prefix for projects that cannot accidentally
-  address live resources.
+- Use `hakeemi-portfolio-dev` for the interactive Emulator Suite so native SDK
+  requests, callable routes, and seeded data share the project ID embedded in
+  the ignored Firebase service files. The app connects every used service to
+  localhost before issuing requests.
+- Use the synthetic project ID `demo-hakeemi` for automated authorization,
+  profile, and booking tests. Firebase reserves the `demo-` prefix for projects
+  that cannot accidentally address live resources.
 - Do not commit `.firebaserc`. Cloud commands must name their target explicitly
   with `--project hakeemi-portfolio-dev`.
 - Do not commit native Firebase service configuration files. Local development
@@ -36,7 +40,8 @@ network access, populated only with fictional data, and promoted deliberately.
 
 ## Consequences
 
-- Local development and authorization tests do not require cloud credentials.
+- Local development and automated authorization tests do not require cloud
+  credentials.
 - A developer must explicitly choose a real project for any deployment.
 - Expo development builds are required once React Native Firebase is linked;
   Expo Go is not a supported runtime for the native SDK.

@@ -35,10 +35,6 @@ function parseOptions(argumentsList: readonly string[]): SeedOptions {
     throw new Error(`Seed target must be one of: ${[...ALLOWED_PROJECT_IDS].sort().join(', ')}`);
   }
 
-  if (emulator && !projectId.startsWith('demo-')) {
-    throw new Error('The --emulator flag requires a demo-* project ID');
-  }
-
   if (!emulator && projectId.startsWith('demo-')) {
     throw new Error('A demo-* project ID requires the --emulator flag');
   }
