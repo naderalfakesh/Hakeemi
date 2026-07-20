@@ -7,6 +7,7 @@ import '@/config/env';
 import { AppText } from '@/components/ui';
 import { AuthSessionProvider, useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { BookingDraftProvider } from '@/features/booking/context/booking-draft-provider';
+import { NotificationRegistrationProvider } from '@/features/notifications/context/notification-registration-provider';
 import {
   AppPreferencesProvider,
   useAppPreferences,
@@ -61,7 +62,9 @@ export default function RootLayout() {
         <AuthSessionProvider>
           <BookingDraftProvider>
             <AppPreferencesProvider>
-              <AppShell />
+              <NotificationRegistrationProvider>
+                <AppShell />
+              </NotificationRegistrationProvider>
             </AppPreferencesProvider>
           </BookingDraftProvider>
         </AuthSessionProvider>

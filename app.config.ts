@@ -68,6 +68,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           'Allow Hakeemi to add fictional appointments to your calendar.',
       },
     ],
+    'expo-notifications',
+    '@react-native-firebase/messaging',
     'expo-font',
   ],
   experiments: {

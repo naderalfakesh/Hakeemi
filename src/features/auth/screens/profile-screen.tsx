@@ -6,6 +6,7 @@ import { AppText, Button, Chip, DecorativeIcon, InlineError, Surface } from '@/c
 import type { ProfileStatus } from '@/features/auth/context/auth-session-provider';
 import type { UserProfile } from '@/features/auth/domain/profile';
 import type { AuthUser } from '@/features/auth/domain/types';
+import type { NotificationRegistrationStatus } from '@/features/notifications/context/notification-registration-provider';
 import type { PreferencesStatus } from '@/features/preferences/context/app-preferences-provider';
 import type { AppPreferences } from '@/features/preferences/domain/preferences';
 import { useAppTheme, type AppTheme } from '@/theme';
@@ -14,6 +15,7 @@ import { toAuthActionError } from '../domain/errors';
 
 type ProfileScreenProps = {
   onCreateAccount: () => void;
+  onEnableNotifications: () => Promise<void>;
   onRetryPreferences: () => void;
   onRetryProfile: () => Promise<void>;
   onSignIn: () => void;
@@ -22,6 +24,8 @@ type ProfileScreenProps = {
   preferences: AppPreferences;
   preferencesError: string | null;
   preferencesStatus: PreferencesStatus;
+  notificationError: string | null;
+  notificationStatus: NotificationRegistrationStatus;
   profile: UserProfile | null;
   profileError: string | null;
   profileStatus: ProfileStatus;
@@ -30,6 +34,7 @@ type ProfileScreenProps = {
 
 export function ProfileScreen({
   onCreateAccount,
+  onEnableNotifications,
   onRetryPreferences,
   onRetryProfile,
   onSignIn,
@@ -38,6 +43,8 @@ export function ProfileScreen({
   preferences,
   preferencesError,
   preferencesStatus,
+  notificationError,
+  notificationStatus,
   profile,
   profileError,
   profileStatus,
@@ -184,6 +191,44 @@ export function ProfileScreen({
               )}
             </Surface>
 
+            <Surface padding="spacious" style={styles.notificationCard} variant="brand">
+              <View style={styles.notificationHeading}>
+                <DecorativeIcon color={theme.colors.brand} name="notifications-outline" size={24} />
+                <AppText variant="titleSmall">Appointment reminders</AppText>
+              </View>
+              {notificationStatus === 'registered' && (
+                <AppText tone="secondary" variant="bodyMedium">
+                  Reminders are enabled on this device. You can change permission in system
+                  settings.
+                </AppText>
+              )}
+              {notificationStatus === 'denied' && (
+                <AppText tone="secondary" variant="bodyMedium">
+                  Notifications are off. You can enable them later from system settings.
+                </AppText>
+              )}
+              {notificationStatus === 'unavailable' && (
+                <AppText tone="secondary" variant="bodyMedium">
+                  Reminders are available in the iOS and Android development builds.
+                </AppText>
+              )}
+              {notificationStatus === 'error' && (
+                <InlineError message={notificationError ?? 'Notifications could not be enabled.'} />
+              )}
+              {(notificationStatus === 'idle' ||
+                notificationStatus === 'denied' ||
+                notificationStatus === 'error') && (
+                <Button onPress={() => void onEnableNotifications()} variant="secondary">
+                  {notificationStatus === 'idle' ? 'Enable reminders' : 'Try again'}
+                </Button>
+              )}
+              {notificationStatus === 'requesting' && (
+                <Button busy onPress={() => undefined} variant="secondary">
+                  Enabling reminders…
+                </Button>
+              )}
+            </Surface>
+
             {signOutError && <InlineError message={signOutError} />}
             <Button busy={isSigningOut} onPress={() => void handleSignOut()} variant="secondary">
               Sign out
@@ -301,6 +346,14 @@ function createStyles(theme: AppTheme) {
     },
     preferenceCard: {
       gap: theme.spacing.lg,
+    },
+    notificationCard: {
+      gap: theme.spacing.md,
+    },
+    notificationHeading: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      gap: theme.spacing.sm,
     },
     preferenceHeading: {
       gap: theme.spacing.xxs,

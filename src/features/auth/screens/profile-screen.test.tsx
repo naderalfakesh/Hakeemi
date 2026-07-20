@@ -17,6 +17,7 @@ describe('ProfileScreen', () => {
       <AppThemeProvider colorScheme="light">
         <ProfileScreen
           onCreateAccount={noop}
+          onEnableNotifications={noop}
           onRetryPreferences={noop}
           onRetryProfile={noop}
           onSignIn={onSignIn}
@@ -25,6 +26,8 @@ describe('ProfileScreen', () => {
           preferences={{ locale: 'en', theme: 'system' }}
           preferencesError={null}
           preferencesStatus="idle"
+          notificationError={null}
+          notificationStatus="idle"
           profile={null}
           profileError={null}
           profileStatus="idle"
@@ -45,6 +48,7 @@ describe('ProfileScreen', () => {
       <AppThemeProvider colorScheme="light">
         <ProfileScreen
           onCreateAccount={noop}
+          onEnableNotifications={noop}
           onRetryPreferences={noop}
           onRetryProfile={noop}
           onSignIn={noop}
@@ -53,6 +57,8 @@ describe('ProfileScreen', () => {
           preferences={{ locale: 'en', theme: 'system' }}
           preferencesError={null}
           preferencesStatus="ready"
+          notificationError={null}
+          notificationStatus="idle"
           profile={{
             displayName: 'Demo Patient',
             email: 'demo@example.test',
@@ -76,6 +82,8 @@ describe('ProfileScreen', () => {
 
     expect(view.getByText('Email verified')).toBeOnTheScreen();
     expect(view.getByText(/idempotent Cloud Function/iu)).toBeOnTheScreen();
+    await fireEvent.press(view.getByRole('button', { name: 'Enable reminders' }));
+    expect(noop).toHaveBeenCalled();
     await fireEvent.press(view.getByRole('button', { name: 'Dark' }));
     expect(onUpdatePreferences).toHaveBeenCalledWith({ locale: 'en', theme: 'dark' });
     await fireEvent.press(view.getByRole('button', { name: 'Sign out' }));
