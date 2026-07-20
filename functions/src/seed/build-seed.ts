@@ -34,6 +34,7 @@ function startOfUtcDay(referenceDate: string) {
 
 export function buildSeedDocuments(catalog: SeedCatalog, referenceDate: string): SeedDocuments {
   const anchor = startOfUtcDay(referenceDate);
+  const auditTimestamp = Timestamp.fromDate(anchor);
   const nextAvailabilityByProvider = new Map<string, Timestamp>();
 
   const availabilitySlots = catalog.slots.map((slot) => {
@@ -58,13 +59,17 @@ export function buildSeedDocuments(catalog: SeedCatalog, referenceDate: string):
     return {
       id: slot.id,
       data: {
+        appointmentId: null,
         clinicId: slot.clinicId,
+        createdAt: auditTimestamp,
         endsAt: endsAtTimestamp,
         providerId: slot.providerId,
         schemaVersion: 1,
         startsAt: startsAtTimestamp,
         status: 'available',
         timezone: 'Asia/Dubai',
+        updatedAt: auditTimestamp,
+        version: 1,
         visitMode: slot.visitMode,
       },
     };

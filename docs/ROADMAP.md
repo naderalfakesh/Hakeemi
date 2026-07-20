@@ -1,6 +1,6 @@
 # Hakeemi Modernization Roadmap
 
-> Status: Phase 2 complete; Phase 3 planned
+> Status: Phase 3 in progress
 >
 > Baseline: `dade72b` on `master`
 >
@@ -714,7 +714,7 @@ _Estimated effort: two to three sessions_
 
 #### Backend
 
-- [ ] Implement `availabilitySlots` and `appointments` indexes and rules.
+- [x] Implement `availabilitySlots` and `appointments` indexes and rules.
 - [ ] Implement `bookAppointment` as an authenticated callable Cloud Function
       using a Firestore transaction.
 - [ ] Validate slot ownership, status, time bounds, and allowed request fields on

@@ -51,14 +51,32 @@ async function seedFirestore() {
       specialtyIds: ['family-medicine'],
     });
     batch.set(firestore.doc('availabilitySlots/lina-slot'), {
+      appointmentId: null,
+      clinicId: 'marsa-family-clinic',
+      createdAt: new Date('2029-12-01T00:00:00.000Z'),
+      endsAt: new Date('2030-01-01T08:30:00.000Z'),
       providerId: 'lina-haddad',
+      schemaVersion: 1,
       startsAt: new Date('2030-01-01T08:00:00.000Z'),
       status: 'available',
+      timezone: 'Asia/Dubai',
+      updatedAt: new Date('2029-12-01T00:00:00.000Z'),
+      version: 1,
+      visitMode: 'in_person',
     });
     batch.set(firestore.doc('availabilitySlots/booked-slot'), {
+      appointmentId: 'alice-appointment',
+      clinicId: 'marsa-family-clinic',
+      createdAt: new Date('2029-12-01T00:00:00.000Z'),
+      endsAt: new Date('2030-01-01T09:30:00.000Z'),
       providerId: 'lina-haddad',
+      schemaVersion: 1,
       startsAt: new Date('2030-01-01T09:00:00.000Z'),
       status: 'booked',
+      timezone: 'Asia/Dubai',
+      updatedAt: new Date('2029-12-01T00:00:00.000Z'),
+      version: 2,
+      visitMode: 'in_person',
     });
     batch.set(firestore.doc('users/alice'), {
       displayName: 'Alice',
@@ -69,10 +87,21 @@ async function seedFirestore() {
       email: 'bob@example.test',
     });
     batch.set(firestore.doc('appointments/alice-appointment'), {
+      cancelledAt: null,
+      cancelledBy: null,
+      clinicId: 'marsa-family-clinic',
+      createdAt: new Date('2029-12-01T00:00:00.000Z'),
+      endsAt: new Date('2030-01-01T09:30:00.000Z'),
       patientId: 'alice',
       providerId: 'lina-haddad',
-      startsAt: new Date('2030-01-01T08:00:00.000Z'),
+      reasonCategory: 'routine_visit',
+      schemaVersion: 1,
+      slotId: 'booked-slot',
+      startsAt: new Date('2030-01-01T09:00:00.000Z'),
       status: 'confirmed',
+      timezone: 'Asia/Dubai',
+      updatedAt: new Date('2029-12-01T00:00:00.000Z'),
+      visitMode: 'in_person',
     });
 
     await batch.commit();
@@ -151,6 +180,7 @@ describe('Cloud Firestore rules', () => {
         .where('providerId', '==', 'lina-haddad')
         .where('status', '==', 'available')
         .orderBy('startsAt')
+        .limit(31)
         .get(),
     );
   });
@@ -162,6 +192,26 @@ describe('Cloud Firestore rules', () => {
     await assertFails(firestore.doc('providers/retired-provider').get());
     await assertFails(firestore.doc('availabilitySlots/booked-slot').get());
     await assertFails(firestore.collection('providers').get());
+    await assertFails(
+      firestore.collection('availabilitySlots').where('status', '==', 'available').get(),
+    );
+    await assertFails(
+      firestore.collection('availabilitySlots').where('status', '==', 'booked').limit(31).get(),
+    );
+  });
+
+  it('keeps every availability state transition server-controlled', async () => {
+    await seedFirestore();
+    const alice = testEnvironment.authenticatedContext('alice').firestore();
+
+    await assertFails(
+      alice.doc('availabilitySlots/new-slot').set({
+        providerId: 'lina-haddad',
+        status: 'available',
+      }),
+    );
+    await assertFails(alice.doc('availabilitySlots/lina-slot').update({ status: 'booked' }));
+    await assertFails(alice.doc('availabilitySlots/lina-slot').delete());
   });
 
   it('allows a user to read only their own profile', async () => {
@@ -234,14 +284,22 @@ describe('Cloud Firestore rules', () => {
 
     await assertSucceeds(alice.doc('appointments/alice-appointment').get());
     await assertFails(bob.doc('appointments/alice-appointment').get());
-    await assertSucceeds(alice.collection('appointments').where('patientId', '==', 'alice').get());
-    await assertFails(bob.collection('appointments').where('patientId', '==', 'alice').get());
+    await assertSucceeds(
+      alice.collection('appointments').where('patientId', '==', 'alice').limit(50).get(),
+    );
+    await assertFails(
+      bob.collection('appointments').where('patientId', '==', 'alice').limit(50).get(),
+    );
+    await assertFails(alice.collection('appointments').where('patientId', '==', 'alice').get());
+    await assertFails(alice.collection('appointments').limit(50).get());
     await assertFails(
       alice.doc('appointments/new-appointment').set({
         patientId: 'alice',
         status: 'confirmed',
       }),
     );
+    await assertFails(alice.doc('appointments/alice-appointment').update({ status: 'cancelled' }));
+    await assertFails(alice.doc('appointments/alice-appointment').delete());
   });
 
   it('denies undeclared collections by default', async () => {

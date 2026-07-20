@@ -1,6 +1,6 @@
 # Current Session
 
-- Current phase: Phase 2 complete — secure accounts and live provider data.
+- Current phase: Phase 3 in progress — trustworthy appointment booking.
 - Legacy baseline: `dade72b`, preserved by the `legacy-v1` tag.
 - Phase 1 proof: [`docs/phase-1-verification.md`](docs/phase-1-verification.md).
 - Phase 2 proof: [`docs/phase-2-verification.md`](docs/phase-2-verification.md).
@@ -34,6 +34,8 @@
 - Portfolio documentation: the README now presents the rebuilt product,
   evidence, architecture decisions, backend safeguards, and reproducible setup
   without claiming planned features as complete.
-- Next action: begin Phase 3 with the transaction-backed booking domain and
-  authorization contract.
+- Booking contract: executable server schemas now define valid request, slot,
+  and appointment records; slot and appointment rules require bounded reads and
+  keep all lifecycle writes server-controlled.
+- Next action: implement the idempotent `bookAppointment` Firestore transaction.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).
