@@ -2,7 +2,14 @@ import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button, DecorativeIcon, EmptyState, IconButton, Skeleton } from '@/components/ui';
+import {
+  Button,
+  DecorativeIcon,
+  EmptyState,
+  IconButton,
+  Skeleton,
+  stateIllustrations,
+} from '@/components/ui';
 import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
@@ -58,13 +65,7 @@ export function BookingRouteState({
         description={
           isError ? strings.routeState.errorDescription : strings.routeState.notFoundDescription
         }
-        icon={
-          <DecorativeIcon
-            color={isError ? theme.colors.danger : theme.colors.brand}
-            name={isError ? 'cloud-offline-outline' : 'calendar-outline'}
-            size={34}
-          />
-        }
+        illustration={isError ? stateIllustrations.offline : stateIllustrations.noAppointments}
         title={isError ? strings.routeState.errorTitle : strings.routeState.chooseAnotherTime}
       />
     </SafeAreaView>

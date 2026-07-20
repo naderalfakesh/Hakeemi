@@ -10,6 +10,7 @@ import {
   EmptyState,
   IconButton,
   Skeleton,
+  stateIllustrations,
   Surface,
 } from '@/components/ui';
 import { formatLocalizedCount } from '@/localization/format';
@@ -223,13 +224,7 @@ function ProviderDetailState({ onBack, onRetry, providerId, status }: ProviderDe
           )
         }
         description={isMissing ? strings.notFoundDescription(providerId) : strings.errorDescription}
-        icon={
-          <DecorativeIcon
-            color={isMissing ? theme.colors.brand : theme.colors.danger}
-            name={isMissing ? 'person-outline' : 'cloud-offline-outline'}
-            size={34}
-          />
-        }
+        illustration={isMissing ? stateIllustrations.noResults : stateIllustrations.offline}
         title={isMissing ? strings.notFoundTitle : strings.errorTitle}
       />
     </SafeAreaView>

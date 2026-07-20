@@ -11,6 +11,7 @@ import {
   IconButton,
   InlineError,
   Skeleton,
+  stateIllustrations,
   Surface,
 } from '@/components/ui';
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
@@ -486,7 +487,7 @@ function DetailState({
       <EmptyState
         action={action}
         description={description}
-        icon={<DecorativeIcon color={theme.colors.brand} name="calendar-outline" size={34} />}
+        illustration={stateIllustrations.noAppointments}
         title={title}
       />
     </SafeAreaView>

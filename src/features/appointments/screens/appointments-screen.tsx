@@ -10,6 +10,7 @@ import {
   EmptyState,
   Skeleton,
   StaleDataNotice,
+  stateIllustrations,
   Surface,
 } from '@/components/ui';
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
@@ -155,13 +156,7 @@ function AuthenticatedAppointments({
           <EmptyState
             action={<Button onPress={onFindCare}>{strings.findClinician}</Button>}
             description={strings.emptyDescriptions[filter]}
-            icon={
-              <DecorativeIcon
-                color={theme.colors.brand}
-                name={filter === 'cancelled' ? 'close-circle-outline' : 'calendar-outline'}
-                size={34}
-              />
-            }
+            illustration={stateIllustrations.noAppointments}
             title={strings.emptyTitles[filter]}
           />
         ) : (

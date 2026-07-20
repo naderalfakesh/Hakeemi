@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppText, Button, DecorativeIcon, Surface } from '@/components/ui';
+import { AppText, Button, Illustration, stateIllustrations, Surface } from '@/components/ui';
 import { useStrings } from '@/localization/use-strings';
 import { AppThemeProvider, useAppTheme, type AppTheme } from '@/theme';
 
@@ -36,7 +36,7 @@ function ErrorBoundaryContent({ error, onRetry }: ErrorBoundaryScreenProps) {
       <View style={styles.content}>
         <Surface padding="spacious" style={styles.card} variant="raised">
           <View style={styles.icon}>
-            <DecorativeIcon color={theme.colors.danger} name="alert-circle-outline" size={32} />
+            <Illustration size={150} source={stateIllustrations.error} />
           </View>
           <AppText accessibilityRole="header" variant="titleMedium">
             {strings.errorBoundary.title}

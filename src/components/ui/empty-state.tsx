@@ -1,24 +1,40 @@
 import { useMemo, type ReactNode } from 'react';
-import { StyleSheet, View, type ViewProps } from 'react-native';
+import { StyleSheet, View, type ImageSourcePropType, type ViewProps } from 'react-native';
 
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { AppText } from './app-text';
+import { Illustration } from './illustration';
 
 type EmptyStateProps = Omit<ViewProps, 'children'> & {
   action?: ReactNode;
   description: string;
   icon?: ReactNode;
+  illustration?: ImageSourcePropType;
   title: string;
 };
 
-export function EmptyState({ action, description, icon, style, title, ...props }: EmptyStateProps) {
+export function EmptyState({
+  action,
+  description,
+  icon,
+  illustration,
+  style,
+  title,
+  ...props
+}: EmptyStateProps) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   return (
     <View {...props} style={[styles.container, style]}>
-      {icon && <View style={styles.icon}>{icon}</View>}
+      {illustration ? (
+        <View style={styles.icon}>
+          <Illustration source={illustration} />
+        </View>
+      ) : (
+        icon && <View style={styles.icon}>{icon}</View>
+      )}
       <AppText accessibilityRole="header" style={styles.centered} variant="titleSmall">
         {title}
       </AppText>

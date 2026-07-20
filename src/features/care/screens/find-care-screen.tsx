@@ -5,10 +5,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   AppText,
   Button,
-  DecorativeIcon,
   EmptyState,
   Skeleton,
   StaleDataNotice,
+  stateIllustrations,
   TextField,
 } from '@/components/ui';
 import { formatLocalizedCount } from '@/localization/format';
@@ -176,7 +176,7 @@ function ResultsState({ hasFilters, onClear, onRetry, status }: ResultsStateProp
       <EmptyState
         action={<Button onPress={onRetry}>{strings.tryAgain}</Button>}
         description={strings.errorDescription}
-        icon={<DecorativeIcon color={theme.colors.danger} name="cloud-offline-outline" size={32} />}
+        illustration={stateIllustrations.offline}
         title={strings.errorTitle}
       />
     );
@@ -192,7 +192,7 @@ function ResultsState({ hasFilters, onClear, onRetry, status }: ResultsStateProp
         ) : undefined
       }
       description={strings.emptyDescription}
-      icon={<DecorativeIcon color={theme.colors.brand} name="search-outline" size={32} />}
+      illustration={stateIllustrations.noResults}
       title={strings.emptyTitle}
     />
   );

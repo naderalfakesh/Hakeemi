@@ -10,6 +10,7 @@ import {
   EmptyState,
   IconButton,
   InlineError,
+  stateIllustrations,
   Surface,
 } from '@/components/ui';
 import type { Provider } from '@/features/care/domain/types';
@@ -352,7 +353,7 @@ function SavedProvidersSection({
       {status === 'ready' && providers.length === 0 && (
         <EmptyState
           description={strings.savedCliniciansEmptyDescription}
-          icon={<DecorativeIcon color={theme.colors.brand} name="bookmark-outline" size={30} />}
+          illustration={stateIllustrations.noSaved}
           title={strings.savedCliniciansEmptyTitle}
         />
       )}

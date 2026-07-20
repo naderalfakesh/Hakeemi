@@ -1,12 +1,38 @@
-import { useMemo } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  View,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppText, Button, DecorativeIcon, Surface } from '@/components/ui';
+import { AppText, Button, DecorativeIcon, Illustration, Surface } from '@/components/ui';
 import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { onboardingStrings } from '../localization/onboarding-strings';
+
+const welcomeHero = require('../../../../assets/illustrations/welcome-hero.png');
+
+const storySlides = [
+  {
+    illustration: require('../../../../assets/illustrations/onboarding-discover.png'),
+    key: 'discover',
+  },
+  {
+    illustration: require('../../../../assets/illustrations/onboarding-book.png'),
+    key: 'book',
+  },
+  {
+    illustration: require('../../../../assets/illustrations/onboarding-care.png'),
+    key: 'care',
+  },
+] as const;
+
+type StorySlideKey = (typeof storySlides)[number]['key'];
 
 type DemoEntryScreenProps = {
   onContinue: () => void;
@@ -17,6 +43,21 @@ export function DemoEntryScreen({ onContinue, onSignIn }: DemoEntryScreenProps) 
   const theme = useAppTheme();
   const strings = useStrings(onboardingStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const [pagerWidth, setPagerWidth] = useState(0);
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  const slideCopy: Record<StorySlideKey, { body: string; title: string }> = {
+    book: { body: strings.slideBookBody, title: strings.slideBookTitle },
+    care: { body: strings.slideCareBody, title: strings.slideCareTitle },
+    discover: { body: strings.slideDiscoverBody, title: strings.slideDiscoverTitle },
+  };
+
+  const handleMomentumEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (pagerWidth > 0) {
+      const page = Math.round(event.nativeEvent.contentOffset.x / pagerWidth);
+      setActiveSlide(Math.min(storySlides.length - 1, Math.max(0, page)));
+    }
+  };
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
@@ -38,30 +79,11 @@ export function DemoEntryScreen({ onContinue, onSignIn }: DemoEntryScreenProps) 
         <View
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
-          style={styles.preview}
+          style={styles.heroStage}
         >
           <View style={styles.ambientOrb} />
-          <View style={styles.previewCopy}>
-            <AppText tone="secondary" variant="caption">
-              {strings.earliestVisit}
-            </AppText>
-            <AppText variant="display">09:30</AppText>
-            <AppText tone="secondary" variant="bodyMedium">
-              {strings.previewSchedule}
-            </AppText>
-          </View>
-          <Surface padding="compact" style={styles.providerCard} variant="raised">
-            <View style={styles.providerAvatar}>
-              <DecorativeIcon color={theme.colors.brand} name="person" size={24} />
-            </View>
-            <View style={styles.providerCopy}>
-              <AppText variant="bodyStrong">{strings.familyMedicine}</AppText>
-              <AppText tone="secondary" variant="caption">
-                {strings.nextAvailableAppointment}
-              </AppText>
-            </View>
-            <DecorativeIcon color={theme.colors.brand} name="arrow-forward" size={20} />
-          </Surface>
+          <View style={styles.ambientOrbSmall} />
+          <Image resizeMode="contain" source={welcomeHero} style={styles.heroImage} />
         </View>
 
         <View style={styles.message}>
@@ -73,9 +95,44 @@ export function DemoEntryScreen({ onContinue, onSignIn }: DemoEntryScreenProps) 
           </AppText>
         </View>
 
-        <View style={styles.proofList}>
-          <ProofPoint label={strings.proofAvailability} />
-          <ProofPoint label={strings.proofSteps} />
+        <View
+          onLayout={(event) => setPagerWidth(event.nativeEvent.layout.width)}
+          style={styles.pager}
+        >
+          <ScrollView
+            decelerationRate="fast"
+            horizontal
+            onMomentumScrollEnd={handleMomentumEnd}
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+          >
+            {storySlides.map((slide) => (
+              <Surface
+                key={slide.key}
+                padding="spacious"
+                style={[styles.slide, pagerWidth > 0 && { width: pagerWidth }]}
+                variant="muted"
+              >
+                <Illustration backdrop={false} size={132} source={slide.illustration} />
+                <View style={styles.slideCopy}>
+                  <AppText style={styles.slideTitle} variant="titleSmall">
+                    {slideCopy[slide.key].title}
+                  </AppText>
+                  <AppText style={styles.slideTitle} tone="secondary" variant="bodyMedium">
+                    {slideCopy[slide.key].body}
+                  </AppText>
+                </View>
+              </Surface>
+            ))}
+          </ScrollView>
+          <View accessibilityElementsHidden importantForAccessibility="no" style={styles.dots}>
+            {storySlides.map((slide, index) => (
+              <View
+                key={slide.key}
+                style={[styles.dot, index === activeSlide && styles.dotActive]}
+              />
+            ))}
+          </View>
         </View>
 
         <View style={styles.actions}>
@@ -91,20 +148,6 @@ export function DemoEntryScreen({ onContinue, onSignIn }: DemoEntryScreenProps) 
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
-}
-
-function ProofPoint({ label }: { label: string }) {
-  const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
-
-  return (
-    <View style={styles.proofPoint}>
-      <View accessibilityElementsHidden importantForAccessibility="no" style={styles.proofIcon}>
-        <DecorativeIcon color={theme.colors.brand} name="checkmark" size={16} />
-      </View>
-      <AppText variant="bodyStrong">{label}</AppText>
-    </View>
   );
 }
 
@@ -140,13 +183,14 @@ function createStyles(theme: AppTheme) {
     rebuildLabel: {
       marginStart: 'auto',
     },
-    preview: {
+    heroStage: {
+      alignItems: 'center',
       backgroundColor: theme.colors.surfaceBrand,
       borderRadius: theme.radii.xl,
-      height: 250,
-      marginTop: theme.spacing.xl,
+      marginTop: theme.spacing.lg,
       overflow: 'hidden',
-      padding: theme.spacing.lg,
+      paddingBottom: 0,
+      paddingTop: theme.spacing.md,
     },
     ambientOrb: {
       backgroundColor: theme.colors.brandSoft,
@@ -157,49 +201,51 @@ function createStyles(theme: AppTheme) {
       top: -72,
       width: 210,
     },
-    previewCopy: {
-      gap: theme.spacing.xxs,
-    },
-    providerCard: {
-      alignItems: 'center',
-      bottom: theme.spacing.lg,
-      end: theme.spacing.lg,
-      flexDirection: 'row',
+    ambientOrbSmall: {
+      backgroundColor: theme.colors.accentSoft,
+      borderRadius: theme.radii.full,
+      bottom: -34,
+      height: 110,
       position: 'absolute',
-      start: theme.spacing.lg,
+      start: -30,
+      width: 110,
     },
-    providerAvatar: {
-      alignItems: 'center',
-      backgroundColor: theme.colors.brandSoft,
-      borderRadius: theme.radii.md,
-      height: 48,
-      justifyContent: 'center',
-      width: 48,
-    },
-    providerCopy: {
-      flex: 1,
-      marginHorizontal: theme.spacing.sm,
+    heroImage: {
+      height: 240,
+      width: '86%',
     },
     message: {
       gap: theme.spacing.sm,
       marginTop: theme.spacing.xl,
     },
-    proofList: {
-      gap: theme.spacing.sm,
+    pager: {
       marginTop: theme.spacing.lg,
     },
-    proofPoint: {
+    slide: {
       alignItems: 'center',
-      flexDirection: 'row',
       gap: theme.spacing.sm,
     },
-    proofIcon: {
-      alignItems: 'center',
+    slideCopy: {
+      gap: theme.spacing.xxs,
+    },
+    slideTitle: {
+      textAlign: 'center',
+    },
+    dots: {
+      alignSelf: 'center',
+      flexDirection: 'row',
+      gap: theme.spacing.xs,
+      marginTop: theme.spacing.sm,
+    },
+    dot: {
       backgroundColor: theme.colors.brandSoft,
-      borderRadius: theme.radii.sm,
-      height: 28,
-      justifyContent: 'center',
-      width: 28,
+      borderRadius: theme.radii.full,
+      height: 8,
+      width: 8,
+    },
+    dotActive: {
+      backgroundColor: theme.colors.brand,
+      width: 20,
     },
     actions: {
       gap: theme.spacing.md,

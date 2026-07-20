@@ -2,7 +2,15 @@ import { useCallback, useMemo } from 'react';
 import { FlatList, StyleSheet, View, type ListRenderItem } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppText, Button, DecorativeIcon, EmptyState, InlineError, Surface } from '@/components/ui';
+import {
+  AppText,
+  Button,
+  DecorativeIcon,
+  EmptyState,
+  InlineError,
+  stateIllustrations,
+  Surface,
+} from '@/components/ui';
 import { ProviderCard } from '@/features/care/components/provider-card';
 import { ProviderCardSkeleton } from '@/features/care/components/provider-card-skeleton';
 import type { CareRepository } from '@/features/care/domain/repository';
@@ -182,7 +190,7 @@ function HomeResultsState({
         </Button>
       }
       description={strings.emptyDescription}
-      icon={<DecorativeIcon color={theme.colors.brand} name="people-outline" size={32} />}
+      illustration={stateIllustrations.noResults}
       title={strings.emptyTitle}
     />
   );

@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppText, Button, DecorativeIcon, Surface } from '@/components/ui';
+import { AppText, Button, Illustration, stateIllustrations, Surface } from '@/components/ui';
 import type { Appointment } from '@/features/appointments/domain/types';
 import type { Provider } from '@/features/care/domain/types';
 import { useAppLocale } from '@/localization/locale-provider';
@@ -36,7 +36,7 @@ export function BookingConfirmationScreen({
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
       <View style={styles.content}>
         <View accessibilityElementsHidden importantForAccessibility="no" style={styles.icon}>
-          <DecorativeIcon color={theme.colors.textInverse} name="checkmark" size={34} />
+          <Illustration backdrop={false} size={200} source={stateIllustrations.bookingConfirmed} />
         </View>
         <View style={styles.heading}>
           <AppText accessibilityRole="header" style={styles.centered} variant="titleLarge">
