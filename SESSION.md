@@ -12,7 +12,8 @@
   emulator tests, and deterministic fictional seed tooling are configured. The
   development project contains the 24-document fictional seed.
 - Native integration: Expo CNG configures React Native Firebase Auth, Firestore,
-  and Functions. iOS Simulator, Android arm64, and static web export checks pass.
+  Functions, Messaging, Expo Calendar, and Notifications. iOS Simulator,
+  Android arm64, and static web export checks pass.
 - Account UI: typed sign-in, sign-up, password recovery, and email verification
   routes are connected to a platform-safe Firebase Auth adapter.
 - Session/profile: one app-level provider restores Auth before navigation, and

@@ -91,16 +91,16 @@ until enabling Firebase billing is an explicit decision.
 
 ## Technology
 
-| Area                 | Choice                                                                               |
-| -------------------- | ------------------------------------------------------------------------------------ |
-| Runtime              | Expo SDK 57, React Native 0.86, React 19.2, New Architecture                         |
-| Navigation           | Expo Router with typed routes and static web export                                  |
-| Native services      | React Native Firebase App, Auth, Firestore, and Functions                            |
-| Server state         | TanStack Query with stable keys, retries, caching, and cursor pages                  |
-| Forms and validation | React Hook Form and Zod                                                              |
-| Backend              | Firebase Auth, Firestore, Cloud Functions, Security Rules, Emulator Suite            |
-| Quality              | Strict TypeScript, Jest, React Native Testing Library, ESLint, Prettier, Expo Doctor |
-| Native lifecycle     | Expo CNG, config plugins, development builds, and EAS profiles                       |
+| Area                 | Choice                                                                                            |
+| -------------------- | ------------------------------------------------------------------------------------------------- |
+| Runtime              | Expo SDK 57, React Native 0.86, React 19.2, New Architecture                                      |
+| Navigation           | Expo Router with typed routes and static web export                                               |
+| Native services      | React Native Firebase App, Auth, Firestore, Functions, Messaging; Expo Calendar and Notifications |
+| Server state         | TanStack Query with stable keys, retries, caching, and cursor pages                               |
+| Forms and validation | React Hook Form and Zod                                                                           |
+| Backend              | Firebase Auth, Firestore, Cloud Functions, Security Rules, Emulator Suite                         |
+| Quality              | Strict TypeScript, Jest, React Native Testing Library, ESLint, Prettier, Expo Doctor              |
+| Native lifecycle     | Expo CNG, config plugins, development builds, and EAS profiles                                    |
 
 ## Quality evidence
 
