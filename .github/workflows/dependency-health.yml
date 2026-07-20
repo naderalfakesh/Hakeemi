@@ -1,0 +1,52 @@
+name: Dependency health
+
+on:
+  schedule:
+    # Monday 06:00 UTC — a weekly pulse, not a merge gate.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  health:
+    name: Check dependency health
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Use project Node version
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            functions/package-lock.json
+
+      - name: Install app dependencies
+        run: npm ci
+
+      - name: Install Functions dependencies
+        run: npm ci --prefix functions
+
+      - name: Validate Expo project health
+        run: npx expo-doctor
+
+      - name: Verify Expo SDK dependency alignment
+        run: npx expo install --check
+
+      - name: Report outdated app packages
+        run: npm outdated || true
+
+      - name: Report outdated Functions packages
+        run: npm outdated --prefix functions || true
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
