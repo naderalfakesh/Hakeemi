@@ -1,7 +1,7 @@
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
+import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { fixtureCareRepository } from '@/features/care/data/fixture-care-repository';
-import type { AuthSession } from '@/features/auth/domain/types';
 import { TestAppProviders } from '@/test/test-app-providers';
 
 import type { AppointmentRepository } from '../domain/repository';
@@ -12,9 +12,7 @@ jest.mock('@/features/auth/context/auth-session-provider', () => ({
   useAuthSession: jest.fn(),
 }));
 
-const mockedUseAuthSession = jest.mocked(
-  require('@/features/auth/context/auth-session-provider').useAuthSession as () => AuthSession,
-);
+const mockedUseAuthSession = jest.mocked(useAuthSession);
 
 const appointment: Appointment = {
   cancelledAt: null,
@@ -69,6 +67,8 @@ describe('AppointmentDetailScreen', () => {
       profile: null,
       profileError: null,
       profileStatus: 'idle',
+      refreshSession: jest.fn().mockResolvedValue(undefined),
+      retryProfile: jest.fn().mockResolvedValue(undefined),
       signOut: jest.fn().mockResolvedValue(undefined),
       status: 'authenticated',
       user: {
