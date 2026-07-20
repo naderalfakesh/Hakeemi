@@ -43,7 +43,7 @@ export function ProviderDetailScreen({
   isProviderSaved = false,
 }: ProviderDetailScreenProps) {
   const theme = useAppTheme();
-  const { intlLocale } = useAppLocale();
+  const { intlLocale, locale } = useAppLocale();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { retry, state } = useProviderDetail(providerId, repository);
 
@@ -59,7 +59,7 @@ export function ProviderDetailScreen({
   }
 
   const { clinics, provider, slots, specialties } = state.data;
-  const specialtyNames = specialties.map((specialty) => specialty.name.en).join(' · ');
+  const specialtyNames = specialties.map((specialty) => specialty.name[locale]).join(' · ');
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
@@ -148,7 +148,7 @@ export function ProviderDetailScreen({
 
         <DetailSection title="Clinics">
           {clinics.map((clinic) => (
-            <ClinicRow clinic={clinic} key={clinic.id} />
+            <ClinicRow clinic={clinic} key={clinic.id} locale={locale} />
           ))}
         </DetailSection>
 
@@ -303,7 +303,7 @@ function InfoRow({ icon, label }: { icon: DecorativeIconName; label: string }) {
   );
 }
 
-function ClinicRow({ clinic }: { clinic: Clinic }) {
+function ClinicRow({ clinic, locale }: { clinic: Clinic; locale: 'ar' | 'en' }) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
@@ -311,9 +311,9 @@ function ClinicRow({ clinic }: { clinic: Clinic }) {
     <View style={styles.infoRow}>
       <DecorativeIcon color={theme.colors.brand} name="location-outline" size={20} />
       <View style={styles.clinicCopy}>
-        <AppText variant="bodyStrong">{clinic.name.en}</AppText>
+        <AppText variant="bodyStrong">{clinic.name[locale]}</AppText>
         <AppText tone="secondary" variant="caption">
-          {clinic.address.en}
+          {clinic.address[locale]}
         </AppText>
       </View>
     </View>

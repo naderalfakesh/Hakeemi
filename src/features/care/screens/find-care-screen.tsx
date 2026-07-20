@@ -3,6 +3,8 @@ import { FlatList, StyleSheet, View, type ListRenderItem } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText, Button, DecorativeIcon, EmptyState, Skeleton, TextField } from '@/components/ui';
+import { formatLocalizedCount } from '@/localization/format';
+import { useAppLocale } from '@/localization/locale-provider';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { ProviderCard } from '../components/provider-card';
@@ -19,6 +21,7 @@ type FindCareScreenProps = {
 
 export function FindCareScreen({ onSelectProvider, repository }: FindCareScreenProps) {
   const theme = useAppTheme();
+  const { locale } = useAppLocale();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [query, setQuery] = useState('');
   const [specialtyId, setSpecialtyId] = useState<string | null>(null);
@@ -29,8 +32,11 @@ export function FindCareScreen({ onSelectProvider, repository }: FindCareScreenP
   });
   const data = state.status === 'success' ? state.data : null;
   const specialtyNames = useMemo(
-    () => new Map(data?.specialties.map((specialty) => [specialty.id, specialty.name.en]) ?? []),
-    [data?.specialties],
+    () =>
+      new Map(
+        data?.specialties.map((specialty) => [specialty.id, specialty.name[locale]] as const) ?? [],
+      ),
+    [data?.specialties, locale],
   );
   const clearFilters = useCallback(() => {
     setQuery('');
@@ -93,7 +99,10 @@ export function FindCareScreen({ onSelectProvider, repository }: FindCareScreenP
             )}
             {data && data.providers.length > 0 && (
               <AppText tone="secondary" variant="caption">
-                {data.providers.length} {data.providers.length === 1 ? 'clinician' : 'clinicians'}
+                {formatLocalizedCount(data.providers.length, locale, {
+                  ar: { one: 'طبيب', other: 'أطباء' },
+                  en: { one: 'clinician', other: 'clinicians' },
+                })}
               </AppText>
             )}
           </View>

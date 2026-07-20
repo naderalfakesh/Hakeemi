@@ -8,6 +8,7 @@ import { ProviderCardSkeleton } from '@/features/care/components/provider-card-s
 import type { CareRepository } from '@/features/care/domain/repository';
 import type { Provider } from '@/features/care/domain/types';
 import { useProviderDiscovery } from '@/features/care/hooks/use-provider-discovery';
+import { useAppLocale } from '@/localization/locale-provider';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 type HomeScreenProps = {
@@ -24,6 +25,7 @@ export function HomeScreen({
   repository,
 }: HomeScreenProps) {
   const theme = useAppTheme();
+  const { locale } = useAppLocale();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { retry, state } = useProviderDiscovery({
     query: '',
@@ -36,9 +38,11 @@ export function HomeScreen({
   const specialtyNames = useMemo(
     () =>
       new Map(
-        discovery?.specialties.map((specialty) => [specialty.id, specialty.name.en] as const) ?? [],
+        discovery?.specialties.map(
+          (specialty) => [specialty.id, specialty.name[locale]] as const,
+        ) ?? [],
       ),
-    [discovery?.specialties],
+    [discovery?.specialties, locale],
   );
   const renderProvider = useCallback<ListRenderItem<Provider>>(
     ({ item }) => (
