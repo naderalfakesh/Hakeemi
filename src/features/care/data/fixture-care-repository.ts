@@ -56,7 +56,7 @@ export class FixtureCareRepository implements CareRepository {
       .sort(
         (left, right) =>
           Number(right.isFeatured) - Number(left.isFeatured) ||
-          left.displayName.localeCompare(right.displayName) ||
+          left.displayName.en.localeCompare(right.displayName.en) ||
           left.id.localeCompare(right.id),
       );
     const pageStart = cursor

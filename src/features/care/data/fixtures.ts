@@ -99,12 +99,22 @@ export const clinicFixtures = [
 export const providerFixtures = [
   {
     id: 'lina-haddad',
-    displayName: 'Dr. Lina Haddad',
+    displayName: { ar: 'د. لينا حداد', en: 'Dr. Lina Haddad' },
     slug: 'dr-lina-haddad',
     specialtyIds: ['family-medicine'],
-    credentialSummary: 'MBBS, MRCGP · 12 years in practice',
-    bio: 'Lina focuses on preventive care and practical long-term health plans. She works with adults and families managing everyday concerns and ongoing conditions.',
-    languages: ['Arabic', 'English', 'French'],
+    credentialSummary: {
+      ar: 'MBBS، MRCGP · خبرة 12 عامًا',
+      en: 'MBBS, MRCGP · 12 years in practice',
+    },
+    bio: {
+      ar: 'تركّز لينا على الرعاية الوقائية والخطط الصحية العملية طويلة الأمد، وتعمل مع البالغين والعائلات لمتابعة الشكاوى اليومية والحالات المزمنة.',
+      en: 'Lina focuses on preventive care and practical long-term health plans. She works with adults and families managing everyday concerns and ongoing conditions.',
+    },
+    languages: [
+      { ar: 'العربية', en: 'Arabic' },
+      { ar: 'الإنجليزية', en: 'English' },
+      { ar: 'الفرنسية', en: 'French' },
+    ],
     clinicIds: ['marsa-family-clinic', 'harbour-telehealth'],
     visitModes: ['in_person', 'video'],
     consultationFee: { amount: 340, currency: 'AED' },
@@ -115,12 +125,21 @@ export const providerFixtures = [
   },
   {
     id: 'omar-rahman',
-    displayName: 'Dr. Omar Rahman',
+    displayName: { ar: 'د. عمر رحمن', en: 'Dr. Omar Rahman' },
     slug: 'dr-omar-rahman',
     specialtyIds: ['cardiology'],
-    credentialSummary: 'MD, FACC · 16 years in practice',
-    bio: 'Omar helps patients understand heart risk, test results, and treatment choices in plain language. His practice covers prevention and ongoing cardiac care.',
-    languages: ['Arabic', 'English'],
+    credentialSummary: {
+      ar: 'MD، FACC · خبرة 16 عامًا',
+      en: 'MD, FACC · 16 years in practice',
+    },
+    bio: {
+      ar: 'يساعد عمر مرضاه على فهم مخاطر القلب ونتائج الفحوصات وخيارات العلاج بلغة واضحة، وتشمل ممارسته الوقاية والرعاية القلبية المستمرة.',
+      en: 'Omar helps patients understand heart risk, test results, and treatment choices in plain language. His practice covers prevention and ongoing cardiac care.',
+    },
+    languages: [
+      { ar: 'العربية', en: 'Arabic' },
+      { ar: 'الإنجليزية', en: 'English' },
+    ],
     clinicIds: ['barari-medical-centre'],
     visitModes: ['in_person'],
     consultationFee: { amount: 620, currency: 'AED' },
@@ -131,12 +150,22 @@ export const providerFixtures = [
   },
   {
     id: 'priya-menon',
-    displayName: 'Dr. Priya Menon',
+    displayName: { ar: 'د. بريا مينون', en: 'Dr. Priya Menon' },
     slug: 'dr-priya-menon',
     specialtyIds: ['dermatology'],
-    credentialSummary: 'MBBS, MD Dermatology · 10 years in practice',
-    bio: 'Priya treats common and complex skin concerns with a measured, evidence-led approach. She has a particular interest in long-term acne and eczema care.',
-    languages: ['English', 'Hindi', 'Malayalam'],
+    credentialSummary: {
+      ar: 'MBBS، MD أمراض جلدية · خبرة 10 أعوام',
+      en: 'MBBS, MD Dermatology · 10 years in practice',
+    },
+    bio: {
+      ar: 'تعالج بريا مشكلات الجلد الشائعة والمعقدة بنهج متوازن قائم على الأدلة، مع اهتمام خاص بالرعاية طويلة الأمد لحب الشباب والإكزيما.',
+      en: 'Priya treats common and complex skin concerns with a measured, evidence-led approach. She has a particular interest in long-term acne and eczema care.',
+    },
+    languages: [
+      { ar: 'الإنجليزية', en: 'English' },
+      { ar: 'الهندية', en: 'Hindi' },
+      { ar: 'المالايالامية', en: 'Malayalam' },
+    ],
     clinicIds: ['marsa-family-clinic', 'harbour-telehealth'],
     visitModes: ['in_person', 'video'],
     consultationFee: { amount: 470, currency: 'AED' },
@@ -147,12 +176,21 @@ export const providerFixtures = [
   },
   {
     id: 'samir-nasser',
-    displayName: 'Dr. Samir Nasser',
+    displayName: { ar: 'د. سمير ناصر', en: 'Dr. Samir Nasser' },
     slug: 'dr-samir-nasser',
     specialtyIds: ['pediatrics'],
-    credentialSummary: 'MD, MRCPCH · 14 years in practice',
-    bio: 'Samir works closely with parents to make children’s care less stressful. He covers newborn checks, childhood illness, development, and preventive care.',
-    languages: ['Arabic', 'English'],
+    credentialSummary: {
+      ar: 'MD، MRCPCH · خبرة 14 عامًا',
+      en: 'MD, MRCPCH · 14 years in practice',
+    },
+    bio: {
+      ar: 'يعمل سمير عن قرب مع الأهل لجعل رعاية الأطفال أقل إرهاقًا، ويغطي فحوصات حديثي الولادة وأمراض الطفولة ومتابعة النمو والرعاية الوقائية.',
+      en: 'Samir works closely with parents to make children’s care less stressful. He covers newborn checks, childhood illness, development, and preventive care.',
+    },
+    languages: [
+      { ar: 'العربية', en: 'Arabic' },
+      { ar: 'الإنجليزية', en: 'English' },
+    ],
     clinicIds: ['barari-medical-centre', 'harbour-telehealth'],
     visitModes: ['in_person', 'video'],
     consultationFee: { amount: 390, currency: 'AED' },
@@ -163,12 +201,21 @@ export const providerFixtures = [
   },
   {
     id: 'aisha-bello',
-    displayName: 'Dr. Aisha Bello',
+    displayName: { ar: 'د. عائشة بيلو', en: 'Dr. Aisha Bello' },
     slug: 'dr-aisha-bello',
     specialtyIds: ['mental-wellbeing'],
-    credentialSummary: 'DClinPsy · 9 years in practice',
-    bio: 'Aisha offers structured, confidential support for anxiety, burnout, and major life changes. Sessions focus on practical tools and sustainable progress.',
-    languages: ['English', 'Yoruba'],
+    credentialSummary: {
+      ar: 'DClinPsy · خبرة 9 أعوام',
+      en: 'DClinPsy · 9 years in practice',
+    },
+    bio: {
+      ar: 'تقدّم عائشة دعمًا منظمًا وسريًا للتعامل مع القلق والإرهاق النفسي والتغيرات الحياتية الكبرى، وتركّز الجلسات على أدوات عملية وتقدّم مستدام.',
+      en: 'Aisha offers structured, confidential support for anxiety, burnout, and major life changes. Sessions focus on practical tools and sustainable progress.',
+    },
+    languages: [
+      { ar: 'الإنجليزية', en: 'English' },
+      { ar: 'اليوروبا', en: 'Yoruba' },
+    ],
     clinicIds: ['harbour-telehealth'],
     visitModes: ['video'],
     consultationFee: { amount: 520, currency: 'AED' },
@@ -179,12 +226,21 @@ export const providerFixtures = [
   },
   {
     id: 'noor-al-mansouri',
-    displayName: 'Dr. Noor Al Mansouri',
+    displayName: { ar: 'د. نور المنصوري', en: 'Dr. Noor Al Mansouri' },
     slug: 'dr-noor-al-mansouri',
     specialtyIds: ['womens-health'],
-    credentialSummary: 'MBBS, MRCOG · 13 years in practice',
-    bio: 'Noor provides preventive and reproductive health care with an emphasis on informed choices, privacy, and continuity across life stages.',
-    languages: ['Arabic', 'English'],
+    credentialSummary: {
+      ar: 'MBBS، MRCOG · خبرة 13 عامًا',
+      en: 'MBBS, MRCOG · 13 years in practice',
+    },
+    bio: {
+      ar: 'تقدّم نور رعاية صحية وقائية وإنجابية مع تركيز على الخيارات الواعية والخصوصية واستمرارية الرعاية عبر مراحل الحياة.',
+      en: 'Noor provides preventive and reproductive health care with an emphasis on informed choices, privacy, and continuity across life stages.',
+    },
+    languages: [
+      { ar: 'العربية', en: 'Arabic' },
+      { ar: 'الإنجليزية', en: 'English' },
+    ],
     clinicIds: ['marsa-family-clinic'],
     visitModes: ['in_person'],
     consultationFee: { amount: 560, currency: 'AED' },

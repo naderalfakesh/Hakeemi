@@ -1071,6 +1071,9 @@ mapping, and accessibility label, with Arabic plural rules for all counts.
 Selecting Arabic persists the native RTL layout direction through
 `I18nManager` with a restart hint, directional icons mirror automatically,
 and onboarding decor uses logical offsets. The inclusive/resilient work is
-recorded in `docs/phase-5-verification.md`; assistive-technology journeys,
-a native-speaker Arabic copy review, provider-data localization, stale-data
-indicators, and manual device-size/offline evidence remain open.
+recorded in `docs/phase-5-verification.md`. The Arabic copy has been through
+a native-level consistency review, provider catalog data (names, credentials,
+bios, languages) is bilingual with English fallback for untranslated
+documents, and the development seed was re-run with the bilingual catalog.
+Assistive-technology journeys and manual device-size/offline evidence remain
+open.

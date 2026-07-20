@@ -27,18 +27,22 @@ const clinicSchema = z.object({
 
 const providerSchema = z.object({
   bio: z.string().min(1),
+  bioAr: z.string().min(1),
   clinicIds: z.array(z.string().min(1)).min(1),
   consultationFee: z.object({
     amount: z.number().int().nonnegative(),
     currency: z.literal('AED'),
   }),
   credentialSummary: z.string().min(1),
+  credentialSummaryAr: z.string().min(1),
   displayName: z.string().min(1),
+  displayNameAr: z.string().min(1),
   id: z.string().min(1),
   image: z.null(),
   isActive: z.boolean(),
   isFeatured: z.boolean(),
   languages: z.array(z.string().min(1)).min(1),
+  languagesAr: z.array(z.string().min(1)).min(1),
   ratingSummary: z.object({
     average: z.number().min(0).max(5),
     count: z.number().int().nonnegative(),

@@ -56,11 +56,55 @@ describe('Firestore care document mappers', () => {
     });
 
     expect(provider).toMatchObject({
-      displayName: 'Dr. Lina Haddad',
+      bio: {
+        ar: 'Family physician focused on preventive care.',
+        en: 'Family physician focused on preventive care.',
+      },
+      displayName: { ar: 'Dr. Lina Haddad', en: 'Dr. Lina Haddad' },
       id: 'lina-haddad',
+      languages: [
+        { ar: 'Arabic', en: 'Arabic' },
+        { ar: 'English', en: 'English' },
+      ],
       visitModes: ['in_person', 'video'],
     });
     expect(provider).not.toHaveProperty('searchTerms');
+  });
+
+  it('prefers localized provider fields when the document carries them', () => {
+    const provider = mapProviderDocument('lina-haddad', {
+      bio: 'Family physician focused on preventive care.',
+      bioAr: 'طبيبة أسرة تركّز على الرعاية الوقائية.',
+      clinicIds: ['marsa-family-clinic'],
+      consultationFee: { amount: 340, currency: 'AED' },
+      credentialSummary: 'MBBS, MRCGP',
+      credentialSummaryAr: 'MBBS، MRCGP',
+      displayName: 'Dr. Lina Haddad',
+      displayNameAr: 'د. لينا حداد',
+      image: null,
+      isActive: true,
+      isFeatured: true,
+      languages: ['Arabic', 'English'],
+      languagesAr: ['العربية', 'الإنجليزية'],
+      ratingSummary: { average: 4.9, count: 128 },
+      schemaVersion: 1,
+      slug: 'lina-haddad',
+      specialtyIds: ['family-medicine'],
+      visitModes: ['in_person', 'video'],
+    });
+
+    expect(provider).toMatchObject({
+      bio: {
+        ar: 'طبيبة أسرة تركّز على الرعاية الوقائية.',
+        en: 'Family physician focused on preventive care.',
+      },
+      credentialSummary: { ar: 'MBBS، MRCGP', en: 'MBBS, MRCGP' },
+      displayName: { ar: 'د. لينا حداد', en: 'Dr. Lina Haddad' },
+      languages: [
+        { ar: 'العربية', en: 'Arabic' },
+        { ar: 'الإنجليزية', en: 'English' },
+      ],
+    });
   });
 
   it('converts Firestore timestamps to serializable ISO dates', () => {

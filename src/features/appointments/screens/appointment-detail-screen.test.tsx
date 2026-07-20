@@ -235,9 +235,7 @@ describe('AppointmentDetailScreen', () => {
       </TestAppProviders>,
     );
 
-    await waitFor(() =>
-      expect(view.getByRole('header', { name: 'Dr. Lina Haddad' })).toBeVisible(),
-    );
+    await waitFor(() => expect(view.getByRole('header', { name: 'د. لينا حداد' })).toBeVisible());
     expect(view.getByText('تفاصيل الموعد')).toBeVisible();
     expect(view.getByText('مؤكد')).toBeVisible();
     expect(view.getByRole('button', { name: 'إضافة إلى التقويم' })).toBeVisible();

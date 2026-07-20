@@ -43,7 +43,7 @@ describe('HomeScreen', () => {
 
     await waitFor(() =>
       expect(
-        view.getByRole('button', { name: 'عرض الملف الشخصي للطبيب Dr. Lina Haddad' }),
+        view.getByRole('button', { name: 'عرض الملف الشخصي للطبيب د. لينا حداد' }),
       ).toBeVisible(),
     );
 

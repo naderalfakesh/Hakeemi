@@ -8,16 +8,19 @@ import { ProfileScreen } from './profile-screen';
 
 const noop = jest.fn().mockResolvedValue(undefined);
 const savedProvider: Provider = {
-  bio: 'A fictional clinician profile.',
+  bio: { ar: 'ملف تعريفي خيالي لطبيبة.', en: 'A fictional clinician profile.' },
   clinicIds: ['marsa-family-clinic'],
   consultationFee: { amount: 340, currency: 'AED' },
-  credentialSummary: 'MBBS · Family medicine',
-  displayName: 'Dr. Lina Haddad',
+  credentialSummary: { ar: 'MBBS · طب الأسرة', en: 'MBBS · Family medicine' },
+  displayName: { ar: 'د. لينا حداد', en: 'Dr. Lina Haddad' },
   id: 'lina-haddad',
   image: null,
   isActive: true,
   isFeatured: true,
-  languages: ['English', 'Arabic'],
+  languages: [
+    { ar: 'الإنجليزية', en: 'English' },
+    { ar: 'العربية', en: 'Arabic' },
+  ],
   ratingSummary: { average: 4.8, count: 126 },
   slug: 'lina-haddad',
   specialtyIds: ['family-medicine'],
@@ -190,7 +193,7 @@ describe('ProfileScreen', () => {
     expect(view.getByText('العربية')).toBeOnTheScreen();
     expect(view.getByText('English')).toBeOnTheScreen();
     expect(
-      view.getByRole('button', { name: 'إزالة Dr. Lina Haddad من الأطباء المحفوظين' }),
+      view.getByRole('button', { name: 'إزالة د. لينا حداد من الأطباء المحفوظين' }),
     ).toBeOnTheScreen();
     expect(view.getByRole('button', { name: 'تسجيل الخروج' })).toBeOnTheScreen();
   });

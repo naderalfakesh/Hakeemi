@@ -24,7 +24,7 @@ export function BookingConfirmationScreen({
   provider: Provider | null;
 }) {
   const theme = useAppTheme();
-  const { intlLocale } = useAppLocale();
+  const { intlLocale, locale } = useAppLocale();
   const strings = useStrings(bookingStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
 
@@ -49,7 +49,9 @@ export function BookingConfirmationScreen({
 
         <Surface padding="spacious" style={styles.card} variant="brand">
           <AppText variant="titleSmall">
-            {provider?.displayName ?? strings.confirmation.confirmedProviderFallback}
+            {provider
+              ? provider.displayName[locale]
+              : strings.confirmation.confirmedProviderFallback}
           </AppText>
           <AppText variant="bodyStrong">{formatAppointment(appointment, intlLocale)}</AppText>
           <AppText tone="secondary" variant="bodyMedium">

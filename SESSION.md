@@ -111,8 +111,18 @@
   Dynamic Type at 2× to protect dense rows, destructive/confirm actions
   (cancel, confirm cancellation, reschedule, confirm booking) carry localized
   accessibility hints, and the saved-clinician row meets the 44 pt target.
-- Phase 5 open items: assistive-technology journeys, native-speaker Arabic copy
-  review, provider-data localization (bios/credentials/languages), and
+- Arabic copy review: a native-level MSA pass tightened grammar and
+  consistency (dual/singular counts now drop the redundant numeral, «ملغى»,
+  transitive reschedule label, unified «معرض الأعمال» terminology, natural
+  greeting) across all bundles.
+- Provider data localization: provider names, credentials, bios, and languages
+  are bilingual end to end. Firestore keeps the English `displayName` string
+  for ordering/cursors and adds optional `*Ar` fields; the mapper composes
+  `LocalizedText` with English fallback for untranslated documents. The seed
+  catalog, seed schema, and search terms (Arabic names/languages/specialties)
+  are updated, and `hakeemi-portfolio-dev` was reseeded with the 24-document
+  bilingual catalog.
+- Phase 5 open items: assistive-technology journeys on devices and
   device-size/rotation/keyboard evidence on small phones and tablets.
 - Phase 6 quality gate: GitHub Actions now runs the app, Firebase, Functions,
   rules, booking, management, notification-token, and scheduled-reminder

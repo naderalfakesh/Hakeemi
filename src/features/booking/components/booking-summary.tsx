@@ -31,7 +31,7 @@ export function BookingSummary({
       <SummaryRow
         icon="person-outline"
         label={strings.summary.clinician}
-        value={selection.provider.displayName}
+        value={selection.provider.displayName[locale]}
       />
       <SummaryRow
         icon="time-outline"

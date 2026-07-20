@@ -3,7 +3,10 @@
   "specialties": [
     {
       "id": "family-medicine",
-      "name": { "en": "Family medicine", "ar": "طب الأسرة" },
+      "name": {
+        "en": "Family medicine",
+        "ar": "طب الأسرة"
+      },
       "description": {
         "en": "Everyday care, prevention, and ongoing health support.",
         "ar": "الرعاية اليومية والوقاية والدعم الصحي المستمر."
@@ -14,7 +17,10 @@
     },
     {
       "id": "cardiology",
-      "name": { "en": "Cardiology", "ar": "طب القلب" },
+      "name": {
+        "en": "Cardiology",
+        "ar": "طب القلب"
+      },
       "description": {
         "en": "Heart health, prevention, diagnosis, and follow-up care.",
         "ar": "صحة القلب والوقاية والتشخيص والرعاية المستمرة."
@@ -25,7 +31,10 @@
     },
     {
       "id": "dermatology",
-      "name": { "en": "Dermatology", "ar": "الأمراض الجلدية" },
+      "name": {
+        "en": "Dermatology",
+        "ar": "الأمراض الجلدية"
+      },
       "description": {
         "en": "Care for skin, hair, and nail concerns.",
         "ar": "رعاية مشكلات البشرة والشعر والأظافر."
@@ -36,7 +45,10 @@
     },
     {
       "id": "pediatrics",
-      "name": { "en": "Pediatrics", "ar": "طب الأطفال" },
+      "name": {
+        "en": "Pediatrics",
+        "ar": "طب الأطفال"
+      },
       "description": {
         "en": "Thoughtful care for infants, children, and teenagers.",
         "ar": "رعاية متخصصة للرضّع والأطفال والمراهقين."
@@ -47,7 +59,10 @@
     },
     {
       "id": "mental-wellbeing",
-      "name": { "en": "Mental wellbeing", "ar": "الصحة النفسية" },
+      "name": {
+        "en": "Mental wellbeing",
+        "ar": "الصحة النفسية"
+      },
       "description": {
         "en": "Confidential support for emotional and mental wellbeing.",
         "ar": "دعم سري للصحة النفسية والعاطفية."
@@ -58,7 +73,10 @@
     },
     {
       "id": "womens-health",
-      "name": { "en": "Women's health", "ar": "صحة المرأة" },
+      "name": {
+        "en": "Women's health",
+        "ar": "صحة المرأة"
+      },
       "description": {
         "en": "Preventive, reproductive, and ongoing health care.",
         "ar": "الرعاية الوقائية والإنجابية والصحية المستمرة."
@@ -71,28 +89,52 @@
   "clinics": [
     {
       "id": "marsa-family-clinic",
-      "name": { "en": "Marsa Family Clinic", "ar": "عيادة مرسى للأسرة" },
-      "address": { "en": "Harbour Walk, Dubai Marina", "ar": "ممشى الميناء، دبي مارينا" },
-      "city": { "en": "Dubai", "ar": "دبي" },
+      "name": {
+        "en": "Marsa Family Clinic",
+        "ar": "عيادة مرسى للأسرة"
+      },
+      "address": {
+        "en": "Harbour Walk, Dubai Marina",
+        "ar": "ممشى الميناء، دبي مارينا"
+      },
+      "city": {
+        "en": "Dubai",
+        "ar": "دبي"
+      },
       "timezone": "Asia/Dubai",
       "isActive": true
     },
     {
       "id": "barari-medical-centre",
-      "name": { "en": "Barari Medical Centre", "ar": "مركز البراري الطبي" },
-      "address": { "en": "Green Avenue, Al Barari", "ar": "الجادة الخضراء، البراري" },
-      "city": { "en": "Dubai", "ar": "دبي" },
+      "name": {
+        "en": "Barari Medical Centre",
+        "ar": "مركز البراري الطبي"
+      },
+      "address": {
+        "en": "Green Avenue, Al Barari",
+        "ar": "الجادة الخضراء، البراري"
+      },
+      "city": {
+        "en": "Dubai",
+        "ar": "دبي"
+      },
       "timezone": "Asia/Dubai",
       "isActive": true
     },
     {
       "id": "harbour-telehealth",
-      "name": { "en": "Harbour Telehealth", "ar": "هاربور للرعاية عن بُعد" },
+      "name": {
+        "en": "Harbour Telehealth",
+        "ar": "هاربور للرعاية عن بُعد"
+      },
       "address": {
         "en": "Video visits across the UAE",
         "ar": "زيارات فيديو في جميع أنحاء الإمارات"
       },
-      "city": { "en": "Online", "ar": "عبر الإنترنت" },
+      "city": {
+        "en": "Online",
+        "ar": "عبر الإنترنت"
+      },
       "timezone": "Asia/Dubai",
       "isActive": true
     }
@@ -108,11 +150,21 @@
       "languages": ["Arabic", "English", "French"],
       "clinicIds": ["marsa-family-clinic", "harbour-telehealth"],
       "visitModes": ["in_person", "video"],
-      "consultationFee": { "amount": 340, "currency": "AED" },
-      "ratingSummary": { "average": 4.9, "count": 184 },
+      "consultationFee": {
+        "amount": 340,
+        "currency": "AED"
+      },
+      "ratingSummary": {
+        "average": 4.9,
+        "count": 184
+      },
       "image": null,
       "isFeatured": true,
-      "isActive": true
+      "isActive": true,
+      "displayNameAr": "د. لينا حداد",
+      "credentialSummaryAr": "MBBS، MRCGP · خبرة 12 عامًا",
+      "bioAr": "تركّز لينا على الرعاية الوقائية والخطط الصحية العملية طويلة الأمد، وتعمل مع البالغين والعائلات لمتابعة الشكاوى اليومية والحالات المزمنة.",
+      "languagesAr": ["العربية", "الإنجليزية", "الفرنسية"]
     },
     {
       "id": "omar-rahman",
@@ -124,11 +176,21 @@
       "languages": ["Arabic", "English"],
       "clinicIds": ["barari-medical-centre"],
       "visitModes": ["in_person"],
-      "consultationFee": { "amount": 620, "currency": "AED" },
-      "ratingSummary": { "average": 4.8, "count": 127 },
+      "consultationFee": {
+        "amount": 620,
+        "currency": "AED"
+      },
+      "ratingSummary": {
+        "average": 4.8,
+        "count": 127
+      },
       "image": null,
       "isFeatured": true,
-      "isActive": true
+      "isActive": true,
+      "displayNameAr": "د. عمر رحمن",
+      "credentialSummaryAr": "MD، FACC · خبرة 16 عامًا",
+      "bioAr": "يساعد عمر مرضاه على فهم مخاطر القلب ونتائج الفحوصات وخيارات العلاج بلغة واضحة، وتشمل ممارسته الوقاية والرعاية القلبية المستمرة.",
+      "languagesAr": ["العربية", "الإنجليزية"]
     },
     {
       "id": "priya-menon",
@@ -140,11 +202,21 @@
       "languages": ["English", "Hindi", "Malayalam"],
       "clinicIds": ["marsa-family-clinic", "harbour-telehealth"],
       "visitModes": ["in_person", "video"],
-      "consultationFee": { "amount": 470, "currency": "AED" },
-      "ratingSummary": { "average": 4.9, "count": 96 },
+      "consultationFee": {
+        "amount": 470,
+        "currency": "AED"
+      },
+      "ratingSummary": {
+        "average": 4.9,
+        "count": 96
+      },
       "image": null,
       "isFeatured": true,
-      "isActive": true
+      "isActive": true,
+      "displayNameAr": "د. بريا مينون",
+      "credentialSummaryAr": "MBBS، MD أمراض جلدية · خبرة 10 أعوام",
+      "bioAr": "تعالج بريا مشكلات الجلد الشائعة والمعقدة بنهج متوازن قائم على الأدلة، مع اهتمام خاص بالرعاية طويلة الأمد لحب الشباب والإكزيما.",
+      "languagesAr": ["الإنجليزية", "الهندية", "المالايالامية"]
     },
     {
       "id": "samir-nasser",
@@ -156,11 +228,21 @@
       "languages": ["Arabic", "English"],
       "clinicIds": ["barari-medical-centre", "harbour-telehealth"],
       "visitModes": ["in_person", "video"],
-      "consultationFee": { "amount": 390, "currency": "AED" },
-      "ratingSummary": { "average": 4.7, "count": 213 },
+      "consultationFee": {
+        "amount": 390,
+        "currency": "AED"
+      },
+      "ratingSummary": {
+        "average": 4.7,
+        "count": 213
+      },
       "image": null,
       "isFeatured": false,
-      "isActive": true
+      "isActive": true,
+      "displayNameAr": "د. سمير ناصر",
+      "credentialSummaryAr": "MD، MRCPCH · خبرة 14 عامًا",
+      "bioAr": "يعمل سمير عن قرب مع الأهل لجعل رعاية الأطفال أقل إرهاقًا، ويغطي فحوصات حديثي الولادة وأمراض الطفولة ومتابعة النمو والرعاية الوقائية.",
+      "languagesAr": ["العربية", "الإنجليزية"]
     },
     {
       "id": "aisha-bello",
@@ -172,11 +254,21 @@
       "languages": ["English", "Yoruba"],
       "clinicIds": ["harbour-telehealth"],
       "visitModes": ["video"],
-      "consultationFee": { "amount": 520, "currency": "AED" },
-      "ratingSummary": { "average": 4.9, "count": 71 },
+      "consultationFee": {
+        "amount": 520,
+        "currency": "AED"
+      },
+      "ratingSummary": {
+        "average": 4.9,
+        "count": 71
+      },
       "image": null,
       "isFeatured": true,
-      "isActive": true
+      "isActive": true,
+      "displayNameAr": "د. عائشة بيلو",
+      "credentialSummaryAr": "DClinPsy · خبرة 9 أعوام",
+      "bioAr": "تقدّم عائشة دعمًا منظمًا وسريًا للتعامل مع القلق والإرهاق النفسي والتغيرات الحياتية الكبرى، وتركّز الجلسات على أدوات عملية وتقدّم مستدام.",
+      "languagesAr": ["الإنجليزية", "اليوروبا"]
     },
     {
       "id": "noor-al-mansouri",
@@ -188,11 +280,21 @@
       "languages": ["Arabic", "English"],
       "clinicIds": ["marsa-family-clinic"],
       "visitModes": ["in_person"],
-      "consultationFee": { "amount": 560, "currency": "AED" },
-      "ratingSummary": { "average": 4.8, "count": 142 },
+      "consultationFee": {
+        "amount": 560,
+        "currency": "AED"
+      },
+      "ratingSummary": {
+        "average": 4.8,
+        "count": 142
+      },
       "image": null,
       "isFeatured": false,
-      "isActive": true
+      "isActive": true,
+      "displayNameAr": "د. نور المنصوري",
+      "credentialSummaryAr": "MBBS، MRCOG · خبرة 13 عامًا",
+      "bioAr": "تقدّم نور رعاية صحية وقائية وإنجابية مع تركيز على الخيارات الواعية والخصوصية واستمرارية الرعاية عبر مراحل الحياة.",
+      "languagesAr": ["العربية", "الإنجليزية"]
     }
   ],
   "slots": [

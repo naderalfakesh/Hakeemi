@@ -15,7 +15,9 @@ export function selectProviders(
 ) {
   const normalizedQuery = normalize(search.query ?? '');
   const specialtyNames = new Map(
-    specialties.map((specialty) => [specialty.id, specialty.name.en] as const),
+    specialties.map(
+      (specialty) => [specialty.id, `${specialty.name.en} ${specialty.name.ar}`] as const,
+    ),
   );
 
   return providers
@@ -27,9 +29,11 @@ export function selectProviders(
       }
 
       const searchableValues = [
-        provider.displayName,
-        provider.credentialSummary,
-        ...provider.languages,
+        provider.displayName.en,
+        provider.displayName.ar,
+        provider.credentialSummary.en,
+        provider.credentialSummary.ar,
+        ...provider.languages.flatMap((language) => [language.en, language.ar]),
         ...provider.specialtyIds.map((id) => specialtyNames.get(id) ?? ''),
       ];
 
@@ -40,6 +44,8 @@ export function selectProviders(
         return left.isFeatured ? -1 : 1;
       }
 
-      return left.displayName.localeCompare(right.displayName) || left.id.localeCompare(right.id);
+      return (
+        left.displayName.en.localeCompare(right.displayName.en) || left.id.localeCompare(right.id)
+      );
     });
 }

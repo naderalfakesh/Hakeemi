@@ -75,8 +75,8 @@ export function buildSeedDocuments(catalog: SeedCatalog, referenceDate: string):
     };
   });
 
-  const specialtyNameById = new Map(
-    catalog.specialties.map((specialty) => [specialty.id, specialty.name.en]),
+  const specialtyNamesById = new Map(
+    catalog.specialties.map((specialty) => [specialty.id, [specialty.name.en, specialty.name.ar]]),
   );
 
   const providers = catalog.providers.map((provider) => {
@@ -88,9 +88,11 @@ export function buildSeedDocuments(catalog: SeedCatalog, referenceDate: string):
 
     const searchTerms = new Set([
       provider.displayName,
+      provider.displayNameAr,
       provider.slug,
       ...provider.languages,
-      ...provider.specialtyIds.map((specialtyId) => specialtyNameById.get(specialtyId) ?? ''),
+      ...provider.languagesAr,
+      ...provider.specialtyIds.flatMap((specialtyId) => specialtyNamesById.get(specialtyId) ?? []),
     ]);
 
     return {

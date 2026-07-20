@@ -79,6 +79,7 @@ function AuthenticatedAppointments({
   onViewAppointment?: ((appointmentId: string) => void) | undefined;
 }) {
   const theme = useAppTheme();
+  const { locale } = useAppLocale();
   const strings = useStrings(appointmentsStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
   const appointmentsQuery = useAppointments(appointmentRepository, careDataRepository);
@@ -169,7 +170,7 @@ function AuthenticatedAppointments({
               appointment={appointment}
               key={appointment.id}
               onPress={onViewAppointment ? () => onViewAppointment(appointment.id) : undefined}
-              providerName={provider?.displayName ?? strings.providerFallback}
+              providerName={provider ? provider.displayName[locale] : strings.providerFallback}
             />
           ))
         )}

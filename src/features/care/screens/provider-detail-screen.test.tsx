@@ -124,14 +124,12 @@ describe('ProviderDetailScreen', () => {
       </TestAppProviders>,
     );
 
-    await waitFor(() =>
-      expect(view.getByRole('header', { name: 'Dr. Lina Haddad' })).toBeVisible(),
-    );
+    await waitFor(() => expect(view.getByRole('header', { name: 'د. لينا حداد' })).toBeVisible());
 
     expect(view.getByText('طب الأسرة')).toBeOnTheScreen();
     expect(view.getByText('المواعيد المتاحة')).toBeOnTheScreen();
     expect(view.getByText('الاستشارة')).toBeOnTheScreen();
     expect(view.getByLabelText('موعدان متاحان')).toBeOnTheScreen();
-    expect(view.getByLabelText('حفظ Dr. Lina Haddad')).toBeOnTheScreen();
+    expect(view.getByLabelText('حفظ د. لينا حداد')).toBeOnTheScreen();
   });
 });

@@ -41,6 +41,7 @@ const clinicDocumentSchema = z.object({
 
 const providerDocumentSchema = z.object({
   bio: z.string().min(1),
+  bioAr: z.string().min(1).optional(),
   clinicIds: z.array(z.string().min(1)).min(1),
   consultationFee: z
     .object({
@@ -49,7 +50,9 @@ const providerDocumentSchema = z.object({
     })
     .nullable(),
   credentialSummary: z.string().min(1),
+  credentialSummaryAr: z.string().min(1).optional(),
   displayName: z.string().min(1),
+  displayNameAr: z.string().min(1).optional(),
   image: z
     .object({
       alt: z.string().min(1),
@@ -60,6 +63,7 @@ const providerDocumentSchema = z.object({
   isActive: z.boolean(),
   isFeatured: z.boolean(),
   languages: z.array(z.string().min(1)).min(1),
+  languagesAr: z.array(z.string().min(1)).optional(),
   ratingSummary: z
     .object({
       average: z.number().min(0).max(5),
@@ -133,9 +137,30 @@ export function mapClinicDocument(documentId: string, data: unknown): Clinic {
 }
 
 export function mapProviderDocument(documentId: string, data: unknown): Provider {
+  const {
+    bio,
+    bioAr,
+    credentialSummary,
+    credentialSummaryAr,
+    displayName,
+    displayNameAr,
+    languages,
+    languagesAr,
+    ...rest
+  } = parseDocument('providers', documentId, providerDocumentSchema, data);
+
+  // Untranslated documents fall back to their English text so partially
+  // migrated backend data stays renderable in Arabic.
   return {
     id: documentId,
-    ...parseDocument('providers', documentId, providerDocumentSchema, data),
+    ...rest,
+    bio: { ar: bioAr ?? bio, en: bio },
+    credentialSummary: { ar: credentialSummaryAr ?? credentialSummary, en: credentialSummary },
+    displayName: { ar: displayNameAr ?? displayName, en: displayName },
+    languages: languages.map((language, index) => ({
+      ar: languagesAr?.[index] ?? language,
+      en: language,
+    })),
   };
 }
 

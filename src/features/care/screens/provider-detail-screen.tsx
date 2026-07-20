@@ -83,8 +83,8 @@ export function ProviderDetailScreen({
           <IconButton
             accessibilityLabel={
               isProviderSaved
-                ? strings.removeFromSaved(provider.displayName)
-                : strings.save(provider.displayName)
+                ? strings.removeFromSaved(provider.displayName[locale])
+                : strings.save(provider.displayName[locale])
             }
             disabled={savedProviderStatus === 'saving' || savedProviderStatus === 'loading'}
             onPress={() => {
@@ -105,16 +105,16 @@ export function ProviderDetailScreen({
         </View>
 
         <View style={styles.identity}>
-          <ProviderAvatar name={provider.displayName} providerId={provider.id} size="large" />
+          <ProviderAvatar name={provider.displayName.en} providerId={provider.id} size="large" />
           <View style={styles.identityCopy}>
             <AppText accessibilityRole="header" variant="titleLarge">
-              {provider.displayName}
+              {provider.displayName[locale]}
             </AppText>
             <AppText tone="brand" variant="bodyStrong">
               {specialtyNames}
             </AppText>
             <AppText tone="secondary" variant="bodyMedium">
-              {provider.credentialSummary}
+              {provider.credentialSummary[locale]}
             </AppText>
           </View>
         </View>
@@ -142,7 +142,7 @@ export function ProviderDetailScreen({
 
         <DetailSection title={strings.about}>
           <AppText tone="secondary" variant="bodyLarge">
-            {provider.bio}
+            {provider.bio[locale]}
           </AppText>
         </DetailSection>
 
@@ -151,7 +151,10 @@ export function ProviderDetailScreen({
             icon="videocam-outline"
             label={provider.visitModes.map((mode) => formatVisitMode(mode, locale)).join(' · ')}
           />
-          <InfoRow icon="language-outline" label={provider.languages.join(' · ')} />
+          <InfoRow
+            icon="language-outline"
+            label={provider.languages.map((language) => language[locale]).join(' · ')}
+          />
         </DetailSection>
 
         <DetailSection title={strings.clinics}>

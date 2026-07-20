@@ -310,6 +310,7 @@ function SavedProvidersSection({
   status: SavedProvidersStatus;
 }) {
   const theme = useAppTheme();
+  const { locale } = useAppLocale();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const strings = useStrings(profileStrings);
 
@@ -359,23 +360,23 @@ function SavedProvidersSection({
         <View style={styles.savedProvidersList}>
           {providers.map((provider) => (
             <View key={provider.id} style={styles.savedProviderRow}>
-              <ProviderAvatar name={provider.displayName} providerId={provider.id} />
+              <ProviderAvatar name={provider.displayName.en} providerId={provider.id} />
               <Pressable
-                accessibilityLabel={strings.savedCliniciansOpen(provider.displayName)}
+                accessibilityLabel={strings.savedCliniciansOpen(provider.displayName[locale])}
                 accessibilityRole="button"
                 disabled={!onOpenProvider}
                 onPress={() => onOpenProvider?.(provider.id)}
                 style={styles.savedProviderCopy}
               >
                 <AppText numberOfLines={1} variant="bodyStrong">
-                  {provider.displayName}
+                  {provider.displayName[locale]}
                 </AppText>
                 <AppText numberOfLines={1} tone="secondary" variant="caption">
-                  {provider.credentialSummary}
+                  {provider.credentialSummary[locale]}
                 </AppText>
               </Pressable>
               <IconButton
-                accessibilityLabel={strings.savedCliniciansRemove(provider.displayName)}
+                accessibilityLabel={strings.savedCliniciansRemove(provider.displayName[locale])}
                 onPress={() => onRemoveProvider?.(provider.id)}
                 variant="soft"
               >

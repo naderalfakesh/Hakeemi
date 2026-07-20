@@ -84,17 +84,34 @@
 
 | Check              | Result                         |
 | ------------------ | ------------------------------ |
-| Application tests  | 34 suites, 103 tests passed    |
+| Application tests  | 34 suites, 106 tests passed    |
 | App lint/typecheck | Passed (ESLint, tsc, Prettier) |
 | Static web export  | 21 routes exported             |
 | Expo Doctor        | 20/20 checks passed            |
 | Root error path    | Recoverable boundary component |
+
+## Arabic copy review and bilingual provider data
+
+- All Arabic bundles passed a native-level Modern Standard Arabic consistency
+  review: singular/dual counts drop the redundant numeral («طبيبان», not
+  «2 طبيبان»), «ملغى» replaces the common misspelling, the reschedule action
+  uses the transitive «النقل إلى هنا», terminology is unified on
+  «معرض الأعمال», and the home greeting reads naturally.
+- Provider catalog data is bilingual end to end: names, credentials, bios,
+  and languages render from `LocalizedText` in both locales. Firestore keeps
+  the English `displayName` string for its composite ordering index and
+  opaque cursors, adds optional `*Ar` fields, and the mapper falls back to
+  English for untranslated documents so partially migrated data stays
+  renderable.
+- Seed tooling requires the Arabic fields, includes Arabic names, languages,
+  and specialty names in the search terms, and the `hakeemi-portfolio-dev`
+  24-document catalog was reseeded with the bilingual data.
+- Fixture search matches both locales, so Arabic queries (for example
+  «طب القلب») find providers in the portfolio web export as well.
 
 ## Remaining Phase 5 work
 
 The remaining pass should run English/LTR plus Arabic/RTL auth, discovery,
 booking, and management journeys on devices with Dynamic Type, VoiceOver, and
 TalkBack, and gather keyboard/safe-area/rotation evidence on small phones and
-tablets. A native-speaker review of the Arabic copy and provider-data
-localization (bios, credentials, languages) also remain open before Phase 5
-can be marked complete.
+tablets before Phase 5 can be marked complete.

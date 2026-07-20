@@ -33,17 +33,17 @@ export const ProviderCard = memo(function ProviderCard({
 
   return (
     <Pressable
-      accessibilityLabel={strings.viewProfileFor(provider.displayName)}
+      accessibilityLabel={strings.viewProfileFor(provider.displayName[locale])}
       accessibilityRole="button"
       android_ripple={{ color: theme.colors.brandSoft }}
       onPress={handlePress}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       <View style={styles.topRow}>
-        <ProviderAvatar name={provider.displayName} providerId={provider.id} />
+        <ProviderAvatar name={provider.displayName.en} providerId={provider.id} />
         <View style={styles.identity}>
           <AppText numberOfLines={1} variant="titleSmall">
-            {provider.displayName}
+            {provider.displayName[locale]}
           </AppText>
           <AppText numberOfLines={1} tone="secondary" variant="bodyMedium">
             {specialtyName}

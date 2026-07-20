@@ -22,16 +22,16 @@ export type ProviderImage = {
 };
 
 export type Provider = {
-  bio: string;
+  bio: LocalizedText;
   clinicIds: readonly string[];
   consultationFee: Money | null;
-  credentialSummary: string;
-  displayName: string;
+  credentialSummary: LocalizedText;
+  displayName: LocalizedText;
   id: string;
   image: ProviderImage | null;
   isActive: boolean;
   isFeatured: boolean;
-  languages: readonly string[];
+  languages: readonly LocalizedText[];
   ratingSummary: RatingSummary | null;
   slug: string;
   specialtyIds: readonly string[];

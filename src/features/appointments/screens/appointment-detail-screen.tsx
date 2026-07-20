@@ -135,7 +135,7 @@ function AuthenticatedAppointmentDetail({
 
   const providerName =
     providerQuery.state.status === 'success'
-      ? providerQuery.state.data.provider.displayName
+      ? providerQuery.state.data.provider.displayName[locale]
       : appointment.providerId;
   const canManage =
     appointment.status === 'confirmed' && new Date(appointment.startsAt) > new Date();
