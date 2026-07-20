@@ -22,12 +22,14 @@ import { formatAvailability, formatFee, formatVisitMode } from '../presentation/
 
 type ProviderDetailScreenProps = {
   onBack: () => void;
+  onChooseSlot: (slot: AvailabilitySlot) => void;
   providerId: string;
   repository?: CareRepository;
 };
 
 export function ProviderDetailScreen({
   onBack,
+  onChooseSlot,
   providerId,
   repository,
 }: ProviderDetailScreenProps) {
@@ -95,7 +97,7 @@ export function ProviderDetailScreen({
           </Surface>
         </View>
 
-        <AvailabilitySection slots={slots} />
+        <AvailabilitySection onChooseSlot={onChooseSlot} slots={slots} />
 
         <DetailSection title="About">
           <AppText tone="secondary" variant="bodyLarge">
@@ -194,7 +196,13 @@ function ProviderDetailState({ onBack, onRetry, providerId, status }: ProviderDe
   );
 }
 
-function AvailabilitySection({ slots }: { slots: readonly AvailabilitySlot[] }) {
+function AvailabilitySection({
+  onChooseSlot,
+  slots,
+}: {
+  onChooseSlot: (slot: AvailabilitySlot) => void;
+  slots: readonly AvailabilitySlot[];
+}) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
@@ -208,7 +216,7 @@ function AvailabilitySection({ slots }: { slots: readonly AvailabilitySlot[] }) 
       </AppText>
       <AppText tone="secondary" variant="bodyMedium">
         {slots.length > 0
-          ? 'Times are shown in Gulf Standard Time. Choose a time in the next step.'
+          ? 'Times are shown in Gulf Standard Time. Choose an available time to continue.'
           : 'No appointments are available in this window. Check again soon.'}
       </AppText>
       {slots.length > 0 && (
@@ -221,7 +229,13 @@ function AvailabilitySection({ slots }: { slots: readonly AvailabilitySlot[] }) 
                   {formatVisitMode(slot.visitMode)}
                 </AppText>
               </View>
-              <DecorativeIcon color={theme.colors.brand} name="time-outline" size={20} />
+              <Button
+                accessibilityLabel={`Choose ${formatAvailability(slot)}`}
+                onPress={() => onChooseSlot(slot)}
+                variant="secondary"
+              >
+                Choose
+              </Button>
             </View>
           ))}
         </View>

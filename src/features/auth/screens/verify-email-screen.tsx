@@ -10,7 +10,7 @@ import { toAuthActionError } from '../domain/errors';
 type VerifyEmailScreenProps = {
   email: string;
   onBack: () => void;
-  onContinue: () => void;
+  onContinue: () => Promise<void>;
   onResend: () => Promise<void>;
   onUseAnotherAccount: () => Promise<void>;
 };
@@ -25,6 +25,7 @@ export function VerifyEmailScreen({
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [isResending, setIsResending] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
   const [message, setMessage] = useState<string>();
   const [submissionError, setSubmissionError] = useState<string>();
 
@@ -40,6 +41,20 @@ export function VerifyEmailScreen({
       setSubmissionError(toAuthActionError(error).message);
     } finally {
       setIsResending(false);
+    }
+  }
+
+  async function handleContinue() {
+    setIsChecking(true);
+    setMessage(undefined);
+    setSubmissionError(undefined);
+
+    try {
+      await onContinue();
+    } catch (error) {
+      setSubmissionError(toAuthActionError(error).message);
+    } finally {
+      setIsChecking(false);
     }
   }
 
@@ -66,7 +81,9 @@ export function VerifyEmailScreen({
         )}
         {submissionError && <InlineError message={submissionError} />}
 
-        <Button onPress={onContinue}>Continue to Hakeemi</Button>
+        <Button busy={isChecking} onPress={() => void handleContinue()}>
+          Continue to Hakeemi
+        </Button>
         <Button busy={isResending} onPress={() => void handleResend()} variant="secondary">
           Resend email
         </Button>

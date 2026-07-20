@@ -6,6 +6,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import '@/config/env';
 import { AppText } from '@/components/ui';
 import { AuthSessionProvider, useAuthSession } from '@/features/auth/context/auth-session-provider';
+import { BookingDraftProvider } from '@/features/booking/context/booking-draft-provider';
 import {
   AppPreferencesProvider,
   useAppPreferences,
@@ -58,9 +59,11 @@ export default function RootLayout() {
     <GestureHandlerRootView style={styles.root}>
       <AppQueryProvider>
         <AuthSessionProvider>
-          <AppPreferencesProvider>
-            <AppShell />
-          </AppPreferencesProvider>
+          <BookingDraftProvider>
+            <AppPreferencesProvider>
+              <AppShell />
+            </AppPreferencesProvider>
+          </BookingDraftProvider>
         </AuthSessionProvider>
       </AppQueryProvider>
     </GestureHandlerRootView>

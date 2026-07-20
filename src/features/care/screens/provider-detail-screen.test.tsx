@@ -8,10 +8,12 @@ import { ProviderDetailScreen } from './provider-detail-screen';
 
 describe('ProviderDetailScreen', () => {
   it('shows decision-making details from the fictional repository', async () => {
+    const onChooseSlot = jest.fn();
     const view = await render(
       <TestAppProviders colorScheme="light">
         <ProviderDetailScreen
           onBack={jest.fn()}
+          onChooseSlot={onChooseSlot}
           providerId="lina-haddad"
           repository={fixtureCareRepository}
         />
@@ -26,6 +28,11 @@ describe('ProviderDetailScreen', () => {
     expect(view.getByText(/AED\s*340/iu)).toBeOnTheScreen();
     expect(view.getByText(/Times are shown in Gulf Standard Time/iu)).toBeOnTheScreen();
     expect(view.getByLabelText('2 available appointments')).toBeOnTheScreen();
+
+    await fireEvent.press(view.getAllByRole('button', { name: /Choose /u })[0]!);
+    expect(onChooseSlot).toHaveBeenCalledWith(
+      expect.objectContaining({ providerId: 'lina-haddad' }),
+    );
   });
 
   it('provides a safe way back when a provider is missing', async () => {
@@ -34,6 +41,7 @@ describe('ProviderDetailScreen', () => {
       <TestAppProviders colorScheme="dark">
         <ProviderDetailScreen
           onBack={onBack}
+          onChooseSlot={jest.fn()}
           providerId="missing-provider"
           repository={fixtureCareRepository}
         />
@@ -60,7 +68,12 @@ describe('ProviderDetailScreen', () => {
     };
     const view = await render(
       <TestAppProviders colorScheme="light">
-        <ProviderDetailScreen onBack={jest.fn()} providerId="lina-haddad" repository={repository} />
+        <ProviderDetailScreen
+          onBack={jest.fn()}
+          onChooseSlot={jest.fn()}
+          providerId="lina-haddad"
+          repository={repository}
+        />
       </TestAppProviders>,
     );
 
