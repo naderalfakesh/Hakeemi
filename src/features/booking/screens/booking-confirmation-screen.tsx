@@ -1,10 +1,11 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText, Button, DecorativeIcon, Surface } from '@/components/ui';
 import type { Appointment } from '@/features/appointments/domain/types';
 import type { Provider } from '@/features/care/domain/types';
+import { triggerHaptic } from '@/services/haptics/haptics';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 export function BookingConfirmationScreen({
@@ -20,6 +21,10 @@ export function BookingConfirmationScreen({
 }) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
+
+  useEffect(() => {
+    void triggerHaptic('success');
+  }, []);
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>

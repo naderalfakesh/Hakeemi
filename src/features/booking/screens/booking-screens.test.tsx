@@ -6,11 +6,18 @@ import {
   buildAvailabilityFixtures,
 } from '@/features/care/data/fixtures';
 import { TestAppProviders } from '@/test/test-app-providers';
+import { triggerHaptic } from '@/services/haptics/haptics';
 
 import type { BookingSelection } from '../hooks/use-booking-selection';
 import { BookingConfirmationScreen } from './booking-confirmation-screen';
 import { BookingDetailsScreen } from './booking-details-screen';
 import { BookingReviewScreen } from './booking-review-screen';
+
+jest.mock('@/services/haptics/haptics', () => ({
+  triggerHaptic: jest.fn().mockResolvedValue(undefined),
+}));
+
+const mockedTriggerHaptic = jest.mocked(triggerHaptic);
 
 const slot = buildAvailabilityFixtures(new Date('2026-07-20T08:00:00.000Z'))[0];
 const selection: BookingSelection = {
@@ -67,6 +74,7 @@ describe('guided booking screens', () => {
   });
 
   it('renders a useful confirmation without exposing patient data', async () => {
+    mockedTriggerHaptic.mockClear();
     const view = await render(
       <TestAppProviders>
         <BookingConfirmationScreen
@@ -97,5 +105,6 @@ describe('guided booking screens', () => {
     expect(view.getByRole('header', { name: 'Appointment confirmed' })).toBeVisible();
     expect(view.getByText('Dr. Lina Haddad')).toBeOnTheScreen();
     expect(view.queryByText('private-patient-id')).not.toBeOnTheScreen();
+    expect(mockedTriggerHaptic).toHaveBeenCalledWith('success');
   });
 });

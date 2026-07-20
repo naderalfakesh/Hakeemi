@@ -19,6 +19,7 @@ import { careRepository } from '@/features/care/data/care-repository';
 import { formatAvailability } from '@/features/care/presentation/formatters';
 import { useProviderDetail } from '@/features/care/hooks/use-provider-detail';
 import { addAppointmentToCalendar } from '@/services/calendar/calendar';
+import { triggerHaptic } from '@/services/haptics/haptics';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { useCancelAppointment } from '../hooks/use-cancel-appointment';
@@ -157,6 +158,11 @@ function AuthenticatedAppointmentDetail({
     setConfirmingCancel(false);
   }
 
+  async function confirmCancel() {
+    await triggerHaptic('warning');
+    await cancel();
+  }
+
   async function reschedule(slotId: string) {
     await rescheduleMutation.reschedule({
       appointmentId: appointmentRecord.id,
@@ -274,7 +280,7 @@ function AuthenticatedAppointmentDetail({
               </Button>
               <Button
                 busy={cancelMutation.status === 'pending'}
-                onPress={() => void cancel()}
+                onPress={() => void confirmCancel()}
                 variant="danger"
               >
                 Confirm cancellation

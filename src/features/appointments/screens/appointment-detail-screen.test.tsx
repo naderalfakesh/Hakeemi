@@ -3,6 +3,7 @@ import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { fixtureCareRepository } from '@/features/care/data/fixture-care-repository';
 import { addAppointmentToCalendar } from '@/services/calendar/calendar';
+import { triggerHaptic } from '@/services/haptics/haptics';
 import { TestAppProviders } from '@/test/test-app-providers';
 
 import type { AppointmentRepository } from '../domain/repository';
@@ -21,8 +22,13 @@ jest.mock('@/services/calendar/calendar', () => ({
   addAppointmentToCalendar: jest.fn().mockResolvedValue({ eventId: 'event-1', status: 'added' }),
 }));
 
+jest.mock('@/services/haptics/haptics', () => ({
+  triggerHaptic: jest.fn().mockResolvedValue(undefined),
+}));
+
 const mockedUseAuthSession = jest.mocked(useAuthSession);
 const mockedAddAppointmentToCalendar = jest.mocked(addAppointmentToCalendar);
+const mockedTriggerHaptic = jest.mocked(triggerHaptic);
 
 const appointment: Appointment = {
   cancelledAt: null,
@@ -75,6 +81,7 @@ describe('AppointmentDetailScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockedAddAppointmentToCalendar.mockResolvedValue({ eventId: 'event-1', status: 'added' });
+    mockedTriggerHaptic.mockResolvedValue(undefined);
     mockedUseAuthSession.mockReturnValue({
       profile: null,
       profileError: null,
@@ -181,6 +188,7 @@ describe('AppointmentDetailScreen', () => {
         requestId: 'request-1',
       }),
     );
+    expect(mockedTriggerHaptic).toHaveBeenCalledWith('warning');
   });
 
   it('reveals available provider slots for rescheduling', async () => {
