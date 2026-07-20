@@ -1,8 +1,9 @@
 # Current Session
 
-- Current phase: Phase 2 in progress — secure accounts and live provider data.
+- Current phase: Phase 2 complete — secure accounts and live provider data.
 - Legacy baseline: `dade72b`, preserved by the `legacy-v1` tag.
 - Phase 1 proof: [`docs/phase-1-verification.md`](docs/phase-1-verification.md).
+- Phase 2 proof: [`docs/phase-2-verification.md`](docs/phase-2-verification.md).
 - Development backend: `hakeemi-portfolio-dev`; the legacy `hakeemi` project is
   intentionally untouched.
 - Backend foundation: Auth, Firestore, native app registrations, rules, indexes,
@@ -27,6 +28,9 @@
   Auth and document cleanup.
 - Billing boundary: Cloud Storage remains emulator-only; enabling it now
   requires the Blaze plan and an explicit billing decision.
-- Next action: close Phase 2 with end-to-end verification, then rewrite the
-  README as the current portfolio case study.
+- Native verification: cloud discovery/filter/detail, emulator-backed sign-up,
+  idempotent profile bootstrap, owner preference writes, dark/Arabic sync, and
+  cold-process restoration all pass. Disposable verification data was removed.
+- Next action: rewrite the README as the current portfolio case study, then
+  begin the transaction-backed booking phase.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).

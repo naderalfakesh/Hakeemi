@@ -1,10 +1,10 @@
 # Hakeemi Modernization Roadmap
 
-> Status: Phase 2 in progress
+> Status: Phase 2 complete; Phase 3 planned
 >
 > Baseline: `dade72b` on `master`
 >
-> Last updated: 2026-07-19
+> Last updated: 2026-07-20
 >
 > Product type: portfolio-quality patient appointment application; not a clinical product
 
@@ -649,7 +649,10 @@ _Estimated effort: two to three sessions_
 6. `feat: add tab navigation and demo entry`
 7. `feat: add fixture-backed provider discovery`
 
-### Phase 2 — Connect secure accounts and live provider data
+### Phase 2 — Connect secure accounts and live provider data ✅
+
+_Completed: 2026-07-20, final implementation commit `a399348`. See
+`docs/phase-2-verification.md`._
 
 _Goal: users can create an account or sign in, and provider discovery reads from
 a reproducible Firebase environment._
@@ -1026,20 +1029,16 @@ The modernization is complete only when:
 
 ## Current position
 
-Phases 0 and 1 are complete. The Expo SDK 57 product slice builds and runs on
-current iOS and Android simulators. Full results are recorded in
-`docs/phase-1-verification.md`.
+Phases 0 through 2 are complete. The Expo SDK 57 product slice builds and runs
+on current iOS and Android simulators. Phase 1 platform proof is recorded in
+`docs/phase-1-verification.md`; the cloud-backed discovery, native account,
+server-owned profile, preference synchronization, and cold-restoration evidence
+is recorded in `docs/phase-2-verification.md`.
 
-**Phase 2: Connect secure accounts and live provider data** is in progress. The
-new `hakeemi-portfolio-dev` project contains the deterministic fictional seed,
-while the inaccessible legacy project remains untouched. Email/password Auth,
-application-level session restoration, and idempotent server-owned profile
-bootstrap are implemented. Native provider discovery now resolves a bounded
-React Native Firebase repository with runtime-validated DTO mappers; Jest and
-the static web export explicitly resolve the deterministic fixture repository.
-Rules tests cover the production discovery query shapes, and all cloud indexes
-are ready. TanStack Query owns server-state caching, retry, and cursor
-pagination. Owner-only locale/theme preferences now synchronize through
-Firestore with optimistic updates and rollback; an authenticated disposable
-cloud smoke test passed and removed both its Auth user and preference document.
-Phase 2 implementation is complete and final end-to-end verification remains.
+The new `hakeemi-portfolio-dev` project contains the deterministic fictional
+seed, while the inaccessible legacy project remains untouched. All provider
+indexes are ready, the full Auth/profile lifecycle passes against the Emulator
+Suite, and disposable cloud and emulator verification data was removed after
+the checks. Cloud Functions and Storage deployment remain an explicit Blaze-plan
+boundary. The next product phase is **Phase 3: Make booking trustworthy** after
+the current README is rewritten as an accurate portfolio case study.
