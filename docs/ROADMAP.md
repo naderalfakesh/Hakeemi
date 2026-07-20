@@ -1059,9 +1059,10 @@ typed appointment notification routing, scheduled generic reminders, idempotent
 delivery receipts, and native haptics are also in place.
 Disposable emulator verification data was removed after the checks. Cloud
 Functions and Storage deployment remain an explicit Blaze-plan boundary. The
-remaining Phase 4 work is **native follow-through**: an iOS/Android management
-E2E journey. Calendar and notification permission flows still need a native
-interactive release-signoff run.
+native iOS management E2E journey (book → reschedule → cancel, in Arabic/RTL
+against the seeded emulators) is complete and recorded in
+`docs/phase-4-verification.md`; an Android-hardware pass and the
+calendar/notification permission dialogs remain for release sign-off.
 
 Phase 5 has started with a recoverable route error boundary, privacy-safe
 development logging, font scaling, RTL-aware text direction, and locale-aware
