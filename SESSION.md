@@ -137,4 +137,9 @@
   rules, booking, management, notification-token, and scheduled-reminder
   contracts; EAS profiles remain explicit but signing/preview artifacts require
   external Expo and Apple/Google credentials.
+- Phase 6 groundwork: `docs/testing-strategy.md` defines the test pyramid,
+  critical-path coverage gate, and the Expo upgrade policy; a weekly
+  `dependency-health` workflow runs expo-doctor, SDK alignment, outdated
+  reports, and a high-severity audit; `docs/analytics-events.md` fixes the
+  privacy-safe analytics contract before any instrumentation.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).

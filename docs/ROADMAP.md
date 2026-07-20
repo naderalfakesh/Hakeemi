@@ -1,6 +1,6 @@
 # Hakeemi Modernization Roadmap
 
-> Status: Phase 4 in progress
+> Status: Phase 5 in progress; Phase 6 groundwork underway
 >
 > Baseline: `dade72b` on `master`
 >
@@ -861,11 +861,11 @@ _Estimated effort: two sessions_
 
 #### Quality and performance
 
-- [ ] Define a test pyramid and minimum critical-path coverage; avoid percentage
+- [x] Define a test pyramid and minimum critical-path coverage; avoid percentage
       targets that reward low-value snapshots.
 - [x] Add CI jobs for install, formatting, lint, typecheck, unit/integration
       tests, Firebase rules/functions tests, and `expo-doctor`.
-- [ ] Add scheduled dependency health checks and an Expo/RN upgrade policy.
+- [x] Add scheduled dependency health checks and an Expo/RN upgrade policy.
 - [ ] Profile provider lists, search input, provider details, and booking on
       representative iOS and Android devices.
 - [ ] Set measurable budgets for cold start, interaction latency, list frame
@@ -876,7 +876,7 @@ _Estimated effort: two sessions_
 - [ ] Enable App Check in monitor mode, verify legitimate traffic, then enforce
       it for supported services.
 - [ ] Add Crashlytics and Performance Monitoring with privacy-safe metadata.
-- [ ] Define analytics events for discovery and booking without recording health
+- [x] Define analytics events for discovery and booking without recording health
       or identity details.
 - [ ] Configure EAS development, preview, and production builds; use fingerprint
       runtime versioning for update compatibility.
