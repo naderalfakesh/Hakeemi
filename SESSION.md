@@ -142,6 +142,14 @@
   `dependency-health` workflow runs expo-doctor, SDK alignment, outdated
   reports, and a high-severity audit; `docs/analytics-events.md` fixes the
   privacy-safe analytics contract before any instrumentation.
+- Visual identity: an original illustration set (welcome hero, six doctor
+  portraits with signature-accent avatar rings, three onboarding story slides,
+  six empty/error/success spot illustrations) now ships bundled under
+  `assets/illustrations/`, wired through `Illustration`, `stateIllustrations`,
+  `providerArtwork`, and an onboarding pager on the welcome screen. Portraits
+  resolve by provider ID with the initials monogram as fallback, keeping the
+  Firestore `image` field as the remote-data contract. The generated README
+  banner was rejected (baked-in text) and awaits regeneration.
 - Portfolio docs: the README now leads with the Arabic/RTL evidence set and
   the completed Phase 0–4 + Phase 5 story, `CONTRIBUTING.md` codifies the
   working agreements (fictional data, bilingual strings, conventional
