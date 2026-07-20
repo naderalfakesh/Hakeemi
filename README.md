@@ -25,9 +25,10 @@ trade-off and escape hatch are recorded in
 [`ADR 0001`](docs/adr/0001-expo-cng.md).
 
 The modernization is delivered as small, independently reviewable commits.
-Phases 0–3 are complete, and the Phase 4 appointment-management checkpoint is
-complete. Native calendar/reminder follow-through is the next slice. See the
-[roadmap](docs/ROADMAP.md) for the complete sequence.
+Phases 0–3 are complete, and the Phase 4 appointment-management and calendar
+checkpoints are complete. Notification/reminder follow-through and native
+management E2E are the next slices. See the [roadmap](docs/ROADMAP.md) for the
+complete sequence.
 
 ## What works today
 
@@ -46,6 +47,9 @@ complete. Native calendar/reminder follow-through is the next slice. See the
   and server-only idempotency receipts.
 - Upcoming, past, cancelled, and deep-linkable appointment detail screens with
   offline-aware lifecycle actions and safe reschedule choices.
+- Confirmed appointment details can request calendar access and add a
+  non-sensitive event through the native Expo calendar adapter; web and Jest
+  use deterministic unavailable adapters.
 - Owner-only language and theme preferences with optimistic updates, rollback,
   Firestore synchronization, and live dark-mode application.
 - Deterministic fictional seed data, default-deny Firebase rules, composite
@@ -53,9 +57,9 @@ complete. Native calendar/reminder follow-through is the next slice. See the
 - Explicit fixture adapters for Jest and the static web portfolio export; no
   native SDK is silently replaced on iOS or Android.
 
-Native calendar permissions, notification registration/deep links, haptics,
-Arabic RTL completion, and native management E2E remain planned work. They are
-not presented as complete.
+Notification registration/deep links, haptics, Arabic RTL completion, and
+native management E2E remain planned work. Calendar still needs a native
+interactive release-signoff run.
 
 ## Architecture
 
@@ -101,7 +105,7 @@ The current milestone has been exercised beyond unit tests:
 - iOS CNG development build: successful, with native Firebase modules linked.
 - Android arm64 debug APK: successful.
 - Static web export: 21 routes generated, including appointment detail.
-- Application tests: 28 suites and 69 tests passing.
+- Application tests: 28 suites and 70 tests passing.
 - Firebase authorization: 14 Emulator Suite rules tests passing.
 - Callable integration: booking and appointment-management Auth, Firestore,
   and Functions emulator suites passing.

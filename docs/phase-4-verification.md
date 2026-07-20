@@ -1,17 +1,19 @@
-# Phase 4 Verification — Appointment Management Checkpoint
+# Phase 4 Verification — Appointment Management and Calendar Checkpoint
 
 > Verified: 2026-07-20
 >
-> Scope: atomic cancellation/rescheduling and the authenticated appointment
-> management experience. Native calendar, notification, and management E2E are
-> intentionally not claimed as complete yet.
+> Scope: atomic cancellation/rescheduling, the authenticated appointment
+> management experience, and the native calendar follow-through. Notification
+> delivery and native management E2E are intentionally not claimed as complete
+> yet.
 
 ## Outcome
 
 An authenticated patient can open an appointment detail route, review its
 provider, time, visit mode, and timezone, cancel it with an explicit
-confirmation, or choose another available slot with the same provider. The
-mobile client sends lifecycle writes only through callable Functions.
+confirmation, choose another available slot with the same provider, or add a
+confirmed visit to a writable device calendar. The mobile client sends
+lifecycle writes only through callable Functions.
 
 ## Backend guarantees
 
@@ -43,14 +45,18 @@ occupied targets, request-key conflicts, owner isolation, and no partial moves.
   success.
 - Rescheduling shows only the provider's current available slots and leaves the
   current appointment untouched until the server transaction succeeds.
-- Web and Jest use explicit fixture/unavailable adapters; native uses
-  React Native Firebase and the callable Functions.
+- Confirmed appointment details request calendar access only when the patient
+  taps “Add to calendar”; denial and missing writable calendars remain visible,
+  recoverable states and do not block cancellation or rescheduling.
+- Native uses `expo-calendar` with a config-plugin permission explanation;
+  web and Jest use explicit unavailable adapters so the portfolio export stays
+  deterministic.
 
 ## Quality evidence
 
 | Check                                       | Result                                      |
 | ------------------------------------------- | ------------------------------------------- |
-| Application tests                           | 28 suites, 69 tests passed                  |
+| Application tests                           | 28 suites, 70 tests passed                  |
 | Functions unit tests                        | 9 tests passed                              |
 | Appointment-management callable integration | 5 tests passed                              |
 | Strict TypeScript                           | App, Firebase tooling, and Functions passed |
@@ -60,6 +66,7 @@ occupied targets, request-key conflicts, owner isolation, and no partial moves.
 
 ## Remaining Phase 4 work
 
-Calendar permission education and event creation, notification permission and
-token registration, reminder delivery/deep links, restrained haptics, and a
-native iOS/Android management E2E journey remain the next implementation slice.
+Notification permission and token registration, reminder delivery/deep links,
+restrained haptics, and a native iOS/Android management E2E journey remain the
+next implementation slice. Calendar behavior still needs to be exercised in a
+native interactive run before release sign-off.

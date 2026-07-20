@@ -777,8 +777,8 @@ _Estimated effort: two sessions_
 - [x] Add cancellation and rescheduling with clear consequences and optimistic
       feedback only where rollback is safe.
 - [ ] Add saved providers as an owner-only subcollection.
-- [ ] Add calendar permission education and “Add to calendar” through an Expo
-      native API.
+- [x] Add calendar permission education and “Add to calendar” through an Expo
+      native API, with unavailable web/Jest adapters.
 - [ ] Add notification permission education, token refresh handling, and deep
       links into appointment details.
 - [ ] Add restrained haptics to successful booking and destructive confirmation.
@@ -795,7 +795,7 @@ _Estimated effort: two sessions_
 1. `feat(functions): add appointment cancellation and rescheduling`
 2. `feat: add appointment management experience`
 3. `feat: add saved providers`
-4. `feat: add calendar integration`
+4. `feat: add appointment calendar follow-through`
 5. `feat: add appointment reminders and deep links`
 6. `test(e2e): cover appointment management`
 
@@ -1033,8 +1033,8 @@ The modernization is complete only when:
 
 ## Current position
 
-Phases 0 through 3 are complete, and the Phase 4 appointment-management
-checkpoint is complete. The Expo SDK 57 product slice builds and runs
+Phases 0 through 3 are complete, and the Phase 4 appointment-management and
+calendar checkpoints are complete. The Expo SDK 57 product slice builds and runs
 on current iOS and Android simulators. Phase 1 platform proof is recorded in
 `docs/phase-1-verification.md`; cloud-backed discovery, native accounts,
 server-owned profiles, and synchronized preferences are recorded in
@@ -1046,8 +1046,11 @@ seed, while the inaccessible legacy project remains untouched. The booking
 callable prevents double reservations, safe mobile drafts survive
 authentication, owner appointments survive a native process restart, and
 management callables atomically transition appointment/slot state with
-server-only operation receipts.
+server-only operation receipts. Confirmed appointment details can request
+calendar access and create a non-sensitive event through the native Expo
+adapter; web and Jest intentionally report the unavailable state.
 Disposable emulator verification data was removed after the checks. Cloud
 Functions and Storage deployment remain an explicit Blaze-plan boundary. The
-remaining Phase 4 work is **native follow-through**: calendar permissions,
-reminders, notification deep links, haptics, and iOS/Android management E2E.
+remaining Phase 4 work is **native follow-through**: reminders, notification
+deep links, haptics, and iOS/Android management E2E. Calendar still needs a
+native interactive release-signoff run.
