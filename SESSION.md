@@ -83,8 +83,10 @@
   5 appointment-management, 2 notification-token, and 1 appointment-reminder
   callable integration tests, 14 rules tests, 21 static routes, and Expo Doctor
   20/20 all pass.
-- Next action: verify calendar/notification and management journeys natively on
-  iOS and Android, then continue the inclusive/resilient Phase 5 pass.
+- Native management E2E: the full book → reschedule → cancel journey passed on
+  the iOS Simulator in Arabic/RTL against the seeded emulators, with evidence
+  screenshots in `docs/images/`. Android hardware and the calendar/notification
+  permission dialogs remain for release sign-off.
 - Phase 5 foundation: the root route now recovers from render failures with
   privacy-safe development logging, AppText keeps Dynamic Type enabled and
   applies RTL writing direction, and date/time formatters follow the selected

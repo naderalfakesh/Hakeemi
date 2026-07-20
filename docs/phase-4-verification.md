@@ -80,8 +80,27 @@ occupied targets, request-key conflicts, owner isolation, and no partial moves.
 | Static web export                           | 21 routes, including appointment detail     |
 | Expo Doctor                                 | 20/20 checks passed                         |
 
+## Native iOS management E2E journey
+
+An interactive iOS Simulator run (development build against the seeded local
+emulators, Arabic/RTL locale) completed the full management journey through
+the transactional callables:
+
+- Discovery → provider detail → slot selection → visit details → review →
+  confirm produced a confirmed appointment with a server reference
+  (`docs/images/booking-confirmation-arabic-native.png`).
+- Rescheduling moved the same appointment (identical reference) from the
+  Tuesday video slot to the Wednesday in-person slot atomically
+  (`docs/images/appointment-rescheduled-arabic-native.png`).
+- Cancellation required the explicit confirmation step, released the slot, and
+  left the audit trail visible — «ملغى» status pill and the cancelled-on
+  notice with no further management actions
+  (`docs/images/appointment-cancelled-arabic-native.png`).
+- Signed-out isolation was confirmed in the same session: the appointments tab
+  shows only the private sign-in gate for guests.
+
 ## Remaining Phase 4 work
 
-An authenticated saved-clinician shortlist is now complete. A native iOS/Android
-management E2E journey remains. Calendar and notification permission behavior
-still need a native interactive run before release sign-off.
+An Android-device management E2E pass and the calendar/notification
+permission dialogs still need a native interactive run on hardware before
+release sign-off.
