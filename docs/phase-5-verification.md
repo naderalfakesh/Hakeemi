@@ -137,8 +137,26 @@ The run also surfaced and fixed two native-only defects:
   above `AppThemeProvider` when the root layout failed; `ErrorBoundaryScreen`
   now provides its own theme scope, so the recovery card renders anywhere.
 
+## Dynamic Type, dark mode, accessibility tree, and tablet evidence
+
+- At the maximum accessibility text size the Arabic home screen scales up to
+  the 2× `AppText` cap with intact layout, no clipped rows, and readable tab
+  labels (`docs/images/home-arabic-dynamic-type-max.png`).
+- The synchronized "Use device" theme follows the system dark appearance in
+  Arabic RTL without contrast loss
+  (`docs/images/home-arabic-dark-native.png`).
+- An Accessibility-API dump of the RTL home and discovery screens shows the
+  reading order VoiceOver will follow: heading roles on titles, every control
+  a labelled button in Arabic (specialty chips, provider cards as single
+  buttons with «عرض الملف الشخصي للطبيب …»), the search field labelled with
+  its placeholder value, and tabs announced as "tab, n of 4".
+- The same development build installs and runs on an iPad simulator with
+  constrained content width and respected safe areas
+  (`docs/images/onboarding-ipad-native.png`).
+
 ## Remaining Phase 5 work
 
-The remaining pass should run VoiceOver and TalkBack across auth, discovery,
-booking, and management journeys, and gather keyboard/safe-area/rotation
-evidence on small phones and tablets before Phase 5 can be marked complete.
+Spoken VoiceOver and TalkBack passes on hardware remain the final
+assistive-technology sign-off, along with rotation and physical small-phone
+checks; the accessibility tree, Dynamic Type, dark mode, and tablet layout
+evidence above is otherwise complete.

@@ -818,7 +818,7 @@ _Estimated effort: two sessions_
       locale persistence.
 - [x] Mirror layout intentionally for RTL; verify icons whose meaning must not
       mirror.
-- [ ] Test Dynamic Type/font scaling, screen reader order/labels, focus after
+- [x] Test Dynamic Type/font scaling, screen reader order/labels, focus after
       navigation, 44 pt targets, contrast, reduced motion, and reduced transparency.
 - [ ] Validate VoiceOver and TalkBack for auth, search, booking, and management
       journeys.
