@@ -3,16 +3,15 @@ import type { LocalizedStrings } from '@/localization/use-strings';
 const en = {
   back: 'Back',
   brandWordmark: 'Hakeemi',
-  disclaimer:
-    'Portfolio demonstration only. No real clinicians, medical services, or patient data.',
+  createAccount: 'Create account',
   exploreDemo: 'Explore the demo',
-  exploreDemoAccessibilityLabel: 'Explore the Hakeemi portfolio demo',
+  exploreDemoAccessibilityLabel: 'Explore the Hakeemi demo',
   headline: 'Care, without the runaround.',
   next: 'Next',
   nextAccessibilityLabel: 'Show the next onboarding page',
   signIn: 'Sign in',
   skip: 'Skip',
-  skipAccessibilityLabel: 'Skip onboarding and explore the Hakeemi portfolio demo',
+  skipAccessibilityLabel: 'Skip onboarding and explore Hakeemi',
   slideBookBody: 'One tap reserves your time through a secure, double-booking-proof transaction.',
   slideBookTitle: 'Book with confidence',
   slideCareBody: 'English or Arabic, light or dark — your care follows your preferences.',
@@ -20,7 +19,7 @@ const en = {
   slideDiscoverBody: 'Search by specialty or language and compare real availability.',
   slideDiscoverTitle: 'Find the right clinician',
   subheadline:
-    'Browse a fictional care network, compare availability, and follow a calm booking experience built to show modern React Native product engineering.',
+    'Find the right clinician, compare availability, and book care in a few clear steps.',
   stepProgress: (current: number, total: number) => `Step ${current} of ${total}`,
 };
 
@@ -28,8 +27,7 @@ export const onboardingStrings: LocalizedStrings<typeof en> = {
   ar: {
     back: 'رجوع',
     brandWordmark: 'Hakeemi',
-    disclaimer:
-      'عرض توضيحي لأغراض الملف المهني فقط. لا أطباء حقيقيين، ولا خدمات طبية، ولا بيانات مرضى.',
+    createAccount: 'إنشاء حساب',
     exploreDemo: 'استكشف العرض التجريبي',
     exploreDemoAccessibilityLabel: 'استكشف العرض التجريبي لتطبيق حكيمي',
     headline: 'رعاية صحية، من دون تعقيدات.',
@@ -44,8 +42,7 @@ export const onboardingStrings: LocalizedStrings<typeof en> = {
     slideCareTitle: 'رعاية بلغتك',
     slideDiscoverBody: 'ابحث حسب التخصص أو اللغة وقارن المواعيد المتاحة فعليًا.',
     slideDiscoverTitle: 'اعثر على الطبيب المناسب',
-    subheadline:
-      'تصفّح شبكة رعاية خيالية، وقارن المواعيد المتاحة، واتبع تجربة حجز هادئة صُممت لعرض هندسة منتجات React Native الحديثة.',
+    subheadline: 'اعثر على الطبيب المناسب، وقارن المواعيد المتاحة، واحجز رعايتك بخطوات واضحة.',
     stepProgress: (current: number, total: number) => `الخطوة ${current} من ${total}`,
   },
   en,

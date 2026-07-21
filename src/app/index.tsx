@@ -14,6 +14,7 @@ export default function DemoEntryRoute() {
     <DemoEntryScreen
       onContinue={() => router.replace('/home')}
       onSignIn={() => router.push('/auth/sign-in')}
+      onSignUp={() => router.push('/auth/sign-up')}
     />
   );
 }

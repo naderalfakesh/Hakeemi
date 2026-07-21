@@ -46,9 +46,10 @@ type OnboardingSlideKey = (typeof onboardingSlides)[number]['key'];
 type DemoEntryScreenProps = {
   onContinue: () => void;
   onSignIn: () => void;
+  onSignUp: () => void;
 };
 
-export function DemoEntryScreen({ onContinue, onSignIn }: DemoEntryScreenProps) {
+export function DemoEntryScreen({ onContinue, onSignIn, onSignUp }: DemoEntryScreenProps) {
   const theme = useAppTheme();
   const strings = useStrings(onboardingStrings);
   const { height, width } = useWindowDimensions();
@@ -136,34 +137,46 @@ export function DemoEntryScreen({ onContinue, onSignIn }: DemoEntryScreenProps) 
             </View>
           </View>
 
-          <View style={styles.navigationRow}>
-            {!isFirstSlide && (
-              <View style={styles.backAction}>
-                <Button onPress={showPreviousSlide} variant="secondary">
-                  {strings.back}
-                </Button>
-              </View>
-            )}
-            <View style={styles.primaryAction}>
+          {isLastSlide ? (
+            <View style={styles.finalActions}>
               <Button
-                accessibilityLabel={
-                  isLastSlide
-                    ? strings.exploreDemoAccessibilityLabel
-                    : strings.nextAccessibilityLabel
-                }
-                onPress={isLastSlide ? onContinue : showNextSlide}
+                accessibilityLabel={strings.exploreDemoAccessibilityLabel}
+                onPress={onContinue}
               >
-                {isLastSlide ? strings.exploreDemo : strings.next}
+                {strings.exploreDemo}
+              </Button>
+              <View style={styles.authActions}>
+                <View style={styles.authAction}>
+                  <Button onPress={onSignIn} variant="secondary">
+                    {strings.signIn}
+                  </Button>
+                </View>
+                <View style={styles.authAction}>
+                  <Button onPress={onSignUp} variant="secondary">
+                    {strings.createAccount}
+                  </Button>
+                </View>
+              </View>
+              <Button onPress={showPreviousSlide} variant="tertiary">
+                {strings.back}
               </Button>
             </View>
-          </View>
-
-          <Button onPress={onSignIn} variant="tertiary">
-            {strings.signIn}
-          </Button>
-          <AppText style={styles.disclaimer} tone="secondary" variant="caption">
-            {strings.disclaimer}
-          </AppText>
+          ) : (
+            <View style={styles.navigationRow}>
+              {!isFirstSlide && (
+                <View style={styles.backAction}>
+                  <Button onPress={showPreviousSlide} variant="secondary">
+                    {strings.back}
+                  </Button>
+                </View>
+              )}
+              <View style={styles.primaryAction}>
+                <Button accessibilityLabel={strings.nextAccessibilityLabel} onPress={showNextSlide}>
+                  {strings.next}
+                </Button>
+              </View>
+            </View>
+          )}
         </View>
       </View>
     </SafeAreaView>
@@ -276,16 +289,21 @@ function createStyles(
       flexDirection: 'row',
       gap: theme.spacing.sm,
     },
+    finalActions: {
+      gap: theme.spacing.xs,
+    },
+    authActions: {
+      flexDirection: 'row',
+      gap: theme.spacing.sm,
+    },
+    authAction: {
+      flex: 1,
+    },
     backAction: {
       flex: 1,
     },
     primaryAction: {
       flex: 2,
-    },
-    disclaimer: {
-      alignSelf: 'center',
-      maxWidth: 520,
-      textAlign: 'center',
     },
   });
 }
