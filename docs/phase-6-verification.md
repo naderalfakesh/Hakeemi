@@ -13,6 +13,9 @@
   and a 30-minute ceiling for the full emulator matrix.
 - `eas.json` contains development, simulator, preview, and production profiles
   with explicit environment boundaries and `requireCommit: true`.
+- The 16 bundled illustrations use native-safe WebP and total 808.8 KB, down
+  from roughly 4.6 MB. `npm run assets:check` enforces 150 KB per file and 1 MB
+  aggregate as part of local validation and CI.
 
 ## Intentionally open release gates
 

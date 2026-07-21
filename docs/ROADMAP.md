@@ -870,8 +870,10 @@ _Estimated effort: two sessions_
 - [x] Add scheduled dependency health checks and an Expo/RN upgrade policy.
 - [ ] Profile provider lists, search input, provider details, and booking on
       representative iOS and Android devices.
+- [x] Set and enforce a bundled illustration budget: 150 KB per asset and 1 MB
+      total, with a measured 808.8 KB baseline for 16 WebP files.
 - [ ] Set measurable budgets for cold start, interaction latency, list frame
-      drops, image payloads, and JS bundle growth; record actual baseline/results.
+      drops, and JS bundle growth; record actual baseline/results.
 
 #### Security and delivery
 
@@ -1097,20 +1099,24 @@ and EAS profiles define development, simulator, preview, and production
 environments. Signing, installable preview artifacts, App Check, observability,
 analytics instrumentation, and measured performance budgets remain open.
 
-The new visual identity includes a welcome hero, a three-slide story pager, six
-fictional clinician portraits, six state illustrations, and an updated native
-screenshot gallery. The story pager intentionally appears on the public demo
-entry screen on every signed-out visit; it is not yet a persisted first-run
-onboarding flow. The illustration bundle is currently about 4.9 MB and includes
-640–800 px PNGs rendered as small as 132 px, so image payload reduction belongs
-in the Phase 6 performance pass. The iOS icon configuration still references
-the Expo template symbol, and the repository hero predates the new identity.
+The new visual identity includes a welcome hero, three feature illustrations,
+six fictional clinician portraits, six state illustrations, and an updated
+native screenshot gallery. Onboarding now uses four full-screen steps with one
+illustration and message per page plus Back, Next, Skip, progress, and final
+demo-entry actions; it no longer stacks a vertical welcome above an embedded
+carousel. It intentionally appears as the public signed-out portfolio entry
+rather than persisted first-run state. Provider portraits use consistent square,
+top-anchored source crops and `contain` fitting so hair and faces stay visible at
+card and profile sizes. All 16 illustrations are native-safe WebP files totaling
+808.8 KB, down from roughly 4.6 MB, and CI enforces 150 KB per-file/1 MB aggregate
+budgets. The iOS icon configuration still references the Expo template symbol,
+and the repository hero predates the new identity.
 
 ## Next execution queue
 
-1. Measure cold start, interaction latency, list frame stability, JS bundle
-   size, and image payloads on representative iOS and Android builds; resize or
-   recompress the illustrations from evidence rather than appearance alone.
+1. Measure cold start, interaction latency, list frame stability, and JS bundle
+   size on representative iOS and Android builds; the bundled illustration
+   payload now has a measured and enforced budget.
 2. Complete the manual Phase 5/4 sign-off matrix: VoiceOver, TalkBack, rotation,
    a physical small phone, Android hardware, and calendar/notification denial.
 3. Add privacy-safe Crashlytics, Performance Monitoring, and analytics, then

@@ -39,8 +39,9 @@ sequence.
 
 ## What works today
 
-- A responsive signed-out welcome with a three-slide product story pager, plus
-  four-tab navigation built with typed Expo Router routes.
+- A responsive four-step, full-screen onboarding sequence with conventional
+  Back, Next, Skip, and final demo-entry actions, plus four-tab navigation built
+  with typed Expo Router routes.
 - Provider search, specialty filters, stable cursor pagination, and provider
   details backed by Firestore on native platforms.
 - Email/password sign-up, sign-in, password recovery, verification handoff,
@@ -138,8 +139,10 @@ The current milestone has been exercised beyond unit tests:
   and the same build verified on an iPad simulator.
 - Android arm64 debug APK: successful.
 - Static web export: 21 routes generated, including appointment detail.
-- Application tests: 34 suites and 107 tests passing, including Arabic-locale
+- Application tests: 34 suites and 108 tests passing, including Arabic-locale
   renders for every screen area.
+- Illustration payload: 16 WebP assets at 808.8 KB total, reduced from roughly
+  4.6 MB and protected by CI budgets of 150 KB per file and 1 MB total.
 - Firebase authorization: 14 Emulator Suite rules tests passing.
 - Callable integration: booking, appointment-management, notification-token,
   and scheduled-reminder Auth, Firestore, Pub/Sub, and Functions emulator
