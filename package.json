@@ -69,6 +69,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
+    "assets:check": "node scripts/check-illustration-budget.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "firebase:emulators": "firebase emulators:start --project hakeemi-portfolio-dev",
@@ -98,7 +99,7 @@
     "typecheck:app": "tsc --noEmit",
     "typecheck:firebase": "tsc -p firebase/tsconfig.json --noEmit",
     "typecheck:functions": "npm --prefix functions run typecheck",
-    "validate": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run test:functions && expo-doctor",
+    "validate": "npm run format:check && npm run lint && npm run typecheck && npm run assets:check && npm test && npm run test:functions && expo-doctor",
     "prepare": "simple-git-hooks"
   },
   "lint-staged": {

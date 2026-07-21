@@ -26,7 +26,7 @@ export function ProviderAvatar({ name, providerId, size = 'medium' }: ProviderAv
   if (artwork) {
     return (
       <View accessibilityElementsHidden importantForAccessibility="no" style={styles.avatar}>
-        <Image resizeMode="cover" source={artwork.source} style={styles.portrait} />
+        <Image resizeMode="contain" source={artwork.source} style={styles.portrait} />
       </View>
     );
   }

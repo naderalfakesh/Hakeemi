@@ -16,22 +16,22 @@ import { onboardingStrings } from '../localization/onboarding-strings';
 
 const onboardingSlides = [
   {
-    illustration: require('../../../../assets/illustrations/welcome-hero.png'),
+    illustration: require('../../../../assets/illustrations/welcome-hero.webp'),
     key: 'welcome',
     surface: 'surfaceBrand',
   },
   {
-    illustration: require('../../../../assets/illustrations/onboarding-discover.png'),
+    illustration: require('../../../../assets/illustrations/onboarding-discover.webp'),
     key: 'discover',
     surface: 'infoSoft',
   },
   {
-    illustration: require('../../../../assets/illustrations/onboarding-book.png'),
+    illustration: require('../../../../assets/illustrations/onboarding-book.webp'),
     key: 'book',
     surface: 'accentSoft',
   },
   {
-    illustration: require('../../../../assets/illustrations/onboarding-care.png'),
+    illustration: require('../../../../assets/illustrations/onboarding-care.webp'),
     key: 'care',
     surface: 'successSoft',
   },
