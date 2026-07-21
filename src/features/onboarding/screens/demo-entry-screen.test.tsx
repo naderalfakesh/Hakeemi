@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@testing-library/react-native';
+import { act, fireEvent, render } from '@testing-library/react-native';
 
 import { AppLocaleProvider } from '@/localization/locale-provider';
 import { AppThemeProvider } from '@/theme';
@@ -60,6 +60,26 @@ describe('OnboardingScreen', () => {
     );
 
     expect(onSkip).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps progress and actions synchronized after a swipe', async () => {
+    const view = await render(
+      <AppThemeProvider colorScheme="light">
+        <OnboardingScreen onComplete={jest.fn()} onSkip={jest.fn()} />
+      </AppThemeProvider>,
+    );
+
+    await act(async () => {
+      view.getByTestId('onboarding-pages').props.onMomentumScrollEnd({
+        nativeEvent: { contentOffset: { x: 10_000, y: 0 } },
+      });
+    });
+
+    expect(view.getByRole('header', { name: 'Care in your language' })).toBeOnTheScreen();
+    expect(view.getByText('Step 4 of 4')).toBeOnTheScreen();
+    expect(
+      view.getByRole('button', { name: 'Finish onboarding and continue to welcome' }),
+    ).toBeOnTheScreen();
   });
 
   it('renders the entry copy in Arabic', async () => {

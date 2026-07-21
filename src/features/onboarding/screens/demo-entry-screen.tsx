@@ -1,16 +1,20 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Image,
+  ScrollView,
   StyleSheet,
   View,
   useWindowDimensions,
   type ImageSourcePropType,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText, Button, DecorativeIcon } from '@/components/ui';
+import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
-import { useAppTheme, type AppTheme, type SemanticColors } from '@/theme';
+import { useAppMotion, useAppTheme, type AppTheme, type SemanticColors } from '@/theme';
 
 import { onboardingStrings } from '../localization/onboarding-strings';
 
@@ -51,6 +55,8 @@ type DemoEntryScreenProps = {
 export function OnboardingScreen({ onComplete, onSkip }: DemoEntryScreenProps) {
   const theme = useAppTheme();
   const strings = useStrings(onboardingStrings);
+  const { isRTL } = useAppLocale();
+  const { prefersReducedMotion } = useAppMotion();
   const { height, width } = useWindowDimensions();
   const isCompact = height < 720;
   const isTablet = width >= 768;
@@ -59,7 +65,13 @@ export function OnboardingScreen({ onComplete, onSkip }: DemoEntryScreenProps) {
     [isCompact, isTablet, theme],
   );
   const [activeSlide, setActiveSlide] = useState(0);
-  const slide = onboardingSlides[activeSlide]!;
+  const scrollViewRef = useRef<ScrollView>(null);
+  const activeSlideRef = useRef(activeSlide);
+  const pageWidth = Math.min(width, theme.sizes.contentMaxWidth) - theme.spacing.lg * 2;
+  const displayedSlides = useMemo(
+    () => (isRTL ? [...onboardingSlides].reverse() : onboardingSlides),
+    [isRTL],
+  );
   const isFirstSlide = activeSlide === 0;
   const isLastSlide = activeSlide === onboardingSlides.length - 1;
 
@@ -70,9 +82,45 @@ export function OnboardingScreen({ onComplete, onSkip }: DemoEntryScreenProps) {
     welcome: { body: strings.subheadline, title: strings.headline },
   };
 
-  const showPreviousSlide = () => setActiveSlide((current) => Math.max(0, current - 1));
-  const showNextSlide = () =>
-    setActiveSlide((current) => Math.min(onboardingSlides.length - 1, current + 1));
+  const getPhysicalIndex = useCallback(
+    (logicalIndex: number) => (isRTL ? onboardingSlides.length - 1 - logicalIndex : logicalIndex),
+    [isRTL],
+  );
+  const showSlide = useCallback(
+    (logicalIndex: number) => {
+      const nextIndex = Math.max(0, Math.min(onboardingSlides.length - 1, logicalIndex));
+      activeSlideRef.current = nextIndex;
+      setActiveSlide(nextIndex);
+      scrollViewRef.current?.scrollTo({
+        animated: !prefersReducedMotion,
+        x: getPhysicalIndex(nextIndex) * pageWidth,
+        y: 0,
+      });
+    },
+    [getPhysicalIndex, pageWidth, prefersReducedMotion],
+  );
+  const showPreviousSlide = () => showSlide(activeSlide - 1);
+  const showNextSlide = () => showSlide(activeSlide + 1);
+  const handleMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const physicalIndex = Math.max(
+      0,
+      Math.min(
+        onboardingSlides.length - 1,
+        Math.round(event.nativeEvent.contentOffset.x / pageWidth),
+      ),
+    );
+    const logicalIndex = isRTL ? onboardingSlides.length - 1 - physicalIndex : physicalIndex;
+    activeSlideRef.current = logicalIndex;
+    setActiveSlide(logicalIndex);
+  };
+
+  useEffect(() => {
+    scrollViewRef.current?.scrollTo({
+      animated: false,
+      x: getPhysicalIndex(activeSlideRef.current) * pageWidth,
+      y: 0,
+    });
+  }, [getPhysicalIndex, pageWidth]);
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
@@ -95,26 +143,55 @@ export function OnboardingScreen({ onComplete, onSkip }: DemoEntryScreenProps) {
           )}
         </View>
 
-        <View accessibilityLiveRegion="polite" key={slide.key} style={styles.slide}>
-          <View
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-            style={[styles.artworkStage, { backgroundColor: theme.colors[slide.surface] }]}
-          >
-            <View style={styles.ambientOrb} />
-            <View style={styles.ambientOrbSmall} />
-            <Image resizeMode="contain" source={slide.illustration} style={styles.artwork} />
-          </View>
+        <ScrollView
+          bounces={false}
+          contentOffset={{ x: getPhysicalIndex(0) * pageWidth, y: 0 }}
+          decelerationRate="fast"
+          horizontal
+          onMomentumScrollEnd={handleMomentumScrollEnd}
+          pagingEnabled
+          ref={scrollViewRef}
+          showsHorizontalScrollIndicator={false}
+          style={styles.slideViewport}
+          testID="onboarding-pages"
+        >
+          {displayedSlides.map((item) => {
+            const logicalIndex = onboardingSlides.findIndex((slide) => slide.key === item.key);
+            const isActive = logicalIndex === activeSlide;
 
-          <View style={styles.copy}>
-            <AppText accessibilityRole="header" variant={isFirstSlide ? 'display' : 'titleLarge'}>
-              {slideCopy[slide.key].title}
-            </AppText>
-            <AppText tone="secondary" variant="bodyLarge">
-              {slideCopy[slide.key].body}
-            </AppText>
-          </View>
-        </View>
+            return (
+              <View
+                accessibilityElementsHidden={!isActive}
+                accessibilityLiveRegion={isActive ? 'polite' : 'none'}
+                importantForAccessibility={isActive ? 'auto' : 'no-hide-descendants'}
+                key={item.key}
+                style={[styles.slide, { width: pageWidth }]}
+              >
+                <View
+                  accessibilityElementsHidden
+                  importantForAccessibility="no-hide-descendants"
+                  style={[styles.artworkStage, { backgroundColor: theme.colors[item.surface] }]}
+                >
+                  <View style={styles.ambientOrb} />
+                  <View style={styles.ambientOrbSmall} />
+                  <Image resizeMode="contain" source={item.illustration} style={styles.artwork} />
+                </View>
+
+                <View style={styles.copy}>
+                  <AppText
+                    accessibilityRole="header"
+                    variant={logicalIndex === 0 ? 'display' : 'titleLarge'}
+                  >
+                    {slideCopy[item.key].title}
+                  </AppText>
+                  <AppText tone="secondary" variant="bodyLarge">
+                    {slideCopy[item.key].body}
+                  </AppText>
+                </View>
+              </View>
+            );
+          })}
+        </ScrollView>
 
         <View style={styles.footer}>
           <View
@@ -207,6 +284,9 @@ function createStyles(
       justifyContent: 'center',
       paddingBottom: isCompact ? theme.spacing.sm : theme.spacing.lg,
       paddingTop: isCompact ? theme.spacing.sm : theme.spacing.md,
+    },
+    slideViewport: {
+      flex: 1,
     },
     artworkStage: {
       alignItems: 'center',
