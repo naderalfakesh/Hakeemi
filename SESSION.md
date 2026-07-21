@@ -148,14 +148,18 @@
   `assets/illustrations/`, wired through `Illustration`, `stateIllustrations`,
   `providerArtwork`, and a four-step full-screen onboarding sequence. Portraits
   resolve by provider ID with the initials monogram as fallback, keeping the
-  Firestore `image` field as the remote-data contract. Their square,
-  top-anchored crops preserve each full face at card and profile sizes. The
-  generated README banner was rejected (baked-in text) and awaits regeneration.
+  Firestore `image` field as the remote-data contract. All six source portraits
+  were repaired with complete hair/head-covering silhouettes and consistent
+  transparent headroom, eliminating the sharp top cuts at card and profile
+  sizes. The generated README banner was rejected (baked-in text) and awaits
+  regeneration.
 - Asset performance: all 16 bundled illustrations now use native-safe WebP at
-  808.8 KB total, down from roughly 4.6 MB. `npm run assets:check` enforces a
+  819.1 KB total, down from roughly 4.6 MB. `npm run assets:check` enforces a
   150 KB per-file and 1 MB aggregate CI budget. The onboarding remains a public
-  signed-out portfolio entry rather than persisted first-run state, and the iOS
-  icon configuration still uses the Expo template symbol.
+  signed-out portfolio entry rather than persisted first-run state. Sign-in and
+  account creation are available only on its final step, and the disclaimer is
+  no longer repeated inside onboarding. The iOS icon configuration still uses
+  the Expo template symbol.
 - Portfolio docs: the README now leads with the illustrated and Arabic/RTL
   evidence sets and
   the completed Phase 0–4 + Phase 5 story, `CONTRIBUTING.md` codifies the

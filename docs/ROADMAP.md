@@ -1103,14 +1103,24 @@ The new visual identity includes a welcome hero, three feature illustrations,
 six fictional clinician portraits, six state illustrations, and an updated
 native screenshot gallery. Onboarding now uses four full-screen steps with one
 illustration and message per page plus Back, Next, Skip, progress, and final
-demo-entry actions; it no longer stacks a vertical welcome above an embedded
-carousel. It intentionally appears as the public signed-out portfolio entry
-rather than persisted first-run state. Provider portraits use consistent square,
-top-anchored source crops and `contain` fitting so hair and faces stay visible at
-card and profile sizes. All 16 illustrations are native-safe WebP files totaling
-808.8 KB, down from roughly 4.6 MB, and CI enforces 150 KB per-file/1 MB aggregate
-budgets. The iOS icon configuration still references the Expo template symbol,
-and the repository hero predates the new identity.
+demo and authentication choices; it no longer stacks a vertical welcome above
+an embedded carousel. Sign-in and account creation appear only on the final
+step, and the portfolio/fictional-data disclaimer is intentionally kept out of
+the onboarding flow. The sequence remains the public signed-out portfolio entry
+rather than persisted first-run state. Provider portraits now use repaired
+source artwork with complete hair, head-covering, and head silhouettes plus
+consistent transparent headroom; `contain` fitting keeps the full composition
+visible at card and profile sizes without sharp canvas-edge cuts. All 16
+illustrations are native-safe WebP files totaling 819.1 KB, down from roughly
+4.6 MB, and CI enforces 150 KB per-file/1 MB aggregate budgets. The iOS icon
+configuration still references the Expo template symbol, and the repository
+hero predates the new identity.
+
+The 21 July 2026 onboarding/avatar refinement is complete in two reviewable
+commits: `d89c762` moved authentication to the finish step and removed the
+repeated disclaimer, while `ac3b7d6` replaced all six visibly cropped portrait
+sources with identity-preserving, naturally framed artwork. The refreshed iOS
+screenshots in `docs/images/` record both outcomes.
 
 ## Next execution queue
 
