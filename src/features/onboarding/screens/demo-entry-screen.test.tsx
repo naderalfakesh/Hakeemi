@@ -18,6 +18,23 @@ describe('DemoEntryScreen', () => {
     expect(view.getByRole('header', { name: 'Care, without the runaround.' })).toBeOnTheScreen();
     expect(view.getByText(/No real clinicians/iu)).toBeOnTheScreen();
 
+    await fireEvent.press(view.getByRole('button', { name: 'Show the next onboarding page' }));
+
+    expect(view.getByRole('header', { name: 'Find the right clinician' })).toBeOnTheScreen();
+
+    await fireEvent.press(view.getByRole('button', { name: 'Show the next onboarding page' }));
+
+    expect(view.getByRole('header', { name: 'Book with confidence' })).toBeOnTheScreen();
+
+    await fireEvent.press(view.getByRole('button', { name: 'Back' }));
+
+    expect(view.getByRole('header', { name: 'Find the right clinician' })).toBeOnTheScreen();
+
+    await fireEvent.press(view.getByRole('button', { name: 'Show the next onboarding page' }));
+    await fireEvent.press(view.getByRole('button', { name: 'Show the next onboarding page' }));
+
+    expect(view.getByRole('header', { name: 'Care in your language' })).toBeOnTheScreen();
+
     await fireEvent.press(view.getByRole('button', { name: 'Explore the Hakeemi portfolio demo' }));
 
     expect(onContinue).toHaveBeenCalledTimes(1);
@@ -25,6 +42,23 @@ describe('DemoEntryScreen', () => {
     await fireEvent.press(view.getByRole('button', { name: 'Sign in' }));
 
     expect(onSignIn).toHaveBeenCalledTimes(1);
+  });
+
+  it('can skip directly from the first page', async () => {
+    const onContinue = jest.fn();
+    const view = await render(
+      <AppThemeProvider colorScheme="light">
+        <DemoEntryScreen onContinue={onContinue} onSignIn={jest.fn()} />
+      </AppThemeProvider>,
+    );
+
+    await fireEvent.press(
+      view.getByRole('button', {
+        name: 'Skip onboarding and explore the Hakeemi portfolio demo',
+      }),
+    );
+
+    expect(onContinue).toHaveBeenCalledTimes(1);
   });
 
   it('renders the entry copy in Arabic', async () => {
@@ -37,9 +71,7 @@ describe('DemoEntryScreen', () => {
     );
 
     expect(view.getByRole('header', { name: 'رعاية صحية، من دون تعقيدات.' })).toBeOnTheScreen();
-    expect(
-      view.getByRole('button', { name: 'استكشف العرض التجريبي لتطبيق حكيمي' }),
-    ).toBeOnTheScreen();
+    expect(view.getByRole('button', { name: 'اعرض صفحة التعريف التالية' })).toBeOnTheScreen();
     expect(view.getByRole('button', { name: 'تسجيل الدخول' })).toBeOnTheScreen();
     expect(view.getByText('Hakeemi')).toBeOnTheScreen();
   });

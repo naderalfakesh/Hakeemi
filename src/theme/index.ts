@@ -5,6 +5,7 @@ export {
   getTheme,
   lightTheme,
   type AppTheme,
+  type SemanticColors,
   type ThemeMode,
   type ThemePreference,
 } from './themes';
