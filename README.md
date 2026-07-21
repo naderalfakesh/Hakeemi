@@ -5,9 +5,9 @@
 > Hakeemi is a technical portfolio project. It uses fictional clinicians and
 > patient data and is not a healthcare service or clinical product.
 
-| Illustrated welcome                                                                                                                                 | Discovery with portraits                                                                                                                 | Provider profile                                                                                                                                  |
-| --------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| <img src="docs/images/welcome-illustrated-native.png" alt="Welcome screen with an original doctor illustration and onboarding story" width="260" /> | <img src="docs/images/find-care-illustrated-native.png" alt="Find Care with illustrated doctor portraits on tinted tiles" width="260" /> | <img src="docs/images/provider-detail-illustrated-native.png" alt="Provider profile with a large ringed portrait and availability" width="260" /> |
+| Illustrated welcome                                                                                                                      | Discovery with portraits                                                                                                                 | Provider profile                                                                                                                                  |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <img src="docs/images/welcome-illustrated-native.png" alt="Signed-out Welcome screen with account and demo entry choices" width="260" /> | <img src="docs/images/find-care-illustrated-native.png" alt="Find Care with illustrated doctor portraits on tinted tiles" width="260" /> | <img src="docs/images/provider-detail-illustrated-native.png" alt="Provider profile with a large ringed portrait and availability" width="260" /> |
 
 | Arabic RTL discovery                                                                                                                     | Dark mode, Arabic                                                                                       | Account preferences                                                                                                                    |
 | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
@@ -39,10 +39,11 @@ sequence.
 
 ## What works today
 
-- A responsive four-step, full-screen onboarding sequence with conventional
-  Back, Next, and Skip controls; demo, sign-in, and account-creation choices
-  appear together only on the final step. Four-tab navigation is built with
-  typed Expo Router routes.
+- A first-run, four-step onboarding sequence with button and swipe navigation,
+  native horizontal page transitions, RTL direction support, and a
+  reduced-motion fallback. Completion is persisted; returning signed-out users
+  land on a separate Welcome screen that owns demo, sign-in, and account-creation
+  choices. Four-tab navigation is built with typed Expo Router routes.
 - Provider search, specialty filters, stable cursor pagination, and provider
   details backed by Firestore on native platforms.
 - Email/password sign-up, sign-in, password recovery, verification handoff,

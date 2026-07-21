@@ -1102,12 +1102,15 @@ analytics instrumentation, and measured performance budgets remain open.
 The new visual identity includes a welcome hero, three feature illustrations,
 six fictional clinician portraits, six state illustrations, and an updated
 native screenshot gallery. Onboarding now uses four full-screen steps with one
-illustration and message per page plus Back, Next, Skip, progress, and final
-demo and authentication choices; it no longer stacks a vertical welcome above
-an embedded carousel. Sign-in and account creation appear only on the final
-step, and the portfolio/fictional-data disclaimer is intentionally kept out of
-the onboarding flow. The sequence remains the public signed-out portfolio entry
-rather than persisted first-run state. Provider portraits now use repaired
+illustration and message per page plus Back, Next, Skip, progress, and touch
+swiping; it no longer stacks a vertical welcome above an embedded carousel.
+The pages use native horizontal slide-out/slide-in transitions, reverse their
+physical order for Arabic RTL, and make button navigation instant when reduced
+motion is requested. Skip and final Continue persist a versioned AsyncStorage
+completion flag and lead to a separate signed-out Welcome route. Returning
+visitors therefore bypass onboarding and land on Welcome, which exclusively
+owns Create account, Sign in, and Explore demo. The portfolio/fictional-data
+disclaimer remains outside onboarding. Provider portraits now use repaired
 source artwork with complete hair, head-covering, and head silhouettes plus
 consistent transparent headroom; `contain` fitting keeps the full composition
 visible at card and profile sizes without sharp canvas-edge cuts. All 16
@@ -1116,11 +1119,13 @@ illustrations are native-safe WebP files totaling 819.1 KB, down from roughly
 configuration still references the Expo template symbol, and the repository
 hero predates the new identity.
 
-The 21 July 2026 onboarding/avatar refinement is complete in two reviewable
-commits: `d89c762` moved authentication to the finish step and removed the
-repeated disclaimer, while `ac3b7d6` replaced all six visibly cropped portrait
-sources with identity-preserving, naturally framed artwork. The refreshed iOS
-screenshots in `docs/images/` record both outcomes.
+The 21 July 2026 onboarding/avatar refinement is complete in reviewable commits.
+`d89c762` removed the repeated disclaimer, and its interim finish-step auth
+placement was superseded by `a5dcff4`, which introduced the persisted onboarding
+gate and standalone Welcome route. `abec842` added native paged motion, touch
+swiping, RTL order, and reduced-motion behavior. `ac3b7d6` replaced all six
+visibly cropped portrait sources with identity-preserving, naturally framed
+artwork. The refreshed iOS screenshots in `docs/images/` record the final state.
 
 ## Next execution queue
 

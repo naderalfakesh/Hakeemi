@@ -155,11 +155,13 @@
   regeneration.
 - Asset performance: all 16 bundled illustrations now use native-safe WebP at
   819.1 KB total, down from roughly 4.6 MB. `npm run assets:check` enforces a
-  150 KB per-file and 1 MB aggregate CI budget. The onboarding remains a public
-  signed-out portfolio entry rather than persisted first-run state. Sign-in and
-  account creation are available only on its final step, and the disclaimer is
-  no longer repeated inside onboarding. The iOS icon configuration still uses
-  the Expo template symbol.
+  150 KB per-file and 1 MB aggregate CI budget. Onboarding is now a persisted
+  first-run sequence with horizontal button/swipe paging, Arabic RTL order, and
+  reduced-motion behavior. Skip and Continue lead to a separate reusable
+  Welcome route; only Welcome owns Create account, Sign in, and Explore demo.
+  Returning signed-out users bypass onboarding, and the disclaimer is no longer
+  repeated inside it. The iOS icon configuration still uses the Expo template
+  symbol.
 - Portfolio docs: the README now leads with the illustrated and Arabic/RTL
   evidence sets and
   the completed Phase 0–4 + Phase 5 story, `CONTRIBUTING.md` codifies the
