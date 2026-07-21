@@ -44,12 +44,11 @@ const onboardingSlides = [
 type OnboardingSlideKey = (typeof onboardingSlides)[number]['key'];
 
 type DemoEntryScreenProps = {
-  onContinue: () => void;
-  onSignIn: () => void;
-  onSignUp: () => void;
+  onComplete: () => void;
+  onSkip: () => void;
 };
 
-export function DemoEntryScreen({ onContinue, onSignIn, onSignUp }: DemoEntryScreenProps) {
+export function OnboardingScreen({ onComplete, onSkip }: DemoEntryScreenProps) {
   const theme = useAppTheme();
   const strings = useStrings(onboardingStrings);
   const { height, width } = useWindowDimensions();
@@ -87,7 +86,7 @@ export function DemoEntryScreen({ onContinue, onSignIn, onSignUp }: DemoEntryScr
             <View style={styles.skipAction}>
               <Button
                 accessibilityLabel={strings.skipAccessibilityLabel}
-                onPress={onContinue}
+                onPress={onSkip}
                 variant="tertiary"
               >
                 {strings.skip}
@@ -139,24 +138,9 @@ export function DemoEntryScreen({ onContinue, onSignIn, onSignUp }: DemoEntryScr
 
           {isLastSlide ? (
             <View style={styles.finalActions}>
-              <Button
-                accessibilityLabel={strings.exploreDemoAccessibilityLabel}
-                onPress={onContinue}
-              >
-                {strings.exploreDemo}
+              <Button accessibilityLabel={strings.finishAccessibilityLabel} onPress={onComplete}>
+                {strings.finish}
               </Button>
-              <View style={styles.authActions}>
-                <View style={styles.authAction}>
-                  <Button onPress={onSignIn} variant="secondary">
-                    {strings.signIn}
-                  </Button>
-                </View>
-                <View style={styles.authAction}>
-                  <Button onPress={onSignUp} variant="secondary">
-                    {strings.createAccount}
-                  </Button>
-                </View>
-              </View>
               <Button onPress={showPreviousSlide} variant="tertiary">
                 {strings.back}
               </Button>
@@ -291,13 +275,6 @@ function createStyles(
     },
     finalActions: {
       gap: theme.spacing.xs,
-    },
-    authActions: {
-      flexDirection: 'row',
-      gap: theme.spacing.sm,
-    },
-    authAction: {
-      flex: 1,
     },
     backAction: {
       flex: 1,

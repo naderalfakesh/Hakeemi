@@ -3,16 +3,14 @@ import { fireEvent, render } from '@testing-library/react-native';
 import { AppLocaleProvider } from '@/localization/locale-provider';
 import { AppThemeProvider } from '@/theme';
 
-import { DemoEntryScreen } from './demo-entry-screen';
+import { OnboardingScreen } from './demo-entry-screen';
 
-describe('DemoEntryScreen', () => {
-  it('moves through onboarding and exposes auth choices at the end', async () => {
-    const onContinue = jest.fn();
-    const onSignIn = jest.fn();
-    const onSignUp = jest.fn();
+describe('OnboardingScreen', () => {
+  it('moves through the story and completes from the final page', async () => {
+    const onComplete = jest.fn();
     const view = await render(
       <AppThemeProvider colorScheme="light">
-        <DemoEntryScreen onContinue={onContinue} onSignIn={onSignIn} onSignUp={onSignUp} />
+        <OnboardingScreen onComplete={onComplete} onSkip={jest.fn()} />
       </AppThemeProvider>,
     );
 
@@ -37,44 +35,38 @@ describe('DemoEntryScreen', () => {
     await fireEvent.press(view.getByRole('button', { name: 'Show the next onboarding page' }));
 
     expect(view.getByRole('header', { name: 'Care in your language' })).toBeOnTheScreen();
-    expect(view.getByRole('button', { name: 'Sign in' })).toBeOnTheScreen();
-    expect(view.getByRole('button', { name: 'Create account' })).toBeOnTheScreen();
+    expect(view.queryByRole('button', { name: 'Sign in' })).not.toBeOnTheScreen();
+    expect(view.queryByRole('button', { name: 'Create account' })).not.toBeOnTheScreen();
 
-    await fireEvent.press(view.getByRole('button', { name: 'Explore the Hakeemi demo' }));
+    await fireEvent.press(
+      view.getByRole('button', { name: 'Finish onboarding and continue to welcome' }),
+    );
 
-    expect(onContinue).toHaveBeenCalledTimes(1);
-
-    await fireEvent.press(view.getByRole('button', { name: 'Sign in' }));
-
-    expect(onSignIn).toHaveBeenCalledTimes(1);
-
-    await fireEvent.press(view.getByRole('button', { name: 'Create account' }));
-
-    expect(onSignUp).toHaveBeenCalledTimes(1);
+    expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
-  it('can skip directly from the first page', async () => {
-    const onContinue = jest.fn();
+  it('can skip directly to welcome from the first page', async () => {
+    const onSkip = jest.fn();
     const view = await render(
       <AppThemeProvider colorScheme="light">
-        <DemoEntryScreen onContinue={onContinue} onSignIn={jest.fn()} onSignUp={jest.fn()} />
+        <OnboardingScreen onComplete={jest.fn()} onSkip={onSkip} />
       </AppThemeProvider>,
     );
 
     await fireEvent.press(
       view.getByRole('button', {
-        name: 'Skip onboarding and explore Hakeemi',
+        name: 'Skip onboarding and continue to welcome',
       }),
     );
 
-    expect(onContinue).toHaveBeenCalledTimes(1);
+    expect(onSkip).toHaveBeenCalledTimes(1);
   });
 
   it('renders the entry copy in Arabic', async () => {
     const view = await render(
       <AppThemeProvider colorScheme="light">
         <AppLocaleProvider locale="ar">
-          <DemoEntryScreen onContinue={jest.fn()} onSignIn={jest.fn()} onSignUp={jest.fn()} />
+          <OnboardingScreen onComplete={jest.fn()} onSkip={jest.fn()} />
         </AppLocaleProvider>
       </AppThemeProvider>,
     );
