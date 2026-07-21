@@ -5,7 +5,8 @@
 > Scope: atomic cancellation/rescheduling, the authenticated appointment
 > management experience, native calendar follow-through, notification
 > registration/routing plumbing, scheduled delivery, and restrained haptics.
-> Native management E2E is intentionally not claimed as complete yet.
+> The native iOS management E2E is complete; Android hardware and native
+> permission-dialog checks remain release sign-off work.
 
 ## Outcome
 

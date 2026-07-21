@@ -1,10 +1,10 @@
 # Hakeemi Modernization Roadmap
 
-> Status: Phase 5 in progress; Phase 6 groundwork underway
+> Status: Phase 5 release sign-off in progress; Phase 6 delivery and performance work next
 >
 > Baseline: `dade72b` on `master`
 >
-> Last updated: 2026-07-20
+> Last updated: 2026-07-21
 >
 > Product type: portfolio-quality patient appointment application; not a clinical product
 
@@ -754,7 +754,7 @@ _Estimated effort: two to three sessions_
 5. `feat: add guided booking and confirmation flow`
 6. `test(e2e): cover appointment booking`
 
-### Phase 4 — Manage appointments and native follow-through
+### Phase 4 — Manage appointments and native follow-through ✅
 
 _Goal: patients can manage upcoming care and use meaningful native integrations
 after booking._
@@ -831,7 +831,9 @@ _Estimated effort: two sessions_
 - [x] Add route-level error boundaries and safe structured logging.
 - [x] Define query caching and stale-data indicators; never queue a booking while
       offline.
-- [ ] Tune keyboard avoidance, safe areas, rotation, small phones, and tablets.
+- [x] Tune keyboard avoidance and safe areas, and verify constrained tablet
+      layouts in the iOS Simulator.
+- [ ] Complete rotation and physical small-phone sign-off.
 - [x] Apply purposeful transitions and shared motion tokens with reduced-motion
       fallbacks.
 
@@ -878,8 +880,9 @@ _Estimated effort: two sessions_
 - [ ] Add Crashlytics and Performance Monitoring with privacy-safe metadata.
 - [x] Define analytics events for discovery and booking without recording health
       or identity details.
-- [ ] Configure EAS development, preview, and production builds; use fingerprint
-      runtime versioning for update compatibility.
+- [x] Configure EAS development, simulator, preview, and production profiles
+      with explicit environment boundaries.
+- [ ] Adopt fingerprint runtime versioning before enabling OTA updates.
 - [ ] Configure signing through EAS credentials; never reuse the legacy Android
       debug signing setup.
 - [ ] Produce installable iOS and Android preview builds and run the full smoke
@@ -913,13 +916,17 @@ _Estimated effort: one session_
 #### README and documentation
 
 - [x] Replace the current README with a concise case-study structure.
-- [ ] Create a new original hero image, app icon, screenshot set, and short demo
-      video/GIF using fictional data.
+- [x] Create an original in-app illustration set and current native screenshot
+      gallery using fictional data.
+- [ ] Replace the template Expo app icon and legacy repository hero with an
+      original Hakeemi identity.
+- [ ] Record a short demo video/GIF of the core journey.
 - [x] Explain the 2021-to-2026 rebuild and link the `legacy-v1` tag.
 - [x] Document the Expo/CNG decision and the native development-build model.
-- [ ] Include a small architecture diagram, feature list, stack, directory map,
-      setup steps, emulator seed instructions, scripts, test commands, preview build
-      link/QR, accessibility/localization notes, and privacy disclaimer.
+- [x] Include an architecture diagram, feature list, stack, directory map,
+      setup steps, emulator seed instructions, scripts, test commands,
+      accessibility/localization notes, and privacy disclaimer.
+- [ ] Add an installable preview build link and QR code.
 - [ ] Include measured performance and quality results only after they exist.
 - [x] Credit the historical Figma inspiration without presenting the new UI as a
       free-template implementation.
@@ -1030,17 +1037,18 @@ The modernization is complete only when:
 - [ ] English/LTR and Arabic/RTL core journeys pass accessibility review.
 - [x] Offline, loading, empty, error, permission-denied, and retry states are
       designed and tested.
-- [ ] CI, EAS preview builds, observability, App Check, and signing are configured.
+- [x] CI and explicit EAS development/preview/production profiles are configured.
+- [ ] Signed preview artifacts, observability, and App Check are configured.
 - [ ] Performance budgets have measured results, not aspirational numbers.
 - [x] The README is a reproducible portfolio case study with current screenshots.
 - [ ] All phases and hashes are recorded here and the working tree is clean.
 
 ## Current position
 
-Phases 0 through 3 are complete, and the Phase 4 appointment-management,
-calendar, notification, scheduled-reminder, and haptics checkpoints are
-complete. The Expo SDK 57 product slice builds and runs on current iOS and
-Android simulators. Phase 1 platform proof is recorded in
+Phases 0 through 4 are complete. The Expo SDK 57 product slice builds and runs
+on current iOS and Android simulators, and appointment management, calendar,
+notifications, scheduled reminders, haptics, and saved clinicians are all
+implemented. Phase 1 platform proof is recorded in
 `docs/phase-1-verification.md`; cloud-backed discovery, native accounts,
 server-owned profiles, and synchronized preferences are recorded in
 `docs/phase-2-verification.md`; transactional booking and durable confirmation
@@ -1064,9 +1072,10 @@ against the seeded emulators) is complete and recorded in
 `docs/phase-4-verification.md`; an Android-hardware pass and the
 calendar/notification permission dialogs remain for release sign-off.
 
-Phase 5 has started with a recoverable route error boundary, privacy-safe
-development logging, font scaling, RTL-aware text direction, and locale-aware
-date/time formatting. The full Arabic UI copy now ships through typed
+Phase 5 implementation is substantially complete: the app has a recoverable
+route error boundary, privacy-safe development logging, font scaling,
+RTL-aware text direction, locale-aware date/time formatting, reduced-motion
+navigation, and stale-data behavior. The full Arabic UI copy ships through typed
 bilingual string catalogs covering every screen, validation message, error
 mapping, and accessibility label, with Arabic plural rules for all counts.
 Selecting Arabic persists the native RTL layout direction through
@@ -1076,5 +1085,35 @@ recorded in `docs/phase-5-verification.md`. The Arabic copy has been through
 a native-level consistency review, provider catalog data (names, credentials,
 bios, languages) is bilingual with English fallback for untranslated
 documents, and the development seed was re-run with the bilingual catalog.
-Assistive-technology journeys and manual device-size/offline evidence remain
-open.
+Dynamic Type, dark mode, accessibility-tree order, and tablet layout have
+native evidence. Spoken VoiceOver/TalkBack journeys, rotation, physical
+small-phone checks, Android hardware, and native permission-dialog checks
+remain release sign-off work.
+
+Phase 6 groundwork is also present: CI runs the full application and Firebase
+matrix, a weekly dependency-health workflow checks Expo alignment and security
+advisories, the testing and privacy-safe analytics contracts are documented,
+and EAS profiles define development, simulator, preview, and production
+environments. Signing, installable preview artifacts, App Check, observability,
+analytics instrumentation, and measured performance budgets remain open.
+
+The new visual identity includes a welcome hero, a three-slide story pager, six
+fictional clinician portraits, six state illustrations, and an updated native
+screenshot gallery. The story pager intentionally appears on the public demo
+entry screen on every signed-out visit; it is not yet a persisted first-run
+onboarding flow. The illustration bundle is currently about 4.9 MB and includes
+640–800 px PNGs rendered as small as 132 px, so image payload reduction belongs
+in the Phase 6 performance pass. The iOS icon configuration still references
+the Expo template symbol, and the repository hero predates the new identity.
+
+## Next execution queue
+
+1. Measure cold start, interaction latency, list frame stability, JS bundle
+   size, and image payloads on representative iOS and Android builds; resize or
+   recompress the illustrations from evidence rather than appearance alone.
+2. Complete the manual Phase 5/4 sign-off matrix: VoiceOver, TalkBack, rotation,
+   a physical small phone, Android hardware, and calendar/notification denial.
+3. Add privacy-safe Crashlytics, Performance Monitoring, and analytics, then
+   enable App Check in monitor mode before considering enforcement.
+4. Replace the template app icon/repository hero, capture a short core-flow
+   demo, and attach signed EAS preview builds with an install link and QR code.

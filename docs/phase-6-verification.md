@@ -18,8 +18,9 @@
 
 EAS signing credentials and installable preview artifacts require an Expo owner
 login and Apple/Google credentials, so they are not fabricated in source. App
-Check enforcement, Crashlytics/Performance Monitoring, privacy-safe analytics,
-dependency health scheduling, performance budgets, and real-device VoiceOver/
-TalkBack smoke evidence also require project-console or hardware access. The
-development Firebase project remains the only configured project; production
-deployment still requires an explicit billing and operations decision.
+Check enforcement, Crashlytics/Performance Monitoring, privacy-safe analytics
+instrumentation, performance budgets, and real-device VoiceOver/TalkBack smoke
+evidence also require project-console, measurement, or hardware work. Weekly
+dependency-health scheduling is now delivered. The development Firebase project
+remains the only configured project; production deployment still requires an
+explicit billing and operations decision.

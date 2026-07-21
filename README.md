@@ -39,8 +39,8 @@ sequence.
 
 ## What works today
 
-- Responsive onboarding and four-tab navigation built with typed Expo Router
-  routes.
+- A responsive signed-out welcome with a three-slide product story pager, plus
+  four-tab navigation built with typed Expo Router routes.
 - Provider search, specialty filters, stable cursor pagination, and provider
   details backed by Firestore on native platforms.
 - Email/password sign-up, sign-in, password recovery, verification handoff,

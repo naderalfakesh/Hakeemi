@@ -84,7 +84,7 @@
 
 | Check              | Result                         |
 | ------------------ | ------------------------------ |
-| Application tests  | 34 suites, 106 tests passed    |
+| Application tests  | 34 suites, 107 tests passed    |
 | App lint/typecheck | Passed (ESLint, tsc, Prettier) |
 | Static web export  | 21 routes exported             |
 | Expo Doctor        | 20/20 checks passed            |

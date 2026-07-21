@@ -1,7 +1,7 @@
 # Current Session
 
-- Current phase: Phase 4 in progress — native E2E follow-through remains after
-  the calendar/notification/reminder checkpoint.
+- Current phase: Phases 0–4 complete; Phase 5 manual release sign-off and Phase 6
+  measured performance, observability, App Check, and signed delivery remain.
 - Legacy baseline: `dade72b`, preserved by the `legacy-v1` tag.
 - Phase 1 proof: [`docs/phase-1-verification.md`](docs/phase-1-verification.md).
 - Phase 2 proof: [`docs/phase-2-verification.md`](docs/phase-2-verification.md).
@@ -150,10 +150,15 @@
   resolve by provider ID with the initials monogram as fallback, keeping the
   Firestore `image` field as the remote-data contract. The generated README
   banner was rejected (baked-in text) and awaits regeneration.
-- Portfolio docs: the README now leads with the Arabic/RTL evidence set and
+- State audit: the signed-out entry now contains a three-slide story pager, not
+  a persisted first-run onboarding flow. The illustration bundle is about
+  4.9 MB and should be resized/recompressed during the measured performance
+  pass; the iOS icon configuration still uses the Expo template symbol.
+- Portfolio docs: the README now leads with the illustrated and Arabic/RTL
+  evidence sets and
   the completed Phase 0–4 + Phase 5 story, `CONTRIBUTING.md` codifies the
   working agreements (fictional data, bilingual strings, conventional
   commits, validate-before-review), and the repository carries an MIT
-  `LICENSE`. Remaining Phase 7 items need external assets: hero image, demo
-  video, and an EAS preview link/QR.
+  `LICENSE`. Remaining Phase 7 items are an original app/repository icon and
+  hero, a demo video, and an EAS preview link/QR.
 - Source of truth: [`docs/ROADMAP.md`](docs/ROADMAP.md).
