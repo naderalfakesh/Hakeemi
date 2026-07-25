@@ -33,7 +33,7 @@ export const navigationStrings: LocalizedStrings<typeof en> = {
       appointments: 'المواعيد',
       findCare: 'ابحث عن رعاية',
       home: 'الرئيسية',
-      profile: 'الملف الشخصي',
+      profile: 'حسابي',
     },
   },
   en,
