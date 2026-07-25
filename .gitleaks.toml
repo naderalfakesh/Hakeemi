@@ -1,0 +1,6 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Committed emulator-only placeholder Firebase config; contains no real identifiers"
+paths = ['''firebase/templates/emulator/.*''']
