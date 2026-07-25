@@ -34,8 +34,8 @@ Firebase contract changes additionally require the relevant emulator suites
 - Single-line [Conventional Commit](https://www.conventionalcommits.org)
   subjects without scopes or bodies, e.g. `feat: add saved providers`.
 - One focused change per commit; keep it runnable where practical.
-- Update the roadmap checkboxes and `SESSION.md` in the commit that completes
-  a checkpoint, and record verification evidence under `docs/`.
+- Update the roadmap checkboxes in the commit that completes a checkpoint,
+  and record verification evidence under `docs/`.
 
 ## Testing expectations
 
