@@ -1,3 +1,4 @@
+import { reloadAppAsync } from 'expo';
 import { I18nManager, Platform } from 'react-native';
 
 import type { AppLocale } from './locale-provider';
@@ -36,6 +37,24 @@ export function isLayoutDirectionPendingRestart(locale: AppLocale): boolean {
   }
 
   return I18nManager.isRTL !== (locale === 'ar');
+}
+
+/**
+ * Reloads the app so a changed layout direction takes effect immediately.
+ * Returns false where no programmatic reload exists (web); callers keep the
+ * manual restart hint for that case.
+ */
+export async function restartToApplyLayoutDirection(): Promise<boolean> {
+  if (Platform.OS === 'web') {
+    return false;
+  }
+
+  try {
+    await reloadAppAsync('layout-direction-change');
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function resetLayoutDirectionSyncForTests() {

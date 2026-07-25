@@ -26,7 +26,11 @@ import {
   useAppTheme,
 } from '@/theme';
 import { logSafeError } from '@/services/logging/safe-logger';
-import { syncNativeLayoutDirection } from '@/localization/layout-direction';
+import {
+  isLayoutDirectionPendingRestart,
+  restartToApplyLayoutDirection,
+  syncNativeLayoutDirection,
+} from '@/localization/layout-direction';
 import { AppLocaleProvider } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 
@@ -108,11 +112,28 @@ function NotificationNavigationBridge() {
 }
 
 function AppShell() {
-  const { preferences } = useAppPreferences();
+  const { preferences, status } = useAppPreferences();
+  const hasRequestedRestart = useRef(false);
 
   useEffect(() => {
     syncNativeLayoutDirection(preferences.locale);
   }, [preferences.locale]);
+
+  useEffect(() => {
+    // Reload the app once the changed locale is persisted so the new layout
+    // direction applies without a manual restart. The persisted RTL flag is
+    // already in place, so the reloaded instance boots in the right direction.
+    if (
+      status !== 'ready' ||
+      hasRequestedRestart.current ||
+      !isLayoutDirectionPendingRestart(preferences.locale)
+    ) {
+      return;
+    }
+
+    hasRequestedRestart.current = true;
+    void restartToApplyLayoutDirection();
+  }, [preferences.locale, status]);
 
   return (
     <AppLocaleProvider locale={preferences.locale}>
