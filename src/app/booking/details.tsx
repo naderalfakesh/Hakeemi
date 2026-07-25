@@ -7,13 +7,20 @@ import { useBookingDraft } from '@/features/booking/context/booking-draft-provid
 import { useBookingSelection } from '@/features/booking/hooks/use-booking-selection';
 import { bookingStrings } from '@/features/booking/localization/booking-strings';
 import { BookingDetailsScreen } from '@/features/booking/screens/booking-details-screen';
+import { useAppDataSources } from '@/features/demo/use-app-data-sources';
 import { useStrings } from '@/localization/use-strings';
 
 export default function BookingDetailsRoute() {
   const { providerId, slotId } = useBookingParams();
   const session = useAuthSession();
+  const dataSources = useAppDataSources();
   const bookingDraft = useBookingDraft();
-  const selection = useBookingSelection(providerId, slotId);
+  const selection = useBookingSelection(
+    providerId,
+    slotId,
+    dataSources.careRepository,
+    dataSources.scope,
+  );
   const strings = useStrings(bookingStrings);
 
   useEffect(() => {
@@ -38,7 +45,7 @@ export default function BookingDetailsRoute() {
     );
   }
 
-  if (!session.user?.emailVerified) {
+  if (session.status === 'authenticated' && !session.user?.emailVerified) {
     return (
       <Redirect
         href={{

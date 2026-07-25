@@ -3,12 +3,13 @@ import { useCallback, useState } from 'react';
 
 import { careRepository } from '@/features/care/data/care-repository';
 
-import { careQueryKeys } from '../data/query-keys';
+import { careQueryKeys, type CareQueryScope } from '../data/query-keys';
 import { createAvailabilityWindow } from '../domain/availability';
 import type { CareRepository } from '../domain/repository';
 import type { AvailabilitySlot, Clinic, Provider, Specialty } from '../domain/types';
 
 export type ProviderDetailData = {
+  availabilityWindow: ReturnType<typeof createAvailabilityWindow>;
   clinics: readonly Clinic[];
   provider: Provider;
   slots: readonly AvailabilitySlot[];
@@ -21,13 +22,17 @@ export type ProviderDetailState =
   | { status: 'not-found' }
   | { data: ProviderDetailData; status: 'success' };
 
-export function useProviderDetail(providerId: string, repository?: CareRepository) {
+export function useProviderDetail(
+  providerId: string,
+  repository?: CareRepository,
+  queryScope: CareQueryScope = 'account',
+) {
   const resolvedRepository = repository ?? careRepository;
   const [availabilityWindow] = useState(createAvailabilityWindow);
   const providerQuery = useQuery({
     enabled: providerId.length > 0,
-    queryKey: careQueryKeys.detail(providerId),
-    queryFn: async (): Promise<Omit<ProviderDetailData, 'slots'> | null> => {
+    queryKey: careQueryKeys.detail(providerId, queryScope),
+    queryFn: async (): Promise<Omit<ProviderDetailData, 'availabilityWindow' | 'slots'> | null> => {
       const provider = await resolvedRepository.getProvider(providerId);
 
       if (!provider) {
@@ -48,7 +53,7 @@ export function useProviderDetail(providerId: string, repository?: CareRepositor
   const availabilityQuery = useQuery({
     enabled:
       providerId.length > 0 && providerQuery.data !== undefined && providerQuery.data !== null,
-    queryKey: careQueryKeys.availability(providerId, availabilityWindow),
+    queryKey: careQueryKeys.availability(providerId, availabilityWindow, queryScope),
     queryFn: () => resolvedRepository.listAvailableSlots(providerId, availabilityWindow),
   });
 
@@ -63,7 +68,11 @@ export function useProviderDetail(providerId: string, repository?: CareRepositor
   } else {
     state = {
       status: 'success',
-      data: { ...providerQuery.data, slots: availabilityQuery.data ?? [] },
+      data: {
+        ...providerQuery.data,
+        availabilityWindow,
+        slots: availabilityQuery.data ?? [],
+      },
     };
   }
 

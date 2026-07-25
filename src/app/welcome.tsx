@@ -10,10 +10,17 @@ export default function WelcomeRoute() {
     return <Redirect href={session.user?.emailVerified ? '/home' : '/auth/verify-email'} />;
   }
 
+  if (session.status === 'demo') {
+    return <Redirect href="/home" />;
+  }
+
   return (
     <WelcomeScreen
       onCreateAccount={() => router.push('/auth/sign-up')}
-      onExploreDemo={() => router.replace('/home')}
+      onExploreDemo={() => {
+        session.enterDemo();
+        router.replace('/home');
+      }}
       onSignIn={() => router.push('/auth/sign-in')}
     />
   );

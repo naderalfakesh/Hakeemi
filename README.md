@@ -45,13 +45,19 @@ sequence.
   land on a separate Welcome screen that owns demo, sign-in, and account-creation
   choices. Four-tab navigation is built with typed Expo Router routes.
 - Provider search, specialty filters, stable cursor pagination, and provider
-  details backed by Firestore on native platforms.
+  details backed by Firestore on native platforms. Provider profiles now expose
+  a two-week availability calendar with unavailable days, day-specific time
+  choices, visit modes, and an explicit continue action.
 - Email/password sign-up, sign-in, password recovery, verification handoff,
   sign-out, and cold-start session restoration.
 - A callable Function that creates the authenticated user's server-owned
   profile idempotently.
 - An authenticated, idempotent booking Function that prevents two requests from
   reserving the same slot in tested Firestore transactions.
+- Explore Demo is a persistent, account-free session with seeded upcoming,
+  completed, and cancelled appointments. Demo booking and management use an
+  isolated on-device repository, while authenticated writes continue through
+  the secure Firebase Functions boundary.
 - Authenticated appointment management with atomic cancellation and
   same-provider rescheduling, a 15-minute lead-time policy, audit timestamps,
   and server-only idempotency receipts.
@@ -217,11 +223,12 @@ a supported runtime after React Native Firebase is linked.
 Start the local services in one terminal:
 
 ```sh
-npm --prefix functions run build
-npm run firebase:emulators
+npm run firebase:emulators:seeded
 ```
 
-Seed fictional provider data from another terminal:
+The seeded command imports saved emulator state and automatically refreshes the
+fictional appointment dates for today without reopening confirmed reservations.
+If an already-running clean emulator needs data, seed it from another terminal:
 
 ```sh
 npm run firebase:seed:emulator

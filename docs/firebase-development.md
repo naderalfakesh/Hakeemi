@@ -27,13 +27,20 @@ development, preview, and production builds cannot be mixed accidentally.
 Run all emulators, including Pub/Sub for scheduled reminder functions, with:
 
 ```sh
-npm run firebase:emulators
+npm run firebase:emulators:seeded
 ```
 
 The interactive suite deliberately uses the `hakeemi-portfolio-dev` namespace
 because the ignored iOS and Android service files identify that project. All
 services used by the app are connected to localhost before any reads or writes;
-keep the full suite running while using this command.
+keep the full suite running while using this command. It imports the saved local
+state and automatically rolls fictional provider availability forward from the
+current UTC date, so a previously exported snapshot cannot leave the calendar
+with expired slots. Confirmed appointments keep their reserved slots; the
+rolling seed only updates availability that is still open.
+
+Use `npm run firebase:emulators` only when you intentionally need a clean,
+unseeded suite.
 
 The services bind to all local interfaces so iOS Simulator and Android Emulator
 can connect. The Emulator UI and hub remain bound to `127.0.0.1`. Do not expose

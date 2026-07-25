@@ -28,9 +28,9 @@ describe('ProviderDetailScreen', () => {
     expect(view.getByText('Marsa Family Clinic')).toBeOnTheScreen();
     expect(view.getByText(/AED\s*340/iu)).toBeOnTheScreen();
     expect(view.getByText(/Times are shown in Gulf Standard Time/iu)).toBeOnTheScreen();
-    expect(view.getByLabelText('2 available appointments')).toBeOnTheScreen();
+    expect(view.getByLabelText('7 available appointments')).toBeOnTheScreen();
 
-    await fireEvent.press(view.getAllByRole('button', { name: /Choose /u })[0]!);
+    await fireEvent.press(view.getByRole('button', { name: /Continue with/u }));
     expect(onChooseSlot).toHaveBeenCalledWith(
       expect.objectContaining({ providerId: 'lina-haddad' }),
     );
@@ -129,7 +129,7 @@ describe('ProviderDetailScreen', () => {
     expect(view.getByText('طب الأسرة')).toBeOnTheScreen();
     expect(view.getByText('المواعيد المتاحة')).toBeOnTheScreen();
     expect(view.getByText('الاستشارة')).toBeOnTheScreen();
-    expect(view.getByLabelText('موعدان متاحان')).toBeOnTheScreen();
+    expect(view.getByLabelText('7 مواعيد متاحة')).toBeOnTheScreen();
     expect(view.getByLabelText('حفظ د. لينا حداد')).toBeOnTheScreen();
   });
 });

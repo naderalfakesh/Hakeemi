@@ -30,7 +30,7 @@ export function useBookAppointment({
       }
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: appointmentQueryKeys.list() });
+      void queryClient.invalidateQueries({ queryKey: appointmentQueryKeys.all });
       void queryClient.invalidateQueries({ queryKey: careQueryKeys.all });
     },
     retry: false,

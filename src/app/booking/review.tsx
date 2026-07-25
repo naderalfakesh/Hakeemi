@@ -8,7 +8,10 @@ import { BookingRouteState } from '@/features/booking/components/booking-route-s
 import { useBookingDraft } from '@/features/booking/context/booking-draft-provider';
 import { useBookingSelection } from '@/features/booking/hooks/use-booking-selection';
 import { BookingReviewScreen } from '@/features/booking/screens/booking-review-screen';
+import { useAppDataSources } from '@/features/demo/use-app-data-sources';
 import { useAppLocale } from '@/localization/locale-provider';
+
+const alwaysConnected = async () => true;
 
 export default function BookingReviewRoute() {
   const params = useLocalSearchParams<{
@@ -18,9 +21,22 @@ export default function BookingReviewRoute() {
   const providerId = readParam(params.providerId);
   const slotId = readParam(params.slotId);
   const session = useAuthSession();
+  const dataSources = useAppDataSources();
   const draftContext = useBookingDraft();
-  const selection = useBookingSelection(providerId, slotId);
-  const booking = useBookAppointment();
+  const selection = useBookingSelection(
+    providerId,
+    slotId,
+    dataSources.careRepository,
+    dataSources.scope,
+  );
+  const booking = useBookAppointment(
+    dataSources.isDemo
+      ? {
+          checkConnection: alwaysConnected,
+          repository: dataSources.appointmentRepository,
+        }
+      : { repository: dataSources.appointmentRepository },
+  );
   const networkState = Network.useNetworkState();
   const { locale } = useAppLocale();
   const draft = draftContext.draft;
@@ -36,7 +52,7 @@ export default function BookingReviewRoute() {
     );
   }
 
-  if (!session.user?.emailVerified) {
+  if (session.status === 'authenticated' && !session.user?.emailVerified) {
     return (
       <Redirect
         href={{
@@ -61,8 +77,9 @@ export default function BookingReviewRoute() {
     );
   }
 
-  const isOnline =
-    networkState.isConnected === undefined
+  const isOnline = dataSources.isDemo
+    ? true
+    : networkState.isConnected === undefined
       ? null
       : networkState.isConnected && networkState.isInternetReachable !== false;
 

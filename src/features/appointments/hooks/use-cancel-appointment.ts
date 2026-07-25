@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { appointmentRepository } from '@/features/appointments/data/appointment-repository';
+import { careQueryKeys } from '@/features/care/data/query-keys';
 import { hasInternetConnection } from '@/services/connectivity/connectivity';
 
 import { appointmentQueryKeys } from '../data/query-keys';
@@ -29,8 +30,9 @@ export function useCancelAppointment({
       }
     },
     onSuccess: ({ appointment }) => {
-      void queryClient.invalidateQueries({ queryKey: appointmentQueryKeys.list() });
-      void queryClient.invalidateQueries({ queryKey: appointmentQueryKeys.detail(appointment.id) });
+      void appointment;
+      void queryClient.invalidateQueries({ queryKey: appointmentQueryKeys.all });
+      void queryClient.invalidateQueries({ queryKey: careQueryKeys.all });
     },
     retry: false,
   });

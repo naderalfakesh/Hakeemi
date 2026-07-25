@@ -15,9 +15,9 @@ import {
   Surface,
 } from '@/components/ui';
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
+import { AvailabilityCalendar } from '@/features/care/components/availability-calendar';
 import type { CareRepository } from '@/features/care/domain/repository';
 import { careRepository } from '@/features/care/data/care-repository';
-import { formatAvailability } from '@/features/care/presentation/formatters';
 import { useProviderDetail } from '@/features/care/hooks/use-provider-detail';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
@@ -34,6 +34,8 @@ import { appointmentDetailStrings } from '../localization/appointment-detail-str
 import { appointmentStatusStrings } from '../localization/appointment-status-strings';
 import { localizeAppointmentError } from '../localization/appointment-error-strings';
 
+const alwaysConnected = async () => true;
+
 export function AppointmentDetailScreen({
   appointmentId,
   appointmentRepository,
@@ -41,6 +43,7 @@ export function AppointmentDetailScreen({
   createRequestId = Crypto.randomUUID,
   onBack,
   onFindCare,
+  queryScope = 'account',
 }: {
   appointmentId: string;
   appointmentRepository?: AppointmentRepository | undefined;
@@ -48,11 +51,12 @@ export function AppointmentDetailScreen({
   createRequestId?: () => string;
   onBack: () => void;
   onFindCare: () => void;
+  queryScope?: 'account' | 'demo';
 }) {
   const session = useAuthSession();
   const strings = useStrings(appointmentDetailStrings);
 
-  if (session.status !== 'authenticated') {
+  if (session.status !== 'authenticated' && session.status !== 'demo') {
     return (
       <DetailState
         action={<Button onPress={onBack}>{strings.backToAppointments}</Button>}
@@ -71,6 +75,7 @@ export function AppointmentDetailScreen({
       createRequestId={createRequestId}
       onBack={onBack}
       onFindCare={onFindCare}
+      queryScope={queryScope}
     />
   );
 }
@@ -82,6 +87,7 @@ function AuthenticatedAppointmentDetail({
   createRequestId,
   onBack,
   onFindCare,
+  queryScope,
 }: {
   appointmentId: string;
   appointmentRepository?: AppointmentRepository | undefined;
@@ -89,17 +95,26 @@ function AuthenticatedAppointmentDetail({
   createRequestId: () => string;
   onBack: () => void;
   onFindCare: () => void;
+  queryScope: 'account' | 'demo';
 }) {
   const theme = useAppTheme();
   const { intlLocale, locale } = useAppLocale();
   const strings = useStrings(appointmentDetailStrings);
   const statusStrings = useStrings(appointmentStatusStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const detailQuery = useAppointmentDetail(appointmentId, appointmentRepository);
+  const detailQuery = useAppointmentDetail(appointmentId, appointmentRepository, queryScope);
   const providerId = detailQuery.data?.providerId ?? '';
-  const providerQuery = useProviderDetail(providerId, careDataRepository);
-  const cancelMutation = useCancelAppointment({ repository: appointmentRepository });
-  const rescheduleMutation = useRescheduleAppointment({ repository: appointmentRepository });
+  const providerQuery = useProviderDetail(providerId, careDataRepository, queryScope);
+  const cancelMutation = useCancelAppointment(
+    queryScope === 'demo'
+      ? { checkConnection: alwaysConnected, repository: appointmentRepository }
+      : { repository: appointmentRepository },
+  );
+  const rescheduleMutation = useRescheduleAppointment(
+    queryScope === 'demo'
+      ? { checkConnection: alwaysConnected, repository: appointmentRepository }
+      : { repository: appointmentRepository },
+  );
   const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [showReschedule, setShowReschedule] = useState(false);
   const [calendarState, setCalendarState] = useState<CalendarState>({ status: 'idle' });
@@ -347,7 +362,6 @@ function RescheduleSection({
   const theme = useAppTheme();
   const { locale } = useAppLocale();
   const strings = useStrings(appointmentDetailStrings);
-  const statusStrings = useStrings(appointmentStatusStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   if (providerState.status === 'loading') {
@@ -369,7 +383,7 @@ function RescheduleSection({
     );
   }
 
-  const slots = providerState.data.slots.filter((slot) => slot.id !== currentSlotId).slice(0, 6);
+  const slots = providerState.data.slots.filter((slot) => slot.id !== currentSlotId);
 
   return (
     <Surface padding="spacious" style={styles.reschedule} variant="plain">
@@ -382,27 +396,13 @@ function RescheduleSection({
           {strings.noOtherTimes}
         </AppText>
       ) : (
-        <View style={styles.slotList}>
-          {slots.map((slot) => (
-            <View key={slot.id} style={styles.slotRow}>
-              <View style={styles.slotCopy}>
-                <AppText variant="bodyStrong">{formatAvailability(slot, locale)}</AppText>
-                <AppText tone="secondary" variant="caption">
-                  {statusStrings.visitModeLabels[slot.visitMode]} · {slot.timezone}
-                </AppText>
-              </View>
-              <Button
-                accessibilityHint={strings.moveHereHint}
-                busy={submitting}
-                disabled={submitting}
-                onPress={() => onSelect(slot.id)}
-                variant="secondary"
-              >
-                {strings.moveHere}
-              </Button>
-            </View>
-          ))}
-        </View>
+        <AvailabilityCalendar
+          availabilityWindow={providerState.data.availabilityWindow}
+          isSubmitting={submitting}
+          locale={locale}
+          onChooseSlot={(slot) => onSelect(slot.id)}
+          slots={slots}
+        />
       )}
     </Surface>
   );
@@ -551,16 +551,5 @@ function createStyles(theme: AppTheme) {
     confirmation: { gap: theme.spacing.sm },
     inlineActions: { gap: theme.spacing.xs },
     reschedule: { gap: theme.spacing.sm },
-    slotList: { gap: theme.spacing.sm, marginTop: theme.spacing.xs },
-    slotRow: {
-      alignItems: 'center',
-      backgroundColor: theme.colors.surfaceMuted,
-      borderRadius: theme.radii.md,
-      flexDirection: 'row',
-      gap: theme.spacing.sm,
-      justifyContent: 'space-between',
-      padding: theme.spacing.sm,
-    },
-    slotCopy: { flex: 1, gap: theme.spacing.xxs },
   });
 }

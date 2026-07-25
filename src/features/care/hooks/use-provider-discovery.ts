@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { careRepository } from '@/features/care/data/care-repository';
 
-import { careQueryKeys } from '../data/query-keys';
+import { careQueryKeys, type CareQueryScope } from '../data/query-keys';
 import { createAvailabilityWindow } from '../domain/availability';
 import type { CareRepository, ProviderPageCursor } from '../domain/repository';
 import type { AvailabilitySlot, Provider, Specialty } from '../domain/types';
@@ -20,12 +20,14 @@ export type ProviderDiscoveryState =
   { status: 'error' } | { status: 'loading' } | { data: ProviderDiscoveryData; status: 'success' };
 
 type ProviderDiscoveryOptions = {
+  queryScope?: CareQueryScope;
   query: string;
   repository?: CareRepository;
   specialtyId: string | null;
 };
 
 export function useProviderDiscovery({
+  queryScope = 'account',
   query,
   repository = careRepository,
   specialtyId,
@@ -36,11 +38,11 @@ export function useProviderDiscovery({
     [query, specialtyId],
   );
   const specialtiesQuery = useQuery({
-    queryKey: careQueryKeys.specialties(),
+    queryKey: careQueryKeys.specialties(queryScope),
     queryFn: () => repository.listSpecialties(),
   });
   const providersQuery = useInfiniteQuery({
-    queryKey: careQueryKeys.discovery(search),
+    queryKey: careQueryKeys.discovery(search, queryScope),
     queryFn: ({ pageParam }) => repository.listProviderPage(search, pageParam, PROVIDER_PAGE_SIZE),
     initialPageParam: null as ProviderPageCursor | null,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
@@ -63,7 +65,7 @@ export function useProviderDiscovery({
   }, [providersQuery.data?.pages]);
   const slotQueries = useQueries({
     queries: providers.map((provider) => ({
-      queryKey: careQueryKeys.availability(provider.id, availabilityWindow),
+      queryKey: careQueryKeys.availability(provider.id, availabilityWindow, queryScope),
       queryFn: () => repository.listAvailableSlots(provider.id, availabilityWindow),
     })),
   });

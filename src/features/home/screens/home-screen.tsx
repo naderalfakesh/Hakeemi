@@ -14,6 +14,7 @@ import {
 import { ProviderCard } from '@/features/care/components/provider-card';
 import { ProviderCardSkeleton } from '@/features/care/components/provider-card-skeleton';
 import type { CareRepository } from '@/features/care/domain/repository';
+import type { CareQueryScope } from '@/features/care/data/query-keys';
 import type { Provider } from '@/features/care/domain/types';
 import { useProviderDiscovery } from '@/features/care/hooks/use-provider-discovery';
 import { homeStrings } from '@/features/home/localization/home-strings';
@@ -25,6 +26,7 @@ type HomeScreenProps = {
   onFindCare: () => void;
   onOpenCatalogue?: () => void;
   onSelectProvider: (providerId: string) => void;
+  queryScope?: CareQueryScope;
   repository?: CareRepository;
 };
 
@@ -32,6 +34,7 @@ export function HomeScreen({
   onFindCare,
   onOpenCatalogue,
   onSelectProvider,
+  queryScope = 'account',
   repository,
 }: HomeScreenProps) {
   const theme = useAppTheme();
@@ -39,6 +42,7 @@ export function HomeScreen({
   const strings = useStrings(homeStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { retry, state } = useProviderDiscovery({
+    queryScope,
     query: '',
     specialtyId: null,
     ...(repository ? { repository } : {}),

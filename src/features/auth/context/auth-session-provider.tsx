@@ -8,8 +8,8 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { Platform } from 'react-native';
 
+import { demoSessionStorage } from '../data/demo-session-storage';
 import {
   getCurrentAuthUser,
   observeAuthState,
@@ -20,10 +20,11 @@ import { toAuthActionError } from '../domain/errors';
 import type { UserProfile } from '../domain/profile';
 import type { AuthUser } from '../domain/types';
 
-export type AuthSessionStatus = 'anonymous' | 'authenticated' | 'restoring';
+export type AuthSessionStatus = 'anonymous' | 'authenticated' | 'demo' | 'restoring';
 export type ProfileStatus = 'error' | 'idle' | 'loading' | 'ready';
 
 type AuthSessionContextValue = {
+  enterDemo: () => void;
   profile: UserProfile | null;
   profileError: string | null;
   profileStatus: ProfileStatus;
@@ -37,14 +38,19 @@ type AuthSessionContextValue = {
 const AuthSessionContext = createContext<AuthSessionContextValue | null>(null);
 
 export function AuthSessionProvider({ children }: { children: ReactNode }) {
-  const [status, setStatus] = useState<AuthSessionStatus>(
-    Platform.OS === 'web' ? 'anonymous' : 'restoring',
-  );
+  const [status, setStatus] = useState<AuthSessionStatus>('restoring');
   const [user, setUser] = useState<AuthUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileStatus, setProfileStatus] = useState<ProfileStatus>('idle');
   const [profileError, setProfileError] = useState<string | null>(null);
   const profileRequestId = useRef(0);
+  const statusRef = useRef<AuthSessionStatus>(status);
+  const demoModeRef = useRef(false);
+
+  const updateStatus = useCallback((nextStatus: AuthSessionStatus) => {
+    statusRef.current = nextStatus;
+    setStatus(nextStatus);
+  }, []);
 
   const synchronizeProfile = useCallback(async () => {
     const requestId = ++profileRequestId.current;
@@ -69,23 +75,79 @@ export function AuthSessionProvider({ children }: { children: ReactNode }) {
   const applyAuthUser = useCallback(
     (nextUser: AuthUser | null) => {
       if (!nextUser) {
+        if (statusRef.current === 'demo') {
+          return;
+        }
+
         profileRequestId.current += 1;
         setProfile(null);
         setProfileError(null);
         setProfileStatus('idle');
         setUser(null);
-        setStatus('anonymous');
+        updateStatus('anonymous');
         return;
       }
 
+      demoModeRef.current = false;
+      void demoSessionStorage.clear();
       setUser(nextUser);
-      setStatus('authenticated');
+      updateStatus('authenticated');
       void synchronizeProfile();
     },
-    [synchronizeProfile],
+    [synchronizeProfile, updateStatus],
   );
 
-  useEffect(() => observeAuthState(applyAuthUser), [applyAuthUser]);
+  const applyDemo = useCallback(() => {
+    demoModeRef.current = true;
+    profileRequestId.current += 1;
+    setProfile(null);
+    setProfileError(null);
+    setProfileStatus('idle');
+    setUser(null);
+    updateStatus('demo');
+  }, [updateStatus]);
+
+  useEffect(() => {
+    let isActive = true;
+    let authState: AuthUser | null | undefined;
+    let isDemoRestoreComplete = false;
+
+    const restoreSession = () => {
+      if (!isActive || authState === undefined || !isDemoRestoreComplete) {
+        return;
+      }
+
+      if (authState) {
+        applyAuthUser(authState);
+      } else if (demoModeRef.current) {
+        applyDemo();
+      } else {
+        applyAuthUser(null);
+      }
+    };
+    const unsubscribe = observeAuthState((nextUser) => {
+      authState = nextUser;
+      restoreSession();
+    });
+
+    void demoSessionStorage
+      .isEnabled()
+      .then((isEnabled) => {
+        demoModeRef.current = isEnabled;
+        isDemoRestoreComplete = true;
+        restoreSession();
+      })
+      .catch(() => {
+        demoModeRef.current = false;
+        isDemoRestoreComplete = true;
+        restoreSession();
+      });
+
+    return () => {
+      isActive = false;
+      unsubscribe();
+    };
+  }, [applyAuthUser, applyDemo]);
 
   const refreshSession = useCallback(async () => {
     const nextUser = await getCurrentAuthUser();
@@ -96,9 +158,9 @@ export function AuthSessionProvider({ children }: { children: ReactNode }) {
     }
 
     setUser(nextUser);
-    setStatus('authenticated');
+    updateStatus('authenticated');
     await synchronizeProfile();
-  }, [applyAuthUser, synchronizeProfile]);
+  }, [applyAuthUser, synchronizeProfile, updateStatus]);
 
   const retryProfile = useCallback(async () => {
     if (user) {
@@ -107,12 +169,25 @@ export function AuthSessionProvider({ children }: { children: ReactNode }) {
   }, [synchronizeProfile, user]);
 
   const signOut = useCallback(async () => {
-    await signOutFromFirebase();
+    demoModeRef.current = false;
+    await demoSessionStorage.clear();
+
+    if (statusRef.current !== 'demo') {
+      await signOutFromFirebase();
+    }
+
+    updateStatus('anonymous');
     applyAuthUser(null);
-  }, [applyAuthUser]);
+  }, [applyAuthUser, updateStatus]);
+
+  const enterDemo = useCallback(() => {
+    applyDemo();
+    void demoSessionStorage.enable();
+  }, [applyDemo]);
 
   const value = useMemo<AuthSessionContextValue>(
     () => ({
+      enterDemo,
       profile,
       profileError,
       profileStatus,
@@ -122,7 +197,17 @@ export function AuthSessionProvider({ children }: { children: ReactNode }) {
       status,
       user,
     }),
-    [profile, profileError, profileStatus, refreshSession, retryProfile, signOut, status, user],
+    [
+      enterDemo,
+      profile,
+      profileError,
+      profileStatus,
+      refreshSession,
+      retryProfile,
+      signOut,
+      status,
+      user,
+    ],
   );
 
   return <AuthSessionContext.Provider value={value}>{children}</AuthSessionContext.Provider>;

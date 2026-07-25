@@ -1,4 +1,5 @@
 import type { CareRepository } from '@/features/care/domain/repository';
+import type { CareQueryScope } from '@/features/care/data/query-keys';
 import type { AvailabilitySlot, Clinic, Provider } from '@/features/care/domain/types';
 import { useProviderDetail } from '@/features/care/hooks/use-provider-detail';
 
@@ -16,8 +17,9 @@ export function useBookingSelection(
   providerId: string,
   slotId: string,
   repository?: CareRepository,
+  queryScope: CareQueryScope = 'account',
 ) {
-  const providerDetail = useProviderDetail(providerId, repository);
+  const providerDetail = useProviderDetail(providerId, repository, queryScope);
   let state: BookingSelectionState;
 
   if (providerDetail.state.status !== 'success') {

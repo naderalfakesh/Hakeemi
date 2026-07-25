@@ -38,17 +38,19 @@ export function AppointmentsScreen({
   careDataRepository,
   onSignIn,
   onViewAppointment,
+  queryScope = 'account',
 }: {
   appointmentRepository?: AppointmentRepository | undefined;
   careDataRepository?: CareRepository | undefined;
   onFindCare: () => void;
   onSignIn: () => void;
   onViewAppointment?: ((appointmentId: string) => void) | undefined;
+  queryScope?: 'account' | 'demo';
 }) {
   const session = useAuthSession();
   const strings = useStrings(appointmentsStrings);
 
-  if (session.status !== 'authenticated') {
+  if (session.status !== 'authenticated' && session.status !== 'demo') {
     return (
       <AppointmentState
         action={<Button onPress={onSignIn}>{strings.signIn}</Button>}
@@ -64,6 +66,7 @@ export function AppointmentsScreen({
       careDataRepository={careDataRepository}
       onFindCare={onFindCare}
       onViewAppointment={onViewAppointment}
+      queryScope={queryScope}
     />
   );
 }
@@ -73,17 +76,19 @@ function AuthenticatedAppointments({
   careDataRepository,
   onFindCare,
   onViewAppointment,
+  queryScope,
 }: {
   appointmentRepository?: AppointmentRepository | undefined;
   careDataRepository?: CareRepository | undefined;
   onFindCare: () => void;
   onViewAppointment?: ((appointmentId: string) => void) | undefined;
+  queryScope: 'account' | 'demo';
 }) {
   const theme = useAppTheme();
   const { locale } = useAppLocale();
   const strings = useStrings(appointmentsStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const appointmentsQuery = useAppointments(appointmentRepository, careDataRepository);
+  const appointmentsQuery = useAppointments(appointmentRepository, careDataRepository, queryScope);
   const isOffline = useIsOffline();
   const [filter, setFilter] = useState<AppointmentFilter>('upcoming');
 
@@ -95,7 +100,7 @@ function AuthenticatedAppointments({
         style={styles.safeArea}
       >
         <View style={styles.content}>
-          <Skeleton height={38} width="60%" />
+          <AppointmentsHeader hasAppointments={false} onFindCare={onFindCare} />
           <View style={styles.filterRow}>
             <Skeleton height={44} radius="sm" width={112} />
             <Skeleton height={44} radius="sm" width={92} />
@@ -108,30 +113,32 @@ function AuthenticatedAppointments({
 
   if (appointmentsQuery.isError && appointmentsQuery.data === undefined) {
     return (
-      <AppointmentState
-        action={
-          <Button onPress={() => void appointmentsQuery.refetch()}>{strings.tryAgain}</Button>
-        }
-        description={strings.errorDescription}
-        title={strings.errorTitle}
-      />
+      <SafeAreaView edges={['top']} style={styles.safeArea}>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <AppointmentsHeader hasAppointments={false} onFindCare={onFindCare} />
+          <EmptyState
+            action={
+              <Button onPress={() => void appointmentsQuery.refetch()} variant="secondary">
+                {strings.tryAgain}
+              </Button>
+            }
+            description={strings.errorDescription}
+            icon={<DecorativeIcon color={theme.colors.brand} name="calendar-outline" size={34} />}
+            title={strings.errorTitle}
+          />
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 
   const staleReason = isOffline ? 'offline' : appointmentsQuery.isError ? 'refresh-failed' : null;
+  const hasAppointments = (appointmentsQuery.data?.length ?? 0) > 0;
   const visibleAppointments = selectAppointments(appointmentsQuery.data ?? [], filter);
 
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.heading}>
-          <AppText accessibilityRole="header" variant="titleLarge">
-            {strings.title}
-          </AppText>
-          <AppText tone="secondary" variant="bodyLarge">
-            {strings.subtitle}
-          </AppText>
-        </View>
+        <AppointmentsHeader hasAppointments={hasAppointments} onFindCare={onFindCare} />
 
         {staleReason && (
           <StaleDataNotice reason={staleReason} updatedAt={appointmentsQuery.dataUpdatedAt} />
@@ -154,7 +161,6 @@ function AuthenticatedAppointments({
 
         {visibleAppointments.length === 0 ? (
           <EmptyState
-            action={<Button onPress={onFindCare}>{strings.findClinician}</Button>}
             description={strings.emptyDescriptions[filter]}
             illustration={stateIllustrations.noAppointments}
             title={strings.emptyTitles[filter]}
@@ -171,6 +177,41 @@ function AuthenticatedAppointments({
         )}
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function AppointmentsHeader({
+  hasAppointments,
+  onFindCare,
+}: {
+  hasAppointments: boolean;
+  onFindCare: () => void;
+}) {
+  const theme = useAppTheme();
+  const strings = useStrings(appointmentsStrings);
+  const styles = useMemo(() => createStyles(theme), [theme]);
+  const actionLabel = hasAppointments ? strings.bookAnotherAppointment : strings.bookAppointment;
+
+  return (
+    <View style={styles.heading}>
+      <View style={styles.headingCopy}>
+        <AppText accessibilityRole="header" variant="titleLarge">
+          {strings.title}
+        </AppText>
+        <AppText tone="secondary" variant="bodyLarge">
+          {strings.subtitle}
+        </AppText>
+      </View>
+      <Button
+        accessibilityLabel={actionLabel}
+        leading={
+          <DecorativeIcon color={theme.colors.textInverse} name="add-circle-outline" size={20} />
+        }
+        onPress={onFindCare}
+      >
+        {actionLabel}
+      </Button>
+    </View>
   );
 }
 
@@ -283,8 +324,11 @@ function createStyles(theme: AppTheme) {
       width: '100%',
     },
     heading: {
-      gap: theme.spacing.xs,
+      gap: theme.spacing.md,
       marginBottom: theme.spacing.sm,
+    },
+    headingCopy: {
+      gap: theme.spacing.xs,
     },
     filterRow: {
       gap: theme.spacing.xs,

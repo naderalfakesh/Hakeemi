@@ -3,6 +3,8 @@ import type { LocalizedStrings } from '@/localization/use-strings';
 import type { AppointmentFilter } from '../hooks/use-appointments';
 
 const en = {
+  bookAnotherAppointment: 'Book another appointment',
+  bookAppointment: 'Book an appointment',
   emptyDescriptions: {
     cancelled: 'Cancelled visits will stay here so your care history remains clear.',
     past: 'Completed visits and appointments you missed will appear here.',
@@ -34,6 +36,8 @@ const en = {
 
 export const appointmentsStrings: LocalizedStrings<typeof en> = {
   ar: {
+    bookAnotherAppointment: 'احجز موعدًا آخر',
+    bookAppointment: 'احجز موعدًا',
     emptyDescriptions: {
       cancelled: 'ستبقى الزيارات الملغاة هنا ليظل سجل رعايتك واضحًا.',
       past: 'ستظهر هنا الزيارات المكتملة والمواعيد التي فاتتك.',

@@ -1,5 +1,5 @@
 import { applicationDefault, deleteApp, initializeApp } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
@@ -49,6 +49,44 @@ async function loadCatalog() {
   return seedCatalogSchema.parse(JSON.parse(catalogSource) as unknown);
 }
 
+async function readReservations(firestore: Firestore, slotIds: readonly string[]) {
+  const [confirmedAppointments, existingSlots] = await Promise.all([
+    firestore.collection('appointments').where('status', '==', 'confirmed').get(),
+    firestore.getAll(
+      ...slotIds.map((slotId) => firestore.collection('availabilitySlots').doc(slotId)),
+    ),
+  ]);
+  const reservedSlotIds = new Set<string>();
+  const confirmedReservations = new Map<
+    string,
+    { appointmentId: string; data: Record<string, unknown> }
+  >();
+
+  for (const slot of existingSlots) {
+    if (slot.exists && slot.get('status') !== 'available') {
+      reservedSlotIds.add(slot.id);
+    }
+  }
+
+  for (const appointment of confirmedAppointments.docs) {
+    const data = appointment.data();
+    const slotId = typeof data.slotId === 'string' ? data.slotId : null;
+
+    if (!slotId || !slotIds.includes(slotId)) {
+      continue;
+    }
+
+    if (confirmedReservations.has(slotId)) {
+      throw new Error(`Multiple confirmed appointments reserve availability slot ${slotId}.`);
+    }
+
+    reservedSlotIds.add(slotId);
+    confirmedReservations.set(slotId, { appointmentId: appointment.id, data });
+  }
+
+  return { confirmedReservations, reservedSlotIds };
+}
+
 async function seed() {
   const options = parseOptions(process.argv.slice(2));
 
@@ -66,7 +104,17 @@ async function seed() {
   try {
     const firestore = getFirestore(app);
     const catalog = await loadCatalog();
-    const documents = buildSeedDocuments(catalog, options.referenceDate);
+    const { confirmedReservations, reservedSlotIds } = await readReservations(
+      firestore,
+      catalog.slots.map((slot) => slot.id),
+    );
+    const documents = buildSeedDocuments(
+      {
+        ...catalog,
+        slots: catalog.slots.filter((slot) => !reservedSlotIds.has(slot.id)),
+      },
+      options.referenceDate,
+    );
     const batch = firestore.batch();
 
     for (const [collectionName, collectionDocuments] of Object.entries(documents)) {
@@ -75,7 +123,28 @@ async function seed() {
       }
     }
 
+    for (const [slotId, reservation] of confirmedReservations) {
+      const { data } = reservation;
+
+      batch.set(
+        firestore.collection('availabilitySlots').doc(slotId),
+        {
+          appointmentId: reservation.appointmentId,
+          clinicId: data.clinicId,
+          endsAt: data.endsAt,
+          providerId: data.providerId,
+          startsAt: data.startsAt,
+          status: 'booked',
+          timezone: data.timezone,
+          updatedAt: data.updatedAt,
+          visitMode: data.visitMode,
+        },
+        { merge: true },
+      );
+    }
+
     batch.set(firestore.collection('_meta').doc('seed'), {
+      preservedReservationCount: reservedSlotIds.size,
       referenceDate: options.referenceDate,
       version: catalog.version,
     });
@@ -88,7 +157,7 @@ async function seed() {
     );
 
     console.log(
-      `Seeded ${documentCount} fictional documents into ${options.projectId} using ${options.referenceDate}.`,
+      `Seeded ${documentCount} fictional documents into ${options.projectId} using ${options.referenceDate}; preserved ${reservedSlotIds.size} reserved slots.`,
     );
   } finally {
     await deleteApp(app);

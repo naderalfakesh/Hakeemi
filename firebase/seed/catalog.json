@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-19",
+  "version": "2026-07-25",
   "specialties": [
     {
       "id": "family-medicine",
@@ -308,6 +308,15 @@
       "visitMode": "video"
     },
     {
+      "id": "lina-clinic-day-1-0700",
+      "providerId": "lina-haddad",
+      "clinicId": "marsa-family-clinic",
+      "dayOffset": 1,
+      "startTimeUtc": "07:00",
+      "durationMinutes": 30,
+      "visitMode": "in_person"
+    },
+    {
       "id": "lina-clinic-late",
       "providerId": "lina-haddad",
       "clinicId": "marsa-family-clinic",
@@ -317,11 +326,92 @@
       "visitMode": "in_person"
     },
     {
+      "id": "lina-clinic-day-4-0500",
+      "providerId": "lina-haddad",
+      "clinicId": "marsa-family-clinic",
+      "dayOffset": 4,
+      "startTimeUtc": "05:00",
+      "durationMinutes": 30,
+      "visitMode": "in_person"
+    },
+    {
+      "id": "lina-video-day-7-0930",
+      "providerId": "lina-haddad",
+      "clinicId": "harbour-telehealth",
+      "dayOffset": 7,
+      "startTimeUtc": "09:30",
+      "durationMinutes": 30,
+      "visitMode": "video"
+    },
+    {
+      "id": "lina-clinic-day-10-0630",
+      "providerId": "lina-haddad",
+      "clinicId": "marsa-family-clinic",
+      "dayOffset": 10,
+      "startTimeUtc": "06:30",
+      "durationMinutes": 30,
+      "visitMode": "in_person"
+    },
+    {
+      "id": "lina-video-day-12-1200",
+      "providerId": "lina-haddad",
+      "clinicId": "harbour-telehealth",
+      "dayOffset": 12,
+      "startTimeUtc": "12:00",
+      "durationMinutes": 30,
+      "visitMode": "video"
+    },
+    {
+      "id": "omar-clinic-day-2-0530",
+      "providerId": "omar-rahman",
+      "clinicId": "barari-medical-centre",
+      "dayOffset": 2,
+      "startTimeUtc": "05:30",
+      "durationMinutes": 45,
+      "visitMode": "in_person"
+    },
+    {
       "id": "omar-clinic-morning",
       "providerId": "omar-rahman",
       "clinicId": "barari-medical-centre",
       "dayOffset": 3,
       "startTimeUtc": "06:15",
+      "durationMinutes": 45,
+      "visitMode": "in_person"
+    },
+    {
+      "id": "omar-clinic-day-3-0900",
+      "providerId": "omar-rahman",
+      "clinicId": "barari-medical-centre",
+      "dayOffset": 3,
+      "startTimeUtc": "09:00",
+      "durationMinutes": 45,
+      "visitMode": "in_person"
+    },
+    {
+      "id": "omar-clinic-day-6-0700",
+      "providerId": "omar-rahman",
+      "clinicId": "barari-medical-centre",
+      "dayOffset": 6,
+      "startTimeUtc": "07:00",
+      "durationMinutes": 45,
+      "visitMode": "in_person"
+    },
+    {
+      "id": "omar-clinic-day-9-0500",
+      "providerId": "omar-rahman",
+      "clinicId": "barari-medical-centre",
+      "dayOffset": 9,
+      "startTimeUtc": "05:00",
+      "durationMinutes": 45,
+      "visitMode": "in_person"
+    },
+    {
+      "id": "omar-clinic-day-12-1030",
+      "providerId": "omar-rahman",
+      "clinicId": "barari-medical-centre",
+      "dayOffset": 12,
+      "startTimeUtc": "10:30",
       "durationMinutes": 45,
       "visitMode": "in_person"
     },
@@ -335,11 +425,47 @@
       "visitMode": "video"
     },
     {
+      "id": "priya-video-day-1-1000",
+      "providerId": "priya-menon",
+      "clinicId": "harbour-telehealth",
+      "dayOffset": 1,
+      "startTimeUtc": "10:00",
+      "durationMinutes": 30,
+      "visitMode": "video"
+    },
+    {
       "id": "priya-clinic-late",
       "providerId": "priya-menon",
       "clinicId": "marsa-family-clinic",
       "dayOffset": 4,
       "startTimeUtc": "11:30",
+      "durationMinutes": 30,
+      "visitMode": "in_person"
+    },
+    {
+      "id": "priya-clinic-day-6-0530",
+      "providerId": "priya-menon",
+      "clinicId": "marsa-family-clinic",
+      "dayOffset": 6,
+      "startTimeUtc": "05:30",
+      "durationMinutes": 30,
+      "visitMode": "in_person"
+    },
+    {
+      "id": "priya-video-day-8-0800",
+      "providerId": "priya-menon",
+      "clinicId": "harbour-telehealth",
+      "dayOffset": 8,
+      "startTimeUtc": "08:00",
+      "durationMinutes": 30,
+      "visitMode": "video"
+    },
+    {
+      "id": "priya-clinic-day-11-1030",
+      "providerId": "priya-menon",
+      "clinicId": "marsa-family-clinic",
+      "dayOffset": 11,
+      "startTimeUtc": "10:30",
       "durationMinutes": 30,
       "visitMode": "in_person"
     },
@@ -353,6 +479,51 @@
       "visitMode": "video"
     },
     {
+      "id": "samir-video-day-2-0900",
+      "providerId": "samir-nasser",
+      "clinicId": "harbour-telehealth",
+      "dayOffset": 2,
+      "startTimeUtc": "09:00",
+      "durationMinutes": 30,
+      "visitMode": "video"
+    },
+    {
+      "id": "samir-clinic-day-5-0530",
+      "providerId": "samir-nasser",
+      "clinicId": "barari-medical-centre",
+      "dayOffset": 5,
+      "startTimeUtc": "05:30",
+      "durationMinutes": 30,
+      "visitMode": "in_person"
+    },
+    {
+      "id": "samir-video-day-8-0600",
+      "providerId": "samir-nasser",
+      "clinicId": "harbour-telehealth",
+      "dayOffset": 8,
+      "startTimeUtc": "06:00",
+      "durationMinutes": 30,
+      "visitMode": "video"
+    },
+    {
+      "id": "samir-clinic-day-10-0830",
+      "providerId": "samir-nasser",
+      "clinicId": "barari-medical-centre",
+      "dayOffset": 10,
+      "startTimeUtc": "08:30",
+      "durationMinutes": 30,
+      "visitMode": "in_person"
+    },
+    {
+      "id": "samir-video-day-13-1000",
+      "providerId": "samir-nasser",
+      "clinicId": "harbour-telehealth",
+      "dayOffset": 13,
+      "startTimeUtc": "10:00",
+      "durationMinutes": 30,
+      "visitMode": "video"
+    },
+    {
       "id": "aisha-video-afternoon",
       "providerId": "aisha-bello",
       "clinicId": "harbour-telehealth",
@@ -362,11 +533,110 @@
       "visitMode": "video"
     },
     {
+      "id": "aisha-video-day-1-1400",
+      "providerId": "aisha-bello",
+      "clinicId": "harbour-telehealth",
+      "dayOffset": 1,
+      "startTimeUtc": "14:00",
+      "durationMinutes": 50,
+      "visitMode": "video"
+    },
+    {
+      "id": "aisha-video-day-3-0900",
+      "providerId": "aisha-bello",
+      "clinicId": "harbour-telehealth",
+      "dayOffset": 3,
+      "startTimeUtc": "09:00",
+      "durationMinutes": 50,
+      "visitMode": "video"
+    },
+    {
+      "id": "aisha-video-day-5-1100",
+      "providerId": "aisha-bello",
+      "clinicId": "harbour-telehealth",
+      "dayOffset": 5,
+      "startTimeUtc": "11:00",
+      "durationMinutes": 50,
+      "visitMode": "video"
+    },
+    {
+      "id": "aisha-video-day-8-0800",
+      "providerId": "aisha-bello",
+      "clinicId": "harbour-telehealth",
+      "dayOffset": 8,
+      "startTimeUtc": "08:00",
+      "durationMinutes": 50,
+      "visitMode": "video"
+    },
+    {
+      "id": "aisha-video-day-11-1200",
+      "providerId": "aisha-bello",
+      "clinicId": "harbour-telehealth",
+      "dayOffset": 11,
+      "startTimeUtc": "12:00",
+      "durationMinutes": 50,
+      "visitMode": "video"
+    },
+    {
+      "id": "aisha-video-day-13-1000",
+      "providerId": "aisha-bello",
+      "clinicId": "harbour-telehealth",
+      "dayOffset": 13,
+      "startTimeUtc": "10:00",
+      "durationMinutes": 50,
+      "visitMode": "video"
+    },
+    {
+      "id": "noor-clinic-day-2-0630",
+      "providerId": "noor-al-mansouri",
+      "clinicId": "marsa-family-clinic",
+      "dayOffset": 2,
+      "startTimeUtc": "06:30",
+      "durationMinutes": 40,
+      "visitMode": "in_person"
+    },
+    {
       "id": "noor-clinic-morning",
       "providerId": "noor-al-mansouri",
       "clinicId": "marsa-family-clinic",
       "dayOffset": 5,
       "startTimeUtc": "05:00",
+      "durationMinutes": 40,
+      "visitMode": "in_person"
+    },
+    {
+      "id": "noor-clinic-day-5-0800",
+      "providerId": "noor-al-mansouri",
+      "clinicId": "marsa-family-clinic",
+      "dayOffset": 5,
+      "startTimeUtc": "08:00",
+      "durationMinutes": 40,
+      "visitMode": "in_person"
+    },
+    {
+      "id": "noor-clinic-day-7-0700",
+      "providerId": "noor-al-mansouri",
+      "clinicId": "marsa-family-clinic",
+      "dayOffset": 7,
+      "startTimeUtc": "07:00",
+      "durationMinutes": 40,
+      "visitMode": "in_person"
+    },
+    {
+      "id": "noor-clinic-day-9-0530",
+      "providerId": "noor-al-mansouri",
+      "clinicId": "marsa-family-clinic",
+      "dayOffset": 9,
+      "startTimeUtc": "05:30",
+      "durationMinutes": 40,
+      "visitMode": "in_person"
+    },
+    {
+      "id": "noor-clinic-day-12-0900",
+      "providerId": "noor-al-mansouri",
+      "clinicId": "marsa-family-clinic",
+      "dayOffset": 12,
+      "startTimeUtc": "09:00",
       "durationMinutes": 40,
       "visitMode": "in_person"
     }

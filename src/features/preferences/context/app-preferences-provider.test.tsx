@@ -40,6 +40,7 @@ describe('AppPreferencesProvider', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockedUseAuthSession.mockReturnValue({
+      enterDemo: jest.fn(),
       profile: {
         displayName: 'Demo Patient',
         email: 'demo@example.test',

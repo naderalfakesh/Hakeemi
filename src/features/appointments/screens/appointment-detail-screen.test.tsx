@@ -84,6 +84,7 @@ describe('AppointmentDetailScreen', () => {
     mockedAddAppointmentToCalendar.mockResolvedValue({ eventId: 'event-1', status: 'added' });
     mockedTriggerHaptic.mockResolvedValue(undefined);
     mockedUseAuthSession.mockReturnValue({
+      enterDemo: jest.fn(),
       profile: null,
       profileError: null,
       profileStatus: 'idle',
@@ -114,7 +115,7 @@ describe('AppointmentDetailScreen', () => {
     );
 
     await waitFor(() =>
-      expect(view.getByRole('button', { name: 'Add to calendar' })).toBeVisible(),
+      expect(view.getByRole('header', { name: 'Dr. Lina Haddad' })).toBeVisible(),
     );
     await act(async () => fireEvent.press(view.getByRole('button', { name: 'Add to calendar' })));
 
@@ -211,8 +212,7 @@ describe('AppointmentDetailScreen', () => {
     await act(async () => fireEvent.press(view.getByRole('button', { name: 'Reschedule' })));
     await waitFor(() => expect(view.getByText('Choose a new time')).toBeVisible());
 
-    const moveButtons = view.getAllByRole('button', { name: 'Move here' });
-    await act(async () => fireEvent.press(moveButtons[0]!));
+    await act(async () => fireEvent.press(view.getByRole('button', { name: /Continue with/u })));
     await waitFor(() => expect(reschedule).toHaveBeenCalled());
     expect(reschedule.mock.calls[0]?.[0]).toMatchObject({
       appointmentId: appointment.id,

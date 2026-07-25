@@ -19,5 +19,9 @@ export default function OnboardingRoute() {
     return <Redirect href={session.user?.emailVerified ? '/home' : '/auth/verify-email'} />;
   }
 
+  if (session.status === 'demo') {
+    return <Redirect href="/home" />;
+  }
+
   return <OnboardingScreen onComplete={finishOnboarding} onSkip={finishOnboarding} />;
 }

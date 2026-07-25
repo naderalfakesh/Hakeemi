@@ -19,15 +19,13 @@ import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { ProviderAvatar } from '../components/provider-avatar';
+import { AvailabilityCalendar } from '../components/availability-calendar';
+import type { CareQueryScope } from '../data/query-keys';
 import type { CareRepository } from '../domain/repository';
-import type { AvailabilitySlot, Clinic } from '../domain/types';
+import type { AvailabilitySlot, AvailabilityWindow, Clinic } from '../domain/types';
 import { useProviderDetail } from '../hooks/use-provider-detail';
-import {
-  availableAppointmentCountLabels,
-  providerDetailStrings,
-  reviewCountLabels,
-} from '../localization/care-strings';
-import { formatAvailability, formatFee, formatVisitMode } from '../presentation/formatters';
+import { providerDetailStrings, reviewCountLabels } from '../localization/care-strings';
+import { formatFee, formatVisitMode } from '../presentation/formatters';
 
 type ProviderDetailScreenProps = {
   onBack: () => void;
@@ -35,6 +33,7 @@ type ProviderDetailScreenProps = {
   onSignInToSave?: (() => void) | undefined;
   onToggleSavedProvider?: ((providerId: string) => void) | undefined;
   providerId: string;
+  queryScope?: CareQueryScope;
   repository?: CareRepository;
   savedProviderStatus?: 'error' | 'loading' | 'ready' | 'saving' | 'unavailable' | undefined;
   isProviderSaved?: boolean;
@@ -46,6 +45,7 @@ export function ProviderDetailScreen({
   onSignInToSave,
   onToggleSavedProvider,
   providerId,
+  queryScope = 'account',
   repository,
   savedProviderStatus = 'unavailable',
   isProviderSaved = false,
@@ -54,7 +54,7 @@ export function ProviderDetailScreen({
   const { locale } = useAppLocale();
   const strings = useStrings(providerDetailStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const { retry, state } = useProviderDetail(providerId, repository);
+  const { retry, state } = useProviderDetail(providerId, repository, queryScope);
 
   if (state.status !== 'success') {
     return (
@@ -67,7 +67,7 @@ export function ProviderDetailScreen({
     );
   }
 
-  const { clinics, provider, slots, specialties } = state.data;
+  const { availabilityWindow, clinics, provider, slots, specialties } = state.data;
   const specialtyNames = specialties.map((specialty) => specialty.name[locale]).join(' · ');
 
   return (
@@ -139,7 +139,12 @@ export function ProviderDetailScreen({
           </Surface>
         </View>
 
-        <AvailabilitySection locale={locale} onChooseSlot={onChooseSlot} slots={slots} />
+        <AvailabilitySection
+          availabilityWindow={availabilityWindow}
+          locale={locale}
+          onChooseSlot={onChooseSlot}
+          slots={slots}
+        />
 
         <DetailSection title={strings.about}>
           <AppText tone="secondary" variant="bodyLarge">
@@ -232,10 +237,12 @@ function ProviderDetailState({ onBack, onRetry, providerId, status }: ProviderDe
 }
 
 function AvailabilitySection({
+  availabilityWindow,
   locale,
   onChooseSlot,
   slots,
 }: {
+  availabilityWindow: AvailabilityWindow;
   locale: 'ar' | 'en';
   onChooseSlot: (slot: AvailabilitySlot) => void;
   slots: readonly AvailabilitySlot[];
@@ -255,34 +262,12 @@ function AvailabilitySection({
       <AppText tone="secondary" variant="bodyMedium">
         {slots.length > 0 ? strings.timezoneNote : strings.noAppointments}
       </AppText>
-      {slots.length > 0 && (
-        <View
-          accessibilityLabel={formatLocalizedCount(
-            slots.length,
-            locale,
-            availableAppointmentCountLabels,
-          )}
-          style={styles.slotList}
-        >
-          {slots.slice(0, 6).map((slot) => (
-            <View key={slot.id} style={styles.slotRow}>
-              <View style={styles.slotTime}>
-                <AppText variant="bodyStrong">{formatAvailability(slot, locale)}</AppText>
-                <AppText tone="secondary" variant="caption">
-                  {formatVisitMode(slot.visitMode, locale)}
-                </AppText>
-              </View>
-              <Button
-                accessibilityLabel={strings.chooseSlot(formatAvailability(slot, locale))}
-                onPress={() => onChooseSlot(slot)}
-                variant="secondary"
-              >
-                {strings.choose}
-              </Button>
-            </View>
-          ))}
-        </View>
-      )}
+      <AvailabilityCalendar
+        availabilityWindow={availabilityWindow}
+        locale={locale}
+        onChooseSlot={onChooseSlot}
+        slots={slots}
+      />
     </Surface>
   );
 }
@@ -372,26 +357,6 @@ function createStyles(theme: AppTheme) {
     availabilityTitle: {
       marginBottom: theme.spacing.xxs,
       marginTop: theme.spacing.sm,
-    },
-    slotList: {
-      gap: theme.spacing.sm,
-      marginTop: theme.spacing.md,
-    },
-    slotRow: {
-      alignItems: 'center',
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.borderSubtle,
-      borderRadius: theme.radii.md,
-      borderWidth: 1,
-      flexDirection: 'row',
-      gap: theme.spacing.sm,
-      justifyContent: 'space-between',
-      minHeight: theme.sizes.controlHeight,
-      paddingHorizontal: theme.spacing.md,
-      paddingVertical: theme.spacing.sm,
-    },
-    slotTime: {
-      flex: 1,
     },
     section: {
       gap: theme.spacing.sm,

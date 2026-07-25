@@ -4,7 +4,7 @@ import { appointmentRepository } from '@/features/appointments/data/appointment-
 import { careRepository } from '@/features/care/data/care-repository';
 import type { CareRepository } from '@/features/care/domain/repository';
 
-import { appointmentQueryKeys } from '../data/query-keys';
+import { appointmentQueryKeys, type AppointmentQueryScope } from '../data/query-keys';
 import type { AppointmentRepository } from '../domain/repository';
 import type { Appointment } from '../domain/types';
 
@@ -43,9 +43,10 @@ function matchesFilter(appointment: Appointment, filter: AppointmentFilter, now:
 export function useAppointments(
   repository: AppointmentRepository = appointmentRepository,
   providerRepository: CareRepository = careRepository,
+  queryScope: AppointmentQueryScope = 'account',
 ) {
   return useQuery({
-    queryKey: appointmentQueryKeys.list(),
+    queryKey: appointmentQueryKeys.list(queryScope),
     queryFn: async () => {
       const appointments = await repository.listAppointments();
       const providers = await Promise.all(

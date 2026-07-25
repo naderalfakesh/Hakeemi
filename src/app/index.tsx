@@ -40,6 +40,10 @@ export default function EntryRoute() {
     return <Redirect href={session.user?.emailVerified ? '/home' : '/auth/verify-email'} />;
   }
 
+  if (session.status === 'demo') {
+    return <Redirect href="/home" />;
+  }
+
   if (!destination) {
     return (
       <View style={[styles.loading, { backgroundColor: theme.colors.canvas }]}>

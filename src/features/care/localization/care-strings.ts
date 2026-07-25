@@ -80,11 +80,16 @@ export const reviewCountLabels = {
 
 const providerDetailEn = {
   about: 'About',
+  availableDay: (date: string, count: number) =>
+    `${date}, ${count} ${count === 1 ? 'appointment' : 'appointments'} available`,
   availableAppointments: 'Available appointments',
   backToClinicians: 'Back to clinicians',
   browseClinicians: 'Browse clinicians',
+  calendarHint: 'Days with a dot have appointments',
+  chooseTime: 'Choose a time',
   choose: 'Choose',
   chooseSlot: (time: string) => `Choose ${time}`,
+  continueWithTime: (time: string) => `Continue with ${time}`,
   clinics: 'Clinics',
   consultation: 'Consultation',
   disclosure:
@@ -102,17 +107,22 @@ const providerDetailEn = {
   save: (name: string) => `Save ${name}`,
   timezoneNote: 'Times are shown in Gulf Standard Time. Choose an available time to continue.',
   tryAgain: 'Try again',
+  unavailableDay: (date: string) => `${date}, no appointments available`,
   visitOptions: 'Visit options',
 };
 
 export const providerDetailStrings: LocalizedStrings<typeof providerDetailEn> = {
   ar: {
     about: 'نبذة',
+    availableDay: (date, count) => `${date}، ${count} من المواعيد متاحة`,
     availableAppointments: 'المواعيد المتاحة',
     backToClinicians: 'العودة إلى الأطباء',
     browseClinicians: 'تصفح الأطباء',
+    calendarHint: 'الأيام التي تحمل نقطة تتضمن مواعيد متاحة',
+    chooseTime: 'اختر وقتًا',
     choose: 'اختر',
     chooseSlot: (time) => `اختر ${time}`,
+    continueWithTime: (time) => `المتابعة مع موعد ${time}`,
     clinics: 'العيادات',
     consultation: 'الاستشارة',
     disclosure:
@@ -129,6 +139,7 @@ export const providerDetailStrings: LocalizedStrings<typeof providerDetailEn> = 
     save: (name) => `حفظ ${name}`,
     timezoneNote: 'الأوقات معروضة بتوقيت الخليج. اختر وقتًا متاحًا للمتابعة.',
     tryAgain: 'حاول مرة أخرى',
+    unavailableDay: (date) => `${date}، لا توجد مواعيد متاحة`,
     visitOptions: 'خيارات الزيارة',
   },
   en: providerDetailEn,

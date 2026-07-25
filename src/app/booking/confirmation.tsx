@@ -3,9 +3,9 @@ import { Redirect, router, useLocalSearchParams } from 'expo-router';
 
 import { useAppointmentDetail } from '@/features/appointments/hooks/use-appointment-detail';
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
-import { careRepository } from '@/features/care/data/care-repository';
 import { BookingRouteState } from '@/features/booking/components/booking-route-state';
 import { BookingConfirmationScreen } from '@/features/booking/screens/booking-confirmation-screen';
+import { useAppDataSources } from '@/features/demo/use-app-data-sources';
 
 export default function BookingConfirmationRoute() {
   const params = useLocalSearchParams<{ appointmentId?: string | string[] }>();
@@ -13,11 +13,21 @@ export default function BookingConfirmationRoute() {
     ? (params.appointmentId[0] ?? '')
     : (params.appointmentId ?? '');
   const session = useAuthSession();
-  const appointmentQuery = useAppointmentDetail(appointmentId);
+  const dataSources = useAppDataSources();
+  const appointmentQuery = useAppointmentDetail(
+    appointmentId,
+    dataSources.appointmentRepository,
+    dataSources.scope,
+  );
   const providerQuery = useQuery({
     enabled: Boolean(appointmentQuery.data?.providerId),
-    queryKey: ['care', 'confirmation-provider', appointmentQuery.data?.providerId ?? 'pending'],
-    queryFn: () => careRepository.getProvider(appointmentQuery.data?.providerId ?? ''),
+    queryKey: [
+      'care',
+      dataSources.scope,
+      'confirmation-provider',
+      appointmentQuery.data?.providerId ?? 'pending',
+    ],
+    queryFn: () => dataSources.careRepository.getProvider(appointmentQuery.data?.providerId ?? ''),
   });
 
   if (session.status === 'anonymous') {

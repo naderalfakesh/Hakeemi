@@ -27,7 +27,7 @@ describe('fictional care fixtures', () => {
     const repository = new FixtureCareRepository(() => now);
     const slots = await repository.listAvailableSlots('lina-haddad', createAvailabilityWindow(now));
 
-    expect(slots).toHaveLength(2);
+    expect(slots).toHaveLength(7);
     expect(slots.every((slot) => new Date(slot.startsAt) > now)).toBe(true);
     expect(slots[0]?.timezone).toBe('Asia/Dubai');
   });

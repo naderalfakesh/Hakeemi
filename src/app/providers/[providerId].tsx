@@ -5,6 +5,7 @@ import { useBookingDraft } from '@/features/booking/context/booking-draft-provid
 import { ProviderDetailScreen } from '@/features/care/screens/provider-detail-screen';
 import type { AvailabilitySlot } from '@/features/care/domain/types';
 import { useSavedProviders } from '@/features/care/hooks/use-saved-providers';
+import { useAppDataSources } from '@/features/demo/use-app-data-sources';
 
 export default function ProviderRoute() {
   const { providerId: rawProviderId } = useLocalSearchParams<{
@@ -14,6 +15,7 @@ export default function ProviderRoute() {
     ? (rawProviderId[0] ?? '')
     : (rawProviderId ?? '');
   const session = useAuthSession();
+  const dataSources = useAppDataSources();
   const bookingDraft = useBookingDraft();
   const savedProviders = useSavedProviders(session.user);
 
@@ -30,12 +32,12 @@ export default function ProviderRoute() {
     await bookingDraft.selectSlot(providerId, slot.id);
     const bookingParams = { bookingProviderId: providerId, bookingSlotId: slot.id };
 
-    if (session.status !== 'authenticated') {
+    if (session.status !== 'authenticated' && session.status !== 'demo') {
       router.push({ pathname: '/auth/sign-in', params: bookingParams });
       return;
     }
 
-    if (!session.user?.emailVerified) {
+    if (session.status === 'authenticated' && !session.user?.emailVerified) {
       router.push({ pathname: '/auth/verify-email', params: bookingParams });
       return;
     }
@@ -50,6 +52,8 @@ export default function ProviderRoute() {
       onSignInToSave={() => router.push('/auth/sign-in')}
       onToggleSavedProvider={session.user ? savedProviders.toggle : undefined}
       providerId={providerId}
+      queryScope={dataSources.scope}
+      repository={dataSources.careRepository}
       savedProviderStatus={savedProviders.status}
       isProviderSaved={savedProviders.isSaved(providerId)}
     />

@@ -21,16 +21,22 @@ import { ProviderCard } from '../components/provider-card';
 import { ProviderCardSkeleton } from '../components/provider-card-skeleton';
 import { SpecialtyFilter } from '../components/specialty-filter';
 import type { CareRepository } from '../domain/repository';
+import type { CareQueryScope } from '../data/query-keys';
 import type { Provider } from '../domain/types';
 import { useProviderDiscovery } from '../hooks/use-provider-discovery';
 import { clinicianCountLabels, findCareStrings } from '../localization/care-strings';
 
 type FindCareScreenProps = {
   onSelectProvider: (providerId: string) => void;
+  queryScope?: CareQueryScope;
   repository?: CareRepository;
 };
 
-export function FindCareScreen({ onSelectProvider, repository }: FindCareScreenProps) {
+export function FindCareScreen({
+  onSelectProvider,
+  queryScope = 'account',
+  repository,
+}: FindCareScreenProps) {
   const theme = useAppTheme();
   const { locale } = useAppLocale();
   const strings = useStrings(findCareStrings);
@@ -39,6 +45,7 @@ export function FindCareScreen({ onSelectProvider, repository }: FindCareScreenP
   const [specialtyId, setSpecialtyId] = useState<string | null>(null);
   const { hasMore, isLoadingMore, isRefreshFailed, lastUpdatedAt, loadMore, retry, state } =
     useProviderDiscovery({
+      queryScope,
       query,
       specialtyId,
       ...(repository ? { repository } : {}),
