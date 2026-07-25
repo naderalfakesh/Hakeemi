@@ -147,7 +147,7 @@ The current milestone has been exercised beyond unit tests:
   and the same build verified on an iPad simulator.
 - Android arm64 debug APK: successful.
 - Static web export: 21 routes generated, including appointment detail.
-- Application tests: 34 suites and 108 tests passing, including Arabic-locale
+- Application tests: 39 suites and 121 tests passing, including Arabic-locale
   renders for every screen area.
 - Illustration payload: 16 WebP assets at 819.1 KB total, reduced from roughly
   4.6 MB and protected by CI budgets of 150 KB per file and 1 MB total.
@@ -156,7 +156,9 @@ The current milestone has been exercised beyond unit tests:
   and scheduled-reminder Auth, Firestore, Pub/Sub, and Functions emulator
   suites passing.
 - Strict type checks: application, Firebase tooling, and Functions passing.
-- Expo Doctor: 20/20 checks passing.
+- Expo Doctor: 19/20 checks passing; the remaining check reports upstream
+  SDK 57 patch releases newer than the pinned versions, which the weekly
+  dependency-health workflow tracks.
 
 The [testing strategy](docs/testing-strategy.md) defines the test pyramid and
 the critical-path coverage gate, and [analytics events](docs/analytics-events.md)
@@ -185,10 +187,16 @@ docs/                    Roadmap, ADRs, verification evidence, backend guide
 
 ## Run locally
 
+The default local setup runs entirely against the Firebase Emulator Suite —
+**no Firebase account, project, or credentials are required**. The repository
+commits emulator-only placeholder Google service files, and native builds fall
+back to them automatically when no real configuration is present.
+
 ### Prerequisites
 
 - Node.js 22.13 or newer and earlier than 25
 - npm
+- A Java runtime (JDK 17 or newer) for the Firebase Emulator Suite
 - Xcode and CocoaPods for iOS development
 - Android Studio, an Android SDK, and a compatible JDK for Android development
 
@@ -201,10 +209,26 @@ cp .env.example .env
 npm run validate
 ```
 
-Native Firebase service files are deliberately not committed. Place your
-development files at `.firebase/development/GoogleService-Info.plist` and
-`.firebase/development/google-services.json`, or provide their paths through
-the environment variables documented in `.env.example`.
+### Start the local Firebase backend
+
+Start the emulators in one terminal and keep them running:
+
+```sh
+npm run firebase:emulators:seeded
+```
+
+On a fresh clone this starts a clean Emulator Suite and seeds it with the
+deterministic fictional catalogue once the emulators are ready. On exit it
+exports state to an ignored local directory; later runs import that state and
+refresh the fictional appointment dates for today without reopening confirmed
+reservations. If an already-running clean emulator needs data, seed it from
+another terminal:
+
+```sh
+npm run firebase:seed:emulator
+```
+
+### Run the app
 
 Generate and run a native development build:
 
@@ -215,27 +239,26 @@ npm run ios
 npm run android
 ```
 
-Start Metro for an existing development client with `npm start`. Expo Go is not
-a supported runtime after React Native Firebase is linked.
+`.env.example` enables emulator mode (`EXPO_PUBLIC_USE_FIREBASE_EMULATORS=true`),
+so sign-up, discovery, booking, and appointment management all work against the
+local emulators. Push-notification device registration is the one feature that
+needs a real Firebase project. Start Metro for an existing development client
+with `npm start`. Expo Go is not a supported runtime after React Native
+Firebase is linked.
 
-### Firebase emulators
+### Optional: use your own Firebase project
 
-Start the local services in one terminal:
+Real native service files are deliberately not committed. To target a cloud
+project, place your files at `.firebase/development/GoogleService-Info.plist`
+and `.firebase/development/google-services.json` — or point the
+`GOOGLE_SERVICES_JSON` / `GOOGLE_SERVICES_INFO_PLIST` environment variables at
+them — then rerun `npx expo prebuild --clean`. Explicit environment paths win,
+then the `.firebase/development/` files, then the committed emulator
+placeholders in `firebase/templates/emulator/`.
 
-```sh
-npm run firebase:emulators:seeded
-```
-
-The seeded command imports saved emulator state and automatically refreshes the
-fictional appointment dates for today without reopening confirmed reservations.
-If an already-running clean emulator needs data, seed it from another terminal:
-
-```sh
-npm run firebase:seed:emulator
-```
-
-Interactive emulators use `hakeemi-portfolio-dev` so their namespace matches the
-ignored native Firebase configuration. Automated authorization and contention
+Interactive emulators use `hakeemi-portfolio-dev` so their namespace matches
+the native Firebase configuration, whether that is the committed emulator
+placeholder or an ignored real file. Automated authorization and contention
 tests still use the reserved `demo-hakeemi` project. Cloud commands must always
 name `hakeemi-portfolio-dev` explicitly; the repository does not contain a
 `.firebaserc`. The

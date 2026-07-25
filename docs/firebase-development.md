@@ -31,13 +31,19 @@ npm run firebase:emulators:seeded
 ```
 
 The interactive suite deliberately uses the `hakeemi-portfolio-dev` namespace
-because the ignored iOS and Android service files identify that project. All
-services used by the app are connected to localhost before any reads or writes;
-keep the full suite running while using this command. It imports the saved local
-state and automatically rolls fictional provider availability forward from the
-current UTC date, so a previously exported snapshot cannot leave the calendar
-with expired slots. Confirmed appointments keep their reserved slots; the
-rolling seed only updates availability that is still open.
+because the iOS and Android service files — the committed emulator placeholders
+or the ignored real files — identify that project. All services used by the app
+are connected to localhost before any reads or writes; keep the full suite
+running while using this command. On a fresh clone it starts clean and seeds
+the fictional catalogue once the emulators are ready; state is exported to the
+ignored `.firebase/emulator-data` directory on exit. Later runs import the
+saved local state and automatically roll fictional provider availability
+forward from the current UTC date, so a previously exported snapshot cannot
+leave the calendar with expired slots. Confirmed appointments keep their
+reserved slots; the rolling seed only updates availability that is still open.
+
+No Firebase login or credentials are required for any emulator command,
+including the interactive seeded suite.
 
 Use `npm run firebase:emulators` only when you intentionally need a clean,
 unseeded suite.
@@ -94,18 +100,21 @@ refuses any project other than `hakeemi-portfolio-dev`.
 
 ## Generated mobile configuration
 
-Local native configuration lives under ignored `.firebase/development/` paths:
+Native builds resolve their Google service files in this order:
 
-- `.firebase/development/google-services.json`
-- `.firebase/development/GoogleService-Info.plist`
+1. Explicit `GOOGLE_SERVICES_JSON` and `GOOGLE_SERVICES_INFO_PLIST`
+   environment paths (EAS preview and production supply real files through
+   file environment variables rather than source control).
+2. Ignored local files for a real project:
+   `.firebase/development/google-services.json` and
+   `.firebase/development/GoogleService-Info.plist`.
+3. Committed emulator-only placeholders in `firebase/templates/emulator/`,
+   which contain no real identifiers and let a fresh clone build and run
+   against the Emulator Suite without a Firebase project. Cloud features such
+   as FCM device registration do not work with the placeholders.
 
-EAS preview and production environments will supply equivalent files through
-file environment variables rather than source control.
-
-Expo CNG reads `GOOGLE_SERVICES_JSON` and `GOOGLE_SERVICES_INFO_PLIST` from the
-build environment and falls back to the ignored development files above. A
-clean native rebuild is required whenever an RNFirebase module is added or
-removed:
+A clean native rebuild is required whenever an RNFirebase module is added or
+removed, or when the resolved service files change:
 
 ```sh
 npx expo prebuild --clean
