@@ -79,9 +79,9 @@ function createStyles(theme: AppTheme) {
       maxWidth: 560,
     },
     heading: {
-      gap: theme.spacing.sm,
-      marginBottom: theme.spacing.xl,
-      marginTop: theme.spacing.lg,
+      gap: theme.spacing.xs,
+      marginBottom: theme.spacing.lg,
+      marginTop: theme.spacing.md,
     },
     disclaimer: {
       marginTop: 'auto',

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { StyleSheet, TextInput, View, type TextInputProps, type ViewStyle } from 'react-native';
 
+import { useAppLocale } from '@/localization/locale-provider';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { AppText } from './app-text';
@@ -11,6 +12,7 @@ type TextFieldProps = Omit<TextInputProps, 'style'> & {
   error?: string | undefined;
   hint?: string | undefined;
   label: string;
+  labelHidden?: boolean;
 };
 
 export function TextField({
@@ -19,14 +21,16 @@ export function TextField({
   error,
   hint,
   label,
+  labelHidden = false,
   accessibilityHint,
   onBlur,
   onFocus,
   ...props
 }: TextFieldProps) {
   const theme = useAppTheme();
+  const { isRTL } = useAppLocale();
   const [isFocused, setIsFocused] = useState(false);
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useMemo(() => createStyles(theme, isRTL), [isRTL, theme]);
 
   function handleFocus(event: Parameters<NonNullable<TextInputProps['onFocus']>>[0]) {
     setIsFocused(true);
@@ -40,7 +44,7 @@ export function TextField({
 
   return (
     <View style={[styles.container, containerStyle]}>
-      <AppText variant="labelLarge">{label}</AppText>
+      {!labelHidden && <AppText variant="labelLarge">{label}</AppText>}
       <TextInput
         {...props}
         accessibilityHint={error ?? accessibilityHint ?? hint}
@@ -72,7 +76,7 @@ export function TextField({
   );
 }
 
-function createStyles(theme: AppTheme) {
+function createStyles(theme: AppTheme, isRTL: boolean) {
   return StyleSheet.create({
     container: {
       gap: theme.spacing.xs,
@@ -87,6 +91,9 @@ function createStyles(theme: AppTheme) {
       minHeight: theme.sizes.controlHeight,
       paddingHorizontal: theme.spacing.md,
       paddingVertical: theme.spacing.sm,
+      // TextInput is excluded from RN's RTL left/right style swap, so the
+      // physical edge has to be chosen per direction.
+      textAlign: isRTL ? 'right' : 'left',
     },
     focused: {
       borderColor: theme.colors.borderFocus,

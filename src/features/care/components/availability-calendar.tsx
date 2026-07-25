@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText, Button, DecorativeIcon } from '@/components/ui';
@@ -24,15 +24,19 @@ export type AvailabilityCalendarDay = {
 
 export function AvailabilityCalendar({
   availabilityWindow,
+  hideConfirmButton = false,
   isSubmitting = false,
   locale,
   onChooseSlot,
+  onSelectedSlotChange,
   slots,
 }: {
   availabilityWindow: AvailabilityWindow;
+  hideConfirmButton?: boolean;
   isSubmitting?: boolean;
   locale: AppLocale;
   onChooseSlot: (slot: AvailabilitySlot) => void;
+  onSelectedSlotChange?: (slot: AvailabilitySlot | null) => void;
   slots: readonly AvailabilitySlot[];
 }) {
   const theme = useAppTheme();
@@ -53,6 +57,10 @@ export function AvailabilityCalendar({
     selectedDay?.slots.find((slot) => slot.id === selectedSlotId) ?? selectedDay?.slots[0] ?? null;
   const intlLocale = locale === 'ar' ? 'ar-AE' : 'en-AE';
   const activeDay = selectedDay ?? firstAvailableDay;
+
+  useEffect(() => {
+    onSelectedSlotChange?.(selectedSlot);
+  }, [onSelectedSlotChange, selectedSlot]);
 
   return (
     <View
@@ -111,16 +119,18 @@ export function AvailabilityCalendar({
               <AppText tone={isSelected ? 'inverse' : 'primary'} variant="bodyStrong">
                 {formatDayNumber(day.date, intlLocale)}
               </AppText>
+              {/* Only bookable days get a dot; the legend says a dot means
+                  appointments, so unavailable days keep an invisible spacer. */}
               <View
                 style={[
                   styles.availabilityDot,
-                  {
-                    backgroundColor: isSelected
-                      ? theme.colors.textInverse
-                      : isAvailable
-                        ? theme.colors.success
-                        : theme.colors.borderStrong,
-                  },
+                  isAvailable
+                    ? {
+                        backgroundColor: isSelected
+                          ? theme.colors.textInverse
+                          : theme.colors.success,
+                      }
+                    : styles.availabilityDotHidden,
                 ]}
               />
             </Pressable>
@@ -160,15 +170,15 @@ export function AvailabilityCalendar({
                   >
                     <View style={styles.timeRow}>
                       <DecorativeIcon
-                        color={selected ? theme.colors.textInverse : theme.colors.brand}
+                        color={theme.colors.brand}
                         name={slot.visitMode === 'video' ? 'videocam-outline' : 'location-outline'}
                         size={18}
                       />
-                      <AppText tone={selected ? 'inverse' : 'primary'} variant="bodyStrong">
+                      <AppText tone={selected ? 'brand' : 'primary'} variant="bodyStrong">
                         {time}
                       </AppText>
                     </View>
-                    <AppText tone={selected ? 'inverse' : 'secondary'} variant="caption">
+                    <AppText tone={selected ? 'brand' : 'secondary'} variant="caption">
                       {formatVisitMode(slot.visitMode, locale)}
                     </AppText>
                   </Pressable>
@@ -177,19 +187,21 @@ export function AvailabilityCalendar({
             </View>
           </View>
 
-          <Button
-            busy={isSubmitting}
-            disabled={!selectedSlot}
-            onPress={() => {
-              if (selectedSlot) {
-                onChooseSlot(selectedSlot);
-              }
-            }}
-          >
-            {selectedSlot
-              ? strings.continueWithTime(formatSlotTime(selectedSlot, intlLocale))
-              : strings.chooseTime}
-          </Button>
+          {!hideConfirmButton && (
+            <Button
+              busy={isSubmitting}
+              disabled={!selectedSlot}
+              onPress={() => {
+                if (selectedSlot) {
+                  onChooseSlot(selectedSlot);
+                }
+              }}
+            >
+              {selectedSlot
+                ? strings.continueWithTime(formatSlotTime(selectedSlot, intlLocale))
+                : strings.chooseTime}
+            </Button>
+          )}
         </>
       )}
     </View>
@@ -283,7 +295,7 @@ function formatFullDate(date: Date, locale: string) {
   }).format(date);
 }
 
-function formatSlotTime(slot: AvailabilitySlot, locale: string) {
+export function formatSlotTime(slot: AvailabilitySlot, locale: string) {
   return new Intl.DateTimeFormat(locale, {
     hour: 'numeric',
     minute: '2-digit',
@@ -344,6 +356,9 @@ function createStyles(theme: AppTheme) {
       height: 5,
       width: 5,
     },
+    availabilityDotHidden: {
+      backgroundColor: 'transparent',
+    },
     timeSection: {
       gap: theme.spacing.sm,
     },
@@ -367,9 +382,14 @@ function createStyles(theme: AppTheme) {
       paddingHorizontal: theme.spacing.sm,
       paddingVertical: theme.spacing.sm,
     },
+    // Soft selection styling keeps the chosen chip visually distinct from the
+    // solid primary "Continue" button below it.
     selectedTimeSlot: {
-      backgroundColor: theme.colors.brand,
+      backgroundColor: theme.colors.brandSoft,
       borderColor: theme.colors.brand,
+      borderWidth: 2,
+      paddingHorizontal: theme.spacing.sm - 1,
+      paddingVertical: theme.spacing.sm - 1,
     },
     timeRow: {
       alignItems: 'center',

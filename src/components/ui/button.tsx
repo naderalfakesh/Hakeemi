@@ -5,7 +5,7 @@ import { useAppTheme, type AppTheme } from '@/theme';
 
 import { AppText, type TextTone } from './app-text';
 
-export type ButtonVariant = 'danger' | 'primary' | 'secondary' | 'tertiary';
+export type ButtonVariant = 'danger' | 'dangerSoft' | 'primary' | 'secondary' | 'tertiary';
 
 type ButtonProps = Omit<PressableProps, 'children' | 'disabled' | 'style'> & {
   busy?: boolean;
@@ -61,12 +61,20 @@ function getTextTone(variant: ButtonVariant): TextTone {
     return 'inverse';
   }
 
+  if (variant === 'dangerSoft') {
+    return 'danger';
+  }
+
   return variant === 'secondary' ? 'brand' : 'primary';
 }
 
 function getForegroundColor(theme: AppTheme, variant: ButtonVariant) {
   if (variant === 'primary' || variant === 'danger') {
     return theme.colors.textInverse;
+  }
+
+  if (variant === 'dangerSoft') {
+    return theme.colors.danger;
   }
 
   return variant === 'secondary' ? theme.colors.brand : theme.colors.textPrimary;
@@ -96,6 +104,9 @@ function createStyles(theme: AppTheme) {
     },
     danger: {
       backgroundColor: theme.colors.danger,
+    },
+    dangerSoft: {
+      backgroundColor: theme.colors.dangerSoft,
     },
     content: {
       alignItems: 'center',

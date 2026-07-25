@@ -102,7 +102,7 @@ describe('ProfileScreen', () => {
     );
 
     expect(view.getByText('Email verified')).toBeOnTheScreen();
-    expect(view.getByText(/idempotent Cloud Function/iu)).toBeOnTheScreen();
+    expect(view.getByText(/protected and synced to your account/iu)).toBeOnTheScreen();
     await fireEvent.press(view.getByRole('button', { name: 'Enable reminders' }));
     expect(noop).toHaveBeenCalled();
     await fireEvent.press(view.getByRole('button', { name: 'Dark' }));

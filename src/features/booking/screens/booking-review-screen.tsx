@@ -35,6 +35,19 @@ export function BookingReviewScreen({
 
   return (
     <BookingScaffold
+      footer={
+        <>
+          {error && <InlineError message={error} />}
+          <Button
+            accessibilityHint={strings.review.confirmAppointmentHint}
+            busy={isSubmitting}
+            disabled={isOffline}
+            onPress={onConfirm}
+          >
+            {strings.review.confirmAppointment}
+          </Button>
+        </>
+      }
       onBack={onBack}
       step={strings.stepOf(2, 2)}
       subtitle={strings.review.subtitle}
@@ -54,16 +67,6 @@ export function BookingReviewScreen({
         </Surface>
       )}
 
-      {error && <InlineError message={error} />}
-
-      <Button
-        accessibilityHint={strings.review.confirmAppointmentHint}
-        busy={isSubmitting}
-        disabled={isOffline}
-        onPress={onConfirm}
-      >
-        {strings.review.confirmAppointment}
-      </Button>
       <AppText style={styles.disclaimer} tone="secondary" variant="caption">
         {strings.review.disclaimer}
       </AppText>

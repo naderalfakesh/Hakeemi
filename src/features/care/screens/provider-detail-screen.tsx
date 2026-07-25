@@ -1,4 +1,4 @@
-import { useMemo, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -19,7 +19,7 @@ import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { ProviderAvatar } from '../components/provider-avatar';
-import { AvailabilityCalendar } from '../components/availability-calendar';
+import { AvailabilityCalendar, formatSlotTime } from '../components/availability-calendar';
 import type { CareQueryScope } from '../data/query-keys';
 import type { CareRepository } from '../domain/repository';
 import type { AvailabilitySlot, AvailabilityWindow, Clinic } from '../domain/types';
@@ -55,6 +55,7 @@ export function ProviderDetailScreen({
   const strings = useStrings(providerDetailStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { retry, state } = useProviderDetail(providerId, repository, queryScope);
+  const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null);
 
   if (state.status !== 'success') {
     return (
@@ -143,6 +144,7 @@ export function ProviderDetailScreen({
           availabilityWindow={availabilityWindow}
           locale={locale}
           onChooseSlot={onChooseSlot}
+          onSelectedSlotChange={setSelectedSlot}
           slots={slots}
         />
 
@@ -176,6 +178,16 @@ export function ProviderDetailScreen({
           </AppText>
         </Surface>
       </ScrollView>
+
+      {selectedSlot && (
+        <View style={styles.stickyFooter}>
+          <Button onPress={() => onChooseSlot(selectedSlot)}>
+            {strings.continueWithTime(
+              formatSlotTime(selectedSlot, locale === 'ar' ? 'ar-AE' : 'en-AE'),
+            )}
+          </Button>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -240,11 +252,13 @@ function AvailabilitySection({
   availabilityWindow,
   locale,
   onChooseSlot,
+  onSelectedSlotChange,
   slots,
 }: {
   availabilityWindow: AvailabilityWindow;
   locale: 'ar' | 'en';
   onChooseSlot: (slot: AvailabilitySlot) => void;
+  onSelectedSlotChange: (slot: AvailabilitySlot | null) => void;
   slots: readonly AvailabilitySlot[];
 }) {
   const theme = useAppTheme();
@@ -264,8 +278,10 @@ function AvailabilitySection({
       </AppText>
       <AvailabilityCalendar
         availabilityWindow={availabilityWindow}
+        hideConfirmButton
         locale={locale}
         onChooseSlot={onChooseSlot}
+        onSelectedSlotChange={onSelectedSlotChange}
         slots={slots}
       />
     </Surface>
@@ -376,6 +392,13 @@ function createStyles(theme: AppTheme) {
       alignItems: 'flex-start',
       flexDirection: 'row',
       gap: theme.spacing.xs,
+    },
+    stickyFooter: {
+      backgroundColor: theme.colors.canvas,
+      borderTopColor: theme.colors.borderSubtle,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      paddingHorizontal: theme.spacing.lg,
+      paddingVertical: theme.spacing.sm,
     },
     loadingContent: {
       alignSelf: 'center',

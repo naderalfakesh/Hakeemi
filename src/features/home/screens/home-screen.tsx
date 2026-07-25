@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { FlatList, StyleSheet, View, type ListRenderItem } from 'react-native';
+import { FlatList, Pressable, StyleSheet, View, type ListRenderItem } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
@@ -125,18 +125,28 @@ function HomeHeader({ onFindCare }: { onFindCare: () => void }) {
         </AppText>
       </View>
 
-      <Surface padding="spacious" variant="brand">
-        <View style={styles.featureIcon}>
-          <DecorativeIcon color={theme.colors.brand} name="search" size={26} />
-        </View>
-        <AppText style={styles.featureTitle} variant="titleMedium">
-          {strings.featureTitle}
-        </AppText>
-        <AppText style={styles.featureDescription} tone="secondary" variant="bodyLarge">
-          {strings.featureDescription}
-        </AppText>
-        <Button onPress={onFindCare}>{strings.findCare}</Button>
-      </Surface>
+      {/* A compact entry point: the Find care tab and "See all" already lead
+          to the same place, so the hero stays one tappable row instead of a
+          large card with its own button. */}
+      <Pressable
+        accessibilityLabel={strings.featureTitle}
+        accessibilityRole="button"
+        onPress={onFindCare}
+        style={({ pressed }) => pressed && styles.featurePressed}
+      >
+        <Surface padding="compact" style={styles.featureCard} variant="brand">
+          <View style={styles.featureIcon}>
+            <DecorativeIcon color={theme.colors.brand} name="search" size={22} />
+          </View>
+          <View style={styles.featureCopy}>
+            <AppText variant="titleSmall">{strings.featureTitle}</AppText>
+            <AppText numberOfLines={2} tone="secondary" variant="bodyMedium">
+              {strings.featureDescription}
+            </AppText>
+          </View>
+          <DecorativeIcon color={theme.colors.textSecondary} name="chevron-forward" size={20} />
+        </Surface>
+      </Pressable>
 
       <View style={styles.sectionHeading}>
         <View>
@@ -236,20 +246,26 @@ function createStyles(theme: AppTheme) {
     heading: {
       gap: theme.spacing.xxs,
     },
+    featureCard: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      gap: theme.spacing.sm,
+    },
+    featureCopy: {
+      flex: 1,
+      gap: theme.spacing.xxs,
+    },
+    featurePressed: {
+      opacity: 0.86,
+      transform: [{ scale: 0.99 }],
+    },
     featureIcon: {
       alignItems: 'center',
       backgroundColor: theme.colors.surfaceRaised,
       borderRadius: theme.radii.md,
-      height: 52,
+      height: 44,
       justifyContent: 'center',
-      width: 52,
-    },
-    featureTitle: {
-      marginTop: theme.spacing.lg,
-    },
-    featureDescription: {
-      marginBottom: theme.spacing.lg,
-      marginTop: theme.spacing.xs,
+      width: 44,
     },
     sectionHeading: {
       alignItems: 'center',

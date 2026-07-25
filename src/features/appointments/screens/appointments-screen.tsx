@@ -198,16 +198,15 @@ function AppointmentsHeader({
         <AppText accessibilityRole="header" variant="titleLarge">
           {strings.title}
         </AppText>
-        <AppText tone="secondary" variant="bodyLarge">
+        <AppText tone="secondary" variant="bodyMedium">
           {strings.subtitle}
         </AppText>
       </View>
       <Button
         accessibilityLabel={actionLabel}
-        leading={
-          <DecorativeIcon color={theme.colors.textInverse} name="add-circle-outline" size={20} />
-        }
+        leading={<DecorativeIcon color={theme.colors.brand} name="add-circle-outline" size={20} />}
         onPress={onFindCare}
+        variant="secondary"
       >
         {actionLabel}
       </Button>
@@ -301,10 +300,15 @@ function statusColor(theme: AppTheme, appointment: Appointment) {
 }
 
 function formatAppointment(appointment: Appointment, locale = 'en-AE') {
+  // Explicit fields keep Arabic dates verbose ("26 يوليو 2026") instead of the
+  // numeric "2026/07/26" that dateStyle: 'medium' produces for ar-AE.
   return new Intl.DateTimeFormat(locale, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    month: 'short',
     timeZone: appointment.timezone,
+    year: 'numeric',
   }).format(new Date(appointment.startsAt));
 }
 

@@ -101,14 +101,11 @@ function createStyles(theme: AppTheme) {
       padding: theme.spacing.lg,
       width: '100%',
     },
+    // Sized to the illustration; a fixed 72pt box let the 200pt artwork
+    // overflow onto the heading below.
     icon: {
       alignItems: 'center',
       alignSelf: 'center',
-      backgroundColor: theme.colors.success,
-      borderRadius: theme.radii.full,
-      height: 72,
-      justifyContent: 'center',
-      width: 72,
     },
     heading: {
       gap: theme.spacing.xs,

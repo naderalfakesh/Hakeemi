@@ -101,6 +101,7 @@ export function FindCareScreen({
               accessibilityLabel={strings.searchAccessibilityLabel}
               autoCapitalize="none"
               label={strings.searchLabel}
+              labelHidden
               onChangeText={setQuery}
               placeholder={strings.searchPlaceholder}
               returnKeyType="search"

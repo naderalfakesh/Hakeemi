@@ -38,6 +38,14 @@ export function BookingDetailsScreen({
 
   return (
     <BookingScaffold
+      footer={
+        <>
+          {error && <InlineError message={error} />}
+          <Button busy={isSaving} onPress={onContinue}>
+            {strings.details.reviewAppointment}
+          </Button>
+        </>
+      }
       onBack={onBack}
       step={strings.stepOf(1, 2)}
       subtitle={strings.details.subtitle}
@@ -63,11 +71,6 @@ export function BookingDetailsScreen({
           ))}
         </View>
       </Surface>
-
-      {error && <InlineError message={error} />}
-      <Button busy={isSaving} onPress={onContinue}>
-        {strings.details.reviewAppointment}
-      </Button>
     </BookingScaffold>
   );
 }

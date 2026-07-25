@@ -68,10 +68,9 @@ export function OnboardingScreen({ onComplete, onSkip }: DemoEntryScreenProps) {
   const scrollViewRef = useRef<ScrollView>(null);
   const activeSlideRef = useRef(activeSlide);
   const pageWidth = Math.min(width, theme.sizes.contentMaxWidth) - theme.spacing.lg * 2;
-  const displayedSlides = useMemo(
-    () => (isRTL ? [...onboardingSlides].reverse() : onboardingSlides),
-    [isRTL],
-  );
+  // The horizontal ScrollView row is already visually reversed by the native
+  // RTL layout, and getPhysicalIndex maps logical -> physical offsets for it.
+  // Reversing the slide array as well would cancel that mapping out.
   const isFirstSlide = activeSlide === 0;
   const isLastSlide = activeSlide === onboardingSlides.length - 1;
 
@@ -155,7 +154,7 @@ export function OnboardingScreen({ onComplete, onSkip }: DemoEntryScreenProps) {
           style={styles.slideViewport}
           testID="onboarding-pages"
         >
-          {displayedSlides.map((item) => {
+          {onboardingSlides.map((item) => {
             const logicalIndex = onboardingSlides.findIndex((slide) => slide.key === item.key);
             const isActive = logicalIndex === activeSlide;
 

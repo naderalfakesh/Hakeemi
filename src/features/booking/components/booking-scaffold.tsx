@@ -10,12 +10,14 @@ import { bookingStrings } from '../localization/booking-strings';
 
 export function BookingScaffold({
   children,
+  footer,
   onBack,
   step,
   subtitle,
   title,
 }: {
   children: ReactNode;
+  footer?: ReactNode;
   onBack: () => void;
   step: string;
   subtitle: string;
@@ -50,6 +52,7 @@ export function BookingScaffold({
         </View>
         {children}
       </ScrollView>
+      {footer && <View style={styles.footer}>{footer}</View>}
     </SafeAreaView>
   );
 }
@@ -76,6 +79,14 @@ function createStyles(theme: AppTheme) {
     },
     heading: {
       gap: theme.spacing.xs,
+    },
+    footer: {
+      backgroundColor: theme.colors.canvas,
+      borderTopColor: theme.colors.borderSubtle,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      gap: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.lg,
+      paddingVertical: theme.spacing.sm,
     },
   });
 }

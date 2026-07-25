@@ -235,7 +235,7 @@ function AuthenticatedAppointmentDetail({
           </AppText>
         </Surface>
 
-        {appointment.status === 'confirmed' && (
+        {appointment.status === 'confirmed' && !confirmingCancel && !showReschedule && (
           <View style={styles.calendarSection}>
             <Button
               accessibilityLabel={
@@ -278,21 +278,17 @@ function AuthenticatedAppointmentDetail({
           </Surface>
         )}
 
-        {canManage && (
+        {/* Only one intent is visible at a time: the default action stack,
+            the focused cancel confirmation, or the reschedule flow. */}
+        {canManage && !confirmingCancel && !showReschedule && (
           <View style={styles.actions}>
-            <Button
-              onPress={() => {
-                setConfirmingCancel(false);
-                setShowReschedule((visible) => !visible);
-              }}
-              variant="secondary"
-            >
-              {showReschedule ? strings.keepCurrentTime : strings.reschedule}
+            <Button onPress={() => setShowReschedule(true)} variant="secondary">
+              {strings.reschedule}
             </Button>
             <Button
               accessibilityHint={strings.cancelAppointmentHint}
-              onPress={() => setConfirmingCancel((visible) => !visible)}
-              variant="danger"
+              onPress={() => setConfirmingCancel(true)}
+              variant="dangerSoft"
             >
               {strings.cancelAppointment}
             </Button>
@@ -306,7 +302,7 @@ function AuthenticatedAppointmentDetail({
               {strings.cancelConfirmDescription}
             </AppText>
             <View style={styles.inlineActions}>
-              <Button onPress={() => setConfirmingCancel(false)} variant="tertiary">
+              <Button onPress={() => setConfirmingCancel(false)} variant="secondary">
                 {strings.keepAppointment}
               </Button>
               <Button
@@ -322,12 +318,17 @@ function AuthenticatedAppointmentDetail({
         )}
 
         {showReschedule && canManage && (
-          <RescheduleSection
-            currentSlotId={appointment.slotId}
-            onSelect={(slotId) => void reschedule(slotId)}
-            providerState={providerQuery.state}
-            submitting={rescheduleMutation.status === 'pending'}
-          />
+          <>
+            <Button onPress={() => setShowReschedule(false)} variant="secondary">
+              {strings.keepCurrentTime}
+            </Button>
+            <RescheduleSection
+              currentSlotId={appointment.slotId}
+              onSelect={(slotId) => void reschedule(slotId)}
+              providerState={providerQuery.state}
+              submitting={rescheduleMutation.status === 'pending'}
+            />
+          </>
         )}
 
         {actionError && <InlineError message={localizeAppointmentError(actionError, locale)} />}
@@ -340,9 +341,11 @@ function AuthenticatedAppointmentDetail({
           </Surface>
         )}
 
-        <Button onPress={onFindCare} variant="tertiary">
-          {strings.findAnotherClinician}
-        </Button>
+        {!confirmingCancel && !showReschedule && (
+          <Button onPress={onFindCare} variant="tertiary">
+            {strings.findAnotherClinician}
+          </Button>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -411,15 +414,26 @@ function RescheduleSection({
 function StatusPill({ appointment }: { appointment: Appointment }) {
   const theme = useAppTheme();
   const statusStrings = useStrings(appointmentStatusStrings);
+  const palette = statusPillPalette(theme, appointment);
   return (
-    <View
-      style={[createStyles(theme).statusPill, { backgroundColor: statusColor(theme, appointment) }]}
-    >
-      <AppText tone="inverse" variant="labelSmall">
+    <View style={[createStyles(theme).statusPill, { backgroundColor: palette.background }]}>
+      <AppText style={{ color: palette.foreground }} variant="labelSmall">
         {statusStrings.statusLabels[appointment.status]}
       </AppText>
     </View>
   );
+}
+
+function statusPillPalette(theme: AppTheme, appointment: Appointment) {
+  if (appointment.status === 'confirmed') {
+    return { background: theme.colors.successSoft, foreground: theme.colors.success };
+  }
+
+  if (appointment.status === 'cancelled') {
+    return { background: theme.colors.warningSoft, foreground: theme.colors.warning };
+  }
+
+  return { background: theme.colors.surfaceMuted, foreground: theme.colors.textSecondary };
 }
 
 function DetailRow({
@@ -495,13 +509,6 @@ function DetailState({
 }
 
 type CalendarState = { status: 'idle' | 'adding' | 'added' | 'denied' | 'unavailable' | 'error' };
-
-function statusColor(theme: AppTheme, appointment: Appointment) {
-  if (appointment.status === 'confirmed') {
-    return theme.colors.success;
-  }
-  return appointment.status === 'cancelled' ? theme.colors.warning : theme.colors.textSecondary;
-}
 
 function formatAppointment(appointment: Appointment, locale = 'en-AE') {
   return new Intl.DateTimeFormat(locale, {

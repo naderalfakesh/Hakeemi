@@ -48,7 +48,10 @@ function createStyles(theme: AppTheme, tone: TextTone, variant: TextVariant, isR
     text: {
       ...theme.typeScale[variant],
       color: getToneColor(theme, tone),
-      textAlign: isRTL ? 'right' : 'left',
+      // When the native layout is RTL, React Native swaps left/right styles,
+      // so 'left' is the logical start edge in both directions. Passing
+      // 'right' here would be swapped back to the physical left in RTL.
+      textAlign: 'left',
       writingDirection: isRTL ? 'rtl' : 'ltr',
     } as TextStyle,
   });
