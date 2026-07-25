@@ -6,7 +6,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import '@/config/env';
 import { AppText } from '@/components/ui';
-import { TouchIndicatorOverlay } from '@/components/dev/touch-indicator-overlay';
 import { ErrorBoundaryScreen } from '@/components/navigation/error-boundary-screen';
 import { navigationStrings } from '@/components/navigation/navigation-strings';
 import { AuthSessionProvider, useAuthSession } from '@/features/auth/context/auth-session-provider';
@@ -127,19 +126,17 @@ function AppShell() {
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.root}>
-      <TouchIndicatorOverlay>
-        <AppQueryProvider>
-          <AuthSessionProvider>
-            <BookingDraftProvider>
-              <AppPreferencesProvider>
-                <NotificationRegistrationProvider>
-                  <AppShell />
-                </NotificationRegistrationProvider>
-              </AppPreferencesProvider>
-            </BookingDraftProvider>
-          </AuthSessionProvider>
-        </AppQueryProvider>
-      </TouchIndicatorOverlay>
+      <AppQueryProvider>
+        <AuthSessionProvider>
+          <BookingDraftProvider>
+            <AppPreferencesProvider>
+              <NotificationRegistrationProvider>
+                <AppShell />
+              </NotificationRegistrationProvider>
+            </AppPreferencesProvider>
+          </BookingDraftProvider>
+        </AuthSessionProvider>
+      </AppQueryProvider>
     </GestureHandlerRootView>
   );
 }
