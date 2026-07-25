@@ -22,6 +22,7 @@ const en = {
   memberFallback: 'Hakeemi member',
   notificationErrorFallback: 'Notifications could not be enabled.',
   preferencesErrorFallback: 'Your preferences could not be synchronized.',
+  preferencesLocalSubtitle: 'Saved on this device. Sign in to keep them on all your devices.',
   preferencesSubtitle: 'These choices follow your account on all your devices.',
   preferredLanguage: 'Preferred language',
   profileErrorFallback: 'Your profile could not be synced.',
@@ -50,7 +51,7 @@ const en = {
   secureProfileSync: 'Profile sync',
   signIn: 'Sign in',
   signOut: 'Sign out',
-  syncedPreferences: 'Synced app preferences',
+  syncedPreferences: 'App preferences',
   title: 'Profile',
 };
 
@@ -77,6 +78,7 @@ export const profileStrings: LocalizedStrings<typeof en> = {
     memberFallback: 'عضو في «حكيمي»',
     notificationErrorFallback: 'تعذّر تفعيل الإشعارات.',
     preferencesErrorFallback: 'تعذّرت مزامنة تفضيلاتك.',
+    preferencesLocalSubtitle: 'تُحفظ على هذا الجهاز. سجّل الدخول لتبقى معك على جميع أجهزتك.',
     preferencesSubtitle: 'ترافق هذه الخيارات حسابك على جميع أجهزتك.',
     preferredLanguage: 'اللغة المفضلة',
     profileErrorFallback: 'تعذّرت مزامنة ملفك الشخصي.',
@@ -103,7 +105,7 @@ export const profileStrings: LocalizedStrings<typeof en> = {
     secureProfileSync: 'مزامنة الملف الشخصي',
     signIn: 'تسجيل الدخول',
     signOut: 'تسجيل الخروج',
-    syncedPreferences: 'تفضيلات التطبيق المتزامنة',
+    syncedPreferences: 'تفضيلات التطبيق',
     title: 'الملف الشخصي',
   },
   en,

@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useMemo, type ReactNode } from 
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 
 import { readAppPreferences, writeAppPreferences } from '../data/firebase-preferences';
+import { readLocalPreferences, writeLocalPreferences } from '../data/local-preferences';
 import {
   appPreferencesSchema,
   defaultAppPreferences,
@@ -40,13 +41,18 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
   );
   const queryKey = preferencesQueryKey(userId ?? 'anonymous');
   const preferencesQuery = useQuery({
-    enabled: userId !== null && session.profile !== null,
+    enabled: userId === null || session.profile !== null,
     queryKey,
-    queryFn: async () => (await readAppPreferences()) ?? profilePreferences,
+    // Guests keep their choices on the device; accounts use the synced copy.
+    queryFn: async () =>
+      userId
+        ? ((await readAppPreferences()) ?? profilePreferences)
+        : ((await readLocalPreferences()) ?? defaultAppPreferences),
   });
   const preferences = preferencesQuery.data ?? profilePreferences;
   const updateMutation = useMutation({
-    mutationFn: (nextPreferences: AppPreferences) => writeAppPreferences(nextPreferences),
+    mutationFn: (nextPreferences: AppPreferences) =>
+      userId ? writeAppPreferences(nextPreferences) : writeLocalPreferences(nextPreferences),
     onMutate: async (nextPreferences) => {
       await queryClient.cancelQueries({ queryKey });
       const previousPreferences = queryClient.getQueryData<AppPreferences>(queryKey);
@@ -64,9 +70,7 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
   let status: PreferencesStatus;
   let error: string | null = null;
 
-  if (!userId) {
-    status = 'idle';
-  } else if (updateMutation.isPending) {
+  if (updateMutation.isPending) {
     status = 'saving';
   } else if (updateMutation.isError) {
     status = 'error';
@@ -74,7 +78,7 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
   } else if (preferencesQuery.isError) {
     status = 'error';
     error = 'Your synced preferences could not be loaded.';
-  } else if (!session.profile || preferencesQuery.isPending) {
+  } else if ((userId !== null && !session.profile) || preferencesQuery.isPending) {
     status = 'loading';
   } else {
     status = 'ready';
@@ -86,11 +90,9 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
   }, [preferencesQuery, updateMutation]);
   const update = useCallback(
     (nextPreferences: AppPreferences) => {
-      if (userId) {
-        updateMutation.mutate(appPreferencesSchema.parse(nextPreferences));
-      }
+      updateMutation.mutate(appPreferencesSchema.parse(nextPreferences));
     },
-    [updateMutation, userId],
+    [updateMutation],
   );
   const value = useMemo<AppPreferencesContextValue>(
     () => ({ error, preferences, retry, status, update }),

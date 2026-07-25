@@ -162,66 +162,14 @@ export function ProfileScreen({
               )}
             </Surface>
 
-            <Surface padding="spacious" style={styles.preferenceCard} variant="plain">
-              <View style={styles.preferenceHeading}>
-                <AppText variant="titleSmall">{strings.syncedPreferences}</AppText>
-                <AppText tone="secondary" variant="bodyMedium">
-                  {strings.preferencesSubtitle}
-                </AppText>
-              </View>
-
-              <PreferenceChoices
-                disabled={preferencesStatus !== 'ready'}
-                label={strings.appearance}
-                onChange={(themePreference) =>
-                  onUpdatePreferences({ ...preferences, theme: themePreference })
-                }
-                options={[
-                  { label: strings.appearanceSystem, value: 'system' },
-                  { label: strings.appearanceLight, value: 'light' },
-                  { label: strings.appearanceDark, value: 'dark' },
-                ]}
-                value={preferences.theme}
-              />
-
-              <PreferenceChoices
-                disabled={preferencesStatus !== 'ready'}
-                label={strings.preferredLanguage}
-                onChange={(preferredLocale) =>
-                  onUpdatePreferences({ ...preferences, locale: preferredLocale })
-                }
-                options={[
-                  { label: strings.languageEnglish, value: 'en' },
-                  { label: strings.languageArabic, value: 'ar' },
-                ]}
-                value={preferences.locale}
-              />
-
-              {isLayoutDirectionPendingRestart(preferences.locale) && (
-                <AppText accessibilityLiveRegion="polite" tone="secondary" variant="caption">
-                  {strings.languageRestartHint}
-                </AppText>
-              )}
-
-              {preferencesStatus === 'loading' && (
-                <AppText tone="secondary" variant="caption">
-                  {strings.loadingPreferences}
-                </AppText>
-              )}
-              {preferencesStatus === 'saving' && (
-                <AppText accessibilityLiveRegion="polite" tone="secondary" variant="caption">
-                  {strings.savingPreferences}
-                </AppText>
-              )}
-              {preferencesStatus === 'error' && (
-                <>
-                  <InlineError message={preferencesError ?? strings.preferencesErrorFallback} />
-                  <Button onPress={onRetryPreferences} variant="secondary">
-                    {strings.retryPreferences}
-                  </Button>
-                </>
-              )}
-            </Surface>
+            <PreferencesCard
+              onRetryPreferences={onRetryPreferences}
+              onUpdatePreferences={onUpdatePreferences}
+              preferences={preferences}
+              preferencesError={preferencesError}
+              preferencesStatus={preferencesStatus}
+              subtitle={strings.preferencesSubtitle}
+            />
 
             <Surface padding="spacious" style={styles.notificationCard} variant="brand">
               <View style={styles.notificationHeading}>
@@ -274,19 +222,30 @@ export function ProfileScreen({
             </Button>
           </>
         ) : (
-          <Surface padding="spacious" style={styles.guestCard} variant="brand">
-            <View style={styles.guestIcon}>
-              <DecorativeIcon color={theme.colors.brand} name="person-outline" size={30} />
-            </View>
-            <AppText variant="titleMedium">{strings.guestTitle}</AppText>
-            <AppText tone="secondary" variant="bodyLarge">
-              {strings.guestSubtitle}
-            </AppText>
-            <Button onPress={onSignIn}>{strings.signIn}</Button>
-            <Button onPress={onCreateAccount} variant="secondary">
-              {strings.createAccount}
-            </Button>
-          </Surface>
+          <>
+            <Surface padding="spacious" style={styles.guestCard} variant="brand">
+              <View style={styles.guestIcon}>
+                <DecorativeIcon color={theme.colors.brand} name="person-outline" size={30} />
+              </View>
+              <AppText variant="titleMedium">{strings.guestTitle}</AppText>
+              <AppText tone="secondary" variant="bodyLarge">
+                {strings.guestSubtitle}
+              </AppText>
+              <Button onPress={onSignIn}>{strings.signIn}</Button>
+              <Button onPress={onCreateAccount} variant="secondary">
+                {strings.createAccount}
+              </Button>
+            </Surface>
+
+            <PreferencesCard
+              onRetryPreferences={onRetryPreferences}
+              onUpdatePreferences={onUpdatePreferences}
+              preferences={preferences}
+              preferencesError={preferencesError}
+              preferencesStatus={preferencesStatus}
+              subtitle={strings.preferencesLocalSubtitle}
+            />
+          </>
         )}
 
         <AppText style={styles.disclaimer} tone="secondary" variant="caption">
@@ -294,6 +253,89 @@ export function ProfileScreen({
         </AppText>
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function PreferencesCard({
+  onRetryPreferences,
+  onUpdatePreferences,
+  preferences,
+  preferencesError,
+  preferencesStatus,
+  subtitle,
+}: {
+  onRetryPreferences: () => void;
+  onUpdatePreferences: (preferences: AppPreferences) => void;
+  preferences: AppPreferences;
+  preferencesError: string | null;
+  preferencesStatus: PreferencesStatus;
+  subtitle: string;
+}) {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+  const strings = useStrings(profileStrings);
+
+  return (
+    <Surface padding="spacious" style={styles.preferenceCard} variant="plain">
+      <View style={styles.preferenceHeading}>
+        <AppText variant="titleSmall">{strings.syncedPreferences}</AppText>
+        <AppText tone="secondary" variant="bodyMedium">
+          {subtitle}
+        </AppText>
+      </View>
+
+      <PreferenceChoices
+        disabled={preferencesStatus !== 'ready'}
+        label={strings.appearance}
+        onChange={(themePreference) =>
+          onUpdatePreferences({ ...preferences, theme: themePreference })
+        }
+        options={[
+          { label: strings.appearanceSystem, value: 'system' },
+          { label: strings.appearanceLight, value: 'light' },
+          { label: strings.appearanceDark, value: 'dark' },
+        ]}
+        value={preferences.theme}
+      />
+
+      <PreferenceChoices
+        disabled={preferencesStatus !== 'ready'}
+        label={strings.preferredLanguage}
+        onChange={(preferredLocale) =>
+          onUpdatePreferences({ ...preferences, locale: preferredLocale })
+        }
+        options={[
+          { label: strings.languageEnglish, value: 'en' },
+          { label: strings.languageArabic, value: 'ar' },
+        ]}
+        value={preferences.locale}
+      />
+
+      {isLayoutDirectionPendingRestart(preferences.locale) && (
+        <AppText accessibilityLiveRegion="polite" tone="secondary" variant="caption">
+          {strings.languageRestartHint}
+        </AppText>
+      )}
+
+      {preferencesStatus === 'loading' && (
+        <AppText tone="secondary" variant="caption">
+          {strings.loadingPreferences}
+        </AppText>
+      )}
+      {preferencesStatus === 'saving' && (
+        <AppText accessibilityLiveRegion="polite" tone="secondary" variant="caption">
+          {strings.savingPreferences}
+        </AppText>
+      )}
+      {preferencesStatus === 'error' && (
+        <>
+          <InlineError message={preferencesError ?? strings.preferencesErrorFallback} />
+          <Button onPress={onRetryPreferences} variant="secondary">
+            {strings.retryPreferences}
+          </Button>
+        </>
+      )}
+    </Surface>
   );
 }
 
