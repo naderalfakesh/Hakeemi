@@ -1,14 +1,18 @@
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
 
 const firebaseCommand = process.platform === 'win32' ? 'firebase.cmd' : 'firebase';
+const emulatorDataDirectory = '.firebase/emulator-data';
 const firebaseArguments = [
   'emulators:start',
   '--project',
   'hakeemi-portfolio-dev',
-  '--import',
-  '.firebase/emulator-data',
+  // A fresh clone has no exported state yet; the emulators must still start so
+  // the post-start seed can populate them, and --export-on-exit creates the
+  // directory for subsequent runs.
+  ...(existsSync(emulatorDataDirectory) ? ['--import', emulatorDataDirectory] : []),
   '--export-on-exit',
-  '.firebase/emulator-data',
+  emulatorDataDirectory,
 ];
 
 let recentOutput = '';

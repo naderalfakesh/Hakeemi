@@ -15,6 +15,7 @@ expo-env.d.ts
 firebase-debug.log*
 firestore-debug.log*
 ui-debug.log*
+firebase-export-*/
 
 # Native
 .kotlin/
@@ -44,6 +45,9 @@ yarn-error.*
 .env*.local
 google-services.json
 GoogleService-Info.plist
+# committed emulator-only placeholders contain no real identifiers
+!firebase/templates/emulator/google-services.json
+!firebase/templates/emulator/GoogleService-Info.plist
 
 # typescript
 *.tsbuildinfo
@@ -57,3 +61,6 @@ coverage/
 # Cloud Functions build output
 /functions/lib
 pubsub-debug.log*
+
+# local working notes
+SESSION.md

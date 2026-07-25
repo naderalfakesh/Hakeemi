@@ -1,9 +1,33 @@
+import { existsSync } from 'node:fs';
+
 import type { ConfigContext, ExpoConfig } from 'expo/config';
 
-const androidGoogleServicesFile =
-  process.env.GOOGLE_SERVICES_JSON ?? './.firebase/development/google-services.json';
-const iosGoogleServicesFile =
-  process.env.GOOGLE_SERVICES_INFO_PLIST ?? './.firebase/development/GoogleService-Info.plist';
+// Native Firebase config resolution: an explicit environment path wins, then a
+// developer's ignored real project files, then the committed emulator-only
+// placeholders so a fresh clone can build and run against the Emulator Suite
+// without any Firebase credentials.
+function resolveGoogleServicesFile(
+  environmentPath: string | undefined,
+  developmentPath: string,
+  emulatorTemplatePath: string,
+) {
+  if (environmentPath !== undefined && environmentPath !== '') {
+    return environmentPath;
+  }
+
+  return existsSync(developmentPath) ? developmentPath : emulatorTemplatePath;
+}
+
+const androidGoogleServicesFile = resolveGoogleServicesFile(
+  process.env.GOOGLE_SERVICES_JSON,
+  './.firebase/development/google-services.json',
+  './firebase/templates/emulator/google-services.json',
+);
+const iosGoogleServicesFile = resolveGoogleServicesFile(
+  process.env.GOOGLE_SERVICES_INFO_PLIST,
+  './.firebase/development/GoogleService-Info.plist',
+  './firebase/templates/emulator/GoogleService-Info.plist',
+);
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
