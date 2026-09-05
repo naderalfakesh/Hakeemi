@@ -50,7 +50,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: 'com.naderalfakesh.hakeemi',
     googleServicesFile: androidGoogleServicesFile,
     adaptiveIcon: {
-      backgroundColor: '#E7F5F3',
+      backgroundColor: '#0A6765',
       foregroundImage: './assets/images/android-icon-foreground.png',
       backgroundImage: './assets/images/android-icon-background.png',
       monochromeImage: './assets/images/android-icon-monochrome.png',
@@ -79,7 +79,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-splash-screen',
       {
-        backgroundColor: '#0B6B69',
+        backgroundColor: '#0A6765',
         image: './assets/images/splash-icon.png',
         imageWidth: 76,
       },
@@ -95,7 +95,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-notifications',
       {
-        color: '#0B6B69',
+        color: '#0A6765',
         enableBackgroundRemoteNotifications: true,
         icon: './assets/images/android-icon-monochrome.png',
       },
