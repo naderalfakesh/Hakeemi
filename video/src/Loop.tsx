@@ -2,13 +2,8 @@ import React from "react";
 import { AbsoluteFill, Easing, interpolate, useCurrentFrame } from "remotion";
 import { Backdrop } from "./components/Backdrop";
 import { BrandMark } from "./components/BrandMark";
-import type {
-  Beat} from "./components/BeatTrack";
-import {
-  BeatTrack,
-  beatFrames,
-  trackFrames,
-} from "./components/BeatTrack";
+import type { Beat } from "./components/BeatTrack";
+import { BeatTrack, beatFrames, trackFrames } from "./components/BeatTrack";
 import { PhoneFrame } from "./components/PhoneFrame";
 import { segments, DARK_FLIP_FRAME } from "./segments";
 import { dark, EASE_OUT, fonts, light, SCREEN_H, SCREEN_W } from "./theme";

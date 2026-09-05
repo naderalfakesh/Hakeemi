@@ -2,7 +2,7 @@ import React from "react";
 import { Sequence } from "remotion";
 import { Audio } from "@remotion/media";
 import { ding, uiSwitch } from "@remotion/sfx";
-import type { Beat} from "../components/BeatTrack";
+import type { Beat } from "../components/BeatTrack";
 import { BeatTrack, trackFrames } from "../components/BeatTrack";
 import { Caption } from "../components/Caption";
 import { Chapter } from "../components/Chapter";
