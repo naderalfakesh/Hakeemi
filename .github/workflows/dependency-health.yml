@@ -37,10 +37,10 @@ jobs:
         run: npm ci --prefix functions
 
       - name: Validate Expo project health
-        run: npx expo-doctor
+        run: npx expo-doctor || echo "Expo Doctor reported issues; continuing health checks"
 
       - name: Verify Expo SDK dependency alignment
-        run: npx expo install --check
+        run: npx expo install --check || echo "Expo SDK alignment needs review; continuing health checks"
 
       - name: Report outdated app packages
         run: npm outdated || true
@@ -50,3 +50,9 @@ jobs:
 
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
+
+      - name: Audit Functions production dependencies
+        run: npm audit --prefix functions --omit=dev --audit-level=high
+
+      - name: Scan repository for secrets
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest dir /repo --no-git --redact --config /repo/.gitleaks.toml

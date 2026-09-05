@@ -4,6 +4,9 @@ A [Remotion](https://remotion.dev) project that turns the raw simulator
 recordings in `../recordings/` into the promo video used in the repo README
 and on the portfolio site.
 
+The master includes an AI-generated Google Lyria music bed. Use the silent
+master when publishing where soundtrack provenance or licensing is uncertain.
+
 ## Compositions
 
 | ID             | Size      | Length | Purpose                                  |
@@ -26,6 +29,12 @@ npx remotion studio
 # 3. Render
 npx remotion render HakeemiPromo out/hakeemi-promo.mp4
 npx remotion render HakeemiLoop out/hakeemi-loop.mp4
+```
+
+To create a silent copy of the rendered master:
+
+```bash
+ffmpeg -i out/hakeemi-promo.mp4 -c:v copy -an out/hakeemi-promo-silent.mp4
 ```
 
 ## Structure
