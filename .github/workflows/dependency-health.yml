@@ -55,4 +55,4 @@ jobs:
         run: npm audit --prefix functions --omit=dev --audit-level=high
 
       - name: Scan repository for secrets
-        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest dir /repo --no-git --redact --config /repo/.gitleaks.toml
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest dir /repo --redact --config /repo/.gitleaks.toml
