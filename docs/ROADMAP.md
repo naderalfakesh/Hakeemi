@@ -920,9 +920,9 @@ _Estimated effort: one session_
 - [x] Replace the current README with a concise case-study structure.
 - [x] Create an original in-app illustration set and current native screenshot
       gallery using fictional data.
-- [ ] Replace the template Expo app icon and legacy repository hero with an
+- [x] Replace the template Expo app icon and legacy repository hero with an
       original Hakeemi identity.
-- [ ] Record a short demo video/GIF of the core journey.
+- [x] Record a short demo video/GIF of the core journey.
 - [x] Explain the 2021-to-2026 rebuild and link the `legacy-v1` tag.
 - [x] Document the Expo/CNG decision and the native development-build model.
 - [x] Include an architecture diagram, feature list, stack, directory map,
@@ -1115,9 +1115,7 @@ source artwork with complete hair, head-covering, and head silhouettes plus
 consistent transparent headroom; `contain` fitting keeps the full composition
 visible at card and profile sizes without sharp canvas-edge cuts. All 16
 illustrations are native-safe WebP files totaling 819.1 KB, down from roughly
-4.6 MB, and CI enforces 150 KB per-file/1 MB aggregate budgets. The iOS icon
-configuration still references the Expo template symbol, and the repository
-hero predates the new identity.
+4.6 MB, and CI enforces 150 KB per-file/1 MB aggregate budgets.
 
 The 21 July 2026 onboarding/avatar refinement is complete in reviewable commits.
 `d89c762` removed the repeated disclaimer, and its interim finish-step auth
@@ -1126,6 +1124,22 @@ gate and standalone Welcome route. `abec842` added native paged motion, touch
 swiping, RTL order, and reduced-motion behavior. `ac3b7d6` replaced all six
 visibly cropped portrait sources with identity-preserving, naturally framed
 artwork. The refreshed iOS screenshots in `docs/images/` record the final state.
+
+The 5 September 2026 release-readiness pass is recorded in reviewable commits.
+`ee0380c` merged the Remotion promo project, the README highlight loop, and the
+70-second promo; `3154058` added a silent master and documented that the music
+bed is AI-generated (Google Lyria), removed the high-severity Functions
+advisory, and made the weekly dependency-health job audit both dependency trees
+and scan the checked-out tree for secrets independently of Expo Doctor
+(`443ccfd`). `679d9c2` aligned every Expo SDK 57 package with the current patch
+releases and regenerated the lockfile so `npm ci` and Expo Doctor are green
+again. `da96760` replaced the Expo template icon, adaptive icon, monochrome,
+splash mark, favicon, and iOS Icon Composer bundle with the Hakeemi pulse mark
+already used in the promo, and removed the unreferenced 2021 repository banner.
+A history scan found one token-bearing legacy Storage URL (`person.png` in the
+`hakeemi` project, which is reachable from the owner account despite earlier
+notes) and the public legacy client API key; both remain in Git history by
+design and are tracked as release hygiene, not as an incident.
 
 ## Next execution queue
 
@@ -1136,5 +1150,10 @@ artwork. The refreshed iOS screenshots in `docs/images/` record the final state.
    a physical small phone, Android hardware, and calendar/notification denial.
 3. Add privacy-safe Crashlytics, Performance Monitoring, and analytics, then
    enable App Check in monitor mode before considering enforcement.
-4. Replace the template app icon/repository hero, capture a short core-flow
-   demo, and attach signed EAS preview builds with an install link and QR code.
+4. Log in to EAS (`eas login`), configure signing through EAS credentials, and
+   attach signed preview builds with an install link and QR code. Account-backed
+   booking in a preview build also needs the Cloud Functions deployed to
+   `hakeemi-portfolio-dev` (Blaze boundary); demo mode works without them.
+5. Revoke or regenerate the `person.png` download token in the legacy `hakeemi`
+   Storage bucket and confirm the legacy client API key is restricted; then
+   decide whether the `promo` soundtrack stays AI-generated or is replaced.
