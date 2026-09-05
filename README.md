@@ -5,6 +5,15 @@
 > Hakeemi is a technical portfolio project. It uses fictional clinicians and
 > patient data and is not a healthcare service or clinical product.
 
+<p align="center">
+  <img src="docs/hakeemi-loop.gif" alt="Animated tour: finding a clinician, booking against real availability, switching to Arabic RTL, and flipping to dark mode" width="760" />
+</p>
+
+<p align="center">
+  <a href="docs/hakeemi-promo.mp4"><strong>▶ Watch the full 70-second promo with sound</strong></a>
+  · built with <a href="video/">Remotion</a> from real simulator captures
+</p>
+
 | Illustrated welcome                                                                                                                      | Discovery with portraits                                                                                                                 | Provider profile                                                                                                                                  |
 | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | <img src="docs/images/welcome-illustrated-native.png" alt="Signed-out Welcome screen with account and demo entry choices" width="260" /> | <img src="docs/images/find-care-illustrated-native.png" alt="Find Care with illustrated doctor portraits on tinted tiles" width="260" /> | <img src="docs/images/provider-detail-illustrated-native.png" alt="Provider profile with a large ringed portrait and availability" width="260" /> |
