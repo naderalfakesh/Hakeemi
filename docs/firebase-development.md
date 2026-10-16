@@ -125,7 +125,22 @@ npx expo run:android
 The app connects Auth, Firestore, and Functions to `127.0.0.1` on iOS Simulator
 and `10.0.2.2` on Android Emulator when
 `EXPO_PUBLIC_USE_FIREBASE_EMULATORS=true`. Production and preview environments
-must set it to `false`.
+must set it to `false`; the flag is only accepted together with
+`EXPO_PUBLIC_APP_ENV=development`, and `src/config/env.ts` rejects any other
+combination at startup.
+
+Release bundles fail closed. Metro compiles `__DEV__` to `true` for development
+bundles and `false` for release bundles (`expo run:ios --configuration Release`,
+`expo run:android --variant release`, and every EAS preview or production
+build). A development bundle may run without a `.env` file and falls back to the
+development channel, `hakeemi-portfolio-dev`, and the Emulator Suite. A release
+bundle receives no defaults: a missing or blank `EXPO_PUBLIC_APP_ENV`,
+`EXPO_PUBLIC_FIREBASE_PROJECT_ID`, or `EXPO_PUBLIC_USE_FIREBASE_EMULATORS`, or
+an emulator flag set to `true`, throws while the environment module loads, so
+the app stops at startup rather than reaching `127.0.0.1`. The native Firebase
+initializer applies the same rule a second time and only connects the emulators
+when the bundle is a development bundle and the channel is `development`. The
+`eas.json` profiles set all three variables explicitly for every profile.
 
 The authenticated `bootstrapUserProfile` callable owns creation and
 reconciliation of `users/{uid}`. Firestore rules deny direct client creation and

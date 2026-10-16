@@ -10,6 +10,14 @@ const FUNCTIONS_REGION = 'me-central1';
 
 let isConfigured = false;
 
+// Second guard beside env.ts: the Emulator Suite is a development-bundle-only
+// target, so a release bundle never connects even if the flag were true.
+function shouldConnectToEmulators() {
+  return (
+    environment.useFirebaseEmulators && environment.appEnvironment === 'development' && __DEV__
+  );
+}
+
 export function initializeFirebaseServices() {
   if (isConfigured) {
     return;
@@ -17,7 +25,7 @@ export function initializeFirebaseServices() {
 
   isConfigured = true;
 
-  if (!environment.useFirebaseEmulators) {
+  if (!shouldConnectToEmulators()) {
     return;
   }
 
