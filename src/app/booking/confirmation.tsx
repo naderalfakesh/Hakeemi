@@ -18,6 +18,7 @@ export default function BookingConfirmationRoute() {
     appointmentId,
     dataSources.appointmentRepository,
     dataSources.scope,
+    session.user?.id ?? null,
   );
   const providerQuery = useQuery({
     enabled: Boolean(appointmentQuery.data?.providerId),

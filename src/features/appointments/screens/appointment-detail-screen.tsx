@@ -69,6 +69,7 @@ export function AppointmentDetailScreen({
 
   return (
     <AuthenticatedAppointmentDetail
+      accountId={session.user?.id ?? null}
       appointmentId={appointmentId}
       appointmentRepository={appointmentRepository}
       careDataRepository={careDataRepository}
@@ -81,6 +82,7 @@ export function AppointmentDetailScreen({
 }
 
 function AuthenticatedAppointmentDetail({
+  accountId,
   appointmentId,
   appointmentRepository,
   careDataRepository,
@@ -89,6 +91,7 @@ function AuthenticatedAppointmentDetail({
   onFindCare,
   queryScope,
 }: {
+  accountId: string | null;
   appointmentId: string;
   appointmentRepository?: AppointmentRepository | undefined;
   careDataRepository: CareRepository;
@@ -102,7 +105,12 @@ function AuthenticatedAppointmentDetail({
   const strings = useStrings(appointmentDetailStrings);
   const statusStrings = useStrings(appointmentStatusStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const detailQuery = useAppointmentDetail(appointmentId, appointmentRepository, queryScope);
+  const detailQuery = useAppointmentDetail(
+    appointmentId,
+    appointmentRepository,
+    queryScope,
+    accountId,
+  );
   const providerId = detailQuery.data?.providerId ?? '';
   const providerQuery = useProviderDetail(providerId, careDataRepository, queryScope);
   const cancelMutation = useCancelAppointment(

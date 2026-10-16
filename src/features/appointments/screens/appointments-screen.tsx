@@ -62,6 +62,7 @@ export function AppointmentsScreen({
 
   return (
     <AuthenticatedAppointments
+      accountId={session.user?.id ?? null}
       appointmentRepository={appointmentRepository}
       careDataRepository={careDataRepository}
       onFindCare={onFindCare}
@@ -72,12 +73,14 @@ export function AppointmentsScreen({
 }
 
 function AuthenticatedAppointments({
+  accountId,
   appointmentRepository,
   careDataRepository,
   onFindCare,
   onViewAppointment,
   queryScope,
 }: {
+  accountId: string | null;
   appointmentRepository?: AppointmentRepository | undefined;
   careDataRepository?: CareRepository | undefined;
   onFindCare: () => void;
@@ -88,7 +91,12 @@ function AuthenticatedAppointments({
   const { locale } = useAppLocale();
   const strings = useStrings(appointmentsStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const appointmentsQuery = useAppointments(appointmentRepository, careDataRepository, queryScope);
+  const appointmentsQuery = useAppointments(
+    appointmentRepository,
+    careDataRepository,
+    queryScope,
+    accountId,
+  );
   const isOffline = useIsOffline();
   const [filter, setFilter] = useState<AppointmentFilter>('upcoming');
 

@@ -44,9 +44,12 @@ export function useAppointments(
   repository: AppointmentRepository = appointmentRepository,
   providerRepository: CareRepository = careRepository,
   queryScope: AppointmentQueryScope = 'account',
+  accountId: string | null = null,
 ) {
   return useQuery({
-    queryKey: appointmentQueryKeys.list(queryScope),
+    // Account appointments need a signed-in account.
+    enabled: queryScope === 'demo' || accountId !== null,
+    queryKey: appointmentQueryKeys.list(queryScope, accountId),
     queryFn: async () => {
       const appointments = await repository.listAppointments();
       const providers = await Promise.all(

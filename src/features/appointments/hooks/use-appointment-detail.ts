@@ -9,9 +9,12 @@ export function useAppointmentDetail(
   appointmentId: string,
   repository: AppointmentRepository = appointmentRepository,
   queryScope: AppointmentQueryScope = 'account',
+  accountId: string | null = null,
 ) {
   return useQuery({
-    queryKey: appointmentQueryKeys.detail(appointmentId, queryScope),
+    // Account appointments need a signed-in account.
+    enabled: queryScope === 'demo' || accountId !== null,
+    queryKey: appointmentQueryKeys.detail(appointmentId, queryScope, accountId),
     queryFn: () => repository.getAppointment(appointmentId),
   });
 }
