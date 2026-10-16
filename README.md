@@ -35,8 +35,12 @@ sequence and current position.
 
 ## Features
 
-- Four-step onboarding with RTL and reduced-motion support, a signed-out
-  Welcome entry, and typed four-tab Expo Router navigation
+- Original H-pulse identity across icon, adaptive icon, splash and in-app
+  mark, with a splash-to-first-frame hand-off that holds until the session
+  has restored
+- Three-step first run (language and appearance, how booking works,
+  permissions only in context) with RTL and reduced-motion support, a
+  signed-out Welcome entry, and typed four-tab Expo Router navigation
 - Provider discovery backed by Firestore: search, specialty filters, cursor
   pagination, and a two-week availability calendar
 - Email/password accounts with verification, password recovery, and cold-start
@@ -94,12 +98,13 @@ emulator-only until enabling billing is an explicit decision.
 
 ## Quality
 
-CI runs `npm run validate` — formatting, lint, strict types, 39 Jest suites
-with 121 tests (including Arabic-locale renders), CI-enforced illustration
-budgets, and Expo Doctor — plus the Firebase emulator matrix: 14 security-rules
-tests and callable integration suites for booking, appointment management,
-notification tokens, and scheduled reminders. Native evidence includes iOS and
-iPad development builds, an Android arm64 APK, and the static web export.
+CI runs `npm run validate` — formatting, lint, strict types, 45 Jest suites
+with 183 tests (including Arabic-locale renders), 19 Functions unit tests,
+CI-enforced illustration budgets, and Expo Doctor — plus the Firebase emulator
+matrix: 14 security-rules tests and callable integration suites for booking,
+appointment management, notification tokens, and scheduled reminders. Native
+evidence includes iOS and iPad development builds, an iOS Release simulator
+build, an Android arm64 APK, and the static web export.
 The [testing strategy](docs/testing-strategy.md), per-phase verification
 records, and the privacy-safe [analytics contract](docs/analytics-events.md)
 live under [`docs/`](docs/).
@@ -125,8 +130,12 @@ fall back to committed emulator-only placeholder Google service files when no
 real configuration is present.
 
 Prerequisites: Node.js 22.13+ (below 25), npm, a Java runtime (JDK 17+) for
-the emulators, plus Xcode/CocoaPods for iOS and Android Studio with an SDK and
-JDK for Android.
+the emulators, Xcode 27 with the iOS 27 SDK and CocoaPods for iOS, and Android
+Studio with an SDK and a JDK 17 to 21 for Android (the Android Gradle Plugin's
+CMake step aborts on the native-access warning that JDK 24+ prints, so point
+`JAVA_HOME` at an older JDK rather than a JBR 25). The iOS 27 SDK only launches apps that
+use the UIKit scene lifecycle, which SDK 57 keeps opt-in; `app.config.ts`
+enables it through `expo-build-properties`, so no AppDelegate edits are needed.
 
 ```sh
 npm install
@@ -156,7 +165,11 @@ npm run android
 
 `.env.example` enables emulator mode, so accounts, discovery, booking, and
 appointment management all work locally; only push-notification registration
-needs a real Firebase project. Expo Go is not a supported runtime. To target
+needs a real Firebase project. Development bundles fall back to the same
+emulator settings when no `.env` exists, while release bundles (preview and
+production) have no defaults and stop at startup if a public variable is
+missing or emulator mode is requested, so a release build can never reach the
+emulators. Expo Go is not a supported runtime. To target
 your own Firebase project instead, drop its service files under
 `.firebase/development/` and rebuild — the
 [Firebase development guide](docs/firebase-development.md) covers the

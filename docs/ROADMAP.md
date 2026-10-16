@@ -4,7 +4,7 @@
 >
 > Baseline: `dade72b` on `master`
 >
-> Last updated: 2026-07-21
+> Last updated: 2026-10-13
 >
 > Product type: portfolio-quality patient appointment application; not a clinical product
 
@@ -308,6 +308,11 @@ devices:
 
 ## 7. Target technical stack
 
+This table is the stack chosen when the roadmap was written and is kept as the
+plan of record. The "Planned vs. actual" table after it records where the
+delivered application differs and names the artifact that shows the current
+state.
+
 | Layer                  | Choice                                                                        | Why                                                                           |
 | ---------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | Mobile framework       | Expo SDK 57 / RN 0.86 / React 19.2                                            | Current stable framework pairing at plan time                                 |
@@ -327,6 +332,20 @@ devices:
 | E2E                    | Maestro on iOS and Android                                                    | Readable native journey coverage and screenshot automation                    |
 | CI/CD                  | GitHub Actions + EAS Build/Update/Submit profiles                             | Repeatable checks, installable previews, and release evidence                 |
 | Observability          | Crashlytics, Performance Monitoring, structured analytics                     | Production-shaped diagnosis without exposing sensitive content                |
+
+### Planned vs. actual
+
+Rows not listed here are delivered as planned. Checked against the working
+tree on 2026-10-13.
+
+| Layer               | Planned                                        | Actual                                                                                                                                                                                                    | Evidence                                                                                        |
+| ------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Backend             | Includes App Check                             | Auth, Firestore, Cloud Functions, Security Rules, and the Emulator Suite are in use; Storage rules are defined but no client Storage feature exists; App Check is not configured                          | `firebase/`, `firebase.json`, completion checklist below                                        |
+| Lists/images/motion | FlashList, `expo-image`, Reanimated            | React Native `FlatList` and `Image` with Reanimated; neither `@shopify/flash-list` nor `expo-image` is installed                                                                                          | `package.json`                                                                                  |
+| Localization        | i18next + Expo Localization                    | Typed bilingual string catalogs, locale-aware formatting, and `I18nManager` layout direction in `src/localization/`; neither package is installed                                                         | `src/localization/`, `package.json`, `docs/phase-5-verification.md`                             |
+| E2E                 | Maestro on iOS and Android                     | No Maestro flows, `e2e/` directory, or CI E2E job. Native journeys are interactive iOS Simulator runs recorded with screenshots; Android hardware, VoiceOver/TalkBack, and permission dialogs remain open | `docs/phase-3-verification.md`, `docs/phase-4-verification.md`, `docs/phase-5-verification.md`  |
+| CI/CD               | GitHub Actions + EAS Build/Update/Submit       | GitHub Actions and EAS Build profiles only; `eas.json` has no `update` or `submit` section, and signed preview builds are still open                                                                      | `.github/workflows/ci.yml`, `.github/workflows/dependency-health.yml`, `eas.json`               |
+| Observability       | Crashlytics, Performance Monitoring, analytics | None instrumented; the privacy-safe analytics contract is documented only                                                                                                                                 | `package.json` (no Crashlytics, Performance, or Analytics packages), `docs/analytics-events.md` |
 
 ### Proposed repository structure
 
@@ -493,6 +512,59 @@ transitions happen only through callable functions.
 - `enabled: boolean`
 - `updatedAt: Timestamp`
 
+A device token is enabled for at most one account: the one that most recently
+registered it from the device holding it. Registering a token disables every
+other account's record of the same token in the same transaction (served by a
+composite collection-group index on `enabled` and `token`), and sign-out
+disables the signing-out
+account's record through `unregisterDeviceToken` before Firebase sign-out.
+Presenting the raw token is the possession proof; a hash alone is never
+accepted. A sign-out that cannot reach the server (offline, timeout, server
+error) is recorded on the device and retried the next time an account is signed
+in there, so an offline sign-out is not an immediate remote disable. Until that
+retry, or until another account registers the same token, the server still
+holds the record. A token that FCM reports as unregistered is disabled by the
+reminder job on its first delivery attempt.
+
+#### `appointmentReminders/{reminderId}` — Phase 4
+
+- `appointmentId: string`
+- `status: 'sending' | 'sent' | 'skipped' | 'failed' | 'abandoned'`
+- `attempts: number`
+- `outcomeCode: string` (an FCM error code or a short reason such as
+  `delivered`, `no-enabled-tokens`, `appointment-not-confirmed`,
+  `legacy-receipt`)
+- `sendIssuedAt: Timestamp`, written just before the first FCM call
+- `claimedAt`, `createdAt`, `updatedAt: Timestamp`
+
+The reminder ID is a hash of the appointment ID, and the collection is
+server-only. Each run first retries `failed` receipts, then claims the
+appointments whose start lies 24 hours ahead inside the 15-minute window. A
+claim is a transaction that increments `attempts`; `sent`, `skipped` and
+`abandoned` receipts are never claimed again, and a `sending` receipt is never
+reclaimed once `sendIssuedAt` is set. Only a failure with no successful
+recipient and a known-undelivered send is retried: an error before the first
+FCM call, a rejected first call, or per-token delivery failures that the next
+attempt can fix (FCM unavailable, rate limits). Such a failure leaves the
+receipt `failed` for later runs, at most three attempts in total and only
+while the appointment is still confirmed and has not started; the nominal
+48-hour lookback from the due time never binds first because the appointment
+starts 24 hours after the reminder falls due. Once any device may have
+received the reminder (a later locale batch or the bookkeeping after a send
+fails) the receipt records `sent` or `abandoned` and the error is logged, never
+retried; if that final receipt write fails too, the receipt stays `sending`
+with `sendIssuedAt` and is left alone. Credential, permission, sender,
+argument, and invalid-document errors are not retried and mark the receipt
+`abandoned`. Receipts written before `attempts` existed are settled
+`abandoned` with `legacy-receipt`, since the old code recorded `failed` for
+post-send errors too. Every failure is logged with the hashed reminder ID, the
+attempt number, and the error code only; appointment, patient, token, and
+error-message text never reach the logs or the receipt. Notification copy is
+generic and chosen per device from the stored locale: Arabic for `ar` and its
+regional variants, English otherwise. FCM itself gives no exactly-once
+guarantee; the job only never issues a second send for a reminder it may
+already have delivered.
+
 ### Relationships and privacy boundary
 
 - A provider has many slots, but provider documents never contain patient IDs.
@@ -510,6 +582,7 @@ transitions happen only through callable functions.
 | `cancelAppointment`        | 4     | Owner             | Validate cancellation policy, cancel appointment, reopen slot atomically       |
 | `rescheduleAppointment`    | 4     | Owner             | Atomically release old slot and reserve new slot                               |
 | `registerDeviceToken`      | 4     | User              | Store a normalized FCM token without exposing other users' tokens              |
+| `unregisterDeviceToken`    | 4     | User              | Disable one account's record of a device token the caller can present          |
 | `sendAppointmentReminders` | 4     | Scheduled service | Send reminders and record delivery-safe metadata                               |
 
 Firestore transactions are mandatory for slot state changes. Firebase documents
@@ -743,7 +816,8 @@ _Estimated effort: two to three sessions_
 - Two simultaneous requests cannot reserve the same slot.
 - A confirmed booking survives reload and appears only to its owner.
 - The complete happy path and common failures are covered in emulator tests and
-  one native E2E journey.
+  one interactive native journey on the iOS Simulator, recorded in
+  `docs/phase-3-verification.md`; no automated E2E suite exists.
 
 #### Commit checkpoints
 
@@ -792,7 +866,9 @@ _Estimated effort: two sessions_
 - Notification taps open the correct appointment route.
 - Saved clinician references are owner-scoped, optimistic in the UI, and remain
   removable from the authenticated profile shortlist.
-- E2E covers booking, rescheduling, cancellation, and signed-out isolation.
+- An interactive iOS Simulator journey covers booking, rescheduling,
+  cancellation, and signed-out isolation (`docs/phase-4-verification.md`);
+  automated E2E is not implemented.
 
 #### Commit checkpoints
 
@@ -1069,10 +1145,11 @@ typed appointment notification routing, scheduled generic reminders, idempotent
 delivery receipts, and native haptics are also in place.
 Disposable emulator verification data was removed after the checks. Cloud
 Functions and Storage deployment remain an explicit Blaze-plan boundary. The
-native iOS management E2E journey (book → reschedule → cancel, in Arabic/RTL
-against the seeded emulators) is complete and recorded in
-`docs/phase-4-verification.md`; an Android-hardware pass and the
-calendar/notification permission dialogs remain for release sign-off.
+native iOS management journey (book → reschedule → cancel, in Arabic/RTL
+against the seeded emulators) was completed interactively in the iOS Simulator
+and is recorded with screenshots in `docs/phase-4-verification.md`; it is not an
+automated E2E suite. An Android-hardware pass and the calendar/notification
+permission dialogs remain for release sign-off.
 
 Phase 5 implementation is substantially complete: the app has a recoverable
 route error boundary, privacy-safe development logging, font scaling,
@@ -1141,6 +1218,86 @@ A history scan found one token-bearing legacy Storage URL (`person.png` in the
 notes) and the public legacy client API key; both remain in Git history by
 design and are tracked as release hygiene, not as an incident.
 
+The 12 October 2026 toolchain pass moved native builds to Xcode 27.0 (27A266a)
+and the iOS 27 SDK. Expo's SDK 57 release notes state that apps built with the
+iOS 27 SDK must use the UIKit scene-based lifecycle, which SDK 57 supports only
+from `expo@57.0.23` as an opt-in; the locked `57.0.20` predated it. The pass
+therefore ran `npx expo install --fix`, which moved `expo` to `~57.0.28` (the
+npm `latest` tag; SDK 58 stays out of scope while it is `next`) together with
+the `expo-*` packages and `jest-expo`, while React Native stayed at 0.86.3 and
+React Native Firebase at 25.1.0. `app.config.ts` now enables `ios.enableSceneSupport`
+through `expo-build-properties`, so prebuild makes the generated AppDelegate
+conform to `ExpoReactNativeFactoryProvider` and adds a scene manifest that
+points at Expo's `EXExpoAppSceneDelegate`. Two local config plugins under
+`plugins/` handle a checkout whose path contains a space (such as the external
+SSD). One quotes the `react-native-xcode.sh` command substitution at the end of
+the template's "Bundle React Native code and images" phase. The other extends
+the generated Podfile's `post_install` hook to rewrite the expo-constants
+"Generate app.config" phase: `expo-constants@57` leaves both the script path
+and the script's own `basename $PROJECT_DIR` unquoted, so the phase silently
+wrote no `app.config` and a Release build crashed at launch. The rewritten
+phase quotes the path and passes the project root explicitly; a clean Release
+simulator build from the SSD then embedded `app.config` and launched to
+onboarding (13 October 2026, `docs/xcode-27-verification.md`). The lockfile was regenerated because
+the previous one no longer satisfied `npm ci` under npm 11.19, and a clean
+`npm ci` followed by `npm run validate` is green again. Native evidence is
+recorded in `docs/xcode-27-verification.md`.
+
+The 13 October 2026 release-configuration pass made the public environment
+fail closed. `src/config/env.ts` now resolves the three `EXPO_PUBLIC_*`
+variables per bundle type: a development bundle (`__DEV__`) keeps the
+emulator-first defaults so a fresh clone runs without a `.env` file, while a
+release bundle receives no defaults and throws at module load when a variable
+is missing or blank or when emulator mode is requested, and the emulator flag
+is only accepted together with the `development` channel. The native Firebase
+initializer repeats the check and connects the Emulator Suite only from a
+development bundle on the development channel, so a Release build cannot reach
+`127.0.0.1` or `10.0.2.2` even if its variables were wrong. Unit tests cover
+the resolver, the module load under both bundle types, and the initializer
+guard. `eas.json` already sets all three variables on every profile; all
+three profiles, including `production`, still target `hakeemi-portfolio-dev`,
+and `app.config.ts` carries no EAS project ID, so the production mapping is an
+open owner decision rather than a code change.
+
+The 13 October 2026 reminder-delivery pass made reminder failures observable
+and retryable without widening what the job knows or logs. The scheduled job
+now logs each failed delivery through the Functions structured logger with the
+hashed reminder ID, attempt number, and error code; retries deliveries that
+failed before any device could have received them (three attempts in total,
+only while the appointment is still confirmed and upcoming, which with the
+24-hour lead bounds retries well inside the nominal 48-hour lookback); records
+`sent` or `abandoned` without retrying once a send has been issued, and leaves a
+`sending` receipt alone when even that final write fails; marks credential,
+permission, sender, and argument failures `abandoned`; settles receipts from
+before this change as `abandoned` rather than guessing whether they were
+delivered; and sends Arabic generic copy to devices whose stored locale is `ar`
+or an `ar-*` variant. Receipts gained `attempts`, `outcomeCode` and
+`sendIssuedAt` fields and an `abandoned` status; existing receipts need no
+migration. The Functions unit suite covers the copy, locale resolution, and
+error classification, and the emulator reminder suite covers retry, the attempt
+cap, non-retryable failures, cancellation before a retry, per-locale delivery,
+rejected-token cleanup, post-send bookkeeping and later-batch failures without
+a second delivery, legacy receipts, and the absence of token, email, and
+appointment detail from the captured logs.
+
+The 13 October 2026 identity and first-run pass replaced the stock Ionicons
+pulse glyph with an original Hakeemi mark: an uppercase H whose crossbar is a
+single heartbeat, drawn once as `assets/brand/hakeemi-mark.svg` and rendered
+into every icon, adaptive-icon, splash, favicon and in-app asset by
+`npm run assets:brand` (`scripts/render-brand-assets.swift`). The native splash
+now uses the light or dark canvas colour with the tilted brand tile, the root
+layout holds the splash until the session has restored and then fades it out
+(instantly under reduced motion, with a three-second release so the in-app
+gate takes over if restoration stalls), and the first React frame is a
+`LaunchGate` drawing the same tile at the same size, so launch no longer cuts
+from teal to a spinner. Onboarding is three first-run steps instead of four
+slides: language and appearance choices persisted as guest preferences, a
+find/compare/book summary, and a statement that calendar and notification
+access are requested only in context. Skip and Continue keep the versioned
+completion flag, Welcome still owns Create account / Sign in / Explore demo,
+and the session guard still redirects authenticated and demo users before any
+onboarding route renders. Details are in `docs/visual-identity.md`.
+
 ## Next execution queue
 
 1. Measure cold start, interaction latency, list frame stability, and JS bundle
@@ -1154,6 +1311,10 @@ design and are tracked as release hygiene, not as an incident.
    attach signed preview builds with an install link and QR code. Account-backed
    booking in a preview build also needs the Cloud Functions deployed to
    `hakeemi-portfolio-dev` (Blaze boundary); demo mode works without them.
+   Before the first cloud build, decide whether the `production` profile keeps
+   targeting `hakeemi-portfolio-dev` or gets its own Firebase project and real
+   Google service files, and run `eas build:configure` so `app.config.ts`
+   carries the EAS project ID.
 5. Revoke or regenerate the `person.png` download token in the legacy `hakeemi`
    Storage bucket and confirm the legacy client API key is restricted; then
    decide whether the `promo` soundtrack stays AI-generated or is replaced.
