@@ -175,7 +175,7 @@ export async function rescheduleAppointment(
   now: Timestamp = Timestamp.now(),
 ): Promise<RescheduleAppointmentResult> {
   const appointmentReference = firestore.doc(`appointments/${request.appointmentId}`);
-  const oldSlotReferenceForInput = firestore.doc(`availabilitySlots/${request.slotId}`);
+  const targetSlotReference = firestore.doc(`availabilitySlots/${request.slotId}`);
   const operationReference = firestore.doc(
     `appointmentOperations/${deriveOperationId(patientId, request.requestId)}`,
   );
@@ -211,7 +211,7 @@ export async function rescheduleAppointment(
     // A retry after a committed reschedule is safe because the appointment already points to
     // the requested slot. The slot consistency check below keeps this path fail-closed.
     if (appointment.slotId === request.slotId) {
-      const currentSlotSnapshot = await transaction.get(oldSlotReferenceForInput);
+      const currentSlotSnapshot = await transaction.get(targetSlotReference);
 
       if (!currentSlotSnapshot.exists) {
         throw new HttpsError('internal', 'The appointment has no matching availability slot.');
@@ -231,7 +231,7 @@ export async function rescheduleAppointment(
     const oldSlotReference = firestore.doc(`availabilitySlots/${appointment.slotId}`);
     const [oldSlotSnapshot, targetSlotSnapshot] = await Promise.all([
       transaction.get(oldSlotReference),
-      transaction.get(oldSlotReferenceForInput),
+      transaction.get(targetSlotReference),
     ]);
 
     if (!oldSlotSnapshot.exists) {
@@ -302,7 +302,7 @@ export async function rescheduleAppointment(
       updatedAt: FieldValue.serverTimestamp(),
       version: releasedSlot.version,
     });
-    transaction.update(oldSlotReferenceForInput, {
+    transaction.update(targetSlotReference, {
       appointmentId: reservedSlot.appointmentId,
       status: reservedSlot.status,
       updatedAt: FieldValue.serverTimestamp(),
