@@ -9,6 +9,17 @@ export const notificationRegistrationResultSchema = z
 
 export type NotificationRegistrationResult = z.infer<typeof notificationRegistrationResultSchema>;
 
+export const notificationDeregistrationResultSchema = z
+  .object({
+    disabled: z.boolean(),
+    tokenId: z.string().regex(/^[0-9a-f]{64}$/),
+  })
+  .strict();
+
+export type NotificationDeregistrationResult = z.infer<
+  typeof notificationDeregistrationResultSchema
+>;
+
 const appointmentNotificationSchema = z.object({
   appointmentId: z
     .string()

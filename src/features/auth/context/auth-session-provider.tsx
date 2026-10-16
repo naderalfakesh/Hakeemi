@@ -37,7 +37,17 @@ type AuthSessionContextValue = {
 
 const AuthSessionContext = createContext<AuthSessionContextValue | null>(null);
 
-export function AuthSessionProvider({ children }: { children: ReactNode }) {
+type AuthSessionProviderProps = {
+  children: ReactNode;
+  /**
+   * Runs while the account is still signed in, so server-side cleanup that
+   * needs its credentials (such as disabling push registration) can happen
+   * first. Failures are ignored: sign-out must always complete.
+   */
+  onBeforeSignOut?: () => Promise<void>;
+};
+
+export function AuthSessionProvider({ children, onBeforeSignOut }: AuthSessionProviderProps) {
   const [status, setStatus] = useState<AuthSessionStatus>('restoring');
   const [user, setUser] = useState<AuthUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -173,12 +183,18 @@ export function AuthSessionProvider({ children }: { children: ReactNode }) {
     await demoSessionStorage.clear();
 
     if (statusRef.current !== 'demo') {
+      try {
+        await onBeforeSignOut?.();
+      } catch {
+        // Sign-out proceeds regardless; the hook owns its own retry strategy.
+      }
+
       await signOutFromFirebase();
     }
 
     updateStatus('anonymous');
     applyAuthUser(null);
-  }, [applyAuthUser, updateStatus]);
+  }, [applyAuthUser, onBeforeSignOut, updateStatus]);
 
   const enterDemo = useCallback(() => {
     applyDemo();

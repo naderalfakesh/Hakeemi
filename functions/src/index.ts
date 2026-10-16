@@ -21,6 +21,10 @@ import {
   registerDeviceToken as registerDeviceTokenTransaction,
 } from './notifications/register-device-token.js';
 import { sendAppointmentReminders as deliverAppointmentReminders } from './notifications/send-appointment-reminders.js';
+import {
+  parseUnregisterDeviceTokenRequest,
+  unregisterDeviceToken as unregisterDeviceTokenTransaction,
+} from './notifications/unregister-device-token.js';
 
 const FUNCTIONS_REGION = 'me-central1';
 
@@ -125,6 +129,20 @@ export const registerDeviceToken = onCall(async (request) => {
     firestore,
     auth.uid,
     parseRegisterDeviceTokenRequest(request.data),
+  );
+});
+
+export const unregisterDeviceToken = onCall(async (request) => {
+  const auth = request.auth;
+
+  if (!auth) {
+    throw new HttpsError('unauthenticated', 'Sign in before disabling notifications.');
+  }
+
+  return unregisterDeviceTokenTransaction(
+    firestore,
+    auth.uid,
+    parseUnregisterDeviceTokenRequest(request.data),
   );
 });
 

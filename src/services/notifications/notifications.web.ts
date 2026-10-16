@@ -6,6 +6,10 @@ export async function registerForAppointmentNotifications(
   return { status: 'unavailable' };
 }
 
+export async function disableAppointmentNotifications() {}
+
+export async function flushPendingNotificationDeregistrations() {}
+
 export function stopNotificationTokenRefresh() {}
 
 export function subscribeToAppointmentNotificationOpen(_listener: (appointmentId: string) => void) {

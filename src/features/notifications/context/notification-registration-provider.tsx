@@ -12,6 +12,7 @@ import {
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { useAppPreferences } from '@/features/preferences/context/app-preferences-provider';
 import {
+  flushPendingNotificationDeregistrations,
   registerForAppointmentNotifications,
   stopNotificationTokenRefresh,
 } from '@/services/notifications/notifications';
@@ -36,13 +37,20 @@ export function NotificationRegistrationProvider({ children }: { children: React
   const [error, setError] = useState<string | null>(null);
   const registeredLocale = useRef<typeof preferences.locale | null>(null);
   const [statusUserId, setStatusUserId] = useState<string | null>(null);
+  const userId = session.user?.id ?? null;
 
   useEffect(() => {
     stopNotificationTokenRefresh();
     registeredLocale.current = null;
 
+    if (userId) {
+      // A sign-out that could not reach the server is retried as soon as any
+      // account is signed in on this device.
+      void flushPendingNotificationDeregistrations();
+    }
+
     return stopNotificationTokenRefresh;
-  }, [session.user?.id]);
+  }, [userId]);
 
   const enable = useCallback(async () => {
     if (!session.user) {
