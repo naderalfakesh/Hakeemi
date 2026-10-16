@@ -71,6 +71,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-build-properties',
       {
         ios: {
+          // The iOS 27 SDK (Xcode 27) only launches apps that use the UIKit
+          // scene lifecycle; SDK 57 keeps it opt-in. Remove on SDK 58+.
+          enableSceneSupport: true,
           forceStaticLinking: ['RNFBApp', 'RNFBAuth', 'RNFBFirestore', 'RNFBFunctions'],
           useFrameworks: 'static',
         },
@@ -102,6 +105,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     '@react-native-firebase/messaging',
     'expo-font',
+    './plugins/with-expo-constants-script-quoting',
+    './plugins/with-react-native-bundle-script-quoting',
   ],
   experiments: {
     typedRoutes: true,
