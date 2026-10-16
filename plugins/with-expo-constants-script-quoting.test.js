@@ -13,7 +13,7 @@ const withExpoConstantsScriptQuoting = require('./with-expo-constants-script-quo
 
 const { PHASE_SCRIPT } = withExpoConstantsScriptQuoting;
 const SCRIPT_PATH = '$PODS_TARGET_SRCROOT/../scripts/get-app-config-ios.sh';
-// expo-constants@57 form and the quoted form Expo uses on its main branch.
+// expo-constants form before 57.0.22 and the quoted form it uses from 57.0.22.
 const UNQUOTED_SCRIPT = `bash -l -c "${SCRIPT_PATH}"`;
 const QUOTED_SCRIPT = `bash -l -c "\\"${SCRIPT_PATH}\\""`;
 const UNRELATED_SCRIPT = 'echo unrelated';
@@ -138,11 +138,11 @@ describe('expo-constants app.config phase from a path with spaces', () => {
     return { status: result.status, configPath };
   }
 
-  test('the upstream phase writes no app.config', () => {
+  test('the upstream phase writes app.config since expo-constants 57.0.22', () => {
     const quoted = runPhase(QUOTED_SCRIPT, 'upstream');
 
     expect(quoted.status).toBe(0);
-    expect(fs.existsSync(quoted.configPath)).toBe(false);
+    expect(fs.readFileSync(quoted.configPath, 'utf8').trim()).toBe(fs.realpathSync(projectRoot));
   });
 
   test('the rewritten phase writes app.config for the real project root', () => {

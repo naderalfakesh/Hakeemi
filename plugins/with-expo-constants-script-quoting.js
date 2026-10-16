@@ -13,14 +13,15 @@ const PHASE_SCRIPT =
 const HOOK_MARKER = '# Run the expo-constants app.config phase from paths with spaces';
 const POST_INSTALL_ANCHOR = 'post_install do |installer|';
 
-// expo-constants@57 breaks on a checkout path that contains a space in two
-// places. Its phase passes the script path unquoted to `bash -c`, and the script
-// runs `basename $PROJECT_DIR` unquoted, so its "is this the Pods project" guard
-// fails and it exits 0 without writing EXConstants.bundle/app.config. Release
-// builds then crash at launch because they have no Metro server to serve the
-// manifest. The phase is rewritten to quote the script path and to pass the
+// expo-constants before 57.0.22 breaks on a checkout path that contains a space
+// in two places. Its phase passes the script path unquoted to `bash -c`, and the
+// script runs `basename $PROJECT_DIR` unquoted, so its "is this the Pods project"
+// guard fails and it exits 0 without writing EXConstants.bundle/app.config.
+// Release builds then crash at launch because they have no Metro server to serve
+// the manifest. The phase is rewritten to quote the script path and to pass the
 // real project root explicitly, with PROJECT_DIR set to the bare basename the
-// guard expects. Both stay correct once upstream quotes these paths.
+// guard expects. 57.0.22 quotes both paths upstream; the rewrite stays correct
+// there and keeps the build safe if a later patch regresses.
 const POST_INSTALL_HOOK = `
     ${HOOK_MARKER}
     installer.pods_project.targets.each do |target|
