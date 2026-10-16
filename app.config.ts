@@ -82,9 +82,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-splash-screen',
       {
-        backgroundColor: '#0A6765',
+        // Canvas colours and the tilted brand tile match the first React
+        // frame (BrandMark on the launch gate), so the hand-off is seamless.
+        backgroundColor: '#F5F8F5',
+        dark: {
+          backgroundColor: '#071A18',
+          image: './assets/images/splash-icon-dark.png',
+        },
         image: './assets/images/splash-icon.png',
-        imageWidth: 76,
+        imageWidth: 96,
       },
     ],
     [

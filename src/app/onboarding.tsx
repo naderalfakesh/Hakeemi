@@ -4,10 +4,12 @@ import { useCallback } from 'react';
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { onboardingStorage } from '@/features/onboarding/data/onboarding-storage';
 import { OnboardingScreen } from '@/features/onboarding/screens/demo-entry-screen';
+import { useAppPreferences } from '@/features/preferences/context/app-preferences-provider';
 import { logSafeError } from '@/services/logging/safe-logger';
 
 export default function OnboardingRoute() {
   const session = useAuthSession();
+  const { preferences, update } = useAppPreferences();
   const finishOnboarding = useCallback(() => {
     void onboardingStorage
       .markCompleted()
@@ -23,5 +25,12 @@ export default function OnboardingRoute() {
     return <Redirect href="/home" />;
   }
 
-  return <OnboardingScreen onComplete={finishOnboarding} onSkip={finishOnboarding} />;
+  return (
+    <OnboardingScreen
+      onComplete={finishOnboarding}
+      onSkip={finishOnboarding}
+      onUpdatePreferences={update}
+      preferences={preferences}
+    />
+  );
 }

@@ -1,13 +1,15 @@
 import { Stack, ThemeProvider as NavigationThemeProvider, useRouter, type Href } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useRef } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import '@/config/env';
-import { AppText } from '@/components/ui';
 import { ErrorBoundaryScreen } from '@/components/navigation/error-boundary-screen';
+import { LaunchGate } from '@/components/navigation/launch-gate';
 import { navigationStrings } from '@/components/navigation/navigation-strings';
+import { AccountDataReset } from '@/features/auth/context/account-data-reset';
 import { AuthSessionProvider, useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { BookingDraftProvider } from '@/features/booking/context/booking-draft-provider';
 import { NotificationRegistrationProvider } from '@/features/notifications/context/notification-registration-provider';
@@ -16,7 +18,10 @@ import {
   useAppPreferences,
 } from '@/features/preferences/context/app-preferences-provider';
 import { initializeFirebaseServices } from '@/services/firebase/initialize';
-import { subscribeToAppointmentNotificationOpen } from '@/services/notifications/notifications';
+import {
+  disableAppointmentNotifications,
+  subscribeToAppointmentNotificationOpen,
+} from '@/services/notifications/notifications';
 import { AppQueryProvider } from '@/services/query/query-provider';
 import {
   AppThemeProvider,
@@ -36,8 +41,20 @@ import { useStrings } from '@/localization/use-strings';
 
 initializeFirebaseServices();
 
+// The native splash stays up until the session has restored, so launch goes
+// straight from the splash tile to the first routed screen. If restoration
+// is unusually slow the in-app gate takes over instead.
+void SplashScreen.preventAutoHideAsync().catch(() => undefined);
+const SPLASH_HANDOFF_LIMIT_MS = 3000;
+
+function hideSplash(fade: boolean, duration: number) {
+  SplashScreen.setOptions({ duration: fade ? duration : 0, fade });
+  void SplashScreen.hideAsync().catch(() => undefined);
+}
+
 export function ErrorBoundary({ error, retry }: { error: Error; retry: () => void }) {
   logSafeError('route-boundary', error);
+  hideSplash(false, 0);
   return <ErrorBoundaryScreen error={error} onRetry={retry} />;
 }
 
@@ -45,22 +62,32 @@ function Navigation() {
   const theme = useAppTheme();
   const session = useAuthSession();
   const strings = useStrings(navigationStrings);
-  const { prefersReducedMotion } = useAppMotion();
+  const { duration, prefersReducedMotion } = useAppMotion();
   const navigationTheme = theme.mode === 'dark' ? darkNavigationTheme : lightNavigationTheme;
+  const isRestoring = session.status === 'restoring';
 
-  if (session.status === 'restoring') {
+  useEffect(() => {
+    if (!isRestoring) {
+      hideSplash(!prefersReducedMotion, duration.slow);
+      return;
+    }
+
+    const handoff = setTimeout(() => hideSplash(false, 0), SPLASH_HANDOFF_LIMIT_MS);
+    return () => clearTimeout(handoff);
+  }, [duration.slow, isRestoring, prefersReducedMotion]);
+
+  if (isRestoring) {
     return (
-      <View
+      <LaunchGate
         accessibilityLabel={strings.restoringSession.accessibilityLabel}
-        style={[styles.loading, { backgroundColor: theme.colors.canvas }]}
-      >
-        <ActivityIndicator color={theme.colors.brand} size="large" />
-        <AppText tone="secondary" variant="bodyMedium">
-          {strings.restoringSession.message}
-        </AppText>
-      </View>
+        message={strings.restoringSession.message}
+      />
     );
   }
+
+  // Screens the launch gate resolves into fade in so the brand tile hands
+  // off in place instead of sliding the whole screen in from the side.
+  const entryAnimation = prefersReducedMotion ? 'none' : 'fade';
 
   return (
     <NavigationThemeProvider value={navigationTheme}>
@@ -69,7 +96,11 @@ function Navigation() {
           animation: prefersReducedMotion ? 'none' : 'default',
           headerShown: false,
         }}
-      />
+      >
+        <Stack.Screen name="onboarding" options={{ animation: entryAnimation }} />
+        <Stack.Screen name="welcome" options={{ animation: entryAnimation }} />
+        <Stack.Screen name="(tabs)" options={{ animation: entryAnimation }} />
+      </Stack>
       <NotificationNavigationBridge />
       <StatusBar style={theme.mode === 'dark' ? 'light' : 'dark'} />
     </NavigationThemeProvider>
@@ -148,8 +179,9 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.root}>
       <AppQueryProvider>
-        <AuthSessionProvider>
+        <AuthSessionProvider onBeforeSignOut={disableAppointmentNotifications}>
           <BookingDraftProvider>
+            <AccountDataReset />
             <AppPreferencesProvider>
               <NotificationRegistrationProvider>
                 <AppShell />
@@ -165,11 +197,5 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-  },
-  loading: {
-    alignItems: 'center',
-    flex: 1,
-    gap: 12,
-    justifyContent: 'center',
   },
 });

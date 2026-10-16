@@ -69,6 +69,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
+    "assets:brand": "swift scripts/render-brand-assets.swift",
     "assets:check": "node scripts/check-illustration-budget.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   Image,
   ScrollView,
@@ -11,85 +11,84 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppText, Button, DecorativeIcon } from '@/components/ui';
+import {
+  AppText,
+  BrandMark,
+  Button,
+  Chip,
+  DecorativeIcon,
+  type DecorativeIconName,
+} from '@/components/ui';
+import type { AppPreferences } from '@/features/preferences/domain/preferences';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import { useAppMotion, useAppTheme, type AppTheme, type SemanticColors } from '@/theme';
 
 import { onboardingStrings } from '../localization/onboarding-strings';
 
-const onboardingSlides = [
-  {
-    illustration: require('../../../../assets/illustrations/welcome-hero.webp'),
-    key: 'welcome',
-    surface: 'surfaceBrand',
-  },
+const onboardingSteps = [
+  { key: 'personalize' },
   {
     illustration: require('../../../../assets/illustrations/onboarding-discover.webp'),
-    key: 'discover',
+    key: 'journey',
     surface: 'infoSoft',
   },
   {
-    illustration: require('../../../../assets/illustrations/onboarding-book.webp'),
-    key: 'book',
-    surface: 'accentSoft',
-  },
-  {
     illustration: require('../../../../assets/illustrations/onboarding-care.webp'),
-    key: 'care',
+    key: 'permissions',
     surface: 'successSoft',
   },
 ] as const satisfies readonly {
-  illustration: ImageSourcePropType;
-  key: 'book' | 'care' | 'discover' | 'welcome';
-  surface: keyof SemanticColors;
+  illustration?: ImageSourcePropType;
+  key: 'journey' | 'permissions' | 'personalize';
+  surface?: keyof SemanticColors;
 }[];
 
-type OnboardingSlideKey = (typeof onboardingSlides)[number]['key'];
-
-type DemoEntryScreenProps = {
+type OnboardingScreenProps = {
   onComplete: () => void;
   onSkip: () => void;
+  onUpdatePreferences: (preferences: AppPreferences) => void;
+  preferences: AppPreferences;
 };
 
-export function OnboardingScreen({ onComplete, onSkip }: DemoEntryScreenProps) {
+export function OnboardingScreen({
+  onComplete,
+  onSkip,
+  onUpdatePreferences,
+  preferences,
+}: OnboardingScreenProps) {
   const theme = useAppTheme();
   const strings = useStrings(onboardingStrings);
   const { isRTL } = useAppLocale();
   const { prefersReducedMotion } = useAppMotion();
-  const { height, width } = useWindowDimensions();
+  const { fontScale, height, width } = useWindowDimensions();
   const isCompact = height < 720;
   const isTablet = width >= 768;
+  // At accessibility text sizes the Back/Next pair no longer fits side by side.
+  const stackActions = fontScale >= 1.5;
   const styles = useMemo(
-    () => createStyles(theme, { isCompact, isTablet }),
-    [isCompact, isTablet, theme],
+    () => createStyles(theme, { isCompact, isTablet, stackActions }),
+    [isCompact, isTablet, stackActions, theme],
   );
-  const [activeSlide, setActiveSlide] = useState(0);
+  const [activeStep, setActiveStep] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
-  const activeSlideRef = useRef(activeSlide);
+  const activeStepRef = useRef(activeStep);
   const pageWidth = Math.min(width, theme.sizes.contentMaxWidth) - theme.spacing.lg * 2;
   // The horizontal ScrollView row is already visually reversed by the native
   // RTL layout, and getPhysicalIndex maps logical -> physical offsets for it.
-  // Reversing the slide array as well would cancel that mapping out.
-  const isFirstSlide = activeSlide === 0;
-  const isLastSlide = activeSlide === onboardingSlides.length - 1;
-
-  const slideCopy: Record<OnboardingSlideKey, { body: string; title: string }> = {
-    book: { body: strings.slideBookBody, title: strings.slideBookTitle },
-    care: { body: strings.slideCareBody, title: strings.slideCareTitle },
-    discover: { body: strings.slideDiscoverBody, title: strings.slideDiscoverTitle },
-    welcome: { body: strings.subheadline, title: strings.headline },
-  };
+  // Reversing the step array as well would cancel that mapping out.
+  const isFirstStep = activeStep === 0;
+  const isLastStep = activeStep === onboardingSteps.length - 1;
 
   const getPhysicalIndex = useCallback(
-    (logicalIndex: number) => (isRTL ? onboardingSlides.length - 1 - logicalIndex : logicalIndex),
+    (logicalIndex: number) => (isRTL ? onboardingSteps.length - 1 - logicalIndex : logicalIndex),
     [isRTL],
   );
-  const showSlide = useCallback(
+  const showStep = useCallback(
     (logicalIndex: number) => {
-      const nextIndex = Math.max(0, Math.min(onboardingSlides.length - 1, logicalIndex));
-      activeSlideRef.current = nextIndex;
-      setActiveSlide(nextIndex);
+      const nextIndex = Math.max(0, Math.min(onboardingSteps.length - 1, logicalIndex));
+      activeStepRef.current = nextIndex;
+      setActiveStep(nextIndex);
       scrollViewRef.current?.scrollTo({
         animated: !prefersReducedMotion,
         x: getPhysicalIndex(nextIndex) * pageWidth,
@@ -98,38 +97,117 @@ export function OnboardingScreen({ onComplete, onSkip }: DemoEntryScreenProps) {
     },
     [getPhysicalIndex, pageWidth, prefersReducedMotion],
   );
-  const showPreviousSlide = () => showSlide(activeSlide - 1);
-  const showNextSlide = () => showSlide(activeSlide + 1);
+  const showPreviousStep = () => showStep(activeStep - 1);
+  const showNextStep = () => showStep(activeStep + 1);
   const handleMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const physicalIndex = Math.max(
       0,
       Math.min(
-        onboardingSlides.length - 1,
+        onboardingSteps.length - 1,
         Math.round(event.nativeEvent.contentOffset.x / pageWidth),
       ),
     );
-    const logicalIndex = isRTL ? onboardingSlides.length - 1 - physicalIndex : physicalIndex;
-    activeSlideRef.current = logicalIndex;
-    setActiveSlide(logicalIndex);
+    const logicalIndex = isRTL ? onboardingSteps.length - 1 - physicalIndex : physicalIndex;
+    activeStepRef.current = logicalIndex;
+    setActiveStep(logicalIndex);
   };
 
   useEffect(() => {
     scrollViewRef.current?.scrollTo({
       animated: false,
-      x: getPhysicalIndex(activeSlideRef.current) * pageWidth,
+      x: getPhysicalIndex(activeStepRef.current) * pageWidth,
       y: 0,
     });
   }, [getPhysicalIndex, pageWidth]);
+
+  const stepContent: Record<(typeof onboardingSteps)[number]['key'], ReactNode> = {
+    personalize: (
+      <>
+        <View style={styles.copy}>
+          <AppText accessibilityRole="header" maxFontSizeMultiplier={1.5} variant="display">
+            {strings.headline}
+          </AppText>
+          <AppText tone="secondary" variant="bodyLarge">
+            {strings.subheadline}
+          </AppText>
+        </View>
+        <View style={styles.preferenceCard}>
+          <PreferenceChoices
+            label={strings.language}
+            onChange={(locale) => onUpdatePreferences({ ...preferences, locale })}
+            options={[
+              { label: strings.languageEnglish, language: 'en', value: 'en' },
+              { label: strings.languageArabic, language: 'ar', value: 'ar' },
+            ]}
+            styles={styles}
+            value={preferences.locale}
+          />
+          <PreferenceChoices
+            label={strings.appearance}
+            onChange={(themePreference) =>
+              onUpdatePreferences({ ...preferences, theme: themePreference })
+            }
+            options={[
+              { label: strings.appearanceSystem, value: 'system' },
+              { label: strings.appearanceLight, value: 'light' },
+              { label: strings.appearanceDark, value: 'dark' },
+            ]}
+            styles={styles}
+            value={preferences.theme}
+          />
+          <AppText tone="secondary" variant="caption">
+            {strings.languageReloadNote}
+          </AppText>
+        </View>
+      </>
+    ),
+    journey: (
+      <>
+        <View style={styles.copy}>
+          <AppText accessibilityRole="header" variant="titleLarge">
+            {strings.journeyTitle}
+          </AppText>
+          <AppText tone="secondary" variant="bodyLarge">
+            {strings.journeyBody}
+          </AppText>
+        </View>
+        <View style={styles.rows}>
+          <FeatureRow icon="search-outline" styles={styles} text={strings.journeyFind} />
+          <FeatureRow icon="time-outline" styles={styles} text={strings.journeyCompare} />
+          <FeatureRow icon="checkmark-circle-outline" styles={styles} text={strings.journeyBook} />
+        </View>
+      </>
+    ),
+    permissions: (
+      <>
+        <View style={styles.copy}>
+          <AppText accessibilityRole="header" variant="titleLarge">
+            {strings.permissionsTitle}
+          </AppText>
+          <AppText tone="secondary" variant="bodyLarge">
+            {strings.permissionsBody}
+          </AppText>
+        </View>
+        <View style={styles.rows}>
+          <FeatureRow icon="calendar-outline" styles={styles} text={strings.permissionsCalendar} />
+          <FeatureRow
+            icon="notifications-outline"
+            styles={styles}
+            text={strings.permissionsNotifications}
+          />
+          <FeatureRow icon="options-outline" styles={styles} text={strings.permissionsChange} />
+        </View>
+      </>
+    ),
+  };
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
       <View style={styles.content}>
         <View style={styles.brandRow}>
-          <View accessibilityElementsHidden importantForAccessibility="no" style={styles.brandMark}>
-            <DecorativeIcon color={theme.colors.textInverse} name="pulse" size={20} />
-          </View>
+          <BrandMark />
           <AppText variant="titleSmall">{strings.brandWordmark}</AppText>
-          {!isLastSlide && (
+          {!isLastStep && (
             <View style={styles.skipAction}>
               <Button
                 accessibilityLabel={strings.skipAccessibilityLabel}
@@ -151,87 +229,79 @@ export function OnboardingScreen({ onComplete, onSkip }: DemoEntryScreenProps) {
           pagingEnabled
           ref={scrollViewRef}
           showsHorizontalScrollIndicator={false}
-          style={styles.slideViewport}
+          style={styles.stepViewport}
           testID="onboarding-pages"
         >
-          {onboardingSlides.map((item) => {
-            const logicalIndex = onboardingSlides.findIndex((slide) => slide.key === item.key);
-            const isActive = logicalIndex === activeSlide;
+          {onboardingSteps.map((step, logicalIndex) => {
+            const isActive = logicalIndex === activeStep;
 
             return (
-              <View
+              <ScrollView
                 accessibilityElementsHidden={!isActive}
                 accessibilityLiveRegion={isActive ? 'polite' : 'none'}
+                contentContainerStyle={styles.stepContent}
                 importantForAccessibility={isActive ? 'auto' : 'no-hide-descendants'}
-                key={item.key}
-                style={[styles.slide, { width: pageWidth }]}
+                key={step.key}
+                showsVerticalScrollIndicator={false}
+                style={{ width: pageWidth }}
               >
-                <View
-                  accessibilityElementsHidden
-                  importantForAccessibility="no-hide-descendants"
-                  style={[styles.artworkStage, { backgroundColor: theme.colors[item.surface] }]}
-                >
-                  <View style={styles.ambientOrb} />
-                  <View style={styles.ambientOrbSmall} />
-                  <Image resizeMode="contain" source={item.illustration} style={styles.artwork} />
-                </View>
-
-                <View style={styles.copy}>
-                  <AppText
-                    accessibilityRole="header"
-                    variant={logicalIndex === 0 ? 'display' : 'titleLarge'}
+                {'illustration' in step && (
+                  <View
+                    accessibilityElementsHidden
+                    importantForAccessibility="no-hide-descendants"
+                    style={[styles.artworkStage, { backgroundColor: theme.colors[step.surface] }]}
                   >
-                    {slideCopy[item.key].title}
-                  </AppText>
-                  <AppText tone="secondary" variant="bodyLarge">
-                    {slideCopy[item.key].body}
-                  </AppText>
-                </View>
-              </View>
+                    <View style={styles.ambientOrb} />
+                    <View style={styles.ambientOrbSmall} />
+                    <Image resizeMode="contain" source={step.illustration} style={styles.artwork} />
+                  </View>
+                )}
+                {stepContent[step.key]}
+              </ScrollView>
             );
           })}
         </ScrollView>
 
         <View style={styles.footer}>
           <View
-            accessibilityLabel={strings.stepProgress(activeSlide + 1, onboardingSlides.length)}
+            accessibilityLabel={strings.stepProgress(activeStep + 1, onboardingSteps.length)}
             accessibilityRole="text"
             accessible
             style={styles.progressRow}
           >
             <AppText tone="secondary" variant="caption">
-              {strings.stepProgress(activeSlide + 1, onboardingSlides.length)}
+              {strings.stepProgress(activeStep + 1, onboardingSteps.length)}
             </AppText>
             <View accessibilityElementsHidden importantForAccessibility="no" style={styles.dots}>
-              {onboardingSlides.map((item, index) => (
+              {onboardingSteps.map((step, index) => (
                 <View
-                  key={item.key}
-                  style={[styles.dot, index === activeSlide && styles.dotActive]}
+                  key={step.key}
+                  style={[styles.dot, index === activeStep && styles.dotActive]}
                 />
               ))}
             </View>
           </View>
 
-          {isLastSlide ? (
+          {isLastStep ? (
             <View style={styles.finalActions}>
               <Button accessibilityLabel={strings.finishAccessibilityLabel} onPress={onComplete}>
                 {strings.finish}
               </Button>
-              <Button onPress={showPreviousSlide} variant="tertiary">
+              <Button onPress={showPreviousStep} variant="tertiary">
                 {strings.back}
               </Button>
             </View>
           ) : (
             <View style={styles.navigationRow}>
-              {!isFirstSlide && (
+              {!isFirstStep && (
                 <View style={styles.backAction}>
-                  <Button onPress={showPreviousSlide} variant="secondary">
+                  <Button onPress={showPreviousStep} variant="secondary">
                     {strings.back}
                   </Button>
                 </View>
               )}
               <View style={styles.primaryAction}>
-                <Button accessibilityLabel={strings.nextAccessibilityLabel} onPress={showNextSlide}>
+                <Button accessibilityLabel={strings.nextAccessibilityLabel} onPress={showNextStep}>
                   {strings.next}
                 </Button>
               </View>
@@ -243,9 +313,75 @@ export function OnboardingScreen({ onComplete, onSkip }: DemoEntryScreenProps) {
   );
 }
 
+type Styles = ReturnType<typeof createStyles>;
+
+function PreferenceChoices<Value extends string>({
+  label,
+  onChange,
+  options,
+  styles,
+  value,
+}: {
+  label: string;
+  onChange: (value: Value) => void;
+  options: readonly { label: string; language?: string; value: Value }[];
+  styles: Styles;
+  value: Value;
+}) {
+  return (
+    <View style={styles.preferenceGroup}>
+      <AppText variant="bodyStrong">{label}</AppText>
+      <View
+        accessibilityLabel={label}
+        accessibilityRole="radiogroup"
+        style={styles.preferenceOptions}
+      >
+        {options.map((option) => (
+          <Chip
+            accessibilityLanguage={option.language}
+            accessibilityRole="radio"
+            accessibilityState={{ checked: option.value === value }}
+            key={option.value}
+            label={option.label}
+            onPress={() => onChange(option.value)}
+            selected={option.value === value}
+          />
+        ))}
+      </View>
+    </View>
+  );
+}
+
+function FeatureRow({
+  icon,
+  styles,
+  text,
+}: {
+  icon: DecorativeIconName;
+  styles: Styles;
+  text: string;
+}) {
+  const theme = useAppTheme();
+
+  return (
+    <View style={styles.row}>
+      <View style={styles.rowIcon}>
+        <DecorativeIcon color={theme.colors.brand} name={icon} size={20} />
+      </View>
+      <AppText style={styles.rowText} variant="bodyMedium">
+        {text}
+      </AppText>
+    </View>
+  );
+}
+
 function createStyles(
   theme: AppTheme,
-  { isCompact, isTablet }: { isCompact: boolean; isTablet: boolean },
+  {
+    isCompact,
+    isTablet,
+    stackActions,
+  }: { isCompact: boolean; isTablet: boolean; stackActions: boolean },
 ) {
   return StyleSheet.create({
     safeArea: {
@@ -262,35 +398,27 @@ function createStyles(
     brandRow: {
       alignItems: 'center',
       flexDirection: 'row',
+      gap: theme.spacing.sm,
       minHeight: theme.sizes.minimumTouchTarget,
       paddingTop: theme.spacing.xs,
-    },
-    brandMark: {
-      alignItems: 'center',
-      backgroundColor: theme.colors.brand,
-      borderRadius: theme.radii.sm,
-      height: 36,
-      justifyContent: 'center',
-      marginEnd: theme.spacing.sm,
-      transform: [{ rotate: '-5deg' }],
-      width: 36,
     },
     skipAction: {
       marginStart: 'auto',
     },
-    slide: {
+    stepViewport: {
       flex: 1,
+    },
+    stepContent: {
+      flexGrow: 1,
+      gap: isCompact ? theme.spacing.md : theme.spacing.lg,
       justifyContent: 'center',
       paddingBottom: isCompact ? theme.spacing.sm : theme.spacing.lg,
       paddingTop: isCompact ? theme.spacing.sm : theme.spacing.md,
     },
-    slideViewport: {
-      flex: 1,
-    },
     artworkStage: {
       alignItems: 'center',
       borderRadius: theme.radii.xl,
-      height: isCompact ? 188 : isTablet ? 340 : 270,
+      height: isCompact ? 176 : isTablet ? 320 : 240,
       justifyContent: 'center',
       overflow: 'hidden',
       width: '100%',
@@ -321,8 +449,40 @@ function createStyles(
     },
     copy: {
       gap: theme.spacing.sm,
-      marginTop: isCompact ? theme.spacing.md : theme.spacing.lg,
       maxWidth: 580,
+    },
+    preferenceCard: {
+      backgroundColor: theme.colors.surfaceBrand,
+      borderRadius: theme.radii.xl,
+      gap: theme.spacing.md,
+      padding: theme.spacing.lg,
+    },
+    preferenceGroup: {
+      gap: theme.spacing.xs,
+    },
+    preferenceOptions: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: theme.spacing.xs,
+    },
+    rows: {
+      gap: theme.spacing.sm,
+    },
+    row: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      gap: theme.spacing.sm,
+    },
+    rowIcon: {
+      alignItems: 'center',
+      backgroundColor: theme.colors.brandSoft,
+      borderRadius: theme.radii.full,
+      height: 40,
+      justifyContent: 'center',
+      width: 40,
+    },
+    rowText: {
+      flex: 1,
     },
     footer: {
       gap: isCompact ? theme.spacing.xxs : theme.spacing.xs,
@@ -349,17 +509,17 @@ function createStyles(
       width: 24,
     },
     navigationRow: {
-      flexDirection: 'row',
-      gap: theme.spacing.sm,
+      flexDirection: stackActions ? 'column-reverse' : 'row',
+      gap: stackActions ? theme.spacing.xs : theme.spacing.sm,
     },
     finalActions: {
       gap: theme.spacing.xs,
     },
     backAction: {
-      flex: 1,
+      flex: stackActions ? 0 : 1,
     },
     primaryAction: {
-      flex: 2,
+      flex: stackActions ? 0 : 2,
     },
   });
 }

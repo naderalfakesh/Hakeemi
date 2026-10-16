@@ -1,4 +1,5 @@
 export { AppText, type TextTone, type TextVariant } from './app-text';
+export { BrandMark } from './brand-mark';
 export { Button, type ButtonVariant } from './button';
 export { Chip } from './chip';
 export { DecorativeIcon, type DecorativeIconName } from './decorative-icon';

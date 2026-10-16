@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Image, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppText, Button, DecorativeIcon } from '@/components/ui';
+import { AppText, BrandMark, Button } from '@/components/ui';
 import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
@@ -27,9 +27,7 @@ export function WelcomeScreen({ onCreateAccount, onExploreDemo, onSignIn }: Welc
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
       <View style={styles.content}>
         <View style={styles.brandRow}>
-          <View accessibilityElementsHidden importantForAccessibility="no" style={styles.brandMark}>
-            <DecorativeIcon color={theme.colors.textInverse} name="pulse" size={20} />
-          </View>
+          <BrandMark />
           <AppText variant="titleSmall">{strings.brandWordmark}</AppText>
         </View>
 
@@ -95,18 +93,9 @@ function createStyles(
     brandRow: {
       alignItems: 'center',
       flexDirection: 'row',
+      gap: theme.spacing.sm,
       minHeight: theme.sizes.minimumTouchTarget,
       paddingTop: theme.spacing.xs,
-    },
-    brandMark: {
-      alignItems: 'center',
-      backgroundColor: theme.colors.brand,
-      borderRadius: theme.radii.sm,
-      height: 36,
-      justifyContent: 'center',
-      marginEnd: theme.spacing.sm,
-      transform: [{ rotate: '-5deg' }],
-      width: 36,
     },
     hero: {
       flex: 1,
