@@ -26,7 +26,7 @@
 
 The original Hakeemi was a bare React Native 0.64 app from 2021, preserved
 under the [`legacy-v1`](https://github.com/naderalfakesh/Hakeemi/tree/legacy-v1)
-tag. The rebuild replaces it with Expo SDK 57, React Native 0.86, React 19.2,
+tag. The rebuild replaces it with Expo SDK 58, React Native 0.88, React 19.3,
 TypeScript, Expo Router, and native React Native Firebase — not an Expo Go
 prototype, but development builds with Continuous Native Generation and EAS
 profiles ([ADR 0001](docs/adr/0001-expo-cng.md)). The work landed as small,
@@ -87,7 +87,7 @@ emulator-only until enabling billing is an explicit decision.
 
 | Area                 | Choice                                                                                                      |
 | -------------------- | ----------------------------------------------------------------------------------------------------------- |
-| Runtime              | Expo SDK 57, React Native 0.86, React 19.2, New Architecture                                                |
+| Runtime              | Expo SDK 58, React Native 0.88, React 19.3, New Architecture                                                |
 | Navigation           | Expo Router with typed routes and static web export                                                         |
 | Native services      | React Native Firebase App, Auth, Firestore, Functions, Messaging; Expo Calendar, Notifications, and Haptics |
 | Server state         | TanStack Query with stable keys, retries, caching, and cursor pages                                         |
@@ -134,8 +134,9 @@ the emulators, Xcode 27 with the iOS 27 SDK and CocoaPods for iOS, and Android
 Studio with an SDK and a JDK 17 to 21 for Android (the Android Gradle Plugin's
 CMake step aborts on the native-access warning that JDK 24+ prints, so point
 `JAVA_HOME` at an older JDK rather than a JBR 25). The iOS 27 SDK only launches apps that
-use the UIKit scene lifecycle, which SDK 57 keeps opt-in; `app.config.ts`
-enables it through `expo-build-properties`, so no AppDelegate edits are needed.
+use the UIKit scene lifecycle, which SDK 58 generates by default; a local config
+plugin configures Firebase in the generated AppDelegate, so no native edits are
+needed.
 
 ```sh
 npm install
