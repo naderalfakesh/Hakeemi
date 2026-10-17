@@ -8,6 +8,7 @@ import {
   type ImageSourcePropType,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
+  type ScrollViewInstance,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -71,7 +72,7 @@ export function OnboardingScreen({
     [isCompact, isTablet, stackActions, theme],
   );
   const [activeStep, setActiveStep] = useState(0);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollViewRef = useRef<ScrollViewInstance>(null);
   const activeStepRef = useRef(activeStep);
   const pageWidth = Math.min(width, theme.sizes.contentMaxWidth) - theme.spacing.lg * 2;
   // The horizontal ScrollView row is already visually reversed by the native

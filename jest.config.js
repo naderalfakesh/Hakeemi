@@ -9,7 +9,7 @@ module.exports = {
     '^@/features/care/data/saved-providers-repository$':
       '<rootDir>/src/features/care/data/saved-providers-repository.jest.ts',
   },
-  resolver: 'react-native-worklets/jest/resolver.js',
+  resolver: 'react-native-reanimated/jest/resolver.js',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testPathIgnorePatterns: ['/dist/', '/firebase/tests/', '/functions/'],
 };

@@ -137,7 +137,7 @@ export function FindCareScreen({
                 {isLoadingMore ? strings.loadingMoreClinicians : strings.loadMoreClinicians}
               </Button>
             </View>
-          ) : null
+          ) : undefined
         }
         contentContainerStyle={styles.content}
         data={data?.providers ?? []}

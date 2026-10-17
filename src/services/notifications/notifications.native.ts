@@ -56,6 +56,9 @@ export async function registerForAppointmentNotifications({
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync(APPOINTMENT_REMINDER_CHANNEL, {
       description: 'Non-sensitive reminders about fictional Hakeemi appointments.',
+      // eslint-plugin-import cannot detect expo-notifications' compiled enum
+      // exports as an ES module; TypeScript still checks this member.
+      // eslint-disable-next-line import/namespace
       importance: Notifications.AndroidImportance.DEFAULT,
       name: 'Appointment reminders',
       vibrationPattern: [0, 250, 250, 250],
