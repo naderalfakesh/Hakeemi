@@ -74,9 +74,12 @@ the dependencies as up to date.
 - iOS: Release simulator build with Xcode 27.0 and the iOS 27 SDK. On an
   iOS 27 simulator the app launches with a `UIWindowScene`, configures the
   default Firebase app, and renders onboarding, Welcome, Sign-in and the guest
-  tabs. A synthetic sign-in reaches the Firebase Auth endpoint. `expo run:ios`
-  boots the simulator, installs and launches the app while Device Hub is
-  running.
+  tabs. A synthetic sign-in reaches the Firebase Auth endpoint. The app was
+  launched with `xcrun simctl launch`. Xcode 27 has no Simulator.app; with
+  Device Hub running, `expo run:ios` passes its simulator prerequisite, boots
+  the simulator and installs the app, but then exits 1 because
+  `xcrun simctl openurl` times out (`NSPOSIXErrorDomain` code 60). A passing
+  `expo run:ios` has not been recorded yet and still needs a QA re-check.
 - Android: `:app:assembleRelease` with JDK 17, launched on an API 36 emulator
   with the same flows and no fatal exceptions.
 
