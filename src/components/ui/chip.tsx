@@ -29,7 +29,7 @@ export function Chip({ disabled = false, label, selected = false, ...props }: Ch
         isDisabled && styles.disabled,
       ]}
     >
-      <AppText tone={selected ? 'inverse' : 'primary'} variant="labelLarge">
+      <AppText style={styles.label} tone={selected ? 'inverse' : 'primary'} variant="labelLarge">
         {label}
       </AppText>
     </Pressable>
@@ -46,8 +46,16 @@ function createStyles(theme: AppTheme) {
       borderRadius: theme.radii.sm,
       borderWidth: 1,
       justifyContent: 'center',
+      maxWidth: '100%',
       minHeight: theme.sizes.minimumTouchTarget,
       paddingHorizontal: theme.spacing.md,
+      // A label that wraps (large text, long translations) grows the chip
+      // instead of being clipped to one line.
+      paddingVertical: theme.spacing.xxs,
+    },
+    label: {
+      flexShrink: 1,
+      textAlign: 'center',
     },
     selected: {
       backgroundColor: theme.colors.brand,

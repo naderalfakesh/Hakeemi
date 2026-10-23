@@ -1,6 +1,7 @@
 import { fireEvent, render } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
 
+import { AppLocaleProvider } from '@/localization/locale-provider';
 import { AppThemeProvider } from '@/theme';
 
 import { Button } from './button';
@@ -35,6 +36,18 @@ describe('interactive primitives', () => {
     const view = await renderWithTheme(<Chip label="Available today" selected />);
 
     expect(view.getByRole('button', { name: 'Available today' })).toBeSelected();
+  });
+
+  it('drops letter spacing from Arabic chip labels so they are not clipped', async () => {
+    const english = await renderWithTheme(<Chip label="Use device" />);
+    expect(english.getByText('Use device')).toHaveStyle({ letterSpacing: 0.1 });
+
+    const arabic = await renderWithTheme(
+      <AppLocaleProvider locale="ar">
+        <Chip label="حسب الجهاز" />
+      </AppLocaleProvider>,
+    );
+    expect(arabic.getByText('حسب الجهاز')).toHaveStyle({ flexShrink: 1, letterSpacing: 0 });
   });
 
   it('associates a field with its label and renders validation feedback', async () => {
