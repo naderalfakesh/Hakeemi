@@ -3,7 +3,7 @@ import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { fixtureCareRepository } from '@/features/care/data/fixture-care-repository';
 import { AppLocaleProvider } from '@/localization/locale-provider';
-import { addAppointmentToCalendar } from '@/services/calendar/calendar';
+import { addAppointmentToCalendar, listWritableCalendars } from '@/services/calendar/calendar';
 import { triggerHaptic } from '@/services/haptics/haptics';
 import { TestAppProviders } from '@/test/test-app-providers';
 
@@ -21,6 +21,7 @@ jest.mock('@/services/connectivity/connectivity', () => ({
 
 jest.mock('@/services/calendar/calendar', () => ({
   addAppointmentToCalendar: jest.fn().mockResolvedValue({ eventId: 'event-1', status: 'added' }),
+  listWritableCalendars: jest.fn(),
 }));
 
 jest.mock('@/services/haptics/haptics', () => ({
@@ -29,6 +30,9 @@ jest.mock('@/services/haptics/haptics', () => ({
 
 const mockedUseAuthSession = jest.mocked(useAuthSession);
 const mockedAddAppointmentToCalendar = jest.mocked(addAppointmentToCalendar);
+const mockedListWritableCalendars = jest.mocked(listWritableCalendars);
+const personalCalendar = { accountName: null, id: 'calendar-1', title: 'owner@example.test' };
+const workCalendar = { accountName: 'work@example.test', id: 'calendar-7', title: 'Clinic visits' };
 const mockedTriggerHaptic = jest.mocked(triggerHaptic);
 
 const appointment: Appointment = {
@@ -82,6 +86,10 @@ describe('AppointmentDetailScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockedAddAppointmentToCalendar.mockResolvedValue({ eventId: 'event-1', status: 'added' });
+    mockedListWritableCalendars.mockResolvedValue({
+      calendars: [personalCalendar],
+      status: 'ready',
+    });
     mockedTriggerHaptic.mockResolvedValue(undefined);
     mockedUseAuthSession.mockReturnValue({
       enterDemo: jest.fn(),
@@ -101,7 +109,7 @@ describe('AppointmentDetailScreen', () => {
     });
   });
 
-  it('adds a confirmed appointment to the device calendar', async () => {
+  it('adds to the only writable calendar and names it', async () => {
     const view = await render(
       <TestAppProviders>
         <AppointmentDetailScreen
@@ -120,7 +128,7 @@ describe('AppointmentDetailScreen', () => {
     await act(async () => fireEvent.press(view.getByRole('button', { name: 'Add to calendar' })));
 
     await waitFor(() =>
-      expect(mockedAddAppointmentToCalendar).toHaveBeenCalledWith({
+      expect(mockedAddAppointmentToCalendar).toHaveBeenCalledWith('calendar-1', {
         endsAt: appointment.endsAt,
         providerName: 'Dr. Lina Haddad',
         startsAt: appointment.startsAt,
@@ -129,10 +137,79 @@ describe('AppointmentDetailScreen', () => {
       }),
     );
     await waitFor(() => expect(view.getByText('Added to calendar')).toBeVisible());
+    expect(view.getByText('Saved in owner@example.test.')).toBeVisible();
+  });
+
+  it('lets the user choose between several calendars', async () => {
+    mockedListWritableCalendars.mockResolvedValue({
+      calendars: [personalCalendar, workCalendar],
+      status: 'ready',
+    });
+    const view = await render(
+      <TestAppProviders>
+        <AppointmentDetailScreen
+          appointmentId={appointment.id}
+          appointmentRepository={repository()}
+          careDataRepository={fixtureCareRepository}
+          onBack={jest.fn()}
+          onFindCare={jest.fn()}
+        />
+      </TestAppProviders>,
+    );
+
+    await waitFor(() =>
+      expect(view.getByRole('button', { name: 'Add to calendar' })).toBeVisible(),
+    );
+    await act(async () => fireEvent.press(view.getByRole('button', { name: 'Add to calendar' })));
+
+    await waitFor(() => expect(view.getByText('Choose a calendar')).toBeVisible());
+    expect(mockedAddAppointmentToCalendar).not.toHaveBeenCalled();
+    await act(async () =>
+      fireEvent.press(view.getByRole('button', { name: 'Clinic visits · work@example.test' })),
+    );
+
+    await waitFor(() =>
+      expect(mockedAddAppointmentToCalendar).toHaveBeenCalledWith(
+        'calendar-7',
+        expect.objectContaining({ startsAt: appointment.startsAt }),
+      ),
+    );
+    await waitFor(() =>
+      expect(view.getByText('Saved in Clinic visits · work@example.test.')).toBeVisible(),
+    );
+    expect(view.queryByText('Choose a calendar')).not.toBeOnTheScreen();
+  });
+
+  it('closes the calendar chooser without adding anything', async () => {
+    mockedListWritableCalendars.mockResolvedValue({
+      calendars: [personalCalendar, workCalendar],
+      status: 'ready',
+    });
+    const view = await render(
+      <TestAppProviders>
+        <AppointmentDetailScreen
+          appointmentId={appointment.id}
+          appointmentRepository={repository()}
+          careDataRepository={fixtureCareRepository}
+          onBack={jest.fn()}
+          onFindCare={jest.fn()}
+        />
+      </TestAppProviders>,
+    );
+
+    await waitFor(() =>
+      expect(view.getByRole('button', { name: 'Add to calendar' })).toBeVisible(),
+    );
+    await act(async () => fireEvent.press(view.getByRole('button', { name: 'Add to calendar' })));
+    await waitFor(() => expect(view.getByText('Choose a calendar')).toBeVisible());
+    await act(async () => fireEvent.press(view.getByRole('button', { name: 'Not now' })));
+
+    expect(view.getByRole('button', { name: 'Add to calendar' })).toBeEnabled();
+    expect(mockedAddAppointmentToCalendar).not.toHaveBeenCalled();
   });
 
   it('keeps appointment management available when calendar access is denied', async () => {
-    mockedAddAppointmentToCalendar.mockResolvedValue({ status: 'denied' });
+    mockedListWritableCalendars.mockResolvedValue({ status: 'denied' });
     const view = await render(
       <TestAppProviders>
         <AppointmentDetailScreen

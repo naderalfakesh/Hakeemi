@@ -22,10 +22,10 @@ import { useProviderDetail } from '@/features/care/hooks/use-provider-detail';
 import { formatTimeZoneName } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
-import { addAppointmentToCalendar } from '@/services/calendar/calendar';
 import { triggerHaptic } from '@/services/haptics/haptics';
 import { useAppTheme, type AppTheme } from '@/theme';
 
+import { AppointmentCalendarSection } from '../components/appointment-calendar-section';
 import { useCancelAppointment } from '../hooks/use-cancel-appointment';
 import { useAppointmentDetail } from '../hooks/use-appointment-detail';
 import { useRescheduleAppointment } from '../hooks/use-reschedule-appointment';
@@ -126,7 +126,6 @@ function AuthenticatedAppointmentDetail({
   );
   const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [showReschedule, setShowReschedule] = useState(false);
-  const [calendarState, setCalendarState] = useState<CalendarState>({ status: 'idle' });
 
   if (detailQuery.isPending) {
     return <DetailLoading />;
@@ -165,24 +164,6 @@ function AuthenticatedAppointmentDetail({
   const canManage =
     appointment.status === 'confirmed' && new Date(appointment.startsAt) > new Date();
   const actionError = cancelMutation.error ?? rescheduleMutation.error;
-
-  async function addToCalendar() {
-    setCalendarState({ status: 'adding' });
-
-    try {
-      const result = await addAppointmentToCalendar({
-        endsAt: appointmentRecord.endsAt,
-        providerName,
-        startsAt: appointmentRecord.startsAt,
-        timezone: appointmentRecord.timezone,
-        visitMode: appointmentRecord.visitMode,
-      });
-
-      setCalendarState(result.status === 'added' ? { status: 'added' } : result);
-    } catch {
-      setCalendarState({ status: 'error' });
-    }
-  }
 
   async function cancel() {
     await cancelMutation.cancel({
@@ -249,37 +230,7 @@ function AuthenticatedAppointmentDetail({
         </Surface>
 
         {appointment.status === 'confirmed' && !confirmingCancel && !showReschedule && (
-          <View style={styles.calendarSection}>
-            <Button
-              accessibilityLabel={
-                calendarState.status === 'added' ? strings.addedToCalendar : strings.addToCalendar
-              }
-              busy={calendarState.status === 'adding'}
-              disabled={calendarState.status === 'added'}
-              leading={
-                <DecorativeIcon color={theme.colors.brand} name="calendar-outline" size={18} />
-              }
-              onPress={() => void addToCalendar()}
-              variant="secondary"
-            >
-              {calendarState.status === 'added' ? strings.addedToCalendar : strings.addToCalendar}
-            </Button>
-            {calendarState.status === 'denied' && (
-              <AppText tone="secondary" variant="caption">
-                {strings.calendarDenied}
-              </AppText>
-            )}
-            {calendarState.status === 'unavailable' && (
-              <AppText tone="secondary" variant="caption">
-                {strings.calendarUnavailable}
-              </AppText>
-            )}
-            {calendarState.status === 'error' && (
-              <AppText tone="danger" variant="caption">
-                {strings.calendarError}
-              </AppText>
-            )}
-          </View>
+          <AppointmentCalendarSection appointment={appointment} providerName={providerName} />
         )}
 
         {appointment.status === 'cancelled' && appointment.cancelledAt && (
@@ -521,8 +472,6 @@ function DetailState({
   );
 }
 
-type CalendarState = { status: 'idle' | 'adding' | 'added' | 'denied' | 'unavailable' | 'error' };
-
 function formatAppointment(appointment: Appointment, locale = 'en-AE') {
   return new Intl.DateTimeFormat(locale, {
     dateStyle: 'full',
@@ -564,7 +513,6 @@ function createStyles(theme: AppTheme) {
       paddingVertical: theme.spacing.xxs,
     },
     summary: { gap: theme.spacing.md },
-    calendarSection: { gap: theme.spacing.xs },
     detailRow: { alignItems: 'center', flexDirection: 'row', gap: theme.spacing.sm },
     notice: { alignItems: 'flex-start', flexDirection: 'row', gap: theme.spacing.sm },
     actions: { gap: theme.spacing.sm },
