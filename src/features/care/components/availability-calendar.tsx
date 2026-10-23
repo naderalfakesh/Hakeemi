@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { AppText, Button, DecorativeIcon } from '@/components/ui';
 import { formatLocalizedCount } from '@/localization/format';
@@ -41,7 +41,9 @@ export function AvailabilityCalendar({
 }) {
   const theme = useAppTheme();
   const strings = useStrings(providerDetailStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const { fontScale } = useWindowDimensions();
+  const columns = dayGridColumns(fontScale);
+  const styles = useMemo(() => createStyles(theme, columns), [columns, theme]);
   const timezone = slots[0]?.timezone ?? 'Asia/Dubai';
   const days = useMemo(
     () => buildAvailabilityCalendarDays(availabilityWindow, timezone, slots),
@@ -110,6 +112,9 @@ export function AvailabilityCalendar({
               ]}
             >
               <AppText
+                adjustsFontSizeToFit
+                minimumFontScale={0.75}
+                numberOfLines={1}
                 style={styles.weekday}
                 tone={isSelected ? 'inverse' : 'secondary'}
                 variant="labelSmall"
@@ -278,8 +283,25 @@ function formatCalendarRange(days: readonly AvailabilityCalendarDay[], locale: s
   return `${first} – ${last}`;
 }
 
-function formatWeekday(date: Date, locale: string) {
-  return new Intl.DateTimeFormat(locale, { timeZone: 'UTC', weekday: 'short' }).format(date);
+/**
+ * Arabic has no abbreviated weekday names: CLDR's `short` form is the whole
+ * word ("الأربعاء"), which cannot fit a week-wide row of chips and used to break
+ * inside the word. Arabic calendars use the single-letter narrow form instead;
+ * each chip's accessibility label still reads the full date.
+ */
+export function formatWeekday(date: Date, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
+    timeZone: 'UTC',
+    weekday: locale.startsWith('ar') ? 'narrow' : 'short',
+  }).format(date);
+}
+
+/**
+ * Seven chips a row fit a phone at the default text size. Larger text reflows
+ * the two weeks into four columns so a weekday such as "WED" keeps its line.
+ */
+export function dayGridColumns(fontScale: number) {
+  return fontScale >= 1.3 ? 4 : 7;
 }
 
 function formatDayNumber(date: Date, locale: string) {
@@ -303,7 +325,7 @@ export function formatSlotTime(slot: AvailabilitySlot, locale: string) {
   }).format(new Date(slot.startsAt));
 }
 
-function createStyles(theme: AppTheme) {
+function createStyles(theme: AppTheme, columns: number) {
   return StyleSheet.create({
     container: {
       gap: theme.spacing.lg,
@@ -326,7 +348,7 @@ function createStyles(theme: AppTheme) {
       alignItems: 'center',
       borderRadius: theme.radii.md,
       borderWidth: 1,
-      flexBasis: '12%',
+      flexBasis: columns === 7 ? '12%' : '22%',
       flexGrow: 1,
       gap: theme.spacing.xxs,
       justifyContent: 'center',

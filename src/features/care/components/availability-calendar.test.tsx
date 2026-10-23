@@ -1,10 +1,16 @@
 import { render } from '@testing-library/react-native';
 
+import { AppLocaleProvider } from '@/localization/locale-provider';
 import { TestAppProviders } from '@/test/test-app-providers';
 
 import { createAvailabilityWindow } from '../domain/availability';
 import { buildAvailabilityFixtures } from '../data/fixtures';
-import { AvailabilityCalendar, buildAvailabilityCalendarDays } from './availability-calendar';
+import {
+  AvailabilityCalendar,
+  buildAvailabilityCalendarDays,
+  dayGridColumns,
+  formatWeekday,
+} from './availability-calendar';
 
 describe('availability calendar', () => {
   it('maps the complete booking window and preserves unavailable days', () => {
@@ -40,5 +46,54 @@ describe('availability calendar', () => {
     expect(view.getByText('25 Jul – 7 Aug')).toBeOnTheScreen();
     expect(view.getByLabelText('Saturday, 25 July, no appointments available')).toBeDisabled();
     expect(view.queryByRole('button', { name: /Continue with/u })).not.toBeOnTheScreen();
+  });
+
+  it('uses weekday names that fit a chip in both languages', () => {
+    const week = Array.from(
+      { length: 7 },
+      (_, offset) => new Date(Date.UTC(2026, 9, 18 + offset, 12)),
+    );
+
+    expect(week.map((day) => formatWeekday(day, 'en-AE'))).toEqual([
+      'Sun',
+      'Mon',
+      'Tue',
+      'Wed',
+      'Thu',
+      'Fri',
+      'Sat',
+    ]);
+    // CLDR's Arabic "short" weekday is the whole word; the narrow letters are
+    // distinct for every day and never break inside a word.
+    const arabic = week.map((day) => formatWeekday(day, 'ar-AE'));
+    expect(arabic).toEqual(['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س']);
+    expect(new Set(arabic).size).toBe(7);
+  });
+
+  it('reflows the day grid for large text', () => {
+    expect(dayGridColumns(1)).toBe(7);
+    expect(dayGridColumns(1.15)).toBe(7);
+    expect(dayGridColumns(1.3)).toBe(4);
+    expect(dayGridColumns(2)).toBe(4);
+  });
+
+  it('keeps the full date in Arabic day labels', async () => {
+    const now = new Date('2026-07-25T08:00:00.000Z');
+    const view = await render(
+      <TestAppProviders colorScheme="light">
+        <AppLocaleProvider locale="ar">
+          <AvailabilityCalendar
+            availabilityWindow={createAvailabilityWindow(now)}
+            locale="ar"
+            onChooseSlot={jest.fn()}
+            slots={[]}
+          />
+        </AppLocaleProvider>
+      </TestAppProviders>,
+    );
+
+    expect(view.getAllByText('س').length).toBeGreaterThan(0);
+    expect(view.queryByText('السبت')).not.toBeOnTheScreen();
+    expect(view.getAllByLabelText(/^السبت/u)[0]).toBeDisabled();
   });
 });
