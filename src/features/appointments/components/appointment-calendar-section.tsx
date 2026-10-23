@@ -114,7 +114,8 @@ export function AppointmentCalendarSection({
     );
   }
 
-  const added = state.status === 'added' || state.status === 'moved';
+  const added =
+    state.status === 'added' || state.status === 'addedUntracked' || state.status === 'moved';
   const addLabel =
     state.status === 'outdated' ? strings.addNewTimeToCalendar : strings.addToCalendar;
 
@@ -135,6 +136,7 @@ export function AppointmentCalendarSection({
           {state.status === 'moved'
             ? strings.calendarMoved(formatCalendarName(state.calendar))
             : strings.savedInCalendar(formatCalendarName(state.calendar))}
+          {state.status === 'addedUntracked' ? ` ${strings.calendarUntracked}` : ''}
         </AppText>
       )}
       {state.status === 'outdated' && (

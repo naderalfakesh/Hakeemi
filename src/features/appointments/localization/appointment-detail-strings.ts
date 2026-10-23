@@ -13,6 +13,8 @@ const en = {
   calendarNotRemoved: (calendar: string) =>
     `This visit is still in ${calendar}. Remove it in your calendar app.`,
   calendarRemoved: (calendar: string) => `Removed from ${calendar}.`,
+  calendarUntracked:
+    'Hakeemi could not remember this event, so if you reschedule or cancel, update it in your calendar app.',
   calendarStale: (calendar: string) =>
     `The event in ${calendar} still has an earlier time for this visit.`,
   calendarError:
@@ -70,6 +72,8 @@ export const appointmentDetailStrings: LocalizedStrings<typeof en> = {
     calendarNotRemoved: (calendar) =>
       `لا تزال هذه الزيارة في ${calendar}. احذفها من تطبيق التقويم.`,
     calendarRemoved: (calendar) => `أُزيل من ${calendar}.`,
+    calendarUntracked:
+      'تعذّر على حكيمي حفظ هذا الحدث، لذا إذا أعدت الجدولة أو ألغيت الموعد فحدّثه من تطبيق التقويم.',
     calendarStale: (calendar) => `لا يزال الحدث في ${calendar} يحمل وقتًا سابقًا لهذه الزيارة.`,
     calendarError: 'تعذّرت إضافة الموعد. حاول مرة أخرى أو استخدم تقويم الجهاز مباشرة.',
     calendarUnavailable: 'لا يتوفر تقويم قابل للكتابة على هذا الجهاز.',

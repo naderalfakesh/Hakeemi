@@ -26,9 +26,11 @@ export type AppointmentCalendarState =
        * added: the event matches the visit. moved: it just followed a
        * reschedule. stale: it still has an earlier time, and only the user's
        * tap moves it. removed: it followed a cancellation. notRemoved: the
-       * visit is cancelled but the event is still there.
+       * visit is cancelled but the event is still there. addedUntracked: the
+       * event exists but its link could not be stored, so it will not follow
+       * the visit.
        */
-      status: 'added' | 'moved' | 'stale' | 'removed' | 'notRemoved';
+      status: 'added' | 'addedUntracked' | 'moved' | 'stale' | 'removed' | 'notRemoved';
     }
   /** The visit moved but its event is gone; offer to add the new time. */
   | { status: 'outdated' };
@@ -172,10 +174,11 @@ export function useAppointmentCalendar({
         ).catch(() => null);
 
         if (result?.status === 'done') {
-          await storage.write(linkedOwner, appointmentId, {
-            ...link,
-            startsAt: time.startsAt,
-          });
+          // If this write fails the link keeps the old time, which only shows
+          // the (idempotent) move button again; it never adds a second event.
+          await storage
+            .write(linkedOwner, appointmentId, { ...link, startsAt: time.startsAt })
+            .catch(() => undefined);
           setState({ calendar: link.calendar, status: 'moved' });
           return;
         }
@@ -234,10 +237,17 @@ export function useAppointmentCalendar({
           return;
         }
 
-        await storage
-          .write(owner, id, { calendar, eventId: result.eventId, startsAt: event.startsAt })
-          .catch(() => undefined);
-        setState({ calendar, status: 'added' });
+        const link = { calendar, eventId: result.eventId, startsAt: event.startsAt };
+        // One retry covers a busy storage queue; after that the user is told
+        // the event will not follow the visit, rather than finding out later.
+        const stored = await storage
+          .write(owner, id, link)
+          .catch(() => storage.write(owner, id, link))
+          .then(
+            () => true,
+            () => false,
+          );
+        setState({ calendar, status: stored ? 'added' : 'addedUntracked' });
       } catch {
         setState({ status: 'error' });
       } finally {

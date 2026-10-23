@@ -237,6 +237,41 @@ describe('AppointmentDetailScreen', () => {
     expect(mockedAddAppointmentToCalendar).toHaveBeenCalledTimes(1);
   });
 
+  it('says when the added event cannot be remembered', async () => {
+    // The storage mock's setItem is already a jest.fn, so only fail the next
+    // two writes (the first try and the retry) instead of replacing it.
+    const setItem = jest
+      .mocked(AsyncStorage.setItem)
+      .mockRejectedValueOnce(new Error('disk full'))
+      .mockRejectedValueOnce(new Error('disk full'));
+    const callsBefore = setItem.mock.calls.length;
+    const view = await render(
+      <TestAppProviders>
+        <AppointmentDetailScreen
+          appointmentId={appointment.id}
+          appointmentRepository={repository()}
+          careDataRepository={fixtureCareRepository}
+          onBack={jest.fn()}
+          onFindCare={jest.fn()}
+        />
+      </TestAppProviders>,
+    );
+
+    await waitFor(() =>
+      expect(view.getByRole('button', { name: 'Add to calendar' })).toBeEnabled(),
+    );
+    await act(async () => fireEvent.press(view.getByRole('button', { name: 'Add to calendar' })));
+
+    await waitFor(() =>
+      expect(
+        view.getByText(
+          'Saved in owner@example.test. Hakeemi could not remember this event, so if you reschedule or cancel, update it in your calendar app.',
+        ),
+      ).toBeVisible(),
+    );
+    expect(setItem.mock.calls.length - callsBefore).toBe(2);
+  });
+
   it('closes the calendar chooser without adding anything', async () => {
     mockedListWritableCalendars.mockResolvedValue({
       calendars: [personalCalendar, workCalendar],
