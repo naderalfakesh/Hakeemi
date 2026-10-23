@@ -406,11 +406,14 @@ describe('AppointmentDetailScreen', () => {
       await rescheduleToNextTime(view);
 
       await waitFor(() =>
-        expect(mockedMoveEvent).toHaveBeenCalledWith('event-1', {
-          endsAt: rescheduled.endsAt,
-          startsAt: rescheduled.startsAt,
-          timezone: rescheduled.timezone,
-        }),
+        expect(mockedMoveEvent).toHaveBeenCalledWith(
+          { calendarId: 'calendar-1', eventId: 'event-1' },
+          {
+            endsAt: rescheduled.endsAt,
+            startsAt: rescheduled.startsAt,
+            timezone: rescheduled.timezone,
+          },
+        ),
       );
       await waitFor(() =>
         expect(view.getByText('Moved to the new time in owner@example.test.')).toBeVisible(),
@@ -464,7 +467,12 @@ describe('AppointmentDetailScreen', () => {
         fireEvent.press(view.getByRole('button', { name: 'Confirm cancellation' })),
       );
 
-      await waitFor(() => expect(mockedRemoveEvent).toHaveBeenCalledWith('event-1'));
+      await waitFor(() =>
+        expect(mockedRemoveEvent).toHaveBeenCalledWith({
+          calendarId: 'calendar-1',
+          eventId: 'event-1',
+        }),
+      );
       await waitFor(() => expect(view.getByText('Removed from owner@example.test.')).toBeVisible());
       expect(await AsyncStorage.getAllKeys()).toEqual([]);
     });

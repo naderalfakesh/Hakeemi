@@ -1,5 +1,6 @@
 import type {
   CalendarEventChangeResult,
+  CalendarEventRef,
   CalendarEventInput,
   CalendarEventTime,
   CalendarListResult,
@@ -18,14 +19,14 @@ export async function addAppointmentToCalendar(
 }
 
 export async function moveAppointmentCalendarEvent(
-  _eventId: string,
+  _ref: CalendarEventRef,
   _time: CalendarEventTime,
 ): Promise<CalendarEventChangeResult> {
   return { status: 'missing' };
 }
 
 export async function removeAppointmentCalendarEvent(
-  _eventId: string,
+  _ref: CalendarEventRef,
 ): Promise<CalendarEventChangeResult> {
   return { status: 'missing' };
 }

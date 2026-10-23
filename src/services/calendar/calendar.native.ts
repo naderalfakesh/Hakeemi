@@ -2,6 +2,7 @@ import * as Calendar from 'expo-calendar';
 
 import type {
   CalendarEventChangeResult,
+  CalendarEventRef,
   CalendarEventInput,
   CalendarEventTime,
   CalendarListResult,
@@ -57,10 +58,10 @@ export async function addAppointmentToCalendar(
 }
 
 export async function moveAppointmentCalendarEvent(
-  eventId: string,
+  ref: CalendarEventRef,
   time: CalendarEventTime,
 ): Promise<CalendarEventChangeResult> {
-  return withExistingEvent(eventId, (event) =>
+  return withExistingEvent(ref, (event) =>
     event.update({
       endDate: new Date(time.endsAt),
       startDate: new Date(time.startsAt),
@@ -70,13 +71,13 @@ export async function moveAppointmentCalendarEvent(
 }
 
 export async function removeAppointmentCalendarEvent(
-  eventId: string,
+  ref: CalendarEventRef,
 ): Promise<CalendarEventChangeResult> {
-  return withExistingEvent(eventId, (event) => event.delete());
+  return withExistingEvent(ref, (event) => event.delete());
 }
 
 async function withExistingEvent(
-  eventId: string,
+  { calendarId, eventId }: CalendarEventRef,
   change: (event: Calendar.ExpoCalendarEvent) => Promise<void>,
 ): Promise<CalendarEventChangeResult> {
   // Following a reschedule or cancellation must never surprise the user with
@@ -92,6 +93,12 @@ async function withExistingEvent(
   try {
     event = await Calendar.ExpoCalendarEvent.get(eventId);
   } catch {
+    return { status: 'missing' };
+  }
+
+  // Android reuses row ids after a calendar is removed and re-synced, so an
+  // id alone could point at someone else's event in another calendar.
+  if (event.calendarId !== calendarId) {
     return { status: 'missing' };
   }
 

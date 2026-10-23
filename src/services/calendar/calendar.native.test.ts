@@ -31,6 +31,7 @@ function calendar(overrides: Record<string, unknown>) {
   } as unknown as Calendar.ExpoCalendar;
 }
 
+const ref = { calendarId: 'calendar-3', eventId: 'event-9' };
 const time = {
   endsAt: '2030-10-26T09:30:00.000Z',
   startsAt: '2030-10-26T09:00:00.000Z',
@@ -84,10 +85,10 @@ describe('native calendar service', () => {
   });
 
   it('moves and removes an existing event without prompting', async () => {
-    const event = { delete: jest.fn(), update: jest.fn() };
+    const event = { calendarId: 'calendar-3', delete: jest.fn(), update: jest.fn() };
     mocked.ExpoCalendarEvent.get.mockResolvedValue(event as unknown as Calendar.ExpoCalendarEvent);
 
-    await expect(moveAppointmentCalendarEvent('event-9', time)).resolves.toEqual({
+    await expect(moveAppointmentCalendarEvent(ref, time)).resolves.toEqual({
       status: 'done',
     });
     expect(event.update).toHaveBeenCalledWith({
@@ -95,20 +96,30 @@ describe('native calendar service', () => {
       startDate: new Date(time.startsAt),
       timeZone: 'Asia/Dubai',
     });
-    await expect(removeAppointmentCalendarEvent('event-9')).resolves.toEqual({ status: 'done' });
+    await expect(removeAppointmentCalendarEvent(ref)).resolves.toEqual({ status: 'done' });
     expect(event.delete).toHaveBeenCalledTimes(1);
     expect(mocked.requestCalendarPermissions).not.toHaveBeenCalled();
   });
 
   it('reports a missing event and withdrawn access', async () => {
     mocked.ExpoCalendarEvent.get.mockRejectedValue(new Error('not found'));
-    await expect(moveAppointmentCalendarEvent('gone', time)).resolves.toEqual({
+    await expect(moveAppointmentCalendarEvent({ ...ref, eventId: 'gone' }, time)).resolves.toEqual({
       status: 'missing',
     });
 
     mocked.getCalendarPermissions.mockResolvedValue(declined);
-    await expect(removeAppointmentCalendarEvent('event-9')).resolves.toEqual({
+    await expect(removeAppointmentCalendarEvent(ref)).resolves.toEqual({
       status: 'denied',
     });
+  });
+
+  it('leaves an event alone when its id now belongs to another calendar', async () => {
+    const event = { calendarId: 'calendar-other', delete: jest.fn(), update: jest.fn() };
+    mocked.ExpoCalendarEvent.get.mockResolvedValue(event as unknown as Calendar.ExpoCalendarEvent);
+
+    await expect(moveAppointmentCalendarEvent(ref, time)).resolves.toEqual({ status: 'missing' });
+    await expect(removeAppointmentCalendarEvent(ref)).resolves.toEqual({ status: 'missing' });
+    expect(event.update).not.toHaveBeenCalled();
+    expect(event.delete).not.toHaveBeenCalled();
   });
 });

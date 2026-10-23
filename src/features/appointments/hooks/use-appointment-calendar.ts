@@ -77,7 +77,10 @@ export function useAppointmentCalendar({
       update({ status: 'working' });
 
       if (followUp === 'remove') {
-        const result = await removeAppointmentCalendarEvent(link.eventId).catch(() => null);
+        const result = await removeAppointmentCalendarEvent({
+          calendarId: link.calendar.id,
+          eventId: link.eventId,
+        }).catch(() => null);
 
         if (result?.status === 'denied' || result === null) {
           // Keep the link so a later visit with access can still clean up.
@@ -94,11 +97,14 @@ export function useAppointmentCalendar({
         return;
       }
 
-      const result = await moveAppointmentCalendarEvent(link.eventId, {
-        endsAt,
-        startsAt,
-        timezone,
-      }).catch(() => null);
+      const result = await moveAppointmentCalendarEvent(
+        { calendarId: link.calendar.id, eventId: link.eventId },
+        {
+          endsAt,
+          startsAt,
+          timezone,
+        },
+      ).catch(() => null);
 
       if (result?.status === 'done') {
         await storage.write(id, { ...link, startsAt });
