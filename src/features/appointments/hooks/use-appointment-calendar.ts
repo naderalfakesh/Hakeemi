@@ -66,6 +66,8 @@ export function useAppointmentCalendar({
   // Bumped by every follow-up the user starts, so a link read that began
   // before it cannot overwrite its outcome.
   const generation = useRef(0);
+  // Guards against a second add while the first is still being written.
+  const adding = useRef(false);
   const id = appointment?.id ?? null;
   const endsAt = appointment?.endsAt ?? '';
   const startsAt = appointment?.startsAt ?? '';
@@ -217,10 +219,11 @@ export function useAppointmentCalendar({
 
   const choose = useCallback(
     async (calendar: WritableCalendar) => {
-      if (!owner || !id) {
+      if (!owner || !id || adding.current) {
         return;
       }
 
+      adding.current = true;
       setState({ status: 'working' });
 
       try {
@@ -237,6 +240,8 @@ export function useAppointmentCalendar({
         setState({ calendar, status: 'added' });
       } catch {
         setState({ status: 'error' });
+      } finally {
+        adding.current = false;
       }
     },
     [event, id, owner, storage],

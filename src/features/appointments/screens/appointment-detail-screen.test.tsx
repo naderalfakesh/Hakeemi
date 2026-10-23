@@ -194,6 +194,49 @@ describe('AppointmentDetailScreen', () => {
     expect(view.queryByText('Choose a calendar')).not.toBeOnTheScreen();
   });
 
+  it('adds once when a calendar row is pressed twice', async () => {
+    let finishAdd: (value: { eventId: string; status: 'added' }) => void = () => undefined;
+    mockedAddAppointmentToCalendar.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          finishAdd = resolve;
+        }),
+    );
+    mockedListWritableCalendars.mockResolvedValue({
+      calendars: [personalCalendar, workCalendar],
+      status: 'ready',
+    });
+    const view = await render(
+      <TestAppProviders>
+        <AppointmentDetailScreen
+          appointmentId={appointment.id}
+          appointmentRepository={repository()}
+          careDataRepository={fixtureCareRepository}
+          onBack={jest.fn()}
+          onFindCare={jest.fn()}
+        />
+      </TestAppProviders>,
+    );
+
+    await waitFor(() =>
+      expect(view.getByRole('button', { name: 'Add to calendar' })).toBeEnabled(),
+    );
+    await act(async () => fireEvent.press(view.getByRole('button', { name: 'Add to calendar' })));
+    await waitFor(() => expect(view.getByText('Choose a calendar')).toBeVisible());
+
+    const row = view.getByRole('button', { name: 'Clinic visits · work@example.test' });
+    await act(async () => {
+      fireEvent.press(row);
+      fireEvent.press(row);
+    });
+    await act(async () => finishAdd({ eventId: 'event-1', status: 'added' }));
+
+    await waitFor(() =>
+      expect(view.getByText('Saved in Clinic visits · work@example.test.')).toBeVisible(),
+    );
+    expect(mockedAddAppointmentToCalendar).toHaveBeenCalledTimes(1);
+  });
+
   it('closes the calendar chooser without adding anything', async () => {
     mockedListWritableCalendars.mockResolvedValue({
       calendars: [personalCalendar, workCalendar],

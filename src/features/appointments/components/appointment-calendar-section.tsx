@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText, Button, DecorativeIcon, Surface } from '@/components/ui';
 import { useStrings } from '@/localization/use-strings';
+import type { WritableCalendar } from '@/services/calendar/calendar';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import type { AppointmentStatus } from '../domain/types';
@@ -19,6 +20,9 @@ export function AppointmentCalendarSection({
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const strings = useStrings(appointmentDetailStrings);
+  // The chooser list a calendar was picked from; each opening is a new list,
+  // so a fresh chooser is enabled again without resetting state in an effect.
+  const [pickedFrom, setPickedFrom] = useState<readonly WritableCalendar[] | null>(null);
 
   if (appointmentStatus !== 'confirmed') {
     // A cancelled visit only reports what happened to its calendar event.
@@ -65,6 +69,8 @@ export function AppointmentCalendarSection({
   }
 
   if (state.status === 'choosing') {
+    const picked = pickedFrom === state.calendars;
+
     return (
       <Surface padding="spacious" style={styles.chooser} variant="muted">
         <AppText accessibilityRole="header" variant="titleSmall">
@@ -79,8 +85,14 @@ export function AppointmentCalendarSection({
               accessibilityHint={strings.chooseCalendarHint}
               accessibilityLabel={formatCalendarName(calendar)}
               accessibilityRole="button"
+              accessibilityState={{ disabled: picked }}
+              disabled={picked}
               key={calendar.id}
-              onPress={() => void choose(calendar)}
+              onPress={() => {
+                // A second tap before the chooser closes must not add twice.
+                setPickedFrom(state.calendars);
+                void choose(calendar);
+              }}
               style={({ pressed }) => [styles.option, pressed && styles.pressed]}
             >
               <DecorativeIcon color={theme.colors.brand} name="calendar-outline" size={20} />
