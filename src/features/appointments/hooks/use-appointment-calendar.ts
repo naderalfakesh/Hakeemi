@@ -178,6 +178,13 @@ export function useAppointmentCalendar({
           return;
         }
 
+        if (result === null || result.status === 'denied') {
+          // The event still exists; keeping the link lets the user retry the
+          // move instead of adding a second event.
+          setState({ calendar: link.calendar, status: 'stale' });
+          return;
+        }
+
         await storage.remove(linkedOwner, appointmentId);
         setState({ status: 'outdated' });
       }),

@@ -461,6 +461,44 @@ describe('AppointmentDetailScreen', () => {
       await waitFor(() => expect(view.getByText('Added to calendar')).toBeVisible());
     });
 
+    it.each([
+      ['access was withdrawn', () => mockedMoveEvent.mockResolvedValue({ status: 'denied' })],
+      ['the update failed', () => mockedMoveEvent.mockRejectedValue(new Error('update failed'))],
+    ])('keeps the event link when %s during a move', async (_case, arrange) => {
+      arrange();
+      const getAppointment = jest.fn().mockResolvedValue(appointment);
+      const reschedule = jest.fn().mockImplementation(async () => {
+        getAppointment.mockResolvedValue(rescheduled);
+        return rescheduledResult;
+      });
+      const view = await renderDetail(repository({ getAppointment, reschedule }));
+      await addToOnlyCalendar(view);
+
+      await rescheduleToNextTime(view);
+
+      await waitFor(() =>
+        expect(
+          view.getByRole('button', { name: 'Move the calendar event to this time' }),
+        ).toBeVisible(),
+      );
+      expect(
+        view.queryByRole('button', { name: 'Add the new time to calendar' }),
+      ).not.toBeOnTheScreen();
+      expect(await calendarLinkStorage.read('account:patient-1', appointment.id)).toMatchObject({
+        eventId: 'event-1',
+        startsAt: appointment.startsAt,
+      });
+
+      mockedMoveEvent.mockResolvedValue({ status: 'done' });
+      await act(async () =>
+        fireEvent.press(view.getByRole('button', { name: 'Move the calendar event to this time' })),
+      );
+      await waitFor(() =>
+        expect(view.getByText('Moved to the new time in owner@example.test.')).toBeVisible(),
+      );
+      expect(mockedAddAppointmentToCalendar).toHaveBeenCalledTimes(1);
+    });
+
     it('removes the event when the appointment is cancelled', async () => {
       const getAppointment = jest.fn().mockResolvedValue(appointment);
       const cancel = jest.fn().mockImplementation(async () => {
