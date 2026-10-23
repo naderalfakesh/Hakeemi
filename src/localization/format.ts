@@ -61,3 +61,28 @@ export function formatLocalizedCount(
 
   return `${count} ${label}`;
 }
+
+/**
+ * Names a time zone the way people read it ("Gulf Standard Time",
+ * "توقيت الخليج") instead of its IANA id ("Asia/Dubai"). The instant matters
+ * for zones with daylight saving time, so pass the appointment's start. An
+ * engine without time zone names keeps the id rather than failing the screen.
+ */
+export function formatTimeZoneName(
+  timeZone: string,
+  locale: AppLocale,
+  at: Date | string = new Date(),
+) {
+  try {
+    const name = new Intl.DateTimeFormat(toIntlLocale(locale), {
+      timeZone,
+      timeZoneName: 'long',
+    })
+      .formatToParts(typeof at === 'string' ? new Date(at) : at)
+      .find((part) => part.type === 'timeZoneName')?.value;
+
+    return name ?? timeZone;
+  } catch {
+    return timeZone;
+  }
+}

@@ -241,5 +241,7 @@ describe('AppointmentDetailScreen', () => {
     expect(view.getByRole('button', { name: 'إضافة إلى التقويم' })).toBeVisible();
     expect(view.getByRole('button', { name: 'إلغاء الموعد' })).toBeVisible();
     expect(view.getByRole('button', { name: 'ابحث عن طبيب آخر' })).toBeVisible();
+    expect(view.getByText('زيارة حضورية · توقيت الخليج')).toBeVisible();
+    expect(view.queryByText(/Asia\/Dubai/u)).not.toBeOnTheScreen();
   });
 });

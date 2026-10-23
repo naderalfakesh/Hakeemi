@@ -15,6 +15,7 @@ import {
 } from '@/components/ui';
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import type { CareRepository } from '@/features/care/domain/repository';
+import { formatTimeZoneName } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import { useIsOffline } from '@/services/connectivity/use-is-offline';
@@ -232,7 +233,7 @@ function AppointmentCard({
   providerName: string;
 }) {
   const theme = useAppTheme();
-  const { intlLocale } = useAppLocale();
+  const { intlLocale, locale } = useAppLocale();
   const strings = useStrings(appointmentsStrings);
   const statusStrings = useStrings(appointmentStatusStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
@@ -268,7 +269,8 @@ function AppointmentCard({
             size={20}
           />
           <AppText tone="secondary" variant="bodyMedium">
-            {statusStrings.visitModeLabels[appointment.visitMode]} · {appointment.timezone}
+            {statusStrings.visitModeLabels[appointment.visitMode]} ·{' '}
+            {formatTimeZoneName(appointment.timezone, locale, appointment.startsAt)}
           </AppText>
         </View>
       </Surface>

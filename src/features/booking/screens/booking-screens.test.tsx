@@ -73,6 +73,8 @@ describe('guided booking screens', () => {
     expect(view.getByRole('header', { name: 'تفاصيل الزيارة' })).toBeOnTheScreen();
     expect(view.getByRole('button', { name: 'زيارة متابعة' })).toBeOnTheScreen();
     expect(view.getByRole('button', { name: 'مراجعة الموعد' })).toBeOnTheScreen();
+    expect(view.getByText('المنطقة الزمنية: توقيت الخليج')).toBeOnTheScreen();
+    expect(view.queryByText(/Asia\/Dubai/u)).not.toBeOnTheScreen();
   });
 
   it('explains saved choices and disables confirmation while offline', async () => {
@@ -128,6 +130,8 @@ describe('guided booking screens', () => {
     expect(view.getByRole('header', { name: 'Appointment confirmed' })).toBeVisible();
     expect(view.getByText('Dr. Lina Haddad')).toBeOnTheScreen();
     expect(view.queryByText('private-patient-id')).not.toBeOnTheScreen();
+    expect(view.getByText(/· Gulf Standard Time$/u)).toBeOnTheScreen();
+    expect(view.queryByText(/Asia\/Dubai/u)).not.toBeOnTheScreen();
     expect(mockedTriggerHaptic).toHaveBeenCalledWith('success');
   });
 });

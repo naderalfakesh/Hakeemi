@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { AppText, DecorativeIcon, Surface } from '@/components/ui';
 import { formatFee } from '@/features/care/presentation/formatters';
+import { formatTimeZoneName } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
@@ -58,7 +59,9 @@ export function BookingSummary({
         />
       )}
       <AppText tone="secondary" variant="caption">
-        {strings.summary.timezone(selection.slot.timezone)}
+        {strings.summary.timezone(
+          formatTimeZoneName(selection.slot.timezone, locale, selection.slot.startsAt),
+        )}
       </AppText>
     </Surface>
   );

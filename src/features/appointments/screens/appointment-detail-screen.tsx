@@ -19,6 +19,7 @@ import { AvailabilityCalendar } from '@/features/care/components/availability-ca
 import type { CareRepository } from '@/features/care/domain/repository';
 import { careRepository } from '@/features/care/data/care-repository';
 import { useProviderDetail } from '@/features/care/hooks/use-provider-detail';
+import { formatTimeZoneName } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import { addAppointmentToCalendar } from '@/services/calendar/calendar';
@@ -236,7 +237,11 @@ function AuthenticatedAppointmentDetail({
           />
           <DetailRow
             icon={appointment.visitMode === 'video' ? 'videocam-outline' : 'location-outline'}
-            label={`${statusStrings.visitModeLabels[appointment.visitMode]} · ${appointment.timezone}`}
+            label={`${statusStrings.visitModeLabels[appointment.visitMode]} · ${formatTimeZoneName(
+              appointment.timezone,
+              locale,
+              appointment.startsAt,
+            )}`}
           />
           <AppText selectable tone="secondary" variant="caption">
             {strings.reference(appointment.id.slice(-10).toUpperCase())}

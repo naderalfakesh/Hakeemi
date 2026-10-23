@@ -1,4 +1,4 @@
-import { formatLocalizedCount } from './format';
+import { formatLocalizedCount, formatTimeZoneName } from './format';
 
 describe('formatLocalizedCount', () => {
   const labels = {
@@ -49,5 +49,18 @@ describe('formatLocalizedCount', () => {
     } finally {
       intlWithOptionalPluralRules.PluralRules = originalPluralRules;
     }
+  });
+});
+
+describe('formatTimeZoneName', () => {
+  it('names the clinic time zone in each language instead of its IANA id', () => {
+    expect(formatTimeZoneName('Asia/Dubai', 'en', '2030-01-15T08:00:00.000Z')).toBe(
+      'Gulf Standard Time',
+    );
+    expect(formatTimeZoneName('Asia/Dubai', 'ar', '2030-01-15T08:00:00.000Z')).toBe('توقيت الخليج');
+  });
+
+  it('keeps the id when the engine cannot name the zone', () => {
+    expect(formatTimeZoneName('Not/AZone', 'en')).toBe('Not/AZone');
   });
 });

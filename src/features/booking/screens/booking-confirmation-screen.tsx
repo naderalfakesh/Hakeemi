@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppText, Button, Illustration, stateIllustrations, Surface } from '@/components/ui';
 import type { Appointment } from '@/features/appointments/domain/types';
 import type { Provider } from '@/features/care/domain/types';
+import { formatTimeZoneName } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import { triggerHaptic } from '@/services/haptics/haptics';
@@ -59,7 +60,7 @@ export function BookingConfirmationScreen({
               appointment.visitMode === 'video'
                 ? strings.confirmation.videoVisit
                 : strings.confirmation.inPersonVisit,
-              appointment.timezone,
+              formatTimeZoneName(appointment.timezone, locale, appointment.startsAt),
             )}
           </AppText>
           <AppText selectable tone="secondary" variant="caption">
