@@ -8,7 +8,8 @@
 ## Setup
 
 - Google Pixel 9, Android 17.
-- Release APK from `master`, R8 on, signed with the debug key.
+- Release APK of `36cabf5` (sha256 `06974d77…86ad5fd`), R8 on, signed with the
+  debug key.
 - Driven over wireless adb; the owner did the fingerprint, face, camera and
   permission taps.
 
