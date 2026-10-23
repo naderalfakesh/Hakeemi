@@ -1,7 +1,9 @@
 import * as Calendar from 'expo-calendar';
 
 import type {
+  CalendarEventChangeResult,
   CalendarEventInput,
+  CalendarEventTime,
   CalendarListResult,
   CalendarSaveResult,
   WritableCalendar,
@@ -52,6 +54,50 @@ export async function addAppointmentToCalendar(
   });
 
   return { eventId: event.id, status: 'added' };
+}
+
+export async function moveAppointmentCalendarEvent(
+  eventId: string,
+  time: CalendarEventTime,
+): Promise<CalendarEventChangeResult> {
+  return withExistingEvent(eventId, (event) =>
+    event.update({
+      endDate: new Date(time.endsAt),
+      startDate: new Date(time.startsAt),
+      timeZone: time.timezone,
+    }),
+  );
+}
+
+export async function removeAppointmentCalendarEvent(
+  eventId: string,
+): Promise<CalendarEventChangeResult> {
+  return withExistingEvent(eventId, (event) => event.delete());
+}
+
+async function withExistingEvent(
+  eventId: string,
+  change: (event: Calendar.ExpoCalendarEvent) => Promise<void>,
+): Promise<CalendarEventChangeResult> {
+  // Following a reschedule or cancellation must never surprise the user with
+  // a permission prompt, so only an existing grant is used.
+  const permission = await Calendar.getCalendarPermissions();
+
+  if (!permission.granted) {
+    return { status: 'denied' };
+  }
+
+  let event: Calendar.ExpoCalendarEvent;
+
+  try {
+    event = await Calendar.ExpoCalendarEvent.get(eventId);
+  } catch {
+    return { status: 'missing' };
+  }
+
+  await change(event);
+
+  return { status: 'done' };
 }
 
 function toWritableCalendar(calendar: Calendar.ExpoCalendar): WritableCalendar {

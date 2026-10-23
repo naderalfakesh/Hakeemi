@@ -1,9 +1,15 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { fixtureCareRepository } from '@/features/care/data/fixture-care-repository';
 import { AppLocaleProvider } from '@/localization/locale-provider';
-import { addAppointmentToCalendar, listWritableCalendars } from '@/services/calendar/calendar';
+import {
+  addAppointmentToCalendar,
+  listWritableCalendars,
+  moveAppointmentCalendarEvent,
+  removeAppointmentCalendarEvent,
+} from '@/services/calendar/calendar';
 import { triggerHaptic } from '@/services/haptics/haptics';
 import { TestAppProviders } from '@/test/test-app-providers';
 
@@ -22,6 +28,8 @@ jest.mock('@/services/connectivity/connectivity', () => ({
 jest.mock('@/services/calendar/calendar', () => ({
   addAppointmentToCalendar: jest.fn().mockResolvedValue({ eventId: 'event-1', status: 'added' }),
   listWritableCalendars: jest.fn(),
+  moveAppointmentCalendarEvent: jest.fn(),
+  removeAppointmentCalendarEvent: jest.fn(),
 }));
 
 jest.mock('@/services/haptics/haptics', () => ({
@@ -31,6 +39,8 @@ jest.mock('@/services/haptics/haptics', () => ({
 const mockedUseAuthSession = jest.mocked(useAuthSession);
 const mockedAddAppointmentToCalendar = jest.mocked(addAppointmentToCalendar);
 const mockedListWritableCalendars = jest.mocked(listWritableCalendars);
+const mockedMoveEvent = jest.mocked(moveAppointmentCalendarEvent);
+const mockedRemoveEvent = jest.mocked(removeAppointmentCalendarEvent);
 const personalCalendar = { accountName: null, id: 'calendar-1', title: 'owner@example.test' };
 const workCalendar = { accountName: 'work@example.test', id: 'calendar-7', title: 'Clinic visits' };
 const mockedTriggerHaptic = jest.mocked(triggerHaptic);
@@ -83,8 +93,11 @@ function repository(overrides: Partial<AppointmentRepository> = {}): Appointment
 }
 
 describe('AppointmentDetailScreen', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
+    await AsyncStorage.clear();
+    mockedMoveEvent.mockResolvedValue({ status: 'done' });
+    mockedRemoveEvent.mockResolvedValue({ status: 'done' });
     mockedAddAppointmentToCalendar.mockResolvedValue({ eventId: 'event-1', status: 'added' });
     mockedListWritableCalendars.mockResolvedValue({
       calendars: [personalCalendar],
@@ -320,5 +333,166 @@ describe('AppointmentDetailScreen', () => {
     expect(view.getByRole('button', { name: 'ابحث عن طبيب آخر' })).toBeVisible();
     expect(view.getByText('زيارة حضورية · توقيت الخليج')).toBeVisible();
     expect(view.queryByText(/Asia\/Dubai/u)).not.toBeOnTheScreen();
+  });
+
+  describe('calendar event follows the appointment', () => {
+    const rescheduled: Appointment = {
+      ...appointment,
+      endsAt: '2030-01-17T09:30:00.000Z',
+      slotId: 'slot-2',
+      startsAt: '2030-01-17T09:00:00.000Z',
+    };
+    const cancelled: Appointment = {
+      ...appointment,
+      cancelledAt: '2030-01-02T07:00:00.000Z',
+      cancelledBy: 'patient',
+      status: 'cancelled',
+    };
+
+    async function renderDetail(appointmentRepository: AppointmentRepository) {
+      const view = await render(
+        <TestAppProviders>
+          <AppointmentDetailScreen
+            appointmentId={appointment.id}
+            appointmentRepository={appointmentRepository}
+            careDataRepository={fixtureCareRepository}
+            createRequestId={() => 'request-3'}
+            onBack={jest.fn()}
+            onFindCare={jest.fn()}
+          />
+        </TestAppProviders>,
+      );
+      await waitFor(() =>
+        expect(view.getByRole('header', { name: 'Dr. Lina Haddad' })).toBeVisible(),
+      );
+      return view;
+    }
+
+    async function addToOnlyCalendar(view: Awaited<ReturnType<typeof renderDetail>>) {
+      await waitFor(() =>
+        expect(view.getByRole('button', { name: 'Add to calendar' })).toBeEnabled(),
+      );
+      await act(async () => fireEvent.press(view.getByRole('button', { name: 'Add to calendar' })));
+      await waitFor(() => expect(view.getByText('Saved in owner@example.test.')).toBeVisible());
+    }
+
+    async function rescheduleToNextTime(view: Awaited<ReturnType<typeof renderDetail>>) {
+      await act(async () => fireEvent.press(view.getByRole('button', { name: 'Reschedule' })));
+      await waitFor(() => expect(view.getByText('Choose a new time')).toBeVisible());
+      await act(async () => fireEvent.press(view.getByRole('button', { name: /Continue with/u })));
+    }
+
+    it('remembers the added event when the screen opens again', async () => {
+      const first = await renderDetail(repository());
+      await addToOnlyCalendar(first);
+      await first.unmount();
+
+      const second = await renderDetail(repository());
+
+      await waitFor(() => expect(second.getByText('Saved in owner@example.test.')).toBeVisible());
+      expect(second.getByRole('button', { name: 'Added to calendar' })).toBeDisabled();
+      expect(mockedAddAppointmentToCalendar).toHaveBeenCalledTimes(1);
+    });
+
+    it('moves the event to the new time after a reschedule', async () => {
+      const getAppointment = jest.fn().mockResolvedValue(appointment);
+      const reschedule = jest.fn().mockImplementation(async () => {
+        getAppointment.mockResolvedValue(rescheduled);
+        return actionResult;
+      });
+      const view = await renderDetail(repository({ getAppointment, reschedule }));
+      await addToOnlyCalendar(view);
+
+      await rescheduleToNextTime(view);
+
+      await waitFor(() =>
+        expect(mockedMoveEvent).toHaveBeenCalledWith('event-1', {
+          endsAt: rescheduled.endsAt,
+          startsAt: rescheduled.startsAt,
+          timezone: rescheduled.timezone,
+        }),
+      );
+      await waitFor(() =>
+        expect(view.getByText('Moved to the new time in owner@example.test.')).toBeVisible(),
+      );
+      expect(view.getByRole('button', { name: 'Added to calendar' })).toBeDisabled();
+    });
+
+    it('stops claiming the visit is in the calendar when the event cannot move', async () => {
+      mockedMoveEvent.mockResolvedValue({ status: 'missing' });
+      const getAppointment = jest.fn().mockResolvedValue(appointment);
+      const reschedule = jest.fn().mockImplementation(async () => {
+        getAppointment.mockResolvedValue(rescheduled);
+        return actionResult;
+      });
+      const view = await renderDetail(repository({ getAppointment, reschedule }));
+      await addToOnlyCalendar(view);
+
+      await rescheduleToNextTime(view);
+
+      await waitFor(() =>
+        expect(view.getByRole('button', { name: 'Add the new time to calendar' })).toBeEnabled(),
+      );
+      expect(view.queryByText('Added to calendar')).not.toBeOnTheScreen();
+
+      mockedAddAppointmentToCalendar.mockResolvedValue({ eventId: 'event-2', status: 'added' });
+      await act(async () =>
+        fireEvent.press(view.getByRole('button', { name: 'Add the new time to calendar' })),
+      );
+      await waitFor(() =>
+        expect(mockedAddAppointmentToCalendar).toHaveBeenLastCalledWith(
+          'calendar-1',
+          expect.objectContaining({ startsAt: rescheduled.startsAt }),
+        ),
+      );
+      await waitFor(() => expect(view.getByText('Added to calendar')).toBeVisible());
+    });
+
+    it('removes the event when the appointment is cancelled', async () => {
+      const getAppointment = jest.fn().mockResolvedValue(appointment);
+      const cancel = jest.fn().mockImplementation(async () => {
+        getAppointment.mockResolvedValue(cancelled);
+        return actionResult;
+      });
+      const view = await renderDetail(repository({ cancel, getAppointment }));
+      await addToOnlyCalendar(view);
+
+      await act(async () =>
+        fireEvent.press(view.getByRole('button', { name: 'Cancel appointment' })),
+      );
+      await act(async () =>
+        fireEvent.press(view.getByRole('button', { name: 'Confirm cancellation' })),
+      );
+
+      await waitFor(() => expect(mockedRemoveEvent).toHaveBeenCalledWith('event-1'));
+      await waitFor(() => expect(view.getByText('Removed from owner@example.test.')).toBeVisible());
+      expect(await AsyncStorage.getAllKeys()).toEqual([]);
+    });
+
+    it('says the event stayed when access was withdrawn before cancelling', async () => {
+      mockedRemoveEvent.mockResolvedValue({ status: 'denied' });
+      const getAppointment = jest.fn().mockResolvedValue(appointment);
+      const cancel = jest.fn().mockImplementation(async () => {
+        getAppointment.mockResolvedValue(cancelled);
+        return actionResult;
+      });
+      const view = await renderDetail(repository({ cancel, getAppointment }));
+      await addToOnlyCalendar(view);
+
+      await act(async () =>
+        fireEvent.press(view.getByRole('button', { name: 'Cancel appointment' })),
+      );
+      await act(async () =>
+        fireEvent.press(view.getByRole('button', { name: 'Confirm cancellation' })),
+      );
+
+      await waitFor(() =>
+        expect(
+          view.getByText(
+            'This visit is still in owner@example.test. Remove it in your calendar app.',
+          ),
+        ).toBeVisible(),
+      );
+    });
   });
 });

@@ -229,9 +229,13 @@ function AuthenticatedAppointmentDetail({
           </AppText>
         </Surface>
 
-        {appointment.status === 'confirmed' && !confirmingCancel && !showReschedule && (
-          <AppointmentCalendarSection appointment={appointment} providerName={providerName} />
-        )}
+        {/* The section stays for a cancelled visit so its calendar event is
+            removed and the outcome reported. */}
+        {(appointment.status === 'confirmed' || appointment.status === 'cancelled') &&
+          !confirmingCancel &&
+          !showReschedule && (
+            <AppointmentCalendarSection appointment={appointment} providerName={providerName} />
+          )}
 
         {appointment.status === 'cancelled' && appointment.cancelledAt && (
           <Surface padding="compact" style={styles.notice} variant="muted">

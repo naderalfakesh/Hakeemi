@@ -17,14 +17,27 @@ export function AppointmentCalendarSection({
   providerName: string;
 }) {
   const theme = useAppTheme();
-  const { endsAt, startsAt, timezone, visitMode } = appointment;
-  const event = useMemo(
-    () => ({ endsAt, providerName, startsAt, timezone, visitMode }),
-    [endsAt, providerName, startsAt, timezone, visitMode],
-  );
   const styles = useMemo(() => createStyles(theme), [theme]);
   const strings = useStrings(appointmentDetailStrings);
-  const { choose, dismissChooser, start, state } = useAppointmentCalendar(event);
+  const { choose, dismissChooser, start, state } = useAppointmentCalendar({
+    appointment,
+    providerName,
+  });
+
+  if (appointment.status !== 'confirmed') {
+    // A cancelled visit only reports what happened to its calendar event.
+    if (state.status === 'removed' || state.status === 'notRemoved') {
+      return (
+        <AppText accessibilityLiveRegion="polite" tone="secondary" variant="caption">
+          {state.status === 'removed'
+            ? strings.calendarRemoved(formatCalendarName(state.calendar))
+            : strings.calendarNotRemoved(formatCalendarName(state.calendar))}
+        </AppText>
+      );
+    }
+
+    return null;
+  }
 
   if (state.status === 'choosing') {
     return (
@@ -64,23 +77,32 @@ export function AppointmentCalendarSection({
     );
   }
 
-  const added = state.status === 'added';
+  const added = state.status === 'added' || state.status === 'moved';
+  const addLabel =
+    state.status === 'outdated' ? strings.addNewTimeToCalendar : strings.addToCalendar;
 
   return (
     <View style={styles.section}>
       <Button
-        accessibilityLabel={added ? strings.addedToCalendar : strings.addToCalendar}
+        accessibilityLabel={added ? strings.addedToCalendar : addLabel}
         busy={state.status === 'working'}
         disabled={added}
         leading={<DecorativeIcon color={theme.colors.brand} name="calendar-outline" size={18} />}
         onPress={() => void start()}
         variant="secondary"
       >
-        {added ? strings.addedToCalendar : strings.addToCalendar}
+        {added ? strings.addedToCalendar : addLabel}
       </Button>
       {added && (
         <AppText accessibilityLiveRegion="polite" tone="secondary" variant="caption">
-          {strings.savedInCalendar(formatCalendarName(state.calendar))}
+          {state.status === 'moved'
+            ? strings.calendarMoved(formatCalendarName(state.calendar))
+            : strings.savedInCalendar(formatCalendarName(state.calendar))}
+        </AppText>
+      )}
+      {state.status === 'outdated' && (
+        <AppText accessibilityLiveRegion="polite" tone="secondary" variant="caption">
+          {strings.calendarNotMoved}
         </AppText>
       )}
       {state.status === 'denied' && (

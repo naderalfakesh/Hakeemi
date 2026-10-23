@@ -1,11 +1,18 @@
 import type { LocalizedStrings } from '@/localization/use-strings';
 
 const en = {
+  addNewTimeToCalendar: 'Add the new time to calendar',
   addToCalendar: 'Add to calendar',
   addedToCalendar: 'Added to calendar',
   appointmentDetails: 'Appointment details',
   backToAppointments: 'Back to appointments',
   calendarDenied: 'Calendar access was declined. You can still manage this appointment here.',
+  calendarMoved: (calendar: string) => `Moved to the new time in ${calendar}.`,
+  calendarNotMoved:
+    'The calendar event could not follow the new time. If the old time is still in your calendar, remove it there.',
+  calendarNotRemoved: (calendar: string) =>
+    `This visit is still in ${calendar}. Remove it in your calendar app.`,
+  calendarRemoved: (calendar: string) => `Removed from ${calendar}.`,
   calendarError:
     'The appointment could not be added. Try again or use the device calendar directly.',
   calendarUnavailable: 'No writable calendar is available on this device.',
@@ -47,11 +54,18 @@ const en = {
 
 export const appointmentDetailStrings: LocalizedStrings<typeof en> = {
   ar: {
+    addNewTimeToCalendar: 'إضافة الوقت الجديد إلى التقويم',
     addToCalendar: 'إضافة إلى التقويم',
     addedToCalendar: 'أُضيف إلى التقويم',
     appointmentDetails: 'تفاصيل الموعد',
     backToAppointments: 'العودة إلى المواعيد',
     calendarDenied: 'تم رفض الوصول إلى التقويم. لا يزال بإمكانك إدارة هذا الموعد من هنا.',
+    calendarMoved: (calendar) => `نُقل إلى الوقت الجديد في ${calendar}.`,
+    calendarNotMoved:
+      'تعذّر نقل حدث التقويم إلى الوقت الجديد. إذا كان الوقت القديم لا يزال في تقويمك، فاحذفه من هناك.',
+    calendarNotRemoved: (calendar) =>
+      `لا تزال هذه الزيارة في ${calendar}. احذفها من تطبيق التقويم.`,
+    calendarRemoved: (calendar) => `أُزيل من ${calendar}.`,
     calendarError: 'تعذّرت إضافة الموعد. حاول مرة أخرى أو استخدم تقويم الجهاز مباشرة.',
     calendarUnavailable: 'لا يتوفر تقويم قابل للكتابة على هذا الجهاز.',
     cancelAppointment: 'إلغاء الموعد',
