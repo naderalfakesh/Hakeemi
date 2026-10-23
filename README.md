@@ -105,6 +105,8 @@ matrix: 14 security-rules tests and callable integration suites for booking,
 appointment management, notification tokens, and scheduled reminders. Native
 evidence includes iOS and iPad development builds, an iOS Release simulator
 build, an Android arm64 APK, and the static web export.
+An Android release APK was also run on a Pixel 9
+([device notes](docs/device-pixel9-android.md)); iPhone testing is deferred.
 The [testing strategy](docs/testing-strategy.md), per-phase verification
 records, and the privacy-safe [analytics contract](docs/analytics-events.md)
 live under [`docs/`](docs/).
