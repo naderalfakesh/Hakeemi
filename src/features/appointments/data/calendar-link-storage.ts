@@ -4,7 +4,29 @@ import type { WritableCalendar } from '@/services/calendar/calendar';
 
 import type { AppointmentCalendarLink } from '../domain/calendar-link';
 
-const CALENDAR_LINK_PREFIX = '@hakeemi/calendar-link/v1/';
+const CALENDAR_LINK_PREFIX = '@hakeemi/calendar-link/v2/';
+
+/**
+ * Whose appointments a link belongs to: one signed-in account, or the demo.
+ * Demo appointment ids repeat on every demo session, so links are kept per
+ * owner and dropped when that session ends.
+ */
+export type CalendarLinkOwner = 'demo' | `account:${string}`;
+
+export function calendarLinkOwner(
+  scope: 'account' | 'demo',
+  accountId: string | null,
+): CalendarLinkOwner | null {
+  if (scope === 'demo') {
+    return 'demo';
+  }
+
+  return accountId ? `account:${accountId}` : null;
+}
+
+function linkKey(owner: CalendarLinkOwner, appointmentId: string) {
+  return `${CALENDAR_LINK_PREFIX}${owner}/${appointmentId}`;
+}
 
 /**
  * Device calendar event ids only mean something on this device, so the link
@@ -12,14 +34,27 @@ const CALENDAR_LINK_PREFIX = '@hakeemi/calendar-link/v1/';
  * reaches Firestore.
  */
 export interface CalendarLinkStorage {
-  read(appointmentId: string): Promise<AppointmentCalendarLink | null>;
-  remove(appointmentId: string): Promise<void>;
-  write(appointmentId: string, link: AppointmentCalendarLink): Promise<void>;
+  clear(owner: CalendarLinkOwner): Promise<void>;
+  read(owner: CalendarLinkOwner, appointmentId: string): Promise<AppointmentCalendarLink | null>;
+  remove(owner: CalendarLinkOwner, appointmentId: string): Promise<void>;
+  write(
+    owner: CalendarLinkOwner,
+    appointmentId: string,
+    link: AppointmentCalendarLink,
+  ): Promise<void>;
 }
 
 export const calendarLinkStorage: CalendarLinkStorage = {
-  async read(appointmentId) {
-    const value = await AsyncStorage.getItem(CALENDAR_LINK_PREFIX + appointmentId);
+  async clear(owner) {
+    const prefix = `${CALENDAR_LINK_PREFIX}${owner}/`;
+    const keys = (await AsyncStorage.getAllKeys()).filter((key) => key.startsWith(prefix));
+
+    if (keys.length > 0) {
+      await AsyncStorage.multiRemove(keys);
+    }
+  },
+  async read(owner, appointmentId) {
+    const value = await AsyncStorage.getItem(linkKey(owner, appointmentId));
 
     if (!value) {
       return null;
@@ -31,9 +66,9 @@ export const calendarLinkStorage: CalendarLinkStorage = {
       return null;
     }
   },
-  remove: (appointmentId) => AsyncStorage.removeItem(CALENDAR_LINK_PREFIX + appointmentId),
-  write: (appointmentId, link) =>
-    AsyncStorage.setItem(CALENDAR_LINK_PREFIX + appointmentId, JSON.stringify(link)),
+  remove: (owner, appointmentId) => AsyncStorage.removeItem(linkKey(owner, appointmentId)),
+  write: (owner, appointmentId, link) =>
+    AsyncStorage.setItem(linkKey(owner, appointmentId), JSON.stringify(link)),
 };
 
 function restoreCalendarLink(value: unknown): AppointmentCalendarLink | null {

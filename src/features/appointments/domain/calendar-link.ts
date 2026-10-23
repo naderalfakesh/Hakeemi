@@ -13,9 +13,10 @@ export type AppointmentCalendarLink = {
 export type CalendarFollowUp = 'keep' | 'move' | 'remove';
 
 /**
- * Decides how a stored calendar event has to follow the appointment: a
- * cancelled visit takes its event out, a confirmed visit at a new time moves
- * it, and anything else leaves the event alone.
+ * Says whether a stored calendar event still matches the appointment: a
+ * cancelled visit's event should go, a confirmed visit at another time needs
+ * its event moved, and anything else matches. Callers act on it only after a
+ * user's own reschedule or cancel, or a tap.
  */
 export function planCalendarFollowUp(
   appointment: Pick<Appointment, 'startsAt' | 'status'>,

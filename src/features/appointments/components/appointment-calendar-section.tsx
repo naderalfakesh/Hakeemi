@@ -5,38 +5,63 @@ import { AppText, Button, DecorativeIcon, Surface } from '@/components/ui';
 import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
-import type { Appointment } from '../domain/types';
-import { formatCalendarName, useAppointmentCalendar } from '../hooks/use-appointment-calendar';
+import type { AppointmentStatus } from '../domain/types';
+import { formatCalendarName, type AppointmentCalendar } from '../hooks/use-appointment-calendar';
 import { appointmentDetailStrings } from '../localization/appointment-detail-strings';
 
 export function AppointmentCalendarSection({
-  appointment,
-  providerName,
+  appointmentStatus,
+  calendar: { choose, dismissChooser, moveToCurrentTime, removeEvent, start, state },
 }: {
-  appointment: Appointment;
-  providerName: string;
+  appointmentStatus: AppointmentStatus;
+  calendar: AppointmentCalendar;
 }) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const strings = useStrings(appointmentDetailStrings);
-  const { choose, dismissChooser, start, state } = useAppointmentCalendar({
-    appointment,
-    providerName,
-  });
 
-  if (appointment.status !== 'confirmed') {
+  if (appointmentStatus !== 'confirmed') {
     // A cancelled visit only reports what happened to its calendar event.
-    if (state.status === 'removed' || state.status === 'notRemoved') {
+    if (state.status === 'removed') {
       return (
         <AppText accessibilityLiveRegion="polite" tone="secondary" variant="caption">
-          {state.status === 'removed'
-            ? strings.calendarRemoved(formatCalendarName(state.calendar))
-            : strings.calendarNotRemoved(formatCalendarName(state.calendar))}
+          {strings.calendarRemoved(formatCalendarName(state.calendar))}
         </AppText>
       );
     }
 
+    if (state.status === 'notRemoved') {
+      return (
+        <View style={styles.section}>
+          <AppText accessibilityLiveRegion="polite" tone="secondary" variant="caption">
+            {strings.calendarNotRemoved(formatCalendarName(state.calendar))}
+          </AppText>
+          <Button onPress={() => void removeEvent()} variant="secondary">
+            {strings.removeFromCalendar}
+          </Button>
+        </View>
+      );
+    }
+
     return null;
+  }
+
+  if (state.status === 'stale') {
+    return (
+      <View style={styles.section}>
+        <AppText accessibilityLiveRegion="polite" tone="secondary" variant="caption">
+          {strings.calendarStale(formatCalendarName(state.calendar))}
+        </AppText>
+        <Button
+          accessibilityLabel={strings.moveCalendarEvent}
+          leading={<DecorativeIcon color={theme.colors.brand} name="calendar-outline" size={18} />}
+          onPress={() => void moveToCurrentTime()}
+          variant="secondary"
+        >
+          {strings.moveCalendarEvent}
+        </Button>
+      </View>
+    );
   }
 
   if (state.status === 'choosing') {

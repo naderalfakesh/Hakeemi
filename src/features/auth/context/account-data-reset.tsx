@@ -1,6 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 
+import {
+  calendarLinkOwner,
+  calendarLinkStorage,
+} from '@/features/appointments/data/calendar-link-storage';
 import { appointmentQueryKeys } from '@/features/appointments/data/query-keys';
 import { useBookingDraft } from '@/features/booking/context/booking-draft-provider';
 
@@ -16,6 +20,23 @@ export function AccountDataReset() {
   const { clear: clearBookingDraft } = useBookingDraft();
   const accountId = session.status === 'authenticated' ? (session.user?.id ?? null) : null;
   const previousAccountId = useRef(accountId);
+  const calendarOwner =
+    session.status === 'demo'
+      ? calendarLinkOwner('demo', null)
+      : calendarLinkOwner('account', accountId);
+  const previousCalendarOwner = useRef(calendarOwner);
+
+  // Calendar links follow the session that made them: signing out or leaving
+  // the demo forgets them, so the next session's appointments (demo ids
+  // repeat every session) never act on another session's events.
+  useEffect(() => {
+    const endedOwner = previousCalendarOwner.current;
+    previousCalendarOwner.current = calendarOwner;
+
+    if (endedOwner !== null && endedOwner !== calendarOwner) {
+      void calendarLinkStorage.clear(endedOwner).catch(() => undefined);
+    }
+  }, [calendarOwner]);
 
   useEffect(() => {
     const endedAccountId = previousAccountId.current;

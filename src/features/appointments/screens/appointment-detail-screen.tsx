@@ -26,6 +26,8 @@ import { triggerHaptic } from '@/services/haptics/haptics';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { AppointmentCalendarSection } from '../components/appointment-calendar-section';
+import { calendarLinkOwner } from '../data/calendar-link-storage';
+import { useAppointmentCalendar } from '../hooks/use-appointment-calendar';
 import { useCancelAppointment } from '../hooks/use-cancel-appointment';
 import { useAppointmentDetail } from '../hooks/use-appointment-detail';
 import { useRescheduleAppointment } from '../hooks/use-reschedule-appointment';
@@ -126,6 +128,17 @@ function AuthenticatedAppointmentDetail({
   );
   const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [showReschedule, setShowReschedule] = useState(false);
+  const providerName =
+    providerQuery.state.status === 'success'
+      ? providerQuery.state.data.provider.displayName[locale]
+      : (detailQuery.data?.providerId ?? '');
+  // The calendar follow-up lives here, not in its section, because the
+  // section is hidden while the user reschedules or cancels.
+  const calendar = useAppointmentCalendar({
+    appointment: detailQuery.data ?? null,
+    owner: calendarLinkOwner(queryScope, accountId),
+    providerName,
+  });
 
   if (detailQuery.isPending) {
     return <DetailLoading />;
@@ -157,10 +170,6 @@ function AuthenticatedAppointmentDetail({
 
   const appointmentRecord = appointment;
 
-  const providerName =
-    providerQuery.state.status === 'success'
-      ? providerQuery.state.data.provider.displayName[locale]
-      : appointment.providerId;
   const canManage =
     appointment.status === 'confirmed' && new Date(appointment.startsAt) > new Date();
   const actionError = cancelMutation.error ?? rescheduleMutation.error;
@@ -171,6 +180,7 @@ function AuthenticatedAppointmentDetail({
       requestId: createRequestId(),
     });
     setConfirmingCancel(false);
+    void calendar.followCancel();
   }
 
   async function confirmCancel() {
@@ -179,12 +189,17 @@ function AuthenticatedAppointmentDetail({
   }
 
   async function reschedule(slotId: string) {
-    await rescheduleMutation.reschedule({
+    const { appointment: moved } = await rescheduleMutation.reschedule({
       appointmentId: appointmentRecord.id,
       requestId: createRequestId(),
       slotId,
     });
     setShowReschedule(false);
+    void calendar.followReschedule({
+      endsAt: moved.endsAt,
+      startsAt: moved.startsAt,
+      timezone: moved.timezone,
+    });
   }
 
   return (
@@ -234,7 +249,10 @@ function AuthenticatedAppointmentDetail({
         {(appointment.status === 'confirmed' || appointment.status === 'cancelled') &&
           !confirmingCancel &&
           !showReschedule && (
-            <AppointmentCalendarSection appointment={appointment} providerName={providerName} />
+            <AppointmentCalendarSection
+              appointmentStatus={appointment.status}
+              calendar={calendar}
+            />
           )}
 
         {appointment.status === 'cancelled' && appointment.cancelledAt && (

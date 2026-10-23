@@ -13,6 +13,7 @@ import {
 import { triggerHaptic } from '@/services/haptics/haptics';
 import { TestAppProviders } from '@/test/test-app-providers';
 
+import { calendarLinkStorage } from '../data/calendar-link-storage';
 import type { AppointmentRepository } from '../domain/repository';
 import type { Appointment, AppointmentActionResult } from '../domain/types';
 import { AppointmentDetailScreen } from './appointment-detail-screen';
@@ -342,6 +343,15 @@ describe('AppointmentDetailScreen', () => {
       slotId: 'slot-2',
       startsAt: '2030-01-17T09:00:00.000Z',
     };
+    const rescheduledResult: AppointmentActionResult = {
+      appointment: {
+        ...actionResult.appointment,
+        endsAt: rescheduled.endsAt,
+        slotId: rescheduled.slotId,
+        startsAt: rescheduled.startsAt,
+      },
+      isReplay: false,
+    };
     const cancelled: Appointment = {
       ...appointment,
       cancelledAt: '2030-01-02T07:00:00.000Z',
@@ -398,7 +408,7 @@ describe('AppointmentDetailScreen', () => {
       const getAppointment = jest.fn().mockResolvedValue(appointment);
       const reschedule = jest.fn().mockImplementation(async () => {
         getAppointment.mockResolvedValue(rescheduled);
-        return actionResult;
+        return rescheduledResult;
       });
       const view = await renderDetail(repository({ getAppointment, reschedule }));
       await addToOnlyCalendar(view);
@@ -426,7 +436,7 @@ describe('AppointmentDetailScreen', () => {
       const getAppointment = jest.fn().mockResolvedValue(appointment);
       const reschedule = jest.fn().mockImplementation(async () => {
         getAppointment.mockResolvedValue(rescheduled);
-        return actionResult;
+        return rescheduledResult;
       });
       const view = await renderDetail(repository({ getAppointment, reschedule }));
       await addToOnlyCalendar(view);
@@ -500,6 +510,71 @@ describe('AppointmentDetailScreen', () => {
             'This visit is still in owner@example.test. Remove it in your calendar app.',
           ),
         ).toBeVisible(),
+      );
+    });
+
+    it('does not move the event when the visit time changed without the user', async () => {
+      // The demo catalogue rolls forward every day; a stored link from an
+      // earlier day must not move the event by itself.
+      await calendarLinkStorage.write('account:patient-1', appointment.id, {
+        calendar: personalCalendar,
+        eventId: 'event-1',
+        startsAt: '2030-01-14T08:00:00.000Z',
+      });
+      const view = await renderDetail(repository());
+
+      await waitFor(() =>
+        expect(
+          view.getByRole('button', { name: 'Move the calendar event to this time' }),
+        ).toBeVisible(),
+      );
+      expect(
+        view.getByText('The event in owner@example.test still has an earlier time for this visit.'),
+      ).toBeVisible();
+      expect(mockedMoveEvent).not.toHaveBeenCalled();
+      expect(view.queryByText('Added to calendar')).not.toBeOnTheScreen();
+
+      await act(async () =>
+        fireEvent.press(view.getByRole('button', { name: 'Move the calendar event to this time' })),
+      );
+
+      await waitFor(() =>
+        expect(mockedMoveEvent).toHaveBeenCalledWith(
+          { calendarId: 'calendar-1', eventId: 'event-1' },
+          { endsAt: appointment.endsAt, startsAt: appointment.startsAt, timezone: 'Asia/Dubai' },
+        ),
+      );
+      await waitFor(() =>
+        expect(view.getByText('Moved to the new time in owner@example.test.')).toBeVisible(),
+      );
+    });
+
+    it('does not remove the event of a visit cancelled elsewhere without a tap', async () => {
+      await calendarLinkStorage.write('account:patient-1', appointment.id, {
+        calendar: personalCalendar,
+        eventId: 'event-1',
+        startsAt: appointment.startsAt,
+      });
+      const view = await renderDetail(
+        repository({ getAppointment: jest.fn().mockResolvedValue(cancelled) }),
+      );
+
+      await waitFor(() =>
+        expect(view.getByRole('button', { name: 'Remove from calendar' })).toBeVisible(),
+      );
+      expect(mockedRemoveEvent).not.toHaveBeenCalled();
+    });
+
+    it('ignores links stored for another account', async () => {
+      await calendarLinkStorage.write('account:someone-else', appointment.id, {
+        calendar: personalCalendar,
+        eventId: 'event-1',
+        startsAt: appointment.startsAt,
+      });
+      const view = await renderDetail(repository());
+
+      await waitFor(() =>
+        expect(view.getByRole('button', { name: 'Add to calendar' })).toBeEnabled(),
       );
     });
   });

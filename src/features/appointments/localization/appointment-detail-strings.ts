@@ -13,6 +13,8 @@ const en = {
   calendarNotRemoved: (calendar: string) =>
     `This visit is still in ${calendar}. Remove it in your calendar app.`,
   calendarRemoved: (calendar: string) => `Removed from ${calendar}.`,
+  calendarStale: (calendar: string) =>
+    `The event in ${calendar} still has an earlier time for this visit.`,
   calendarError:
     'The appointment could not be added. Try again or use the device calendar directly.',
   calendarUnavailable: 'No writable calendar is available on this device.',
@@ -34,6 +36,7 @@ const en = {
   keepAppointment: 'Keep appointment',
   keepCurrentTime: 'Keep current time',
   loadingAppointment: 'Loading appointment',
+  moveCalendarEvent: 'Move the calendar event to this time',
   moveHere: 'Move here',
   moveHereHint: 'Moves this appointment to the selected time.',
   noOtherTimes: 'No other times are available in the next 14 days.',
@@ -41,6 +44,7 @@ const en = {
   notFoundTitle: 'Appointment not found',
   notNow: 'Not now',
   reference: (code: string) => `Reference ${code}`,
+  removeFromCalendar: 'Remove from calendar',
   reschedule: 'Reschedule',
   rescheduleDescription:
     'Select another available time with the same clinician. Your current appointment stays in place until the change succeeds.',
@@ -66,6 +70,7 @@ export const appointmentDetailStrings: LocalizedStrings<typeof en> = {
     calendarNotRemoved: (calendar) =>
       `لا تزال هذه الزيارة في ${calendar}. احذفها من تطبيق التقويم.`,
     calendarRemoved: (calendar) => `أُزيل من ${calendar}.`,
+    calendarStale: (calendar) => `لا يزال الحدث في ${calendar} يحمل وقتًا سابقًا لهذه الزيارة.`,
     calendarError: 'تعذّرت إضافة الموعد. حاول مرة أخرى أو استخدم تقويم الجهاز مباشرة.',
     calendarUnavailable: 'لا يتوفر تقويم قابل للكتابة على هذا الجهاز.',
     cancelAppointment: 'إلغاء الموعد',
@@ -86,6 +91,7 @@ export const appointmentDetailStrings: LocalizedStrings<typeof en> = {
     keepAppointment: 'الاحتفاظ بالموعد',
     keepCurrentTime: 'الاحتفاظ بالوقت الحالي',
     loadingAppointment: 'جارٍ تحميل الموعد',
+    moveCalendarEvent: 'نقل حدث التقويم إلى هذا الوقت',
     moveHere: 'النقل إلى هنا',
     moveHereHint: 'ينقل هذا الموعد إلى الوقت المحدد.',
     noOtherTimes: 'لا تتوفر أوقات أخرى خلال الأيام الأربعة عشر القادمة.',
@@ -93,6 +99,7 @@ export const appointmentDetailStrings: LocalizedStrings<typeof en> = {
     notFoundTitle: 'الموعد غير موجود',
     notNow: 'ليس الآن',
     reference: (code) => `الرقم المرجعي ${code}`,
+    removeFromCalendar: 'الإزالة من التقويم',
     reschedule: 'إعادة الجدولة',
     rescheduleDescription:
       'اختر وقتًا آخر متاحًا مع الطبيب نفسه. يبقى موعدك الحالي كما هو حتى ينجح التغيير.',
