@@ -7,6 +7,7 @@ import {
   getDocs,
   getFirestore,
   limit,
+  orderBy,
   query,
   where,
 } from '@react-native-firebase/firestore';
@@ -64,6 +65,8 @@ class FirebaseAppointmentRepository implements AppointmentRepository {
       query(
         collection(getFirestore(getApp()), 'appointments'),
         where('patientId', '==', patientId),
+        // Latest first, so the cap drops the oldest history and never an upcoming visit.
+        orderBy('startsAt', 'desc'),
         limit(50),
       ),
     );

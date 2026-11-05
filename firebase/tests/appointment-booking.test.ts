@@ -12,6 +12,8 @@ import {
 } from 'firebase/auth';
 import { connectFunctionsEmulator, getFunctions, httpsCallable } from 'firebase/functions';
 
+import { markEmailVerified } from './auth-emulator';
+
 const PROJECT_ID = 'demo-hakeemi';
 const FUNCTION_REGION = 'me-central1';
 const PASSWORD = 'portfolio-test-password';
@@ -54,12 +56,16 @@ after(async () => {
   await Promise.all([testEnvironment.cleanup(), deleteApp(app)]);
 });
 
-async function signInNewPatient(label: string) {
+async function signInNewPatient(label: string, options: { verified?: boolean } = {}) {
   const credential = await createUserWithEmailAndPassword(
     getAuth(app),
     `${label}-${randomUUID()}@example.test`,
     PASSWORD,
   );
+
+  if (options.verified ?? true) {
+    await markEmailVerified(credential.user, PROJECT_ID);
+  }
 
   return credential.user;
 }
@@ -268,6 +274,17 @@ describe('bookAppointment callable', () => {
     await assert.rejects(
       callable({ ...bookingRequest('forged-slot'), patientId: 'another-user' }),
       (error: unknown) => hasFunctionCode(error, 'invalid-argument'),
+    );
+
+    assert.equal((await readAllBookingDocuments()).appointments.length, 0);
+  });
+
+  it('refuses to book for an account whose email is not verified', async () => {
+    await signInNewPatient('booking-unverified', { verified: false });
+    await seedBookingSurface('unverified-slot');
+
+    await assert.rejects(bookingCallable()(bookingRequest('unverified-slot')), (error: unknown) =>
+      hasFunctionCode(error, 'failed-precondition'),
     );
 
     assert.equal((await readAllBookingDocuments()).appointments.length, 0);

@@ -1,6 +1,6 @@
 import { initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import assert from 'node:assert/strict';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { after, before, beforeEach, describe, it } from 'node:test';
 
 import { deleteApp, initializeApp, type FirebaseApp } from 'firebase/app';
@@ -11,6 +11,8 @@ import {
   signOut,
 } from 'firebase/auth';
 import { connectFunctionsEmulator, getFunctions, httpsCallable } from 'firebase/functions';
+
+import { markEmailVerified } from './auth-emulator';
 
 const PROJECT_ID = 'demo-hakeemi';
 const FUNCTION_REGION = 'me-central1';
@@ -43,12 +45,16 @@ after(async () => {
   await Promise.all([testEnvironment.cleanup(), deleteApp(app)]);
 });
 
-async function signInNewPatient(label: string) {
+async function signInNewPatient(label: string, options: { verified?: boolean } = {}) {
   const credential = await createUserWithEmailAndPassword(
     getAuth(app),
     `${label}-${randomUUID()}@example.test`,
     PASSWORD,
   );
+
+  if (options.verified ?? true) {
+    await markEmailVerified(credential.user, PROJECT_ID);
+  }
 
   return credential.user;
 }
@@ -218,6 +224,33 @@ describe('appointment management callables', () => {
     assert.equal(documents.oldSlot.version, 2);
   });
 
+  it('replays a cancellation retry even after the freed slot was booked again', async () => {
+    const patient = await signInNewPatient('cancel-rebooked');
+    const surface = await seedAppointmentSurface({ patientId: patient.uid });
+
+    await callable('cancelAppointment')({
+      appointmentId: surface.appointmentId,
+      requestId: randomUUID(),
+    });
+    await testEnvironment.withSecurityRulesDisabled(async (context) => {
+      await context.firestore().doc(`availabilitySlots/${surface.oldSlotId}`).update({
+        appointmentId: 'someone-elses-appointment',
+        status: 'booked',
+      });
+    });
+
+    const retry = await callable('cancelAppointment')({
+      appointmentId: surface.appointmentId,
+      requestId: randomUUID(),
+    });
+
+    assert.equal((retry.data as { isReplay?: unknown }).isReplay, true);
+    assert.equal(
+      (retry.data as { appointment: { status: string } }).appointment.status,
+      'cancelled',
+    );
+  });
+
   it('rejects cancellation inside the lead-time policy without changing state', async () => {
     const patient = await signInNewPatient('cancel-policy');
     const surface = await seedAppointmentSurface({
@@ -274,6 +307,35 @@ describe('appointment management callables', () => {
     assert.equal(documents.targetSlot.status, 'booked');
     assert.equal(documents.targetSlot.appointmentId, surface.appointmentId);
     assert.equal(documents.targetSlot.version, 2);
+  });
+
+  it('clears the old reminder receipt so the new time is reminded too', async () => {
+    const patient = await signInNewPatient('reschedule-reminder');
+    const surface = await seedAppointmentSurface({ patientId: patient.uid });
+    const reminderPath = `appointmentReminders/${createHash('sha256')
+      .update(surface.appointmentId)
+      .update('\0')
+      .update('24h')
+      .digest('hex')}`;
+
+    await testEnvironment.withSecurityRulesDisabled(async (context) => {
+      await context.firestore().doc(reminderPath).set({
+        appointmentId: surface.appointmentId,
+        attempts: 1,
+        status: 'sent',
+      });
+    });
+
+    await callable('rescheduleAppointment')({
+      appointmentId: surface.appointmentId,
+      requestId: randomUUID(),
+      slotId: surface.targetSlotId,
+    });
+
+    await testEnvironment.withSecurityRulesDisabled(async (context) => {
+      const receipt = await context.firestore().doc(reminderPath).get();
+      assert.equal(receipt.exists, false);
+    });
   });
 
   it('rejects an occupied target or request-key payload conflict without a partial move', async () => {

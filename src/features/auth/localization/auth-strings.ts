@@ -84,6 +84,7 @@ const verifyEmailEn = {
   subtitle: 'Verification keeps the demo account recoverable and prevents mistyped addresses.',
   title: 'Verify your email',
   useAnotherAccount: 'Use another account',
+  yourEmailAddress: 'your email address',
 };
 
 export const verifyEmailStrings: LocalizedStrings<typeof verifyEmailEn> = {
@@ -96,6 +97,7 @@ export const verifyEmailStrings: LocalizedStrings<typeof verifyEmailEn> = {
     subtitle: 'يحافظ التحقق على إمكانية استعادة الحساب التجريبي ويمنع العناوين المكتوبة خطأً.',
     title: 'تحقق من بريدك الإلكتروني',
     useAnotherAccount: 'استخدام حساب آخر',
+    yourEmailAddress: 'عنوان بريدك الإلكتروني',
   },
   en: verifyEmailEn,
 };

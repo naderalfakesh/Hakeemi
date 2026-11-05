@@ -1,5 +1,5 @@
 import * as Crypto from 'expo-crypto';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -128,6 +128,10 @@ function AuthenticatedAppointmentDetail({
   );
   const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [showReschedule, setShowReschedule] = useState(false);
+  // A retry of a failed action reuses its request ID, so the server can
+  // replay an action that committed but whose response never arrived.
+  const cancelRequestId = useRef<string | null>(null);
+  const rescheduleRequest = useRef<{ requestId: string; slotId: string } | null>(null);
   const providerName =
     providerQuery.state.status === 'success'
       ? providerQuery.state.data.provider.displayName[locale]
@@ -174,26 +178,44 @@ function AuthenticatedAppointmentDetail({
     appointment.status === 'confirmed' && new Date(appointment.startsAt) > new Date();
   const actionError = cancelMutation.error ?? rescheduleMutation.error;
 
-  async function cancel() {
-    await cancelMutation.cancel({
-      appointmentId: appointmentRecord.id,
-      requestId: createRequestId(),
-    });
+  // Failures are shown from the mutation's error state, so the handlers
+  // settle instead of rejecting.
+  async function confirmCancel() {
+    await triggerHaptic('warning');
+    cancelRequestId.current ??= createRequestId();
+
+    try {
+      await cancelMutation.cancel({
+        appointmentId: appointmentRecord.id,
+        requestId: cancelRequestId.current,
+      });
+    } catch {
+      return;
+    }
+
+    cancelRequestId.current = null;
     setConfirmingCancel(false);
     void calendar.followCancel();
   }
 
-  async function confirmCancel() {
-    await triggerHaptic('warning');
-    await cancel();
-  }
-
   async function reschedule(slotId: string) {
-    const { appointment: moved } = await rescheduleMutation.reschedule({
-      appointmentId: appointmentRecord.id,
-      requestId: createRequestId(),
-      slotId,
-    });
+    if (rescheduleRequest.current?.slotId !== slotId) {
+      rescheduleRequest.current = { requestId: createRequestId(), slotId };
+    }
+
+    let moved: Awaited<ReturnType<typeof rescheduleMutation.reschedule>>['appointment'];
+
+    try {
+      ({ appointment: moved } = await rescheduleMutation.reschedule({
+        appointmentId: appointmentRecord.id,
+        requestId: rescheduleRequest.current.requestId,
+        slotId,
+      }));
+    } catch {
+      return;
+    }
+
+    rescheduleRequest.current = null;
     setShowReschedule(false);
     void calendar.followReschedule({
       endsAt: moved.endsAt,

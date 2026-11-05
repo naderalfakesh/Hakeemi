@@ -1,5 +1,5 @@
-import { Redirect, router, useLocalSearchParams } from 'expo-router';
-import { useEffect } from 'react';
+import { Redirect, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useCallback } from 'react';
 
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { BookingRouteState } from '@/features/booking/components/booking-route-state';
@@ -23,16 +23,21 @@ export default function BookingDetailsRoute() {
   );
   const strings = useStrings(bookingStrings);
 
-  useEffect(() => {
-    if (
-      bookingDraft.status !== 'loading' &&
-      (bookingDraft.draft?.providerId !== providerId || bookingDraft.draft.slotId !== slotId) &&
-      providerId &&
-      slotId
-    ) {
-      void bookingDraft.selectSlot(providerId, slotId);
-    }
-  }, [bookingDraft, providerId, slotId]);
+  // Only the focused screen seeds a draft. Once a booking is confirmed this
+  // screen may still be mounted while it animates away, and must not start a
+  // new draft for the slot that was just booked.
+  useFocusEffect(
+    useCallback(() => {
+      if (
+        bookingDraft.status !== 'loading' &&
+        (bookingDraft.draft?.providerId !== providerId || bookingDraft.draft.slotId !== slotId) &&
+        providerId &&
+        slotId
+      ) {
+        void bookingDraft.selectSlot(providerId, slotId);
+      }
+    }, [bookingDraft, providerId, slotId]),
+  );
 
   if (session.status === 'anonymous') {
     return (

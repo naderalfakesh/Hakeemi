@@ -18,7 +18,7 @@ import {
 import { bootstrapUserProfile } from '../data/profile-bootstrap';
 import { toAuthActionError } from '../domain/errors';
 import type { UserProfile } from '../domain/profile';
-import type { AuthUser } from '../domain/types';
+import type { AuthFailureCode, AuthUser } from '../domain/types';
 
 export type AuthSessionStatus = 'anonymous' | 'authenticated' | 'demo' | 'restoring';
 export type ProfileStatus = 'error' | 'idle' | 'loading' | 'ready';
@@ -26,7 +26,7 @@ export type ProfileStatus = 'error' | 'idle' | 'loading' | 'ready';
 type AuthSessionContextValue = {
   enterDemo: () => void;
   profile: UserProfile | null;
-  profileError: string | null;
+  profileError: AuthFailureCode | null;
   profileStatus: ProfileStatus;
   refreshSession: () => Promise<void>;
   retryProfile: () => Promise<void>;
@@ -52,7 +52,7 @@ export function AuthSessionProvider({ children, onBeforeSignOut }: AuthSessionPr
   const [user, setUser] = useState<AuthUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileStatus, setProfileStatus] = useState<ProfileStatus>('idle');
-  const [profileError, setProfileError] = useState<string | null>(null);
+  const [profileError, setProfileError] = useState<AuthFailureCode | null>(null);
   const profileRequestId = useRef(0);
   const statusRef = useRef<AuthSessionStatus>(status);
   const demoModeRef = useRef(false);
@@ -76,7 +76,7 @@ export function AuthSessionProvider({ children, onBeforeSignOut }: AuthSessionPr
       }
     } catch (error) {
       if (profileRequestId.current === requestId) {
-        setProfileError(toAuthActionError(error).message);
+        setProfileError(toAuthActionError(error).code);
         setProfileStatus('error');
       }
     }

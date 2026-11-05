@@ -1,6 +1,8 @@
 import * as Network from 'expo-network';
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
 
+import type { AppointmentReasonCategory } from '@/features/appointments/domain/types';
 import { useBookAppointment } from '@/features/appointments/hooks/use-book-appointment';
 import { localizeAppointmentError } from '@/features/appointments/localization/appointment-error-strings';
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
@@ -39,6 +41,8 @@ export default function BookingReviewRoute() {
   );
   const networkState = Network.useNetworkState();
   const { locale } = useAppLocale();
+  // The confirmed reason stays on screen while it hands over to confirmation.
+  const [confirmedReason, setConfirmedReason] = useState<AppointmentReasonCategory | null>(null);
   const draft = draftContext.draft;
 
   if (session.status === 'anonymous') {
@@ -63,7 +67,12 @@ export default function BookingReviewRoute() {
     );
   }
 
-  if (!draft || draft.providerId !== providerId || draft.slotId !== slotId) {
+  // After a successful booking the draft is cleared while this screen is on
+  // its way out; redirecting then would start a new draft for the booked slot.
+  if (
+    booking.status !== 'success' &&
+    (!draft || draft.providerId !== providerId || draft.slotId !== slotId)
+  ) {
     return <Redirect href={{ pathname: '/booking/details', params: { providerId, slotId } }} />;
   }
 
@@ -88,20 +97,30 @@ export default function BookingReviewRoute() {
       return;
     }
 
+    let appointmentId: string;
+
     try {
       const result = await booking.confirm({
         reasonCategory: draft.reasonCategory,
         requestId: draft.requestId,
         slotId: draft.slotId,
       });
-      await draftContext.clear();
-      router.replace({
-        pathname: '/booking/confirmation',
-        params: { appointmentId: result.appointment.id },
-      });
+      appointmentId = result.appointment.id;
+      setConfirmedReason(draft.reasonCategory);
     } catch {
       // The mutation exposes the mapped, retry-safe error to the screen.
+      return;
     }
+
+    // Confirmation replaces the whole booking flow, so the details screen below
+    // cannot start a new draft for the slot that was just booked.
+    if (router.canDismiss()) {
+      router.dismissAll();
+    }
+    router.replace({ pathname: '/booking/confirmation', params: { appointmentId } });
+    // A draft that outlives a failed clear expires on its own and its request
+    // ID would only replay the booking that already succeeded.
+    await draftContext.clear().catch(() => undefined);
   }
 
   return (
@@ -111,7 +130,7 @@ export default function BookingReviewRoute() {
       isSubmitting={booking.status === 'pending'}
       onBack={() => router.back()}
       onConfirm={() => void handleConfirm()}
-      reasonCategory={draft.reasonCategory}
+      reasonCategory={draft?.reasonCategory ?? confirmedReason}
       selection={selection.state.data}
     />
   );

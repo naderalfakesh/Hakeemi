@@ -145,4 +145,10 @@ describe('appointment list filters', () => {
     expect(selectAppointments(appointments, 'past', now)).toHaveLength(3);
     expect(selectAppointments(appointments, 'cancelled', now)).toHaveLength(1);
   });
+
+  it('lists history with the most recent visit first', () => {
+    expect(
+      selectAppointments(appointments, 'past', now).map(({ appointment }) => appointment.status),
+    ).toEqual(['confirmed', 'completed', 'no_show']);
+  });
 });

@@ -2,6 +2,7 @@ import { AuthActionError } from './types';
 
 const AUTH_ERROR_MESSAGES = {
   'account-exists': 'An account already uses this email. Try signing in instead.',
+  'email-not-verified': 'Your email is not verified yet. Open the link we sent, then try again.',
   'invalid-credentials': 'The email or password is incorrect. Check both and try again.',
   network: 'Hakeemi could not reach the service. Check your connection and try again.',
   'rate-limited': 'Too many attempts were made. Wait a moment, then try again.',

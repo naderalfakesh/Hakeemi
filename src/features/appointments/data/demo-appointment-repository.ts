@@ -113,14 +113,15 @@ export class DemoAppointmentRepository implements AppointmentRepository {
 
   public async getAppointment(id: string) {
     const state = await this.readState();
-    return state.appointments.find((appointment) => appointment.id === id) ?? null;
+    const appointment = state.appointments.find((candidate) => candidate.id === id);
+    return appointment ? { ...appointment } : null;
   }
 
   public async listAppointments() {
     const state = await this.readState();
-    return [...state.appointments].sort((left, right) =>
-      left.startsAt.localeCompare(right.startsAt),
-    );
+    return state.appointments
+      .map((appointment) => ({ ...appointment }))
+      .sort((left, right) => left.startsAt.localeCompare(right.startsAt));
   }
 
   public async reschedule(input: Parameters<AppointmentRepository['reschedule']>[0]) {
@@ -179,7 +180,13 @@ export class DemoAppointmentRepository implements AppointmentRepository {
     operation: (state: DemoAppointmentState) => Promise<Result>,
   ): Promise<Result> {
     const pending = this.mutationQueue.then(async () => {
-      const state = await this.readState();
+      // Operations change a copy, so objects already handed to the query
+      // cache are never edited in place and a failed operation changes nothing.
+      const current = await this.readState();
+      const state: DemoAppointmentState = {
+        ...current,
+        appointments: current.appointments.map((appointment) => ({ ...appointment })),
+      };
       const result = await operation(state);
       this.state = state;
 

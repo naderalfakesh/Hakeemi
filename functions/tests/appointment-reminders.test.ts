@@ -3,7 +3,13 @@ import assert from 'node:assert/strict';
 import { after, before, beforeEach, describe, it } from 'node:test';
 
 import { deleteApp, initializeApp } from 'firebase-admin/app';
-import { DocumentReference, getFirestore, Timestamp, WriteBatch } from 'firebase-admin/firestore';
+import {
+  DocumentReference,
+  Firestore,
+  getFirestore,
+  Timestamp,
+  WriteBatch,
+} from 'firebase-admin/firestore';
 
 import { registerDeviceToken } from '../src/notifications/register-device-token.js';
 import { unregisterDeviceToken } from '../src/notifications/unregister-device-token.js';
@@ -178,6 +184,28 @@ function failNextTokenCleanupCommit() {
 
   return () => {
     WriteBatch.prototype.commit = original;
+    return fired;
+  };
+}
+
+// Rejects the first transaction (the first reminder claim of the run), then
+// restores the real method. Returns a function reporting whether it fired.
+function failNextClaimTransaction() {
+  const original = Firestore.prototype.runTransaction;
+  let fired = false;
+
+  Firestore.prototype.runTransaction = function (this: Firestore, ...args: unknown[]) {
+    if (!fired) {
+      fired = true;
+      Firestore.prototype.runTransaction = original;
+      return Promise.reject(transientFirestoreError());
+    }
+
+    return (original as unknown as (...rest: unknown[]) => Promise<unknown>).apply(this, args);
+  } as typeof Firestore.prototype.runTransaction;
+
+  return () => {
+    Firestore.prototype.runTransaction = original;
     return fired;
   };
 }
@@ -362,15 +390,16 @@ describe('scheduled appointment reminders', () => {
     assert.equal(failedReceipt.attempts, 1);
     assert.equal(failedReceipt.outcomeCode, 'messaging/internal-error');
 
-    // The 15-minute window has moved on; only the failed receipt brings it back.
+    // The retry pass sends it; the catch-up range still lists it, but its
+    // receipt is settled by then, so the scheduled pass skips it.
     const second = await sendAppointmentReminders(firestore, messaging, laterRun(15), { logger });
     assert.deepEqual(second, {
       abandoned: 0,
-      considered: 0,
+      considered: 1,
       failed: 0,
       retried: 1,
       sent: 1,
-      skipped: 0,
+      skipped: 1,
     } satisfies AppointmentReminderRunResult);
     const sentReceipt = await readReceipt(firestore);
     assert.equal(sentReceipt.status, 'sent');
@@ -380,11 +409,11 @@ describe('scheduled appointment reminders', () => {
     const third = await sendAppointmentReminders(firestore, messaging, laterRun(30), { logger });
     assert.deepEqual(third, {
       abandoned: 0,
-      considered: 0,
+      considered: 1,
       failed: 0,
       retried: 0,
       sent: 0,
-      skipped: 0,
+      skipped: 1,
     } satisfies AppointmentReminderRunResult);
     assert.equal(messages.length, 2);
     assert.deepEqual(messages[1]?.tokens, [token]);
@@ -419,6 +448,55 @@ describe('scheduled appointment reminders', () => {
     assert.equal(
       entries.filter((entry) => entry.message === 'appointment reminder run complete').length,
       3,
+    );
+  });
+
+  it('keeps the run going when one claim fails and catches that reminder up later', async () => {
+    const firestore = getFirestore(adminApp);
+    const otherAppointmentId = 'appointment-reminder-other';
+    const startsAt = Timestamp.fromMillis(now.toMillis() + 24 * 60 * 60 * 1_000);
+    await seedConfirmedAppointment(
+      firestore,
+      otherAppointmentId,
+      patientId,
+      startsAt,
+      Timestamp.fromMillis(startsAt.toMillis() + 30 * 60 * 1_000),
+    );
+    const messages: { data: { appointmentId: string } }[] = [];
+    const messaging = createMessagingStub(messages);
+    const { entries, logger } = createLogCapture();
+    const restore = failNextClaimTransaction();
+
+    const first = await sendAppointmentReminders(firestore, messaging, now, { logger });
+    assert.equal(restore(), true);
+    assert.deepEqual(first, {
+      abandoned: 0,
+      considered: 2,
+      failed: 1,
+      retried: 0,
+      sent: 1,
+      skipped: 0,
+    } satisfies AppointmentReminderRunResult);
+    assert.equal(messages.length, 1);
+    const failureLog = entries.find(
+      (entry) => entry.message === 'appointment reminder processing failed',
+    );
+    assert.equal(failureLog?.level, 'error');
+    assert.equal(failureLog?.fields.errorCode, 'grpc/14');
+
+    // The next run's window has moved on, but the catch-up range still holds both.
+    const second = await sendAppointmentReminders(firestore, messaging, laterRun(15), { logger });
+    assert.deepEqual(second, {
+      abandoned: 0,
+      considered: 2,
+      failed: 0,
+      retried: 0,
+      sent: 1,
+      skipped: 1,
+    } satisfies AppointmentReminderRunResult);
+    assert.deepEqual(
+      messages.map((message) => message.data.appointmentId).sort(),
+      [appointmentId, otherAppointmentId].sort(),
     );
   });
 
@@ -834,13 +912,14 @@ describe('scheduled appointment reminders', () => {
       logger,
     });
 
+    // All three are inside the catch-up range; none of them may be claimed.
     assert.deepEqual(result, {
       abandoned: 1,
-      considered: 1,
+      considered: 3,
       failed: 0,
       retried: 0,
       sent: 0,
-      skipped: 1,
+      skipped: 3,
     } satisfies AppointmentReminderRunResult);
     assert.equal(messages.length, 0);
     const legacyFailed = await readReceipt(firestore, legacyFailedId);

@@ -8,6 +8,8 @@ const authErrorStrings: LocalizedStrings<Record<AuthFailureCode, string>> = {
   ar: {
     'account-exists':
       'يوجد حساب يستخدم هذا البريد الإلكتروني بالفعل. جرّب تسجيل الدخول بدلًا من ذلك.',
+    'email-not-verified':
+      'لم يتم التحقق من بريدك الإلكتروني بعد. افتح الرابط الذي أرسلناه، ثم حاول مرة أخرى.',
     'invalid-credentials': 'البريد الإلكتروني أو كلمة المرور غير صحيحة. تحقق منهما وحاول مرة أخرى.',
     network: 'تعذّر على «حكيمي» الوصول إلى الخدمة. تحقق من اتصالك وحاول مرة أخرى.',
     'rate-limited': 'تم إجراء محاولات كثيرة جدًا. انتظر قليلًا، ثم حاول مرة أخرى.',
@@ -16,6 +18,7 @@ const authErrorStrings: LocalizedStrings<Record<AuthFailureCode, string>> = {
   },
   en: {
     'account-exists': 'An account already uses this email. Try signing in instead.',
+    'email-not-verified': 'Your email is not verified yet. Open the link we sent, then try again.',
     'invalid-credentials': 'The email or password is incorrect. Check both and try again.',
     network: 'Hakeemi could not reach the service. Check your connection and try again.',
     'rate-limited': 'Too many attempts were made. Wait a moment, then try again.',
@@ -25,7 +28,9 @@ const authErrorStrings: LocalizedStrings<Record<AuthFailureCode, string>> = {
 };
 
 export function localizeAuthError(error: unknown, locale: AppLocale): string {
-  const code: AuthFailureCode = toAuthActionError(error).code;
+  return localizeAuthFailure(toAuthActionError(error).code, locale);
+}
 
+export function localizeAuthFailure(code: AuthFailureCode, locale: AppLocale): string {
   return authErrorStrings[locale][code];
 }

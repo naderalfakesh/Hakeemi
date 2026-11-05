@@ -20,9 +20,11 @@ import {
 export type NotificationRegistrationStatus =
   'denied' | 'error' | 'idle' | 'registered' | 'requesting' | 'unavailable';
 
+export type NotificationRegistrationError = 'enable-failed';
+
 type NotificationRegistrationContextValue = {
   enable: () => Promise<void>;
-  error: string | null;
+  error: NotificationRegistrationError | null;
   status: NotificationRegistrationStatus;
 };
 
@@ -34,7 +36,7 @@ export function NotificationRegistrationProvider({ children }: { children: React
   const session = useAuthSession();
   const { preferences } = useAppPreferences();
   const [status, setStatus] = useState<NotificationRegistrationStatus>('idle');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<NotificationRegistrationError | null>(null);
   const registeredLocale = useRef<typeof preferences.locale | null>(null);
   const [statusUserId, setStatusUserId] = useState<string | null>(null);
   const userId = session.user?.id ?? null;
@@ -69,7 +71,7 @@ export function NotificationRegistrationProvider({ children }: { children: React
       }
     } catch {
       setStatus('error');
-      setError('Notifications could not be enabled. Try again or check device settings.');
+      setError('enable-failed');
     }
   }, [preferences.locale, session.user]);
 

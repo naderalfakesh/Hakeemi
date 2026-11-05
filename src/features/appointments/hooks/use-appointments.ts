@@ -21,7 +21,15 @@ export function selectAppointments(
   filter: AppointmentFilter,
   now: Date = new Date(),
 ) {
-  return items.filter(({ appointment }) => matchesFilter(appointment, filter, now));
+  const direction = filter === 'upcoming' ? 1 : -1;
+
+  // Upcoming reads soonest first; history reads most recent first.
+  return items
+    .filter(({ appointment }) => matchesFilter(appointment, filter, now))
+    .sort(
+      (left, right) =>
+        direction * left.appointment.startsAt.localeCompare(right.appointment.startsAt),
+    );
 }
 
 function matchesFilter(appointment: Appointment, filter: AppointmentFilter, now: Date) {

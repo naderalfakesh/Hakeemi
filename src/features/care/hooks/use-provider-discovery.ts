@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useQueries, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery, useQueries, useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 
 import { careRepository } from '@/features/care/data/care-repository';
@@ -12,6 +12,8 @@ const PROVIDER_PAGE_SIZE = 12;
 
 export type ProviderDiscoveryData = {
   nextSlots: ReadonlyMap<string, AvailabilitySlot>;
+  /** Providers whose availability is still loading; their cards show a placeholder. */
+  pendingSlotProviderIds: ReadonlySet<string>;
   providers: readonly Provider[];
   specialties: readonly Specialty[];
 };
@@ -46,6 +48,8 @@ export function useProviderDiscovery({
     queryFn: ({ pageParam }) => repository.listProviderPage(search, pageParam, PROVIDER_PAGE_SIZE),
     initialPageParam: null as ProviderPageCursor | null,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    // A new search keeps the current results on screen until its first page arrives.
+    placeholderData: keepPreviousData,
   });
   const providers = useMemo(() => {
     const seen = new Set<string>();
@@ -70,7 +74,6 @@ export function useProviderDiscovery({
     })),
   });
   const hasSlotError = slotQueries.some((slotQuery) => slotQuery.isError);
-  const hasPendingSlot = slotQueries.some((slotQuery) => slotQuery.isPending);
   const isMissingData =
     (providersQuery.isError && providersQuery.data === undefined) ||
     (specialtiesQuery.isError && specialtiesQuery.data === undefined) ||
@@ -81,10 +84,13 @@ export function useProviderDiscovery({
 
   if (isMissingData) {
     state = { status: 'error' };
-  } else if (providersQuery.isPending || specialtiesQuery.isPending || hasPendingSlot) {
+  } else if (providersQuery.isPending || specialtiesQuery.isPending) {
+    // Only the first load blocks the list. Later pages and availability load
+    // in place, so "load more" never replaces the results with skeletons.
     state = { status: 'loading' };
   } else {
     const nextSlots = new Map<string, AvailabilitySlot>();
+    const pendingSlotProviderIds = new Set<string>();
 
     for (const [index, slotQuery] of slotQueries.entries()) {
       const provider = providers[index];
@@ -92,6 +98,8 @@ export function useProviderDiscovery({
 
       if (provider && slot) {
         nextSlots.set(provider.id, slot);
+      } else if (provider && slotQuery.isPending) {
+        pendingSlotProviderIds.add(provider.id);
       }
     }
 
@@ -99,6 +107,7 @@ export function useProviderDiscovery({
       status: 'success',
       data: {
         nextSlots,
+        pendingSlotProviderIds,
         providers,
         specialties: specialtiesQuery.data ?? [],
       },
@@ -123,6 +132,7 @@ export function useProviderDiscovery({
 
   return {
     hasMore: providersQuery.hasNextPage,
+    isSearching: providersQuery.isPlaceholderData,
     isLoadingMore: providersQuery.isFetchingNextPage,
     isRefreshFailed,
     lastUpdatedAt: providersQuery.dataUpdatedAt || null,

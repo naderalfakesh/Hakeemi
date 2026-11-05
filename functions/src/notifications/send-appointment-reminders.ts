@@ -9,6 +9,10 @@ import { appointmentDocumentSchema } from '../appointments/contracts.js';
 
 export const APPOINTMENT_REMINDER_LEAD_TIME_MS = 24 * 60 * 60 * 1_000;
 export const APPOINTMENT_REMINDER_WINDOW_MS = 15 * 60 * 1_000;
+// Each run also looks back this far past the 24-hour target, so an
+// appointment a failed or missed run skipped is picked up by a later one.
+// Receipts keep it from being reminded twice.
+export const APPOINTMENT_REMINDER_CATCH_UP_MS = 60 * 60 * 1_000;
 export const APPOINTMENT_REMINDER_RETRY_LOOKBACK_MS = 48 * 60 * 60 * 1_000;
 export const APPOINTMENT_REMINDER_MAX_ATTEMPTS = 3;
 const REMINDER_CLAIM_LEASE_MS = 10 * 60 * 1_000;
@@ -110,7 +114,7 @@ export function getAppointmentReminderWindow(now: Timestamp): AppointmentReminde
 
   return {
     end: Timestamp.fromMillis(target + halfWindow),
-    start: Timestamp.fromMillis(target - halfWindow),
+    start: Timestamp.fromMillis(target - halfWindow - APPOINTMENT_REMINDER_CATCH_UP_MS),
   };
 }
 
@@ -204,7 +208,7 @@ export async function sendAppointmentReminders(
   result.considered = appointments.size;
 
   for (const appointmentSnapshot of appointments.docs) {
-    await processReminder(context, appointmentSnapshot, result);
+    await processReminderSafely(context, appointmentSnapshot, result, 'scheduled');
   }
 
   context.logger.info('appointment reminder run complete', { ...result });
@@ -225,7 +229,13 @@ type DeviceTokenEntry = {
   token: string;
 };
 
-type ClaimResult = { attempt: number; claimed: true } | { claimed: false };
+// Only the retry pass picks up `failed` receipts, so a reminder that fails is
+// retried on the next schedule tick rather than again in the same run.
+type ReminderPass = 'retry' | 'scheduled';
+
+type ClaimResult =
+  | { appointmentData: FirebaseFirestore.DocumentData | undefined; attempt: number; claimed: true }
+  | { claimed: false };
 
 type ReminderOutcome = {
   code: string;
@@ -248,15 +258,36 @@ class ReminderDeliveryError extends Error {
   }
 }
 
+// One appointment's unexpected error (for example a claim transaction that
+// keeps aborting) must not stop the rest of the run. Nothing is recorded, so
+// the catch-up window or the retry pass picks it up on a later run.
+async function processReminderSafely(
+  context: RunContext,
+  appointmentSnapshot: FirebaseFirestore.DocumentSnapshot,
+  result: AppointmentReminderRunResult,
+  pass: ReminderPass,
+) {
+  try {
+    await processReminder(context, appointmentSnapshot, result, pass);
+  } catch (error) {
+    result.failed += 1;
+    context.logger.error('appointment reminder processing failed', {
+      errorCode: readErrorCode(error),
+      reminderId: deriveReminderId(appointmentSnapshot.id),
+    });
+  }
+}
+
 async function processReminder(
   context: RunContext,
   appointmentSnapshot: FirebaseFirestore.DocumentSnapshot,
   result: AppointmentReminderRunResult,
+  pass: ReminderPass,
 ) {
   const { firestore, logger, now } = context;
   const appointmentId = appointmentSnapshot.id;
   const reminderId = deriveReminderId(appointmentId);
-  const claim = await claimReminder(firestore, appointmentId, now);
+  const claim = await claimReminder(firestore, appointmentSnapshot.ref, now, pass);
 
   if (!claim.claimed) {
     result.skipped += 1;
@@ -269,7 +300,8 @@ async function processReminder(
   try {
     outcome = await deliverReminder(
       context,
-      appointmentSnapshot,
+      appointmentId,
+      claim.appointmentData,
       claim.attempt,
       reminderId,
       progress,
@@ -333,13 +365,14 @@ function resolveDeliveryFailure(
 
 async function deliverReminder(
   context: RunContext,
-  appointmentSnapshot: FirebaseFirestore.DocumentSnapshot,
+  appointmentId: string,
+  appointmentData: FirebaseFirestore.DocumentData | undefined,
   attempt: number,
   reminderId: string,
   progress: DeliveryProgress,
 ): Promise<{ code: string; status: 'sent' | 'skipped' }> {
   const { firestore, logger, messaging, now } = context;
-  const appointment = appointmentDocumentSchema.parse(appointmentSnapshot.data());
+  const appointment = appointmentDocumentSchema.parse(appointmentData);
   const tokens = await readEnabledTokens(firestore, appointment.patientId);
 
   if (tokens.length === 0) {
@@ -356,7 +389,7 @@ async function deliverReminder(
     const response = await messaging.sendEachForMulticast(
       buildAppointmentReminderMessage(
         entries.map((entry) => entry.token),
-        appointmentSnapshot.id,
+        appointmentId,
         locale,
       ),
     );
@@ -467,7 +500,7 @@ async function retryFailedReminders(context: RunContext, result: AppointmentRemi
     }
 
     result.retried += 1;
-    await processReminder(context, appointmentSnapshot, result);
+    await processReminderSafely(context, appointmentSnapshot, result, 'retry');
   }
 }
 
@@ -569,13 +602,30 @@ async function disableInvalidTokens(
 
 async function claimReminder(
   firestore: Firestore,
-  appointmentId: string,
+  appointmentReference: FirebaseFirestore.DocumentReference,
   now: Timestamp,
+  pass: ReminderPass,
 ): Promise<ClaimResult> {
+  const appointmentId = appointmentReference.id;
   const receiptReference = firestore.doc(`appointmentReminders/${deriveReminderId(appointmentId)}`);
 
   return firestore.runTransaction(async (transaction) => {
-    const snapshot = await transaction.get(receiptReference);
+    // The appointment is re-read here so a cancellation or reschedule that
+    // landed after the run's query is respected before anything is sent.
+    const [snapshot, appointmentSnapshot] = await Promise.all([
+      transaction.get(receiptReference),
+      transaction.get(appointmentReference),
+    ]);
+    const appointmentData = appointmentSnapshot.data();
+    const current = appointmentDocumentSchema.safeParse(appointmentData);
+
+    if (
+      current.success &&
+      (current.data.status !== 'confirmed' || current.data.startsAt.toMillis() <= now.toMillis())
+    ) {
+      return { claimed: false };
+    }
+
     const existing = snapshot.exists ? reminderReceiptSchema.safeParse(snapshot.data()) : null;
     let attempts = 0;
 
@@ -583,6 +633,10 @@ async function claimReminder(
       const { status } = existing.data;
 
       if (status === 'abandoned' || status === 'sent' || status === 'skipped') {
+        return { claimed: false };
+      }
+
+      if (status === 'failed' && pass === 'scheduled' && existing.data.attempts !== undefined) {
         return { claimed: false };
       }
 
@@ -637,7 +691,7 @@ async function claimReminder(
       });
     }
 
-    return { attempt, claimed: true };
+    return { appointmentData, attempt, claimed: true };
   });
 }
 

@@ -23,8 +23,11 @@ import { SpecialtyFilter } from '../components/specialty-filter';
 import type { CareRepository } from '../domain/repository';
 import type { CareQueryScope } from '../data/query-keys';
 import type { Provider } from '../domain/types';
+import { useDebouncedValue } from '../hooks/use-debounced-value';
 import { useProviderDiscovery } from '../hooks/use-provider-discovery';
 import { clinicianCountLabels, findCareStrings } from '../localization/care-strings';
+
+const SEARCH_DEBOUNCE_MS = 300;
 
 type FindCareScreenProps = {
   onSelectProvider: (providerId: string) => void;
@@ -43,10 +46,13 @@ export function FindCareScreen({
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [query, setQuery] = useState('');
   const [specialtyId, setSpecialtyId] = useState<string | null>(null);
+  // Typing settles before a new query runs; clearing the field applies at once.
+  const debouncedQuery = useDebouncedValue(query.trim(), SEARCH_DEBOUNCE_MS);
+  const searchQuery = query.trim() === '' ? '' : debouncedQuery;
   const { hasMore, isLoadingMore, isRefreshFailed, lastUpdatedAt, loadMore, retry, state } =
     useProviderDiscovery({
       queryScope,
-      query,
+      query: searchQuery,
       specialtyId,
       ...(repository ? { repository } : {}),
     });
@@ -67,13 +73,14 @@ export function FindCareScreen({
   const renderProvider = useCallback<ListRenderItem<Provider>>(
     ({ item }) => (
       <ProviderCard
+        isSlotLoading={data?.pendingSlotProviderIds.has(item.id) ?? false}
         nextSlot={data?.nextSlots.get(item.id) ?? null}
         onPress={onSelectProvider}
         provider={item}
         specialtyName={specialtyNames.get(item.specialtyIds[0] ?? '') ?? strings.clinicianFallback}
       />
     ),
-    [data?.nextSlots, onSelectProvider, specialtyNames, strings],
+    [data?.nextSlots, data?.pendingSlotProviderIds, onSelectProvider, specialtyNames, strings],
   );
 
   return (

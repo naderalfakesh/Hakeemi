@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { AppText, DecorativeIcon } from '@/components/ui';
+import { AppText, DecorativeIcon, Skeleton } from '@/components/ui';
 import { formatLocalizedCount } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
@@ -13,6 +13,7 @@ import { formatAvailability, formatVisitMode } from '../presentation/formatters'
 import { ProviderAvatar } from './provider-avatar';
 
 type ProviderCardProps = {
+  isSlotLoading?: boolean;
   nextSlot: AvailabilitySlot | null;
   onPress: (providerId: string) => void;
   provider: Provider;
@@ -20,6 +21,7 @@ type ProviderCardProps = {
 };
 
 export const ProviderCard = memo(function ProviderCard({
+  isSlotLoading = false,
   nextSlot,
   onPress,
   provider,
@@ -68,7 +70,15 @@ export const ProviderCard = memo(function ProviderCard({
 
       <View style={styles.divider} />
 
-      {nextSlot ? (
+      {isSlotLoading ? (
+        <View style={styles.availabilityRow}>
+          <Skeleton height={36} radius="sm" width={36} />
+          <View style={styles.availabilityCopy}>
+            <Skeleton height={12} width="40%" />
+            <Skeleton height={16} style={styles.skeletonLine} width="70%" />
+          </View>
+        </View>
+      ) : nextSlot ? (
         <View style={styles.availabilityRow}>
           <View style={styles.availabilityIcon}>
             <DecorativeIcon color={theme.colors.brand} name="calendar-outline" size={18} />
@@ -139,6 +149,9 @@ function createStyles(theme: AppTheme) {
     availabilityCopy: {
       flex: 1,
       marginHorizontal: theme.spacing.sm,
+    },
+    skeletonLine: {
+      marginTop: theme.spacing.xxs,
     },
   });
 }

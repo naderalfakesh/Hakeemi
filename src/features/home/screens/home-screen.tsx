@@ -62,13 +62,20 @@ export function HomeScreen({
   const renderProvider = useCallback<ListRenderItem<Provider>>(
     ({ item }) => (
       <ProviderCard
+        isSlotLoading={discovery?.pendingSlotProviderIds.has(item.id) ?? false}
         nextSlot={discovery?.nextSlots.get(item.id) ?? null}
         onPress={onSelectProvider}
         provider={item}
         specialtyName={specialtyNames.get(item.specialtyIds[0] ?? '') ?? strings.clinicianFallback}
       />
     ),
-    [discovery?.nextSlots, onSelectProvider, specialtyNames, strings],
+    [
+      discovery?.nextSlots,
+      discovery?.pendingSlotProviderIds,
+      onSelectProvider,
+      specialtyNames,
+      strings,
+    ],
   );
 
   return (

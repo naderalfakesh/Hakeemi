@@ -18,16 +18,22 @@ import { ProviderAvatar } from '@/features/care/components/provider-avatar';
 import type { SavedProvidersStatus } from '@/features/care/hooks/use-saved-providers';
 import type { ProfileStatus } from '@/features/auth/context/auth-session-provider';
 import type { UserProfile } from '@/features/auth/domain/profile';
-import type { AuthUser } from '@/features/auth/domain/types';
-import type { NotificationRegistrationStatus } from '@/features/notifications/context/notification-registration-provider';
-import type { PreferencesStatus } from '@/features/preferences/context/app-preferences-provider';
+import type { AuthFailureCode, AuthUser } from '@/features/auth/domain/types';
+import type {
+  NotificationRegistrationError,
+  NotificationRegistrationStatus,
+} from '@/features/notifications/context/notification-registration-provider';
+import type {
+  PreferencesError,
+  PreferencesStatus,
+} from '@/features/preferences/context/app-preferences-provider';
 import type { AppPreferences } from '@/features/preferences/domain/preferences';
 import { isLayoutDirectionPendingRestart } from '@/localization/layout-direction';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
-import { localizeAuthError } from '../localization/auth-error-strings';
+import { localizeAuthError, localizeAuthFailure } from '../localization/auth-error-strings';
 import { profileStrings } from '../localization/profile-strings';
 
 type ProfileScreenProps = {
@@ -42,12 +48,12 @@ type ProfileScreenProps = {
   onToggleSavedProvider?: ((providerId: string) => void) | undefined;
   onUpdatePreferences: (preferences: AppPreferences) => void;
   preferences: AppPreferences;
-  preferencesError: string | null;
+  preferencesError: PreferencesError | null;
   preferencesStatus: PreferencesStatus;
-  notificationError: string | null;
+  notificationError: NotificationRegistrationError | null;
   notificationStatus: NotificationRegistrationStatus;
   profile: UserProfile | null;
-  profileError: string | null;
+  profileError: AuthFailureCode | null;
   profileStatus: ProfileStatus;
   savedProviders?: readonly Provider[] | undefined;
   savedProvidersStatus?: SavedProvidersStatus | undefined;
@@ -154,7 +160,13 @@ export function ProfileScreen({
               )}
               {profileStatus === 'error' && (
                 <>
-                  <InlineError message={profileError ?? strings.profileErrorFallback} />
+                  <InlineError
+                    message={
+                      profileError
+                        ? localizeAuthFailure(profileError, locale)
+                        : strings.profileErrorFallback
+                    }
+                  />
                   <Button onPress={() => void onRetryProfile()} variant="secondary">
                     {strings.retryProfileSync}
                   </Button>
@@ -192,7 +204,13 @@ export function ProfileScreen({
                 </AppText>
               )}
               {notificationStatus === 'error' && (
-                <InlineError message={notificationError ?? strings.notificationErrorFallback} />
+                <InlineError
+                  message={
+                    notificationError === 'enable-failed'
+                      ? strings.notificationEnableFailed
+                      : strings.notificationErrorFallback
+                  }
+                />
               )}
               {(notificationStatus === 'idle' ||
                 notificationStatus === 'denied' ||
@@ -267,7 +285,7 @@ function PreferencesCard({
   onRetryPreferences: () => void;
   onUpdatePreferences: (preferences: AppPreferences) => void;
   preferences: AppPreferences;
-  preferencesError: string | null;
+  preferencesError: PreferencesError | null;
   preferencesStatus: PreferencesStatus;
   subtitle: string;
 }) {
@@ -329,7 +347,15 @@ function PreferencesCard({
       )}
       {preferencesStatus === 'error' && (
         <>
-          <InlineError message={preferencesError ?? strings.preferencesErrorFallback} />
+          <InlineError
+            message={
+              preferencesError === 'save-failed'
+                ? strings.preferencesSaveFailed
+                : preferencesError === 'load-failed'
+                  ? strings.preferencesLoadFailed
+                  : strings.preferencesErrorFallback
+            }
+          />
           <Button onPress={onRetryPreferences} variant="secondary">
             {strings.retryPreferences}
           </Button>

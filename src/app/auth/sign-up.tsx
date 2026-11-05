@@ -31,18 +31,14 @@ export default function SignUpRoute() {
     );
   }
 
+  // The session redirect above navigates once the new account is restored.
   async function handleSignUp(values: SignUpValues) {
-    const user = await signUp({
+    await signUp({
       displayName: values.displayName,
       email: values.email,
       password: values.password,
     });
     await session.refreshSession();
-
-    router.replace({
-      pathname: '/auth/verify-email',
-      params: { email: user.email ?? values.email, ...returnParams },
-    });
   }
 
   return (

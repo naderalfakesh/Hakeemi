@@ -98,8 +98,8 @@ emulator-only until enabling billing is an explicit decision.
 
 ## Quality
 
-CI runs `npm run validate` — formatting, lint, strict types, 45 Jest suites
-with 183 tests (including Arabic-locale renders), 19 Functions unit tests,
+CI runs `npm run validate` — formatting, lint, strict types, 50 Jest suites
+with 227 tests (including Arabic-locale renders), 19 Functions unit tests,
 CI-enforced illustration budgets, and Expo Doctor — plus the Firebase emulator
 matrix: 14 security-rules tests and callable integration suites for booking,
 appointment management, notification tokens, and scheduled reminders. Native

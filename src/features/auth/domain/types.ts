@@ -15,7 +15,13 @@ export type SignUpInput = SignInInput & {
 };
 
 export type AuthFailureCode =
-  'account-exists' | 'invalid-credentials' | 'network' | 'rate-limited' | 'unavailable' | 'unknown';
+  | 'account-exists'
+  | 'email-not-verified'
+  | 'invalid-credentials'
+  | 'network'
+  | 'rate-limited'
+  | 'unavailable'
+  | 'unknown';
 
 export class AuthActionError extends Error {
   constructor(

@@ -49,6 +49,52 @@ describe('useProviderDiscovery', () => {
     );
   });
 
+  it('keeps the list while a new page and its availability load', async () => {
+    const [first, second] = providerFixtures;
+    const listProviderPage = jest
+      .fn()
+      .mockResolvedValueOnce({ items: [first], nextCursor: 'next-page' })
+      .mockResolvedValueOnce({ items: [second], nextCursor: null });
+    const listAvailableSlots = jest.fn((providerId: string) =>
+      providerId === first.id ? Promise.resolve([]) : new Promise<never>(() => undefined),
+    );
+    const repository: CareRepository = {
+      getClinic: jest.fn().mockResolvedValue(null),
+      getProvider: jest.fn().mockResolvedValue(null),
+      listAvailableSlots,
+      listClinics: jest.fn().mockResolvedValue([]),
+      listProviderPage,
+      listSpecialties: jest.fn().mockResolvedValue(specialtyFixtures),
+    };
+    const statuses: string[] = [];
+    const { result } = await renderHook(
+      () => {
+        const discovery = useProviderDiscovery({ query: '', repository, specialtyId: null });
+        statuses.push(discovery.state.status);
+        return discovery;
+      },
+      { wrapper: TestAppProviders },
+    );
+
+    await waitFor(() => expect(result.current.state.status).toBe('success'));
+    statuses.length = 0;
+
+    await act(async () => result.current.loadMore());
+    await waitFor(() =>
+      expect(listAvailableSlots).toHaveBeenCalledWith(second.id, expect.anything()),
+    );
+
+    expect(statuses).not.toContain('loading');
+    const { state } = result.current;
+    expect(state.status === 'success' && state.data.providers.map(({ id }) => id)).toEqual([
+      first.id,
+      second.id,
+    ]);
+    expect(state.status === 'success' && [...state.data.pendingSlotProviderIds]).toEqual([
+      second.id,
+    ]);
+  });
+
   it('keeps cached results and flags the failed refresh instead of erroring', async () => {
     const listProviderPage = jest
       .fn()

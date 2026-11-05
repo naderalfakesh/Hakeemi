@@ -13,8 +13,10 @@ import {
 
 export type PreferencesStatus = 'error' | 'idle' | 'loading' | 'ready' | 'saving';
 
+export type PreferencesError = 'load-failed' | 'save-failed';
+
 type AppPreferencesContextValue = {
-  error: string | null;
+  error: PreferencesError | null;
   preferences: AppPreferences;
   retry: () => void;
   status: PreferencesStatus;
@@ -68,16 +70,16 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
   });
 
   let status: PreferencesStatus;
-  let error: string | null = null;
+  let error: PreferencesError | null = null;
 
   if (updateMutation.isPending) {
     status = 'saving';
   } else if (updateMutation.isError) {
     status = 'error';
-    error = 'Your preference could not be saved. Your previous choice was restored.';
+    error = 'save-failed';
   } else if (preferencesQuery.isError) {
     status = 'error';
-    error = 'Your synced preferences could not be loaded.';
+    error = 'load-failed';
   } else if ((userId !== null && !session.profile) || preferencesQuery.isPending) {
     status = 'loading';
   } else {

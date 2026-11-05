@@ -14,6 +14,7 @@ import { triggerHaptic } from '@/services/haptics/haptics';
 import { TestAppProviders } from '@/test/test-app-providers';
 
 import { calendarLinkStorage } from '../data/calendar-link-storage';
+import { AppointmentActionError } from '../domain/errors';
 import type { AppointmentRepository } from '../domain/repository';
 import type { Appointment, AppointmentActionResult } from '../domain/types';
 import { AppointmentDetailScreen } from './appointment-detail-screen';
@@ -360,6 +361,44 @@ describe('AppointmentDetailScreen', () => {
       }),
     );
     expect(mockedTriggerHaptic).toHaveBeenCalledWith('warning');
+  });
+
+  it('keeps the request ID when a failed cancellation is retried', async () => {
+    const cancel = jest
+      .fn()
+      .mockRejectedValueOnce(new AppointmentActionError('network', 'offline'))
+      .mockResolvedValue(actionResult);
+    let nextRequest = 0;
+    const view = await render(
+      <TestAppProviders>
+        <AppointmentDetailScreen
+          appointmentId={appointment.id}
+          appointmentRepository={repository({ cancel })}
+          careDataRepository={fixtureCareRepository}
+          createRequestId={() => `request-${(nextRequest += 1)}`}
+          onBack={jest.fn()}
+          onFindCare={jest.fn()}
+        />
+      </TestAppProviders>,
+    );
+
+    await waitFor(() =>
+      expect(view.getByRole('header', { name: 'Dr. Lina Haddad' })).toBeVisible(),
+    );
+    await act(async () =>
+      fireEvent.press(view.getByRole('button', { name: 'Cancel appointment' })),
+    );
+    await act(async () =>
+      fireEvent.press(view.getByRole('button', { name: 'Confirm cancellation' })),
+    );
+    await waitFor(() => expect(cancel).toHaveBeenCalledTimes(1));
+    expect(view.getByRole('button', { name: 'Confirm cancellation' })).toBeVisible();
+
+    await act(async () =>
+      fireEvent.press(view.getByRole('button', { name: 'Confirm cancellation' })),
+    );
+    await waitFor(() => expect(cancel).toHaveBeenCalledTimes(2));
+    expect(cancel.mock.calls.map(([input]) => input.requestId)).toEqual(['request-1', 'request-1']);
   });
 
   it('reveals available provider slots for rescheduling', async () => {

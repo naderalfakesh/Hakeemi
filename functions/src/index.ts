@@ -87,6 +87,8 @@ export const bookAppointment = onCall(async (request) => {
     throw new HttpsError('unauthenticated', 'Sign in before booking an appointment.');
   }
 
+  requireVerifiedEmail(auth.token);
+
   return reserveAppointment(firestore, auth.uid, parseBookAppointmentRequest(request.data));
 });
 
@@ -110,6 +112,8 @@ export const rescheduleAppointment = onCall(async (request) => {
   if (!auth) {
     throw new HttpsError('unauthenticated', 'Sign in before rescheduling an appointment.');
   }
+
+  requireVerifiedEmail(auth.token);
 
   return rescheduleAppointmentTransaction(
     firestore,
@@ -155,6 +159,14 @@ export const sendAppointmentReminders = onSchedule(
     await deliverAppointmentReminders(firestore, getMessaging());
   },
 );
+
+// Reserving a slot needs a verified email, matching the app. Cancelling stays
+// open so an account can always release a visit it holds.
+function requireVerifiedEmail(token: { email_verified?: boolean }) {
+  if (token.email_verified !== true) {
+    throw new HttpsError('failed-precondition', 'Verify your email before booking.');
+  }
+}
 
 function readTokenText(value: unknown) {
   return typeof value === 'string' && value.trim() ? value.trim() : null;

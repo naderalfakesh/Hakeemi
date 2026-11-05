@@ -31,19 +31,10 @@ export default function SignInRoute() {
     );
   }
 
+  // The session redirect above navigates once the signed-in user is restored.
   async function handleSignIn(values: SignInValues) {
-    const user = await signIn(values);
+    await signIn(values);
     await session.refreshSession();
-
-    if (!user.emailVerified) {
-      router.replace({
-        pathname: '/auth/verify-email',
-        params: { email: user.email ?? values.email, ...returnParams },
-      });
-      return;
-    }
-
-    router.replace(bookingDestination(bookingReturn));
   }
 
   return (

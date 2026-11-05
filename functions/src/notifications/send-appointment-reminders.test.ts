@@ -5,6 +5,7 @@ import { Timestamp } from 'firebase-admin/firestore';
 import { z } from 'zod';
 
 import {
+  APPOINTMENT_REMINDER_CATCH_UP_MS,
   APPOINTMENT_REMINDER_LEAD_TIME_MS,
   APPOINTMENT_REMINDER_MAX_ATTEMPTS,
   APPOINTMENT_REMINDER_RETRY_LOOKBACK_MS,
@@ -70,13 +71,16 @@ describe('appointment reminder delivery', () => {
     assert.equal(resolveReminderLocale(42), 'en');
   });
 
-  it('creates a centered 15-minute window around the 24-hour reminder target', () => {
+  it('covers the 15-minute window around the 24-hour target plus a one-hour catch-up', () => {
     const now = Timestamp.fromMillis(1_700_000_000_000);
     const window = getAppointmentReminderWindow(now);
     const target = now.toMillis() + APPOINTMENT_REMINDER_LEAD_TIME_MS;
 
-    assert.equal(window.end.toMillis() - window.start.toMillis(), APPOINTMENT_REMINDER_WINDOW_MS);
-    assert.equal(window.start.toMillis(), target - APPOINTMENT_REMINDER_WINDOW_MS / 2);
+    assert.equal(APPOINTMENT_REMINDER_CATCH_UP_MS, 60 * 60 * 1_000);
+    assert.equal(
+      window.start.toMillis(),
+      target - APPOINTMENT_REMINDER_WINDOW_MS / 2 - APPOINTMENT_REMINDER_CATCH_UP_MS,
+    );
     assert.equal(window.end.toMillis(), target + APPOINTMENT_REMINDER_WINDOW_MS / 2);
   });
 

@@ -39,6 +39,8 @@ const SIGN_OUT_BUDGET_MS = 5_000;
 const DEREGISTRATION_TIMEOUT_MS = 5_000;
 
 let stopTokenRefresh: (() => void) | null = null;
+let initialAppointmentId: Promise<string | null> | null = null;
+let hasDeliveredInitialNotification = false;
 // Registration changes run one at a time so a late registration (enable or
 // token refresh) can never land after the sign-out that had to disable it, and
 // a pending flush always precedes the registration that follows it.
@@ -156,10 +158,14 @@ export function subscribeToAppointmentNotificationOpen(listener: (appointmentId:
     }
   });
 
-  void getInitialNotification(messaging).then((message) => {
-    const appointmentId = parseAppointmentNotification(message?.data);
-
-    if (active && appointmentId) {
+  // The notification that launched the app is delivered once per process, so
+  // a later re-subscription never reopens it.
+  initialAppointmentId ??= getInitialNotification(messaging)
+    .then((message) => parseAppointmentNotification(message?.data))
+    .catch(() => null);
+  void initialAppointmentId.then((appointmentId) => {
+    if (active && appointmentId && !hasDeliveredInitialNotification) {
+      hasDeliveredInitialNotification = true;
       listener(appointmentId);
     }
   });

@@ -23,6 +23,7 @@ import {
   validateAvailableSlot,
   validateSlotOwnership,
 } from './book-appointment.js';
+import { deriveReminderId } from '../notifications/send-appointment-reminders.js';
 
 /** Keep appointment management aligned with the booking lead-time policy. */
 export const APPOINTMENT_MANAGEMENT_LEAD_TIME_MS = 15 * 60 * 1_000;
@@ -106,7 +107,7 @@ export async function cancelAppointment(
         throw new HttpsError('failed-precondition', 'This appointment cannot be cancelled again.');
       }
 
-      throwIfCancelledSlotIsNotReleased(slot);
+      throwIfCancelledSlotIsNotReleased(slot, request.appointmentId);
       return cancelAppointmentResultSchema.parse({
         appointment: toAppointmentSummary(request.appointmentId, appointment),
         isReplay: true,
@@ -308,6 +309,11 @@ export async function rescheduleAppointment(
       updatedAt: FieldValue.serverTimestamp(),
       version: reservedSlot.version,
     });
+    // The reminder receipt belongs to the old time; dropping it lets the new
+    // time get its own reminder instead of matching a settled receipt.
+    transaction.delete(
+      firestore.doc(`appointmentReminders/${deriveReminderId(request.appointmentId)}`),
+    );
 
     transaction.create(operationReference, {
       appointmentId: request.appointmentId,
@@ -401,8 +407,13 @@ function assertBookedSlot(slot: ReturnType<typeof parseStoredSlot>, appointmentI
   }
 }
 
-function throwIfCancelledSlotIsNotReleased(slot: ReturnType<typeof parseStoredSlot>) {
-  if (slot.status !== 'available' || slot.appointmentId !== null) {
+// Once released, the slot may already be booked by someone else; it is only
+// inconsistent if it still points at the cancelled appointment.
+function throwIfCancelledSlotIsNotReleased(
+  slot: ReturnType<typeof parseStoredSlot>,
+  appointmentId: string,
+) {
+  if (slot.appointmentId === appointmentId) {
     throw new HttpsError('internal', 'The cancelled appointment slot was not released.');
   }
 }

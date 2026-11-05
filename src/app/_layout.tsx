@@ -1,7 +1,7 @@
 import { Stack, ThemeProvider as NavigationThemeProvider, useRouter, type Href } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -111,22 +111,29 @@ function NotificationNavigationBridge() {
   const router = useRouter();
   const session = useAuthSession();
   const pendingAppointmentId = useRef<string | null>(null);
-  const openAppointment = useCallback(
-    (appointmentId: string) => {
-      if (session.status !== 'authenticated') {
-        pendingAppointmentId.current = appointmentId;
-        return;
-      }
+  // The listener reads the latest status through a ref, so it subscribes once
+  // instead of on every session change.
+  const sessionStatus = useRef(session.status);
 
-      router.push({
-        pathname: '/appointments/[appointmentId]',
-        params: { appointmentId },
-      } as unknown as Href);
-    },
-    [router, session.status],
+  useEffect(() => {
+    sessionStatus.current = session.status;
+  }, [session.status]);
+
+  useEffect(
+    () =>
+      subscribeToAppointmentNotificationOpen((appointmentId) => {
+        if (sessionStatus.current !== 'authenticated') {
+          pendingAppointmentId.current = appointmentId;
+          return;
+        }
+
+        router.push({
+          pathname: '/appointments/[appointmentId]',
+          params: { appointmentId },
+        } as unknown as Href);
+      }),
+    [router],
   );
-
-  useEffect(() => subscribeToAppointmentNotificationOpen(openAppointment), [openAppointment]);
 
   useEffect(() => {
     if (session.status === 'authenticated' && pendingAppointmentId.current) {
