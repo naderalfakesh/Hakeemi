@@ -37,8 +37,11 @@ import { localizeAuthError, localizeAuthFailure } from '../localization/auth-err
 import { profileStrings } from '../localization/profile-strings';
 
 type ProfileScreenProps = {
+  /** A demo session has no account, so it gets a way out instead of sign-out. */
+  isDemo?: boolean;
   onCreateAccount: () => void;
   onEnableNotifications: () => Promise<void>;
+  onExitDemo?: (() => Promise<void>) | undefined;
   onRetryPreferences: () => void;
   onRetryProfile: () => Promise<void>;
   onSignIn: () => void;
@@ -61,8 +64,10 @@ type ProfileScreenProps = {
 };
 
 export function ProfileScreen({
+  isDemo = false,
   onCreateAccount,
   onEnableNotifications,
+  onExitDemo,
   onRetryPreferences,
   onRetryProfile,
   onSignIn,
@@ -90,12 +95,12 @@ export function ProfileScreen({
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState<string>();
 
-  async function handleSignOut() {
+  async function handleSignOut(leave: () => Promise<void> = onSignOut) {
     setIsSigningOut(true);
     setSignOutError(undefined);
 
     try {
-      await onSignOut();
+      await leave();
     } catch (error) {
       setSignOutError(localizeAuthError(error, locale));
     } finally {
@@ -243,16 +248,36 @@ export function ProfileScreen({
           <>
             <Surface padding="spacious" style={styles.guestCard} variant="brand">
               <View style={styles.guestIcon}>
-                <DecorativeIcon color={theme.colors.brand} name="person-outline" size={30} />
+                <DecorativeIcon
+                  color={theme.colors.brand}
+                  name={isDemo ? 'flask-outline' : 'person-outline'}
+                  size={30}
+                />
               </View>
-              <AppText variant="titleMedium">{strings.guestTitle}</AppText>
-              <AppText tone="secondary" variant="bodyLarge">
-                {strings.guestSubtitle}
+              <AppText variant="titleMedium">
+                {isDemo ? strings.demoTitle : strings.guestTitle}
               </AppText>
-              <Button onPress={onSignIn}>{strings.signIn}</Button>
-              <Button onPress={onCreateAccount} variant="secondary">
-                {strings.createAccount}
+              <AppText tone="secondary" variant="bodyLarge">
+                {isDemo ? strings.demoSubtitle : strings.guestSubtitle}
+              </AppText>
+              <Button onPress={isDemo ? onCreateAccount : onSignIn}>
+                {isDemo ? strings.createAccount : strings.signIn}
               </Button>
+              <Button onPress={isDemo ? onSignIn : onCreateAccount} variant="secondary">
+                {isDemo ? strings.signIn : strings.createAccount}
+              </Button>
+              {isDemo && onExitDemo && (
+                <>
+                  {signOutError && <InlineError message={signOutError} />}
+                  <Button
+                    busy={isSigningOut}
+                    onPress={() => void handleSignOut(onExitDemo)}
+                    variant="tertiary"
+                  >
+                    {strings.exitDemo}
+                  </Button>
+                </>
+              )}
             </Surface>
 
             <PreferencesCard

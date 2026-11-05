@@ -11,6 +11,8 @@ import {
   stateIllustrations,
   Surface,
 } from '@/components/ui';
+import { NextVisitCard } from '@/features/appointments/components/next-visit-card';
+import type { Appointment } from '@/features/appointments/domain/types';
 import { ProviderCard } from '@/features/care/components/provider-card';
 import { ProviderCardSkeleton } from '@/features/care/components/provider-card-skeleton';
 import type { CareRepository } from '@/features/care/domain/repository';
@@ -22,8 +24,17 @@ import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
+export type HomeNextVisit = {
+  appointment: Appointment;
+  providerName: string;
+};
+
 type HomeScreenProps = {
+  /** Shows the demo badge so fictional data is never mistaken for an account. */
+  isDemo?: boolean;
+  nextVisit?: HomeNextVisit | null;
   onFindCare: () => void;
+  onOpenAppointment?: (appointmentId: string) => void;
   onOpenCatalogue?: () => void;
   onSelectProvider: (providerId: string) => void;
   queryScope?: CareQueryScope;
@@ -31,7 +42,10 @@ type HomeScreenProps = {
 };
 
 export function HomeScreen({
+  isDemo = false,
+  nextVisit = null,
   onFindCare,
+  onOpenAppointment,
   onOpenCatalogue,
   onSelectProvider,
   queryScope = 'account',
@@ -103,7 +117,14 @@ export function HomeScreen({
             )}
           </View>
         }
-        ListHeaderComponent={<HomeHeader onFindCare={onFindCare} />}
+        ListHeaderComponent={
+          <HomeHeader
+            isDemo={isDemo}
+            nextVisit={nextVisit}
+            onFindCare={onFindCare}
+            onOpenAppointment={onOpenAppointment}
+          />
+        }
         contentContainerStyle={styles.content}
         data={providers}
         initialNumToRender={3}
@@ -116,21 +137,53 @@ export function HomeScreen({
   );
 }
 
-function HomeHeader({ onFindCare }: { onFindCare: () => void }) {
+function HomeHeader({
+  isDemo,
+  nextVisit,
+  onFindCare,
+  onOpenAppointment,
+}: {
+  isDemo: boolean;
+  nextVisit: HomeNextVisit | null;
+  onFindCare: () => void;
+  onOpenAppointment: ((appointmentId: string) => void) | undefined;
+}) {
   const theme = useAppTheme();
+  const { intlLocale } = useAppLocale();
   const strings = useStrings(homeStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const today = new Intl.DateTimeFormat(intlLocale, {
+    day: 'numeric',
+    month: 'long',
+    weekday: 'long',
+  }).format(new Date());
 
   return (
     <View style={styles.header}>
       <View style={styles.heading}>
-        <AppText tone="secondary" variant="labelLarge">
-          {strings.portfolioDemo}
-        </AppText>
+        <View style={styles.eyebrow}>
+          <AppText tone="secondary" variant="labelLarge">
+            {today}
+          </AppText>
+          {isDemo && (
+            <View style={styles.demoBadge}>
+              <DecorativeIcon color={theme.colors.accent} name="flask-outline" size={14} />
+              <AppText variant="labelSmall">{strings.demoBadge}</AppText>
+            </View>
+          )}
+        </View>
         <AppText accessibilityRole="header" variant="display">
           {strings.greeting}
         </AppText>
       </View>
+
+      {nextVisit && onOpenAppointment && (
+        <NextVisitCard
+          appointment={nextVisit.appointment}
+          onPress={() => onOpenAppointment(nextVisit.appointment.id)}
+          providerName={nextVisit.providerName}
+        />
+      )}
 
       {/* A compact entry point: the Find care tab and "See all" already lead
           to the same place, so the hero stays one tappable row instead of a
@@ -253,6 +306,23 @@ function createStyles(theme: AppTheme) {
     heading: {
       gap: theme.spacing.xxs,
     },
+    eyebrow: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: theme.spacing.xs,
+      justifyContent: 'space-between',
+    },
+    demoBadge: {
+      alignItems: 'center',
+      backgroundColor: theme.colors.accentSoft,
+      borderRadius: theme.radii.full,
+      flexDirection: 'row',
+      gap: theme.spacing.xxs,
+      paddingHorizontal: theme.spacing.sm,
+      paddingVertical: theme.spacing.xxs,
+    },
+
     featureCard: {
       alignItems: 'center',
       flexDirection: 'row',

@@ -1,9 +1,11 @@
 import { useEffect, useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText, Button, Illustration, stateIllustrations, Surface } from '@/components/ui';
+import { AppointmentCalendarSection } from '@/features/appointments/components/appointment-calendar-section';
 import type { Appointment } from '@/features/appointments/domain/types';
+import type { AppointmentCalendar } from '@/features/appointments/hooks/use-appointment-calendar';
 import type { Provider } from '@/features/care/domain/types';
 import { formatTimeZoneName } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
@@ -15,11 +17,14 @@ import { bookingStrings } from '../localization/booking-strings';
 
 export function BookingConfirmationScreen({
   appointment,
+  calendar,
   onFindCare,
   onViewAppointments,
   provider,
 }: {
   appointment: Appointment;
+  /** Offers to add the new visit to the device calendar right away. */
+  calendar?: AppointmentCalendar | undefined;
   onFindCare: () => void;
   onViewAppointments: () => void;
   provider: Provider | null;
@@ -35,9 +40,9 @@ export function BookingConfirmationScreen({
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
-      <View style={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View accessibilityElementsHidden importantForAccessibility="no" style={styles.icon}>
-          <Illustration backdrop={false} size={200} source={stateIllustrations.bookingConfirmed} />
+          <Illustration backdrop={false} size={168} source={stateIllustrations.bookingConfirmed} />
         </View>
         <View style={styles.heading}>
           <AppText accessibilityRole="header" style={styles.centered} variant="titleLarge">
@@ -66,6 +71,14 @@ export function BookingConfirmationScreen({
           <AppText selectable tone="secondary" variant="caption">
             {strings.confirmation.reference(appointment.id.slice(-10).toUpperCase())}
           </AppText>
+          {calendar && (
+            <View style={styles.calendar}>
+              <AppointmentCalendarSection
+                appointmentStatus={appointment.status}
+                calendar={calendar}
+              />
+            </View>
+          )}
         </Surface>
 
         <View style={styles.actions}>
@@ -74,7 +87,7 @@ export function BookingConfirmationScreen({
             {strings.confirmation.findAnotherClinician}
           </Button>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -95,7 +108,7 @@ function createStyles(theme: AppTheme) {
     },
     content: {
       alignSelf: 'center',
-      flex: 1,
+      flexGrow: 1,
       gap: theme.spacing.lg,
       justifyContent: 'center',
       maxWidth: theme.sizes.contentMaxWidth,
@@ -116,6 +129,12 @@ function createStyles(theme: AppTheme) {
     },
     card: {
       gap: theme.spacing.sm,
+    },
+    calendar: {
+      borderTopColor: theme.colors.borderSubtle,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      marginTop: theme.spacing.xs,
+      paddingTop: theme.spacing.md,
     },
     actions: {
       gap: theme.spacing.sm,

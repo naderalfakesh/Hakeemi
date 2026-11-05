@@ -62,6 +62,43 @@ describe('ProfileScreen', () => {
     expect(onSignIn).toHaveBeenCalledTimes(1);
   });
 
+  it('lets a demo session create an account or leave the demo', async () => {
+    const onExitDemo = jest.fn().mockResolvedValue(undefined);
+    const onCreateAccount = jest.fn();
+    const view = await render(
+      <AppThemeProvider colorScheme="light">
+        <ProfileScreen
+          isDemo
+          onCreateAccount={onCreateAccount}
+          onEnableNotifications={noop}
+          onExitDemo={onExitDemo}
+          onRetryPreferences={noop}
+          onRetryProfile={noop}
+          onSignIn={noop}
+          onSignOut={noop}
+          onUpdatePreferences={noop}
+          preferences={{ locale: 'en', theme: 'system' }}
+          preferencesError={null}
+          preferencesStatus="idle"
+          notificationError={null}
+          notificationStatus="idle"
+          profile={null}
+          profileError={null}
+          profileStatus="idle"
+          user={null}
+        />
+      </AppThemeProvider>,
+    );
+
+    expect(view.getByText('You’re exploring the demo')).toBeOnTheScreen();
+    await fireEvent.press(view.getByRole('button', { name: 'Create an account' }));
+    await fireEvent.press(view.getByRole('button', { name: 'Exit demo' }));
+
+    expect(onCreateAccount).toHaveBeenCalledTimes(1);
+    expect(onExitDemo).toHaveBeenCalledTimes(1);
+    expect(noop).not.toHaveBeenCalled();
+  });
+
   it('shows the server-owned profile and signs out', async () => {
     const onSignOut = jest.fn().mockResolvedValue(undefined);
     const onUpdatePreferences = jest.fn();

@@ -22,6 +22,10 @@ export default function BookingDetailsRoute() {
     dataSources.scope,
   );
   const strings = useStrings(bookingStrings);
+  // Details is the first step of the booking sheet, so leaving it closes the
+  // sheet and shows the clinician underneath.
+  const closeBooking = () =>
+    router.canGoBack() ? router.back() : router.replace(`/providers/${providerId}`);
 
   // Only the focused screen seeds a draft. Once a booking is confirmed this
   // screen may still be mounted while it animates away, and must not start a
@@ -64,7 +68,7 @@ export default function BookingDetailsRoute() {
   if (selection.state.status !== 'success') {
     return (
       <BookingRouteState
-        onBack={() => router.replace(`/providers/${providerId}`)}
+        onBack={closeBooking}
         onRetry={selection.retry}
         status={selection.state.status}
       />
@@ -74,14 +78,14 @@ export default function BookingDetailsRoute() {
   const draft = bookingDraft.draft;
 
   if (!draft || draft.providerId !== providerId || draft.slotId !== slotId) {
-    return <BookingRouteState onBack={() => router.back()} onRetry={() => {}} status="loading" />;
+    return <BookingRouteState onBack={closeBooking} onRetry={() => {}} status="loading" />;
   }
 
   return (
     <BookingDetailsScreen
       error={bookingDraft.error ? strings.draftErrors[bookingDraft.error] : null}
       isSaving={bookingDraft.status === 'saving'}
-      onBack={() => router.replace(`/providers/${providerId}`)}
+      onBack={closeBooking}
       onContinue={() =>
         router.push({ pathname: '/booking/review', params: { providerId, slotId } })
       }

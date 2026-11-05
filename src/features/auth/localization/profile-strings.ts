@@ -13,6 +13,10 @@ const en = {
   enableReminders: 'Enable reminders',
   enablingReminders: 'Enabling reminders…',
   eyebrow: 'YOUR ACCOUNT',
+  demoSubtitle:
+    'Bookings in the demo are fictional and stay on this device. Create an account to keep real appointments and get reminders.',
+  demoTitle: 'You’re exploring the demo',
+  exitDemo: 'Exit demo',
   guestSubtitle: 'Sign in to keep your appointments and preferences with you on every device.',
   guestTitle: 'You’re exploring as a guest',
   languageArabic: 'العربية',
@@ -73,6 +77,10 @@ export const profileStrings: LocalizedStrings<typeof en> = {
     enableReminders: 'تفعيل التذكيرات',
     enablingReminders: 'جارٍ تفعيل التذكيرات…',
     eyebrow: 'حسابك',
+    demoSubtitle:
+      'الحجوزات في العرض التجريبي خيالية وتبقى على هذا الجهاز. أنشئ حسابًا لتحتفظ بمواعيد حقيقية وتتلقى التذكيرات.',
+    demoTitle: 'أنت تستكشف العرض التجريبي',
+    exitDemo: 'الخروج من العرض التجريبي',
     guestSubtitle: 'سجّل الدخول لتبقى مواعيدك وتفضيلاتك معك على جميع أجهزتك.',
     guestTitle: 'أنت تتصفح كضيف',
     languageArabic: 'العربية',

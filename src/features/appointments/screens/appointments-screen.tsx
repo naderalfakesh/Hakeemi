@@ -28,6 +28,7 @@ import {
   type AppointmentFilter,
 } from '../hooks/use-appointments';
 import type { Appointment } from '../domain/types';
+import { formatAppointmentTime } from '../localization/format-appointment-time';
 import { appointmentStatusStrings } from '../localization/appointment-status-strings';
 import { appointmentsStrings } from '../localization/appointments-strings';
 
@@ -260,7 +261,7 @@ function AppointmentCard({
         <AppText variant="titleSmall">{providerName}</AppText>
         <View style={styles.detailRow}>
           <DecorativeIcon color={theme.colors.brand} name="calendar-outline" size={20} />
-          <AppText variant="bodyStrong">{formatAppointment(appointment, intlLocale)}</AppText>
+          <AppText variant="bodyStrong">{formatAppointmentTime(appointment, intlLocale)}</AppText>
         </View>
         <View style={styles.detailRow}>
           <DecorativeIcon
@@ -307,19 +308,6 @@ function statusColor(theme: AppTheme, appointment: Appointment) {
   }
 
   return appointment.status === 'cancelled' ? theme.colors.warning : theme.colors.textSecondary;
-}
-
-function formatAppointment(appointment: Appointment, locale = 'en-AE') {
-  // Explicit fields keep Arabic dates verbose ("26 يوليو 2026") instead of the
-  // numeric "2026/07/26" that dateStyle: 'medium' produces for ar-AE.
-  return new Intl.DateTimeFormat(locale, {
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    month: 'short',
-    timeZone: appointment.timezone,
-    year: 'numeric',
-  }).format(new Date(appointment.startsAt));
 }
 
 function createStyles(theme: AppTheme) {

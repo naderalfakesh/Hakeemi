@@ -97,9 +97,17 @@ function Navigation() {
           headerShown: false,
         }}
       >
-        <Stack.Screen name="onboarding" options={{ animation: entryAnimation }} />
-        <Stack.Screen name="welcome" options={{ animation: entryAnimation }} />
+        {/* Onboarding and Welcome only exist for someone who is not signed in
+            or exploring the demo. Signing in or starting the demo removes them
+            from history, so Back can never return to them. */}
+        <Stack.Protected guard={session.status === 'anonymous'}>
+          <Stack.Screen name="onboarding" options={{ animation: entryAnimation }} />
+          <Stack.Screen name="welcome" options={{ animation: entryAnimation }} />
+        </Stack.Protected>
         <Stack.Screen name="(tabs)" options={{ animation: entryAnimation }} />
+        {/* Booking is one task with its own steps, so it opens as a sheet over
+            the clinician instead of pushing three more screens onto the stack. */}
+        <Stack.Screen name="booking" options={{ presentation: 'modal' }} />
       </Stack>
       <NotificationNavigationBridge />
       <StatusBar style={theme.mode === 'dark' ? 'light' : 'dark'} />

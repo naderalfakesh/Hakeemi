@@ -2,6 +2,7 @@ import type { LocalizedStrings } from '@/localization/use-strings';
 
 const en = {
   backLabel: 'Back',
+  closeLabel: 'Close booking',
   confirmation: {
     confirmedProviderFallback: 'Confirmed provider',
     findAnotherClinician: 'Find another clinician',
@@ -59,6 +60,7 @@ const en = {
 export const bookingStrings: LocalizedStrings<typeof en> = {
   ar: {
     backLabel: 'رجوع',
+    closeLabel: 'إغلاق الحجز',
     confirmation: {
       confirmedProviderFallback: 'مقدم الرعاية المؤكد',
       findAnotherClinician: 'البحث عن طبيب آخر',

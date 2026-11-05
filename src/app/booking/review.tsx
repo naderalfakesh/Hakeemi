@@ -79,7 +79,7 @@ export default function BookingReviewRoute() {
   if (selection.state.status !== 'success') {
     return (
       <BookingRouteState
-        onBack={() => router.replace(`/providers/${providerId}`)}
+        onBack={() => router.back()}
         onRetry={selection.retry}
         status={selection.state.status}
       />

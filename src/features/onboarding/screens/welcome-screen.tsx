@@ -56,17 +56,23 @@ export function WelcomeScreen({ onCreateAccount, onExploreDemo, onSignIn }: Welc
           </View>
         </View>
 
+        {/* The demo leads: it shows the whole app in one tap, with no email
+            or password, and an account is still one tap away. */}
         <View style={styles.actions}>
-          <Button onPress={onCreateAccount}>{strings.createAccount}</Button>
-          <Button onPress={onSignIn} variant="secondary">
-            {strings.signIn}
-          </Button>
           <Button
             accessibilityLabel={strings.exploreDemoAccessibilityLabel}
             onPress={onExploreDemo}
-            variant="tertiary"
           >
             {strings.exploreDemo}
+          </Button>
+          <AppText style={styles.demoHint} tone="secondary" variant="caption">
+            {strings.exploreDemoHint}
+          </AppText>
+          <Button onPress={onCreateAccount} variant="secondary">
+            {strings.createAccount}
+          </Button>
+          <Button onPress={onSignIn} variant="tertiary">
+            {strings.signIn}
           </Button>
         </View>
       </View>
@@ -143,6 +149,10 @@ function createStyles(
     actions: {
       gap: theme.spacing.xs,
       paddingBottom: theme.spacing.xs,
+    },
+    demoHint: {
+      marginBottom: theme.spacing.xs,
+      textAlign: 'center',
     },
   });
 }

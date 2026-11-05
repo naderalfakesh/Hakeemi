@@ -46,6 +46,7 @@ export function BookingDetailsScreen({
           </Button>
         </>
       }
+      isFirstStep
       onBack={onBack}
       step={strings.stepOf(1, 2)}
       subtitle={strings.details.subtitle}

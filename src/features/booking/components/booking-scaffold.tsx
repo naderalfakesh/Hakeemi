@@ -11,6 +11,7 @@ import { bookingStrings } from '../localization/booking-strings';
 export function BookingScaffold({
   children,
   footer,
+  isFirstStep = false,
   onBack,
   step,
   subtitle,
@@ -18,6 +19,8 @@ export function BookingScaffold({
 }: {
   children: ReactNode;
   footer?: ReactNode;
+  /** The first step closes the booking sheet instead of going back a step. */
+  isFirstStep?: boolean;
   onBack: () => void;
   step: string;
   subtitle: string;
@@ -35,8 +38,16 @@ export function BookingScaffold({
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topBar}>
-          <IconButton accessibilityLabel={strings.backLabel} onPress={onBack} variant="soft">
-            <DecorativeIcon color={theme.colors.brand} name="arrow-back" size={22} />
+          <IconButton
+            accessibilityLabel={isFirstStep ? strings.closeLabel : strings.backLabel}
+            onPress={onBack}
+            variant="soft"
+          >
+            <DecorativeIcon
+              color={theme.colors.brand}
+              name={isFirstStep ? 'close' : 'arrow-back'}
+              size={22}
+            />
           </IconButton>
           <AppText tone="secondary" variant="labelLarge">
             {step}

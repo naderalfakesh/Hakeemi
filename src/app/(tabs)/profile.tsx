@@ -14,8 +14,14 @@ export default function ProfileRoute() {
 
   return (
     <ProfileScreen
+      isDemo={session.status === 'demo'}
       onCreateAccount={() => router.push('/auth/sign-up')}
       onEnableNotifications={notifications.enable}
+      onExitDemo={async () => {
+        await session.signOut();
+        // The entry route sends the signed-out visitor back to Welcome.
+        router.replace('/');
+      }}
       onRetryPreferences={appPreferences.retry}
       onRetryProfile={session.retryProfile}
       onSignIn={() => router.push('/auth/sign-in')}
