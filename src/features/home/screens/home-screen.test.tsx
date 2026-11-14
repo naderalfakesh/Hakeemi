@@ -99,4 +99,23 @@ describe('HomeScreen', () => {
     expect(view.queryByText('Next visit')).toBeNull();
     expect(view.queryByText('Demo mode')).toBeNull();
   });
+
+  it('opens Find care scoped to a tapped specialty quick-chip', async () => {
+    const onSelectSpecialty = jest.fn();
+    const view = await render(
+      <TestAppProviders colorScheme="light">
+        <HomeScreen
+          onFindCare={jest.fn()}
+          onSelectProvider={jest.fn()}
+          onSelectSpecialty={onSelectSpecialty}
+          repository={fixtureCareRepository}
+        />
+      </TestAppProviders>,
+    );
+
+    const cardiologyChip = await waitFor(() => view.getByRole('button', { name: 'Cardiology' }));
+    await fireEvent.press(cardiologyChip);
+
+    expect(onSelectSpecialty).toHaveBeenCalledWith('cardiology');
+  });
 });

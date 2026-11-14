@@ -189,6 +189,45 @@ describe('ProfileScreen', () => {
     expect(onToggleSavedProvider).toHaveBeenCalledWith('lina-haddad');
   });
 
+  it('shows saved clinicians in demo mode when available', async () => {
+    const onToggleSavedProvider = jest.fn();
+    const view = await render(
+      <AppThemeProvider colorScheme="light">
+        <ProfileScreen
+          isDemo
+          notificationError={null}
+          notificationStatus="unavailable"
+          onCreateAccount={noop}
+          onEnableNotifications={noop}
+          onExitDemo={noop}
+          onRetryPreferences={noop}
+          onRetryProfile={noop}
+          onRetrySavedProviders={noop}
+          onSignIn={noop}
+          onSignOut={noop}
+          onToggleSavedProvider={onToggleSavedProvider}
+          onUpdatePreferences={noop}
+          preferences={{ locale: 'en', theme: 'system' }}
+          preferencesError={null}
+          preferencesStatus="ready"
+          profile={null}
+          profileError={null}
+          profileStatus="idle"
+          savedProviders={[savedProvider]}
+          savedProvidersStatus="ready"
+          user={null}
+        />
+      </AppThemeProvider>,
+    );
+
+    expect(view.getByText('You’re exploring the demo')).toBeOnTheScreen();
+    expect(view.getByText('Saved clinicians')).toBeOnTheScreen();
+    await fireEvent.press(
+      view.getByRole('button', { name: 'Remove Dr. Lina Haddad from saved clinicians' }),
+    );
+    expect(onToggleSavedProvider).toHaveBeenCalledWith('lina-haddad');
+  });
+
   it('renders Arabic copy for a signed-in member', async () => {
     const view = await render(
       <AppLocaleProvider locale="ar">

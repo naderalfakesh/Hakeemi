@@ -7,7 +7,7 @@ import type { AppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
-import type { AvailabilitySlot, AvailabilityWindow } from '../domain/types';
+import type { AvailabilitySlot, AvailabilityWindow, Clinic } from '../domain/types';
 import {
   availableAppointmentCountLabels,
   providerDetailStrings,
@@ -24,6 +24,7 @@ export type AvailabilityCalendarDay = {
 
 export function AvailabilityCalendar({
   availabilityWindow,
+  clinics,
   hideConfirmButton = false,
   isSubmitting = false,
   locale,
@@ -32,6 +33,7 @@ export function AvailabilityCalendar({
   slots,
 }: {
   availabilityWindow: AvailabilityWindow;
+  clinics?: readonly Clinic[] | undefined;
   hideConfirmButton?: boolean;
   isSubmitting?: boolean;
   locale: AppLocale;
@@ -45,6 +47,10 @@ export function AvailabilityCalendar({
   const columns = dayGridColumns(fontScale);
   const styles = useMemo(() => createStyles(theme, columns), [columns, theme]);
   const timezone = slots[0]?.timezone ?? 'Asia/Dubai';
+  const clinicsById = useMemo(
+    () => new Map((clinics ?? []).map((clinic) => [clinic.id, clinic])),
+    [clinics],
+  );
   const days = useMemo(
     () => buildAvailabilityCalendarDays(availabilityWindow, timezone, slots),
     [availabilityWindow, slots, timezone],
@@ -156,12 +162,17 @@ export function AvailabilityCalendar({
               {activeDay.slots.map((slot) => {
                 const selected = slot.id === selectedSlot?.id;
                 const time = formatSlotTime(slot, intlLocale);
+                const clinic =
+                  slot.visitMode === 'in_person' && slot.clinicId
+                    ? clinicsById.get(slot.clinicId)
+                    : undefined;
+                const slotMeta = clinic
+                  ? `${formatVisitMode(slot.visitMode, locale)} · ${clinic.name[locale]}`
+                  : formatVisitMode(slot.visitMode, locale);
 
                 return (
                   <Pressable
-                    accessibilityLabel={strings.chooseSlot(
-                      `${time}, ${formatVisitMode(slot.visitMode, locale)}`,
-                    )}
+                    accessibilityLabel={strings.chooseSlot(`${time}, ${slotMeta}`)}
                     accessibilityRole="radio"
                     accessibilityState={{ disabled: isSubmitting, selected }}
                     disabled={isSubmitting}
@@ -183,8 +194,12 @@ export function AvailabilityCalendar({
                         {time}
                       </AppText>
                     </View>
-                    <AppText tone={selected ? 'brand' : 'secondary'} variant="caption">
-                      {formatVisitMode(slot.visitMode, locale)}
+                    <AppText
+                      numberOfLines={2}
+                      tone={selected ? 'brand' : 'secondary'}
+                      variant="caption"
+                    >
+                      {slotMeta}
                     </AppText>
                   </Pressable>
                 );
@@ -325,6 +340,15 @@ export function formatSlotTime(slot: AvailabilitySlot, locale: string) {
   }).format(new Date(slot.startsAt));
 }
 
+export function formatSlotDateSummary(slot: AvailabilitySlot, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
+    day: 'numeric',
+    month: 'short',
+    timeZone: slot.timezone,
+    weekday: 'short',
+  }).format(new Date(slot.startsAt));
+}
+
 function createStyles(theme: AppTheme, columns: number) {
   return StyleSheet.create({
     container: {
@@ -352,7 +376,7 @@ function createStyles(theme: AppTheme, columns: number) {
       flexGrow: 1,
       gap: theme.spacing.xxs,
       justifyContent: 'center',
-      minHeight: 70,
+      minHeight: 58,
       minWidth: 32,
       paddingHorizontal: theme.spacing.xxs,
       paddingVertical: theme.spacing.xs,

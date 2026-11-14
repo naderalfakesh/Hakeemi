@@ -1,7 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { appointmentRepository } from '@/features/appointments/data/appointment-repository';
 import { careRepository } from '@/features/care/data/care-repository';
+import { careQueryKeys } from '@/features/care/data/query-keys';
 import type { CareRepository } from '@/features/care/domain/repository';
 
 import { appointmentQueryKeys, type AppointmentQueryScope } from '../data/query-keys';
@@ -54,19 +55,36 @@ export function useAppointments(
   queryScope: AppointmentQueryScope = 'account',
   accountId: string | null = null,
 ) {
+  const queryClient = useQueryClient();
+
   return useQuery({
     // Account appointments need a signed-in account.
     enabled: queryScope === 'demo' || accountId !== null,
     queryKey: appointmentQueryKeys.list(queryScope, accountId),
     queryFn: async () => {
       const appointments = await repository.listAppointments();
-      const providers = await Promise.all(
-        appointments.map((appointment) => providerRepository.getProvider(appointment.providerId)),
+      const uniqueProviderIds = [
+        ...new Set(appointments.map((appointment) => appointment.providerId)),
+      ];
+      const resolvedProviders = await Promise.all(
+        uniqueProviderIds.map(async (providerId) => {
+          const provider = await providerRepository.getProvider(providerId);
+          queryClient.setQueryData(careQueryKeys.providerSummary(providerId, queryScope), provider);
+          return [providerId, provider] as const;
+        }),
       );
+      const providersById = new Map(resolvedProviders);
 
-      return appointments.map((appointment, index) => ({
+      for (const appointment of appointments) {
+        queryClient.setQueryData(
+          appointmentQueryKeys.detail(appointment.id, queryScope, accountId),
+          appointment,
+        );
+      }
+
+      return appointments.map((appointment) => ({
         appointment,
-        provider: providers[index] ?? null,
+        provider: providersById.get(appointment.providerId) ?? null,
       }));
     },
   });

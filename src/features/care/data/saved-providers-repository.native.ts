@@ -6,6 +6,7 @@ import {
   doc,
   getDocs,
   getFirestore,
+  limit,
   orderBy,
   query,
   serverTimestamp,
@@ -13,6 +14,8 @@ import {
 } from '@react-native-firebase/firestore';
 
 import type { SavedProvidersRepository } from './saved-providers-repository';
+
+const SAVED_PROVIDERS_LIMIT = 50;
 
 function getSavedProvidersCollection() {
   const app = getApp();
@@ -30,7 +33,11 @@ export class FirestoreSavedProvidersRepository implements SavedProvidersReposito
 
   public async listSavedProviderIds() {
     const snapshot = await getDocs(
-      query(getSavedProvidersCollection(), orderBy('savedAt', 'desc')),
+      query(
+        getSavedProvidersCollection(),
+        orderBy('savedAt', 'desc'),
+        limit(SAVED_PROVIDERS_LIMIT),
+      ),
     );
 
     return snapshot.docs.map((savedProvider) => savedProvider.id);

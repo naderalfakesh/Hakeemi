@@ -145,39 +145,45 @@ export function ProfileScreen({
                   name={user.emailVerified ? 'checkmark-circle' : 'alert-circle'}
                   size={20}
                 />
-                <AppText tone={user.emailVerified ? 'success' : 'secondary'} variant="caption">
+                <AppText
+                  style={styles.flexText}
+                  tone={user.emailVerified ? 'success' : 'secondary'}
+                  variant="caption"
+                >
                   {user.emailVerified ? strings.emailVerified : strings.emailVerificationPending}
                 </AppText>
               </View>
-            </Surface>
-
-            <Surface padding="spacious" style={styles.statusCard} variant="plain">
-              <AppText variant="titleSmall">{strings.secureProfileSync}</AppText>
-              {profileStatus === 'loading' && (
-                <AppText tone="secondary" variant="bodyMedium">
-                  {strings.profileLoading}
-                </AppText>
-              )}
               {profileStatus === 'ready' && (
-                <AppText tone="secondary" variant="bodyMedium">
+                <AppText style={styles.profileReadyCopy} tone="secondary" variant="caption">
                   {strings.profileReady}
                 </AppText>
               )}
-              {profileStatus === 'error' && (
-                <>
-                  <InlineError
-                    message={
-                      profileError
-                        ? localizeAuthFailure(profileError, locale)
-                        : strings.profileErrorFallback
-                    }
-                  />
-                  <Button onPress={() => void onRetryProfile()} variant="secondary">
-                    {strings.retryProfileSync}
-                  </Button>
-                </>
-              )}
             </Surface>
+
+            {(profileStatus === 'loading' || profileStatus === 'error') && (
+              <Surface padding="spacious" style={styles.statusCard} variant="plain">
+                <AppText variant="titleSmall">{strings.secureProfileSync}</AppText>
+                {profileStatus === 'loading' && (
+                  <AppText tone="secondary" variant="bodyMedium">
+                    {strings.profileLoading}
+                  </AppText>
+                )}
+                {profileStatus === 'error' && (
+                  <>
+                    <InlineError
+                      message={
+                        profileError
+                          ? localizeAuthFailure(profileError, locale)
+                          : strings.profileErrorFallback
+                      }
+                    />
+                    <Button onPress={() => void onRetryProfile()} variant="secondary">
+                      {strings.retryProfileSync}
+                    </Button>
+                  </>
+                )}
+              </Surface>
+            )}
 
             <PreferencesCard
               onRetryPreferences={onRetryPreferences}
@@ -191,7 +197,9 @@ export function ProfileScreen({
             <Surface padding="spacious" style={styles.notificationCard} variant="brand">
               <View style={styles.notificationHeading}>
                 <DecorativeIcon color={theme.colors.brand} name="notifications-outline" size={24} />
-                <AppText variant="titleSmall">{strings.appointmentReminders}</AppText>
+                <AppText style={styles.flexText} variant="titleSmall">
+                  {strings.appointmentReminders}
+                </AppText>
               </View>
               {notificationStatus === 'registered' && (
                 <AppText tone="secondary" variant="bodyMedium">
@@ -288,6 +296,16 @@ export function ProfileScreen({
               preferencesStatus={preferencesStatus}
               subtitle={strings.preferencesLocalSubtitle}
             />
+
+            {isDemo && savedProvidersStatus !== 'unavailable' && (
+              <SavedProvidersSection
+                onOpenProvider={onOpenSavedProvider}
+                onRemoveProvider={onToggleSavedProvider}
+                onRetry={onRetrySavedProviders}
+                providers={savedProviders}
+                status={savedProvidersStatus}
+              />
+            )}
           </>
         )}
 
@@ -413,7 +431,9 @@ function SavedProvidersSection({
       <View style={styles.savedProvidersHeading}>
         <View style={styles.savedProvidersTitle}>
           <DecorativeIcon color={theme.colors.brand} name="bookmark-outline" size={22} />
-          <AppText variant="titleSmall">{strings.savedCliniciansTitle}</AppText>
+          <AppText style={styles.flexText} variant="titleSmall">
+            {strings.savedCliniciansTitle}
+          </AppText>
         </View>
         <AppText tone="secondary" variant="bodyMedium">
           {strings.savedCliniciansSubtitle}
@@ -565,6 +585,12 @@ function createStyles(theme: AppTheme) {
       flexBasis: '100%',
       flexDirection: 'row',
       gap: theme.spacing.xs,
+    },
+    profileReadyCopy: {
+      flexBasis: '100%',
+    },
+    flexText: {
+      flex: 1,
     },
     statusCard: {
       gap: theme.spacing.md,

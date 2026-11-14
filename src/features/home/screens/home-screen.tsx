@@ -1,10 +1,18 @@
-import { useCallback, useMemo } from 'react';
-import { FlatList, Pressable, StyleSheet, View, type ListRenderItem } from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import {
+  FlatList,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+  type ListRenderItem,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
   AppText,
   Button,
+  Chip,
   DecorativeIcon,
   EmptyState,
   InlineError,
@@ -17,7 +25,7 @@ import { ProviderCard } from '@/features/care/components/provider-card';
 import { ProviderCardSkeleton } from '@/features/care/components/provider-card-skeleton';
 import type { CareRepository } from '@/features/care/domain/repository';
 import type { CareQueryScope } from '@/features/care/data/query-keys';
-import type { Provider } from '@/features/care/domain/types';
+import type { Provider, Specialty } from '@/features/care/domain/types';
 import { useProviderDiscovery } from '@/features/care/hooks/use-provider-discovery';
 import { homeStrings } from '@/features/home/localization/home-strings';
 import { useAppLocale } from '@/localization/locale-provider';
@@ -37,6 +45,7 @@ type HomeScreenProps = {
   onOpenAppointment?: (appointmentId: string) => void;
   onOpenCatalogue?: () => void;
   onSelectProvider: (providerId: string) => void;
+  onSelectSpecialty?: ((specialtyId: string) => void) | undefined;
   queryScope?: CareQueryScope;
   repository?: CareRepository;
 };
@@ -48,6 +57,7 @@ export function HomeScreen({
   onOpenAppointment,
   onOpenCatalogue,
   onSelectProvider,
+  onSelectSpecialty,
   queryScope = 'account',
   repository,
 }: HomeScreenProps) {
@@ -55,12 +65,22 @@ export function HomeScreen({
   const { locale } = useAppLocale();
   const strings = useStrings(homeStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const { retry, state } = useProviderDiscovery({
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { refresh, retry, state } = useProviderDiscovery({
+    featuredOnly: true,
     queryScope,
     query: '',
     specialtyId: null,
     ...(repository ? { repository } : {}),
   });
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await refresh();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [refresh]);
   const discovery = state.status === 'success' ? state.data : null;
   const providers =
     discovery?.providers.filter((provider) => provider.isFeatured).slice(0, 3) ?? [];
@@ -106,7 +126,7 @@ export function HomeScreen({
                 name="information-circle"
                 size={20}
               />
-              <AppText tone="secondary" variant="caption">
+              <AppText style={styles.noteText} tone="secondary" variant="caption">
                 {strings.fictionalDataNote}
               </AppText>
             </View>
@@ -123,6 +143,8 @@ export function HomeScreen({
             nextVisit={nextVisit}
             onFindCare={onFindCare}
             onOpenAppointment={onOpenAppointment}
+            onSelectSpecialty={onSelectSpecialty}
+            specialties={discovery?.specialties ?? []}
           />
         }
         contentContainerStyle={styles.content}
@@ -130,6 +152,8 @@ export function HomeScreen({
         initialNumToRender={3}
         ItemSeparatorComponent={ProviderSeparator}
         keyExtractor={providerKeyExtractor}
+        onRefresh={() => void handleRefresh()}
+        refreshing={isRefreshing}
         renderItem={renderProvider}
         showsVerticalScrollIndicator={false}
       />
@@ -142,14 +166,18 @@ function HomeHeader({
   nextVisit,
   onFindCare,
   onOpenAppointment,
+  onSelectSpecialty,
+  specialties,
 }: {
   isDemo: boolean;
   nextVisit: HomeNextVisit | null;
   onFindCare: () => void;
   onOpenAppointment: ((appointmentId: string) => void) | undefined;
+  onSelectSpecialty: ((specialtyId: string) => void) | undefined;
+  specialties: readonly Specialty[];
 }) {
   const theme = useAppTheme();
-  const { intlLocale } = useAppLocale();
+  const { intlLocale, locale } = useAppLocale();
   const strings = useStrings(homeStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
   const today = new Intl.DateTimeFormat(intlLocale, {
@@ -207,6 +235,23 @@ function HomeHeader({
           <DecorativeIcon color={theme.colors.textSecondary} name="chevron-forward" size={20} />
         </Surface>
       </Pressable>
+
+      {specialties.length > 0 && (
+        <ScrollView
+          contentContainerStyle={styles.specialtyRow}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        >
+          {specialties.map((specialty) => (
+            <Chip
+              key={specialty.id}
+              label={specialty.name[locale]}
+              onPress={() => (onSelectSpecialty ? onSelectSpecialty(specialty.id) : onFindCare())}
+              selected={false}
+            />
+          ))}
+        </ScrollView>
+      )}
 
       <View style={styles.sectionHeading}>
         <View>
@@ -349,6 +394,9 @@ function createStyles(theme: AppTheme) {
       flexDirection: 'row',
       justifyContent: 'space-between',
     },
+    specialtyRow: {
+      gap: theme.spacing.xs,
+    },
     loadingCards: {
       gap: theme.spacing.sm,
     },
@@ -364,6 +412,9 @@ function createStyles(theme: AppTheme) {
       flexDirection: 'row',
       gap: theme.spacing.xs,
       paddingHorizontal: theme.spacing.xs,
+    },
+    noteText: {
+      flex: 1,
     },
   });
 }

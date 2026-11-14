@@ -16,11 +16,34 @@ export type ProviderDetailData = {
   specialties: readonly Specialty[];
 };
 
+export type ProviderDetailSummary = Omit<ProviderDetailData, 'availabilityWindow' | 'slots'>;
+
 export type ProviderDetailState =
   | { status: 'error' }
   | { status: 'loading' }
   | { status: 'not-found' }
   | { data: ProviderDetailData; status: 'success' };
+
+export async function fetchProviderDetailSummary(
+  repository: CareRepository,
+  providerId: string,
+): Promise<ProviderDetailSummary | null> {
+  const provider = await repository.getProvider(providerId);
+
+  if (!provider) {
+    return null;
+  }
+
+  const [allSpecialties, clinicResults] = await Promise.all([
+    repository.listSpecialties(),
+    Promise.all(provider.clinicIds.map((clinicId) => repository.getClinic(clinicId))),
+  ]);
+  const specialtyIds = new Set(provider.specialtyIds);
+  const clinics = clinicResults.filter((clinic): clinic is Clinic => clinic !== null);
+  const specialties = allSpecialties.filter((specialty) => specialtyIds.has(specialty.id));
+
+  return { clinics, provider, specialties };
+}
 
 export function useProviderDetail(
   providerId: string,
@@ -32,23 +55,7 @@ export function useProviderDetail(
   const providerQuery = useQuery({
     enabled: providerId.length > 0,
     queryKey: careQueryKeys.detail(providerId, queryScope),
-    queryFn: async (): Promise<Omit<ProviderDetailData, 'availabilityWindow' | 'slots'> | null> => {
-      const provider = await resolvedRepository.getProvider(providerId);
-
-      if (!provider) {
-        return null;
-      }
-
-      const [allSpecialties, clinicResults] = await Promise.all([
-        resolvedRepository.listSpecialties(),
-        Promise.all(provider.clinicIds.map((clinicId) => resolvedRepository.getClinic(clinicId))),
-      ]);
-      const specialtyIds = new Set(provider.specialtyIds);
-      const clinics = clinicResults.filter((clinic): clinic is Clinic => clinic !== null);
-      const specialties = allSpecialties.filter((specialty) => specialtyIds.has(specialty.id));
-
-      return { clinics, provider, specialties };
-    },
+    queryFn: () => fetchProviderDetailSummary(resolvedRepository, providerId),
   });
   const availabilityQuery = useQuery({
     enabled:

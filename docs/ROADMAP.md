@@ -10,7 +10,7 @@
 
 ## Executive decision
 
-Rebuild Hakeemi on **Expo SDK 57, React Native 0.86, React 19.2, the New
+Rebuild Hakeemi on **Expo SDK 58, React Native 0.88, React 19.3, the New
 Architecture, Expo Router, Continuous Native Generation (CNG), and an Expo
 development build**. Continue to use React Native Firebase, backed by a newly
 defined Firestore and Cloud Functions contract.
@@ -28,11 +28,12 @@ better judgment. The stronger portfolio story is a documented migration from a
 2021 bare app to a modern, production-shaped Expo application that still uses
 native dependencies and native build tooling.
 
-The exact stable Expo SDK must be rechecked at the start of implementation. SDK
-57 is the current stable target at the time of this plan. Official references:
+The exact stable Expo SDK must be rechecked at the start of implementation; this
+repository currently targets Expo SDK 58 (`~58.0.25`), upgraded from the
+initial Expo SDK 57 plan baseline. Official references:
 
 - [React Native recommends using a framework such as Expo for new apps](https://reactnative.dev/)
-- [Expo SDK 57 targets React Native 0.86 and React 19.2](https://docs.expo.dev/versions/latest/)
+- [Expo SDK 58 targets React Native 0.88 and React 19.3](https://docs.expo.dev/versions/latest/)
 - [Expo development builds support production apps and custom native code](https://docs.expo.dev/develop/development-builds/introduction/)
 - [React Native Firebase is supported with Expo development builds](https://docs.expo.dev/guides/using-firebase/)
 - [CNG can regenerate native projects and keep native configuration declarative](https://docs.expo.dev/workflow/continuous-native-generation/)
@@ -340,6 +341,7 @@ tree on 2026-10-13.
 
 | Layer               | Planned                                        | Actual                                                                                                                                                                                                    | Evidence                                                                                        |
 | ------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Mobile framework    | Expo SDK 57 / RN 0.86 / React 19.2             | Upgraded to Expo SDK 58 (`~58.0.25`) / React Native 0.88.1 / React 19.3.0                                                                                                                                 | `package.json`, `README.md`                                                                     |
 | Backend             | Includes App Check                             | Auth, Firestore, Cloud Functions, Security Rules, and the Emulator Suite are in use; Storage rules are defined but no client Storage feature exists; App Check is not configured                          | `firebase/`, `firebase.json`, completion checklist below                                        |
 | Lists/images/motion | FlashList, `expo-image`, Reanimated            | React Native `FlatList` and `Image` with Reanimated; neither `@shopify/flash-list` nor `expo-image` is installed                                                                                          | `package.json`                                                                                  |
 | Localization        | i18next + Expo Localization                    | Typed bilingual string catalogs, locale-aware formatting, and `I18nManager` layout direction in `src/localization/`; neither package is installed                                                         | `src/localization/`, `package.json`, `docs/phase-5-verification.md`                             |
@@ -1123,7 +1125,7 @@ The modernization is complete only when:
 
 ## Current position
 
-Phases 0 through 4 are complete. The Expo SDK 57 product slice builds and runs
+Phases 0 through 4 are complete. The Expo SDK 58 product slice builds and runs
 on current iOS and Android simulators, and appointment management, calendar,
 notifications, scheduled reminders, haptics, and saved clinicians are all
 implemented. Phase 1 platform proof is recorded in
@@ -1190,8 +1192,8 @@ owns Create account, Sign in, and Explore demo. The portfolio/fictional-data
 disclaimer remains outside onboarding. Provider portraits now use repaired
 source artwork with complete hair, head-covering, and head silhouettes plus
 consistent transparent headroom; `contain` fitting keeps the full composition
-visible at card and profile sizes without sharp canvas-edge cuts. All 16
-illustrations are native-safe WebP files totaling 819.1 KB, down from roughly
+visible at card and profile sizes without sharp canvas-edge cuts. All 15
+illustrations are native-safe WebP files totaling 314.1 KB, down from roughly
 4.6 MB, and CI enforces 150 KB per-file/1 MB aggregate budgets.
 
 The 21 July 2026 onboarding/avatar refinement is complete in reviewable commits.

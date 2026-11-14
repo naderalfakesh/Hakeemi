@@ -33,17 +33,20 @@ service cloud.firestore {
     }
 
     match /specialties/{specialtyId} {
-      allow get, list: if isActivePublicResource();
+      allow get: if isActivePublicResource();
+      allow list: if isActivePublicResource() && hasBoundedLimit(50);
       allow create, update, delete: if false;
     }
 
     match /clinics/{clinicId} {
-      allow get, list: if isActivePublicResource();
+      allow get: if isActivePublicResource();
+      allow list: if isActivePublicResource() && hasBoundedLimit(50);
       allow create, update, delete: if false;
     }
 
     match /providers/{providerId} {
-      allow get, list: if isActivePublicResource();
+      allow get: if isActivePublicResource();
+      allow list: if isActivePublicResource() && hasBoundedLimit(50);
       allow create, update, delete: if false;
     }
 
@@ -66,7 +69,8 @@ service cloud.firestore {
       }
 
       match /savedProviders/{providerId} {
-        allow get, list: if isOwner(userId);
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId) && hasBoundedLimit(50);
         allow create: if isOwner(userId) && isValidSavedProvider(providerId);
         allow update: if false;
         allow delete: if isOwner(userId);

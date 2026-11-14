@@ -2,15 +2,20 @@ import { router } from 'expo-router';
 
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { ProfileScreen } from '@/features/auth/screens/profile-screen';
+import { useAppDataSources } from '@/features/demo/use-app-data-sources';
 import { useNotificationRegistration } from '@/features/notifications/context/notification-registration-provider';
 import { useAppPreferences } from '@/features/preferences/context/app-preferences-provider';
 import { useSavedProviders } from '@/features/care/hooks/use-saved-providers';
 
 export default function ProfileRoute() {
   const session = useAuthSession();
+  const dataSources = useAppDataSources();
   const appPreferences = useAppPreferences();
   const notifications = useNotificationRegistration();
-  const savedProviders = useSavedProviders(session.user);
+  const savedProviders = useSavedProviders(session.user, {
+    careRepository: dataSources.careRepository,
+    isDemo: dataSources.isDemo,
+  });
 
   return (
     <ProfileScreen

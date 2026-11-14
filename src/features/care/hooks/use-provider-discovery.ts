@@ -22,6 +22,7 @@ export type ProviderDiscoveryState =
   { status: 'error' } | { status: 'loading' } | { data: ProviderDiscoveryData; status: 'success' };
 
 type ProviderDiscoveryOptions = {
+  featuredOnly?: boolean;
   queryScope?: CareQueryScope;
   query: string;
   repository?: CareRepository;
@@ -29,6 +30,7 @@ type ProviderDiscoveryOptions = {
 };
 
 export function useProviderDiscovery({
+  featuredOnly = false,
   queryScope = 'account',
   query,
   repository = careRepository,
@@ -67,8 +69,13 @@ export function useProviderDiscovery({
         }) ?? []
     );
   }, [providersQuery.data?.pages]);
+  const slotTargets = useMemo(
+    () =>
+      featuredOnly ? providers.filter((provider) => provider.isFeatured).slice(0, 3) : providers,
+    [featuredOnly, providers],
+  );
   const slotQueries = useQueries({
-    queries: providers.map((provider) => ({
+    queries: slotTargets.map((provider) => ({
       queryKey: careQueryKeys.availability(provider.id, availabilityWindow, queryScope),
       queryFn: () => repository.listAvailableSlots(provider.id, availabilityWindow),
     })),
@@ -93,7 +100,7 @@ export function useProviderDiscovery({
     const pendingSlotProviderIds = new Set<string>();
 
     for (const [index, slotQuery] of slotQueries.entries()) {
-      const provider = providers[index];
+      const provider = slotTargets[index];
       const slot = slotQuery.data?.[0];
 
       if (provider && slot) {
@@ -114,15 +121,21 @@ export function useProviderDiscovery({
     };
   }
 
-  const retry = useCallback(() => {
-    void providersQuery.refetch();
-    void specialtiesQuery.refetch();
-
-    for (const slotQuery of slotQueries) {
-      if (slotQuery.isError) {
-        void slotQuery.refetch();
-      }
-    }
+  const retry = useCallback(async () => {
+    await Promise.all([
+      providersQuery.refetch(),
+      specialtiesQuery.refetch(),
+      ...slotQueries
+        .filter((slotQuery) => slotQuery.isError)
+        .map((slotQuery) => slotQuery.refetch()),
+    ]);
+  }, [providersQuery, slotQueries, specialtiesQuery]);
+  const refresh = useCallback(async () => {
+    await Promise.all([
+      providersQuery.refetch(),
+      specialtiesQuery.refetch(),
+      ...slotQueries.map((slotQuery) => slotQuery.refetch()),
+    ]);
   }, [providersQuery, slotQueries, specialtiesQuery]);
   const loadMore = useCallback(() => {
     if (providersQuery.hasNextPage && !providersQuery.isFetching) {
@@ -137,6 +150,7 @@ export function useProviderDiscovery({
     isRefreshFailed,
     lastUpdatedAt: providersQuery.dataUpdatedAt || null,
     loadMore,
+    refresh,
     retry,
     state,
   };

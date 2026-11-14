@@ -34,10 +34,16 @@ export default function BookingReviewRoute() {
   const booking = useBookAppointment(
     dataSources.isDemo
       ? {
+          accountId: null,
           checkConnection: alwaysConnected,
+          queryScope: dataSources.scope,
           repository: dataSources.appointmentRepository,
         }
-      : { repository: dataSources.appointmentRepository },
+      : {
+          accountId: session.user?.id ?? null,
+          queryScope: dataSources.scope,
+          repository: dataSources.appointmentRepository,
+        },
   );
   const networkState = Network.useNetworkState();
   const { locale } = useAppLocale();
@@ -77,6 +83,10 @@ export default function BookingReviewRoute() {
   }
 
   if (selection.state.status !== 'success') {
+    if (booking.status === 'success') {
+      return null;
+    }
+
     return (
       <BookingRouteState
         onBack={() => router.back()}

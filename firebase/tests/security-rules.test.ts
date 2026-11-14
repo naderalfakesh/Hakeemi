@@ -172,8 +172,12 @@ describe('Cloud Firestore rules', () => {
         .limit(13)
         .get(),
     );
-    await assertSucceeds(firestore.collection('specialties').where('isActive', '==', true).get());
-    await assertSucceeds(firestore.collection('clinics').where('isActive', '==', true).get());
+    await assertSucceeds(
+      firestore.collection('specialties').where('isActive', '==', true).limit(50).get(),
+    );
+    await assertSucceeds(
+      firestore.collection('clinics').where('isActive', '==', true).limit(50).get(),
+    );
     await assertSucceeds(
       firestore
         .collection('availabilitySlots')
@@ -192,6 +196,17 @@ describe('Cloud Firestore rules', () => {
     await assertFails(firestore.doc('providers/retired-provider').get());
     await assertFails(firestore.doc('availabilitySlots/booked-slot').get());
     await assertFails(firestore.collection('providers').get());
+    await assertFails(firestore.collection('specialties').where('isActive', '==', true).get());
+    await assertFails(firestore.collection('clinics').where('isActive', '==', true).get());
+    await assertFails(
+      firestore
+        .collection('providers')
+        .where('isActive', '==', true)
+        .orderBy('displayName')
+        .orderBy(firebase.firestore.FieldPath.documentId())
+        .limit(51)
+        .get(),
+    );
     await assertFails(
       firestore.collection('availabilitySlots').where('status', '==', 'available').get(),
     );
@@ -269,6 +284,8 @@ describe('Cloud Firestore rules', () => {
 
     await assertSucceeds(alice.doc('users/alice/savedProviders/lina-haddad').set(savedProvider));
     await assertSucceeds(alice.doc('users/alice/savedProviders/lina-haddad').get());
+    await assertSucceeds(alice.collection('users/alice/savedProviders').limit(50).get());
+    await assertFails(alice.collection('users/alice/savedProviders').get());
     await assertFails(bob.doc('users/alice/savedProviders/lina-haddad').set(savedProvider));
     await assertFails(
       alice.doc('users/alice/savedProviders/retired-provider').set({

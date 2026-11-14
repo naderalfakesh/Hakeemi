@@ -7,6 +7,8 @@ import {
 } from '@/features/appointments/data/calendar-link-storage';
 import { appointmentQueryKeys } from '@/features/appointments/data/query-keys';
 import { useBookingDraft } from '@/features/booking/context/booking-draft-provider';
+import { demoSavedProvidersRepository } from '@/features/care/data/demo-saved-providers-repository';
+import { savedProvidersQueryKeys } from '@/features/care/hooks/use-saved-providers';
 
 import { useAuthSession } from './auth-session-provider';
 
@@ -35,8 +37,13 @@ export function AccountDataReset() {
 
     if (endedOwner !== null && endedOwner !== calendarOwner) {
       void calendarLinkStorage.clear(endedOwner).catch(() => undefined);
+
+      if (endedOwner === 'demo') {
+        void demoSavedProvidersRepository.reset().catch(() => undefined);
+        queryClient.removeQueries({ queryKey: savedProvidersQueryKeys.owner('demo') });
+      }
     }
-  }, [calendarOwner]);
+  }, [calendarOwner, queryClient]);
 
   useEffect(() => {
     const endedAccountId = previousAccountId.current;
@@ -51,6 +58,7 @@ export function AccountDataReset() {
     // Removing (rather than invalidating) also discards responses still in
     // flight for the ended account.
     queryClient.removeQueries({ queryKey: appointmentQueryKeys.account(endedAccountId) });
+    queryClient.removeQueries({ queryKey: savedProvidersQueryKeys.owner(endedAccountId) });
     void clearBookingDraft();
   }, [accountId, clearBookingDraft, queryClient]);
 

@@ -22,7 +22,7 @@ export function InlineError({ message, style, ...props }: InlineErrorProps) {
       style={[styles.container, style]}
     >
       <DecorativeIcon color={theme.colors.danger} name="alert-circle" size={18} />
-      <AppText tone="danger" variant="caption">
+      <AppText style={styles.text} tone="danger" variant="caption">
         {message}
       </AppText>
     </View>
@@ -35,6 +35,9 @@ function createStyles(theme: AppTheme) {
       alignItems: 'flex-start',
       flexDirection: 'row',
       gap: theme.spacing.xs,
+    },
+    text: {
+      flex: 1,
     },
   });
 }

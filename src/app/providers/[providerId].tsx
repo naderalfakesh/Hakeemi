@@ -17,7 +17,10 @@ export default function ProviderRoute() {
   const session = useAuthSession();
   const dataSources = useAppDataSources();
   const bookingDraft = useBookingDraft();
-  const savedProviders = useSavedProviders(session.user);
+  const savedProviders = useSavedProviders(session.user, {
+    careRepository: dataSources.careRepository,
+    isDemo: dataSources.isDemo,
+  });
 
   function handleBack() {
     if (router.canGoBack()) {
@@ -50,7 +53,7 @@ export default function ProviderRoute() {
       onBack={handleBack}
       onChooseSlot={(slot) => void handleChooseSlot(slot)}
       onSignInToSave={() => router.push('/auth/sign-in')}
-      onToggleSavedProvider={session.user ? savedProviders.toggle : undefined}
+      onToggleSavedProvider={session.user || dataSources.isDemo ? savedProviders.toggle : undefined}
       providerId={providerId}
       queryScope={dataSources.scope}
       repository={dataSources.careRepository}

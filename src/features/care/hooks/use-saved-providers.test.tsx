@@ -3,6 +3,8 @@ import { act, renderHook, waitFor } from '@testing-library/react-native';
 import { TestAppProviders } from '@/test/test-app-providers';
 
 import { careRepository } from '@/features/care/data/care-repository';
+import { demoCareRepository } from '@/features/care/data/demo-care-repository';
+import { demoSavedProvidersRepository } from '@/features/care/data/demo-saved-providers-repository';
 import { savedProvidersRepository } from '@/features/care/data/saved-providers-repository';
 import { providerFixtures } from '../data/fixtures';
 import { useSavedProviders } from './use-saved-providers';
@@ -56,5 +58,35 @@ describe('useSavedProviders', () => {
 
     expect(mockedSavedProvidersRepository.removeProvider).toHaveBeenCalledWith('lina-haddad');
     await waitFor(() => expect(result.current.isSaved('lina-haddad')).toBe(false));
+  });
+
+  it('supports saving and removing clinicians in demo mode without a signed-in user', async () => {
+    await demoSavedProvidersRepository.reset();
+
+    const { result } = await renderHook(
+      () =>
+        useSavedProviders(null, {
+          careRepository: demoCareRepository,
+          isDemo: true,
+          repository: demoSavedProvidersRepository,
+        }),
+      {
+        wrapper: TestAppProviders,
+      },
+    );
+
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    expect(result.current.providers).toEqual([]);
+
+    await act(async () => result.current.toggle('lina-haddad'));
+    await waitFor(() => expect(result.current.isSaved('lina-haddad')).toBe(true));
+    await waitFor(() =>
+      expect(result.current.providers.map((provider) => provider.id)).toEqual(['lina-haddad']),
+    );
+
+    await act(async () => result.current.toggle('lina-haddad'));
+    await waitFor(() => expect(result.current.isSaved('lina-haddad')).toBe(false));
+
+    await demoSavedProvidersRepository.reset();
   });
 });

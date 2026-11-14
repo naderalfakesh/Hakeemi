@@ -24,10 +24,16 @@ import {
   mapSpecialtyDocument,
 } from './firestore-care-mappers';
 import { selectProviders } from './selectors';
-import { createProviderCursor, parseProviderCursor } from './provider-cursor';
+import {
+  compareProviderToCursor,
+  createProviderCursor,
+  parseProviderCursor,
+} from './provider-cursor';
 
 const DEFAULT_PROVIDER_PAGE_SIZE = 12;
 const MAX_PROVIDER_PAGE_SIZE = 20;
+const MAX_PROVIDER_SEARCH_SCAN = 50;
+const MAX_CATALOG_ITEMS = 50;
 const SLOT_RESULT_LIMIT = 31;
 
 export class FirestoreCareRepository implements CareRepository {
@@ -66,7 +72,11 @@ export class FirestoreCareRepository implements CareRepository {
 
   public async listClinics() {
     const snapshot = await getDocs(
-      query(collection(this.firestore, 'clinics'), where('isActive', '==', true)),
+      query(
+        collection(this.firestore, 'clinics'),
+        where('isActive', '==', true),
+        limit(MAX_CATALOG_ITEMS),
+      ),
     );
 
     return snapshot.docs
@@ -93,6 +103,36 @@ export class FirestoreCareRepository implements CareRepository {
       orderBy('displayName', 'asc'),
       orderBy(documentId(), 'asc'),
     );
+
+    if (search.query?.trim()) {
+      const [providerSnapshot, specialties] = await Promise.all([
+        getDocs(
+          query(
+            collection(this.firestore, 'providers'),
+            ...constraints,
+            limit(MAX_PROVIDER_SEARCH_SCAN),
+          ),
+        ),
+        this.listSpecialties(),
+      ]);
+      const allProviders = providerSnapshot.docs.map((document) =>
+        mapProviderDocument(document.id, document.data()),
+      );
+      const matched = selectProviders(allProviders, specialties, search);
+      const pageStart = cursor
+        ? matched.findIndex((provider) => compareProviderToCursor(provider, cursor) > 0)
+        : 0;
+      const safePageStart = pageStart < 0 ? matched.length : pageStart;
+      const pageItems = matched.slice(safePageStart, safePageStart + pageSize);
+      const hasNextPage = safePageStart + pageSize < matched.length;
+      const lastProvider = pageItems[pageItems.length - 1];
+
+      return {
+        items: pageItems,
+        nextCursor:
+          hasNextPage && lastProvider !== undefined ? createProviderCursor(lastProvider) : null,
+      };
+    }
 
     if (cursor) {
       constraints.push(startAfter(...parseProviderCursor(cursor)));
@@ -134,7 +174,11 @@ export class FirestoreCareRepository implements CareRepository {
 
   private async fetchSpecialties() {
     const snapshot = await getDocs(
-      query(collection(this.firestore, 'specialties'), where('isActive', '==', true)),
+      query(
+        collection(this.firestore, 'specialties'),
+        where('isActive', '==', true),
+        limit(MAX_CATALOG_ITEMS),
+      ),
     );
 
     return snapshot.docs

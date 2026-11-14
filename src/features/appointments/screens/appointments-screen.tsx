@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
@@ -101,6 +101,15 @@ function AuthenticatedAppointments({
   );
   const isOffline = useIsOffline();
   const [filter, setFilter] = useState<AppointmentFilter>('upcoming');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await appointmentsQuery.refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [appointmentsQuery]);
 
   if (appointmentsQuery.isPending) {
     return (
@@ -124,7 +133,17 @@ function AuthenticatedAppointments({
   if (appointmentsQuery.isError && appointmentsQuery.data === undefined) {
     return (
       <SafeAreaView edges={['top']} style={styles.safeArea}>
-        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          refreshControl={
+            <RefreshControl
+              onRefresh={() => void handleRefresh()}
+              refreshing={isRefreshing}
+              tintColor={theme.colors.brand}
+            />
+          }
+          showsVerticalScrollIndicator={false}
+        >
           <AppointmentsHeader hasAppointments={false} onFindCare={onFindCare} />
           <EmptyState
             action={
@@ -147,7 +166,17 @@ function AuthenticatedAppointments({
 
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl
+            onRefresh={() => void handleRefresh()}
+            refreshing={isRefreshing}
+            tintColor={theme.colors.brand}
+          />
+        }
+        showsVerticalScrollIndicator={false}
+      >
         <AppointmentsHeader hasAppointments={hasAppointments} onFindCare={onFindCare} />
 
         {staleReason && (
@@ -261,7 +290,9 @@ function AppointmentCard({
         <AppText variant="titleSmall">{providerName}</AppText>
         <View style={styles.detailRow}>
           <DecorativeIcon color={theme.colors.brand} name="calendar-outline" size={20} />
-          <AppText variant="bodyStrong">{formatAppointmentTime(appointment, intlLocale)}</AppText>
+          <AppText style={styles.detailText} variant="bodyStrong">
+            {formatAppointmentTime(appointment, intlLocale)}
+          </AppText>
         </View>
         <View style={styles.detailRow}>
           <DecorativeIcon
@@ -269,7 +300,7 @@ function AppointmentCard({
             name={appointment.visitMode === 'video' ? 'videocam-outline' : 'location-outline'}
             size={20}
           />
-          <AppText tone="secondary" variant="bodyMedium">
+          <AppText style={styles.detailText} tone="secondary" variant="bodyMedium">
             {statusStrings.visitModeLabels[appointment.visitMode]} ·{' '}
             {formatTimeZoneName(appointment.timezone, locale, appointment.startsAt)}
           </AppText>
@@ -360,6 +391,9 @@ function createStyles(theme: AppTheme) {
       alignItems: 'center',
       flexDirection: 'row',
       gap: theme.spacing.sm,
+    },
+    detailText: {
+      flex: 1,
     },
   });
 }

@@ -20,5 +20,7 @@ export const careQueryKeys = {
     ['care', scope, 'provider', providerId] as const,
   discovery: (search: ProviderSearch, scope: CareQueryScope = 'account') =>
     ['care', scope, 'provider-discovery', normalizedSearch(search)] as const,
+  providerSummary: (providerId: string, scope: CareQueryScope = 'account') =>
+    ['care', scope, 'provider-summary', providerId] as const,
   specialties: (scope: CareQueryScope = 'account') => ['care', scope, 'specialties'] as const,
 };

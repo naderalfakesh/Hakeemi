@@ -8,6 +8,8 @@ import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { BookingRouteState } from '@/features/booking/components/booking-route-state';
 import { BookingConfirmationScreen } from '@/features/booking/screens/booking-confirmation-screen';
 import { bookingStrings } from '@/features/booking/localization/booking-strings';
+import { careQueryKeys } from '@/features/care/data/query-keys';
+import { fetchProviderDetailSummary } from '@/features/care/hooks/use-provider-detail';
 import { useAppDataSources } from '@/features/demo/use-app-data-sources';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
@@ -25,16 +27,13 @@ export default function BookingConfirmationRoute() {
     dataSources.scope,
     session.user?.id ?? null,
   );
+  const providerId = appointmentQuery.data?.providerId ?? '';
   const providerQuery = useQuery({
-    enabled: Boolean(appointmentQuery.data?.providerId),
-    queryKey: [
-      'care',
-      dataSources.scope,
-      'confirmation-provider',
-      appointmentQuery.data?.providerId ?? 'pending',
-    ],
-    queryFn: () => dataSources.careRepository.getProvider(appointmentQuery.data?.providerId ?? ''),
+    enabled: providerId.length > 0,
+    queryKey: careQueryKeys.detail(providerId, dataSources.scope),
+    queryFn: () => fetchProviderDetailSummary(dataSources.careRepository, providerId),
   });
+  const provider = providerQuery.data?.provider ?? null;
   const { locale } = useAppLocale();
   const strings = useStrings(bookingStrings);
   // The same link the visit's detail screen reads, so an event added here
@@ -42,8 +41,7 @@ export default function BookingConfirmationRoute() {
   const calendar = useAppointmentCalendar({
     appointment: appointmentQuery.data ?? null,
     owner: calendarLinkOwner(dataSources.scope, session.user?.id ?? null),
-    providerName:
-      providerQuery.data?.displayName[locale] ?? strings.confirmation.confirmedProviderFallback,
+    providerName: provider?.displayName[locale] ?? strings.confirmation.confirmedProviderFallback,
   });
 
   // Confirmation is the last step of the booking sheet: both ways out close
@@ -91,7 +89,7 @@ export default function BookingConfirmationRoute() {
       calendar={calendar}
       onFindCare={() => router.dismissTo('/find-care')}
       onViewAppointments={() => router.dismissTo('/appointments')}
-      provider={providerQuery.data ?? null}
+      provider={provider}
     />
   );
 }

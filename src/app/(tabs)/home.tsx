@@ -41,6 +41,9 @@ export default function HomeRoute() {
       onSelectProvider={(providerId) =>
         router.push({ pathname: '/providers/[providerId]', params: { providerId } })
       }
+      onSelectSpecialty={(specialtyId) =>
+        router.push({ pathname: '/find-care', params: { specialtyId } })
+      }
       queryScope={dataSources.scope}
       repository={dataSources.careRepository}
       {...(__DEV__ ? { onOpenCatalogue: () => router.push('/dev/components') } : {})}

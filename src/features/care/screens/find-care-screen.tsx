@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { FlatList, StyleSheet, View, type ListRenderItem } from 'react-native';
+import { ActivityIndicator, FlatList, StyleSheet, View, type ListRenderItem } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
@@ -30,12 +30,14 @@ import { clinicianCountLabels, findCareStrings } from '../localization/care-stri
 const SEARCH_DEBOUNCE_MS = 300;
 
 type FindCareScreenProps = {
+  initialSpecialtyId?: string | null | undefined;
   onSelectProvider: (providerId: string) => void;
   queryScope?: CareQueryScope;
   repository?: CareRepository;
 };
 
 export function FindCareScreen({
+  initialSpecialtyId,
   onSelectProvider,
   queryScope = 'account',
   repository,
@@ -45,17 +47,45 @@ export function FindCareScreen({
   const strings = useStrings(findCareStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [query, setQuery] = useState('');
-  const [specialtyId, setSpecialtyId] = useState<string | null>(null);
+  const [specialtyId, setSpecialtyId] = useState<string | null>(initialSpecialtyId ?? null);
+  const [prevInitialSpecialtyId, setPrevInitialSpecialtyId] = useState(initialSpecialtyId);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  if (initialSpecialtyId !== prevInitialSpecialtyId) {
+    setPrevInitialSpecialtyId(initialSpecialtyId);
+    if (initialSpecialtyId !== undefined) {
+      setSpecialtyId(initialSpecialtyId);
+    }
+  }
+
   // Typing settles before a new query runs; clearing the field applies at once.
   const debouncedQuery = useDebouncedValue(query.trim(), SEARCH_DEBOUNCE_MS);
   const searchQuery = query.trim() === '' ? '' : debouncedQuery;
-  const { hasMore, isLoadingMore, isRefreshFailed, lastUpdatedAt, loadMore, retry, state } =
-    useProviderDiscovery({
-      queryScope,
-      query: searchQuery,
-      specialtyId,
-      ...(repository ? { repository } : {}),
-    });
+  const {
+    hasMore,
+    isLoadingMore,
+    isRefreshFailed,
+    isSearching,
+    lastUpdatedAt,
+    loadMore,
+    refresh,
+    retry,
+    state,
+  } = useProviderDiscovery({
+    queryScope,
+    query: searchQuery,
+    specialtyId,
+    ...(repository ? { repository } : {}),
+  });
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await refresh();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [refresh]);
+  const isUpdatingSearch = isSearching || query.trim() !== searchQuery;
   const isOffline = useIsOffline();
   const data = state.status === 'success' ? state.data : null;
   const staleReason = isOffline ? 'offline' : isRefreshFailed ? 'refresh-failed' : null;
@@ -130,10 +160,21 @@ export function FindCareScreen({
             {data && staleReason && (
               <StaleDataNotice reason={staleReason} updatedAt={lastUpdatedAt} />
             )}
-            {data && data.providers.length > 0 && (
-              <AppText tone="secondary" variant="caption">
-                {formatLocalizedCount(data.providers.length, locale, clinicianCountLabels)}
-              </AppText>
+            {data && (data.providers.length > 0 || isUpdatingSearch) && (
+              <View style={styles.resultsMeta}>
+                {data.providers.length > 0 && (
+                  <AppText tone="secondary" variant="caption">
+                    {formatLocalizedCount(data.providers.length, locale, clinicianCountLabels)}
+                  </AppText>
+                )}
+                {isUpdatingSearch && (
+                  <ActivityIndicator
+                    accessibilityLabel={strings.loadingClinicians}
+                    color={theme.colors.brand}
+                    size="small"
+                  />
+                )}
+              </View>
             )}
           </View>
         }
@@ -156,6 +197,8 @@ export function FindCareScreen({
         maxToRenderPerBatch={6}
         onEndReached={hasMore && !isLoadingMore ? loadMore : undefined}
         onEndReachedThreshold={0.35}
+        onRefresh={() => void handleRefresh()}
+        refreshing={isRefreshing}
         renderItem={renderProvider}
         showsVerticalScrollIndicator={false}
         windowSize={5}
@@ -256,6 +299,11 @@ function createStyles(theme: AppTheme) {
     },
     loadingCards: {
       gap: theme.spacing.sm,
+    },
+    resultsMeta: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      gap: theme.spacing.xs,
     },
     pagination: {
       paddingTop: theme.spacing.lg,

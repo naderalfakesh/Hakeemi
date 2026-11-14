@@ -1,18 +1,31 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 
-import { careRepository } from '@/features/care/data/care-repository';
-import { savedProvidersRepository } from '@/features/care/data/saved-providers-repository';
-import type { Provider } from '@/features/care/domain/types';
 import type { AuthUser } from '@/features/auth/domain/types';
+import { careRepository } from '@/features/care/data/care-repository';
+import { demoCareRepository } from '@/features/care/data/demo-care-repository';
+import { demoSavedProvidersRepository } from '@/features/care/data/demo-saved-providers-repository';
+import {
+  savedProvidersRepository,
+  type SavedProvidersRepository,
+} from '@/features/care/data/saved-providers-repository';
+import type { CareRepository } from '@/features/care/domain/repository';
+import type { Provider } from '@/features/care/domain/types';
 
-const savedProvidersQueryKeys = {
-  ids: (userId: string) => ['care', 'saved-providers', userId, 'ids'] as const,
-  providers: (userId: string, providerIds: readonly string[]) =>
-    ['care', 'saved-providers', userId, 'providers', providerIds] as const,
+export const savedProvidersQueryKeys = {
+  ids: (ownerKey: string) => ['care', 'saved-providers', ownerKey, 'ids'] as const,
+  owner: (ownerKey: string) => ['care', 'saved-providers', ownerKey] as const,
+  providers: (ownerKey: string, providerIds: readonly string[]) =>
+    ['care', 'saved-providers', ownerKey, 'providers', providerIds] as const,
 };
 
 export type SavedProvidersStatus = 'error' | 'loading' | 'ready' | 'saving' | 'unavailable';
+
+export type UseSavedProvidersOptions = {
+  careRepository?: Pick<CareRepository, 'getProvider'> | undefined;
+  isDemo?: boolean | undefined;
+  repository?: SavedProvidersRepository | undefined;
+};
 
 type SavedProviderMutationVariables = {
   providerId: string;
@@ -23,25 +36,30 @@ type SavedProviderMutationContext = {
   previousIds: readonly string[];
 };
 
-export function useSavedProviders(user: AuthUser | null) {
+export function useSavedProviders(user: AuthUser | null, options: UseSavedProvidersOptions = {}) {
   const queryClient = useQueryClient();
-  const userId = user?.id ?? null;
-  const isEnabled = Boolean(userId && savedProvidersRepository.available);
+  const isDemoSession = Boolean(options.isDemo && !user);
+  const ownerKey = user?.id ?? (isDemoSession ? 'demo' : null);
+  const activeSavedRepo =
+    options.repository ?? (isDemoSession ? demoSavedProvidersRepository : savedProvidersRepository);
+  const activeCareRepo =
+    options.careRepository ?? (isDemoSession ? demoCareRepository : careRepository);
+  const isEnabled = Boolean(ownerKey && activeSavedRepo.available);
   const idsQuery = useQuery({
     enabled: isEnabled,
-    queryFn: () => savedProvidersRepository.listSavedProviderIds(),
-    queryKey: savedProvidersQueryKeys.ids(userId ?? 'guest'),
+    queryFn: () => activeSavedRepo.listSavedProviderIds(),
+    queryKey: savedProvidersQueryKeys.ids(ownerKey ?? 'guest'),
   });
   const providerIds = useMemo(() => idsQuery.data ?? [], [idsQuery.data]);
   const providersQuery = useQuery({
     enabled: isEnabled && providerIds.length > 0,
     queryFn: async () => {
       const providers = await Promise.all(
-        providerIds.map((providerId) => careRepository.getProvider(providerId)),
+        providerIds.map((providerId) => activeCareRepo.getProvider(providerId)),
       );
       return providers.filter((provider): provider is Provider => provider !== null);
     },
-    queryKey: savedProvidersQueryKeys.providers(userId ?? 'guest', providerIds),
+    queryKey: savedProvidersQueryKeys.providers(ownerKey ?? 'guest', providerIds),
   });
   const mutation = useMutation<
     void,
@@ -51,22 +69,22 @@ export function useSavedProviders(user: AuthUser | null) {
   >({
     mutationFn: async ({ providerId, shouldSave }) => {
       if (shouldSave) {
-        await savedProvidersRepository.saveProvider(providerId);
+        await activeSavedRepo.saveProvider(providerId);
       } else {
-        await savedProvidersRepository.removeProvider(providerId);
+        await activeSavedRepo.removeProvider(providerId);
       }
     },
     onError: (_error, _variables, context) => {
-      if (context?.previousIds && userId) {
-        queryClient.setQueryData(savedProvidersQueryKeys.ids(userId), context.previousIds);
+      if (context?.previousIds && ownerKey) {
+        queryClient.setQueryData(savedProvidersQueryKeys.ids(ownerKey), context.previousIds);
       }
     },
     onMutate: async ({ providerId, shouldSave }) => {
-      if (!userId) {
+      if (!ownerKey) {
         return { previousIds: [] };
       }
 
-      const idsKey = savedProvidersQueryKeys.ids(userId);
+      const idsKey = savedProvidersQueryKeys.ids(ownerKey);
       await queryClient.cancelQueries({ queryKey: idsKey });
       const previousIds = queryClient.getQueryData<readonly string[]>(idsKey) ?? [];
       const nextIds = shouldSave
@@ -76,10 +94,10 @@ export function useSavedProviders(user: AuthUser | null) {
       return { previousIds };
     },
     onSettled: () => {
-      if (userId) {
-        void queryClient.invalidateQueries({ queryKey: savedProvidersQueryKeys.ids(userId) });
+      if (ownerKey) {
+        void queryClient.invalidateQueries({ queryKey: savedProvidersQueryKeys.ids(ownerKey) });
         void queryClient.invalidateQueries({
-          queryKey: ['care', 'saved-providers', userId, 'providers'],
+          queryKey: ['care', 'saved-providers', ownerKey, 'providers'],
         });
       }
     },
@@ -87,13 +105,13 @@ export function useSavedProviders(user: AuthUser | null) {
 
   const toggle = useCallback(
     (providerId: string) => {
-      if (!userId || !savedProvidersRepository.available) {
+      if (!ownerKey || !activeSavedRepo.available) {
         return;
       }
 
       mutation.mutate({ providerId, shouldSave: !providerIds.includes(providerId) });
     },
-    [mutation, providerIds, userId],
+    [activeSavedRepo.available, mutation, ownerKey, providerIds],
   );
 
   const retry = useCallback(() => {
@@ -101,7 +119,7 @@ export function useSavedProviders(user: AuthUser | null) {
   }, [idsQuery]);
 
   const status: SavedProvidersStatus = useMemo(() => {
-    if (!userId || !savedProvidersRepository.available) {
+    if (!ownerKey || !activeSavedRepo.available) {
       return 'unavailable';
     }
     if (mutation.isPending) {
@@ -114,7 +132,14 @@ export function useSavedProviders(user: AuthUser | null) {
       return 'error';
     }
     return 'ready';
-  }, [idsQuery, mutation.isPending, providerIds.length, providersQuery, userId]);
+  }, [
+    activeSavedRepo.available,
+    idsQuery,
+    mutation.isPending,
+    ownerKey,
+    providerIds.length,
+    providersQuery,
+  ]);
 
   return {
     isSaved: (providerId: string) => providerIds.includes(providerId),

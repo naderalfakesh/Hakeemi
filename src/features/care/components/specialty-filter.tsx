@@ -38,6 +38,7 @@ export function SpecialtyFilter({ onChange, selectedId, specialties }: Specialty
           <Chip label={strings.all} onPress={() => onChange(null)} selected={selectedId === null} />
         </View>
       }
+      ItemSeparatorComponent={ChipSeparator}
       contentContainerStyle={styles.content}
       data={specialties}
       horizontal
@@ -46,6 +47,11 @@ export function SpecialtyFilter({ onChange, selectedId, specialties }: Specialty
       showsHorizontalScrollIndicator={false}
     />
   );
+}
+
+function ChipSeparator() {
+  const theme = useAppTheme();
+  return <View style={{ width: theme.spacing.xs }} />;
 }
 
 function keyExtractor(item: Specialty) {

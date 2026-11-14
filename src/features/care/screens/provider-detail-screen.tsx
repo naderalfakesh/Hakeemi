@@ -1,5 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
@@ -16,10 +17,14 @@ import {
 import { formatLocalizedCount } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppMotion, useAppTheme, type AppTheme } from '@/theme';
 
 import { ProviderAvatar } from '../components/provider-avatar';
-import { AvailabilityCalendar, formatSlotTime } from '../components/availability-calendar';
+import {
+  AvailabilityCalendar,
+  formatSlotDateSummary,
+  formatSlotTime,
+} from '../components/availability-calendar';
 import type { CareQueryScope } from '../data/query-keys';
 import type { CareRepository } from '../domain/repository';
 import type { AvailabilitySlot, AvailabilityWindow, Clinic } from '../domain/types';
@@ -51,7 +56,8 @@ export function ProviderDetailScreen({
   isProviderSaved = false,
 }: ProviderDetailScreenProps) {
   const theme = useAppTheme();
-  const { locale } = useAppLocale();
+  const motion = useAppMotion();
+  const { intlLocale, locale } = useAppLocale();
   const strings = useStrings(providerDetailStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { retry, state } = useProviderDetail(providerId, repository, queryScope);
@@ -70,6 +76,10 @@ export function ProviderDetailScreen({
 
   const { availabilityWindow, clinics, provider, slots, specialties } = state.data;
   const specialtyNames = specialties.map((specialty) => specialty.name[locale]).join(' · ');
+  const selectedClinic =
+    selectedSlot?.visitMode === 'in_person' && selectedSlot.clinicId
+      ? clinics.find((clinic) => clinic.id === selectedSlot.clinicId)
+      : undefined;
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
@@ -142,6 +152,7 @@ export function ProviderDetailScreen({
 
         <AvailabilitySection
           availabilityWindow={availabilityWindow}
+          clinics={clinics}
           locale={locale}
           onChooseSlot={onChooseSlot}
           onSelectedSlotChange={setSelectedSlot}
@@ -173,20 +184,29 @@ export function ProviderDetailScreen({
 
         <Surface style={styles.disclosure} variant="plain">
           <DecorativeIcon color={theme.colors.textSecondary} name="information-circle" size={20} />
-          <AppText tone="secondary" variant="caption">
+          <AppText style={styles.flexText} tone="secondary" variant="caption">
             {strings.disclosure}
           </AppText>
         </Surface>
       </ScrollView>
 
       {selectedSlot && (
-        <View style={styles.stickyFooter}>
+        <Animated.View
+          {...(motion.prefersReducedMotion
+            ? {}
+            : { entering: FadeIn.duration(motion.duration.normal) })}
+          style={styles.stickyFooter}
+        >
+          <AppText numberOfLines={1} tone="secondary" variant="caption">
+            {`${formatSlotDateSummary(selectedSlot, intlLocale)} · ${formatVisitMode(
+              selectedSlot.visitMode,
+              locale,
+            )}${selectedClinic ? ` · ${selectedClinic.name[locale]}` : ''}`}
+          </AppText>
           <Button onPress={() => onChooseSlot(selectedSlot)}>
-            {strings.continueWithTime(
-              formatSlotTime(selectedSlot, locale === 'ar' ? 'ar-AE' : 'en-AE'),
-            )}
+            {strings.continueWithTime(formatSlotTime(selectedSlot, intlLocale))}
           </Button>
-        </View>
+        </Animated.View>
       )}
     </SafeAreaView>
   );
@@ -250,12 +270,14 @@ function ProviderDetailState({ onBack, onRetry, providerId, status }: ProviderDe
 
 function AvailabilitySection({
   availabilityWindow,
+  clinics,
   locale,
   onChooseSlot,
   onSelectedSlotChange,
   slots,
 }: {
   availabilityWindow: AvailabilityWindow;
+  clinics: readonly Clinic[];
   locale: 'ar' | 'en';
   onChooseSlot: (slot: AvailabilitySlot) => void;
   onSelectedSlotChange: (slot: AvailabilitySlot | null) => void;
@@ -278,6 +300,7 @@ function AvailabilitySection({
       </AppText>
       <AvailabilityCalendar
         availabilityWindow={availabilityWindow}
+        clinics={clinics}
         hideConfirmButton
         locale={locale}
         onChooseSlot={onChooseSlot}
@@ -307,7 +330,9 @@ function InfoRow({ icon, label }: { icon: DecorativeIconName; label: string }) {
   return (
     <View style={styles.infoRow}>
       <DecorativeIcon color={theme.colors.brand} name={icon} size={20} />
-      <AppText variant="bodyMedium">{label}</AppText>
+      <AppText style={styles.flexText} variant="bodyMedium">
+        {label}
+      </AppText>
     </View>
   );
 }
@@ -388,6 +413,9 @@ function createStyles(theme: AppTheme) {
     clinicCopy: {
       flex: 1,
     },
+    flexText: {
+      flex: 1,
+    },
     disclosure: {
       alignItems: 'flex-start',
       flexDirection: 'row',
@@ -397,6 +425,7 @@ function createStyles(theme: AppTheme) {
       backgroundColor: theme.colors.canvas,
       borderTopColor: theme.colors.borderSubtle,
       borderTopWidth: StyleSheet.hairlineWidth,
+      gap: theme.spacing.xs,
       paddingHorizontal: theme.spacing.lg,
       paddingVertical: theme.spacing.sm,
     },

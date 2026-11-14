@@ -35,8 +35,8 @@ function ErrorBoundaryContent({ error, onRetry }: ErrorBoundaryScreenProps) {
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
       <View style={styles.content}>
         <Surface padding="spacious" style={styles.card} variant="raised">
-          <View style={styles.icon}>
-            <Illustration size={150} source={stateIllustrations.error} />
+          <View style={styles.illustration}>
+            <Illustration backdrop={false} size={150} source={stateIllustrations.error} />
           </View>
           <AppText accessibilityRole="header" variant="titleMedium">
             {strings.errorBoundary.title}
@@ -73,13 +73,10 @@ function createStyles(theme: AppTheme) {
       maxWidth: theme.sizes.contentMaxWidth,
       width: '100%',
     },
-    icon: {
+    illustration: {
       alignItems: 'center',
-      backgroundColor: theme.colors.dangerSoft,
-      borderRadius: theme.radii.md,
-      height: 56,
-      justifyContent: 'center',
-      width: 56,
+      alignSelf: 'center',
+      marginBottom: theme.spacing.xs,
     },
   });
 }

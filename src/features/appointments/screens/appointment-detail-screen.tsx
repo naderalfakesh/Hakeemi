@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import * as Crypto from 'expo-crypto';
 import { useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
@@ -18,6 +19,8 @@ import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { AvailabilityCalendar } from '@/features/care/components/availability-calendar';
 import type { CareRepository } from '@/features/care/domain/repository';
 import { careRepository } from '@/features/care/data/care-repository';
+import { careQueryKeys } from '@/features/care/data/query-keys';
+import type { Provider } from '@/features/care/domain/types';
 import { useProviderDetail } from '@/features/care/hooks/use-provider-detail';
 import { formatTimeZoneName } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
@@ -108,6 +111,7 @@ function AuthenticatedAppointmentDetail({
   const strings = useStrings(appointmentDetailStrings);
   const statusStrings = useStrings(appointmentStatusStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const queryClient = useQueryClient();
   const detailQuery = useAppointmentDetail(
     appointmentId,
     appointmentRepository,
@@ -132,10 +136,21 @@ function AuthenticatedAppointmentDetail({
   // replay an action that committed but whose response never arrived.
   const cancelRequestId = useRef<string | null>(null);
   const rescheduleRequest = useRef<{ requestId: string; slotId: string } | null>(null);
-  const providerName =
-    providerQuery.state.status === 'success'
-      ? providerQuery.state.data.provider.displayName[locale]
-      : (detailQuery.data?.providerId ?? '');
+  const cachedProvider =
+    providerId.length > 0
+      ? (queryClient.getQueryData<{ provider: Provider } | null>(
+          careQueryKeys.detail(providerId, queryScope),
+        )?.provider ??
+        queryClient.getQueryData<Provider | null>(
+          careQueryKeys.providerSummary(providerId, queryScope),
+        ) ??
+        null)
+      : null;
+  const resolvedProvider =
+    providerQuery.state.status === 'success' ? providerQuery.state.data.provider : cachedProvider;
+  const providerName = resolvedProvider
+    ? resolvedProvider.displayName[locale]
+    : strings.appointmentDetails;
   // The calendar follow-up lives here, not in its section, because the
   // section is hidden while the user reschedules or cancels.
   const calendar = useAppointmentCalendar({
@@ -241,9 +256,13 @@ function AuthenticatedAppointmentDetail({
         </View>
 
         <View style={styles.heading}>
-          <AppText accessibilityRole="header" variant="titleLarge">
-            {providerName}
-          </AppText>
+          {resolvedProvider || providerQuery.state.status !== 'loading' ? (
+            <AppText accessibilityRole="header" variant="titleLarge">
+              {providerName}
+            </AppText>
+          ) : (
+            <Skeleton height={32} width={180} />
+          )}
           <StatusPill appointment={appointment} />
         </View>
 
@@ -280,7 +299,7 @@ function AuthenticatedAppointmentDetail({
         {appointment.status === 'cancelled' && appointment.cancelledAt && (
           <Surface padding="compact" style={styles.notice} variant="muted">
             <DecorativeIcon color={theme.colors.warning} name="information-circle" size={20} />
-            <AppText tone="secondary" variant="bodyMedium">
+            <AppText style={styles.flexText} tone="secondary" variant="bodyMedium">
               {strings.cancelledOn(formatDate(appointment.cancelledAt, intlLocale))}
             </AppText>
           </Surface>
@@ -458,7 +477,7 @@ function DetailRow({
   return (
     <View style={styles.detailRow}>
       <DecorativeIcon color={theme.colors.brand} name={icon} size={20} />
-      <AppText tone={tone} variant="bodyMedium">
+      <AppText style={styles.flexText} tone={tone} variant="bodyMedium">
         {label}
       </AppText>
     </View>
@@ -558,6 +577,7 @@ function createStyles(theme: AppTheme) {
     },
     summary: { gap: theme.spacing.md },
     detailRow: { alignItems: 'center', flexDirection: 'row', gap: theme.spacing.sm },
+    flexText: { flex: 1 },
     notice: { alignItems: 'flex-start', flexDirection: 'row', gap: theme.spacing.sm },
     actions: { gap: theme.spacing.sm },
     confirmation: { gap: theme.spacing.sm },
