@@ -18,9 +18,9 @@
 | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | <img src="docs/images/welcome-illustrated-native.png" alt="Signed-out Welcome screen with account and demo entry choices" width="260" /> | <img src="docs/images/find-care-illustrated-native.png" alt="Find Care with illustrated doctor portraits on tinted tiles" width="260" /> | <img src="docs/images/provider-detail-illustrated-native.png" alt="Provider profile with a large ringed portrait and availability" width="260" /> |
 
-| Arabic RTL discovery                                                                                                                     | Dark mode, Arabic                                                                                       | Account preferences                                                                                                                    |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| <img src="docs/images/find-care-arabic-rtl-native.png" alt="Find Care fully localized in Arabic with mirrored RTL layout" width="260" /> | <img src="docs/images/home-arabic-dark-native.png" alt="Home screen in Arabic dark mode" width="260" /> | <img src="docs/images/profile-preferences-dark.png" alt="Authenticated profile with synchronized dark-mode preferences" width="260" /> |
+| Arabic RTL discovery                                                                                                                     | Dark mode, Arabic                                                                                       | Account preferences                                                                                                                     |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| <img src="docs/images/find-care-arabic-rtl-native.png" alt="Find Care fully localized in Arabic with mirrored RTL layout" width="260" /> | <img src="docs/images/home-arabic-dark-native.png" alt="Home screen in Arabic dark mode" width="260" /> | <img src="docs/images/profile-preferences-dark.png" alt="Profile screen with saved clinicians and dark-mode preferences" width="260" /> |
 
 ## The rebuild
 
@@ -99,7 +99,7 @@ emulator-only until enabling billing is an explicit decision.
 ## Quality
 
 CI runs `npm run validate` — formatting, lint, strict types, 51 Jest suites
-with 233 tests (including Arabic-locale renders), 19 Functions unit tests,
+with 236 tests (including Arabic-locale renders), 19 Functions unit tests,
 CI-enforced illustration budgets, and Expo Doctor — plus the Firebase emulator
 matrix: 14 security-rules tests and callable integration suites for booking,
 appointment management, notification tokens, and scheduled reminders. Native

@@ -1,6 +1,6 @@
 # Pixel 9 Android Device Verification
 
-> Verified: 2026-10-23
+> Verified: 2026-10-23; re-verified: 2026-11-15
 >
 > Scope: Android release build on a physical phone, Explore Demo and
 > onboarding in English and Arabic. iPhone testing is deferred by the owner.
@@ -8,37 +8,39 @@
 ## Setup
 
 - Google Pixel 9, Android 17.
-- Release APK of `36cabf5` (sha256 `06974d77…86ad5fd`), R8 on, signed with the
-  debug key.
-- Driven over wireless adb; the owner did the fingerprint, face, camera and
-  permission taps.
+- Initial pass (`2026-10-23`): Release APK of `36cabf5` (sha256 `06974d77…86ad5fd`), R8 on, signed with the debug key.
+- Re-verification (`2026-11-15`): Release APK of `ab881bb` (`expo ~58.0.25`, `react-native 0.88.1`, `versionName 2.0.0`, `minSdk 24`, `targetSdk 36`), R8 on, signed with the debug key.
+- Driven over wireless `adb` and `agent-device`.
 
 ## Passed
 
 - Onboarding: switching English to Arabic reloads into right to left; the
-  three steps and Welcome work; a relaunch skips onboarding.
-- Demo home in Arabic, right to left, including the tabs.
+  three steps and Welcome work; a relaunch skips onboarding; the `"حسب الجهاز"`
+  ("Use device") appearance chip fits without clipping (`HK-L1`).
+- Welcome (`2026-11-15`): `"Explore the demo"` is foregrounded alongside `"Create account"` and `"Sign in"`.
+- Demo home, Find care, Clinician profile, and Profile (`2026-11-15`): verified in Light and Dark mode, English LTR and Arabic RTL, including the Next Visit card, Specialty quick-chips, Saved clinicians bookmarking in Demo Mode, inline sticky booking footer (`Continue with ...`), and single-letter Arabic weekday headers (`HK-M1`).
 - Booking: clinician profile, slot, details, review, confirmed (with a
   booking reference).
-- Calendar permission is asked in context. Deny shows an inline sentence;
-  allow shows "أُضيف إلى التقويم" and writes the event at the booked time
-  (Asia/Dubai).
+- Calendar & Visit details (`2026-11-15`):
+  - Localized time zone name (`توقيت الخليج`) instead of raw `Asia/Dubai` (`HK-L2`).
+  - Calendar permission is asked in context (`Deny` shows an inline message; with access granted, `"إضافة إلى التقويم"` opens a calendar chooser across multiple Google accounts and displays the chosen calendar name (`HK-M2`)).
+  - Rescheduling moves the linked calendar event and reports `"نُقل إلى الوقت الجديد في <calendar>."` (`HK-M3`).
+  - Cancelling removes the linked calendar event and reports `"أُزيل من <calendar>."` (`HK-M3b`).
+- Play Protect (`2026-11-15`): `com.naderalfakesh.hakeemi` targets `targetSdk=36` (`minSdk=24`) and installs without older-Android warnings (an earlier prompt on the device came from the external `com.android.cli.interact.instrumentation` helper APK, not Hakeemi).
 - Largest Android font size: nothing cut off (owner).
-- Light mode.
 
 ## Findings
 
-Fixes are in progress on branch `fix/device-findings`; none is on `master`
-yet.
+All six findings from the 2026-10-23 pass were fixed on `master` and verified on the Pixel 9 (`2026-11-15`):
 
-| ID     | Severity | Finding                                                                                                                                                  | Status          |
-| ------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
-| HK-M1  | Medium   | Arabic weekday chips on the clinician profile break day names mid-word at normal text size                                                               | Fix in progress |
-| HK-M2  | Medium   | Add to calendar writes silently into the first calendar of the first account (the phone has three Google accounts); the user can't pick or see which one | Fix in progress |
-| HK-M3  | Medium   | After a reschedule the calendar event stays at the old time while the app still says it was added                                                        | Fix in progress |
-| HK-M3b | Medium   | Cancelling an appointment leaves its calendar event in place                                                                                             | Fix in progress |
-| HK-L1  | Low      | Arabic onboarding Appearance chip "Use device" shows only its first word, although the chip has room                                                     | Fix in progress |
-| HK-L2  | Low      | Visit details shows the raw time zone id `Asia/Dubai` in Arabic, while the profile shows the localized name                                              | Fix in progress |
+| ID     | Severity | Finding                                                                                                                                                 | Status |
+| ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| HK-M1  | Medium   | Arabic weekday chips on the clinician profile use single-letter CLDR narrow labels (`ن`, `ث`, `ر`, `خ`, `ج`, `س`, `ح`) and reflow at `fontScale >= 1.3` | Fixed  |
+| HK-M2  | Medium   | Add to calendar opens a chooser when multiple writable calendars exist and displays the chosen calendar/account name                                    | Fixed  |
+| HK-M3  | Medium   | Rescheduling an appointment updates its linked calendar event to the new slot time and reports the target calendar                                      | Fixed  |
+| HK-M3b | Medium   | Cancelling an appointment deletes its linked calendar event and reports the removal                                                                     | Fixed  |
+| HK-L1  | Low      | Arabic RTL `AppText` zeroes `letterSpacing` and `Chip` allows wrapping so `"حسب الجهاز"` ("Use device") renders without clipping                        | Fixed  |
+| HK-L2  | Low      | Visit details and cards format time zone names with `Intl.DateTimeFormat` (`توقيت الخليج` / `Gulf Standard Time`) instead of raw IANA `Asia/Dubai`      | Fixed  |
 
 ## Skipped
 

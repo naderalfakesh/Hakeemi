@@ -1,29 +1,27 @@
 # Expo SDK 58 Upgrade
 
-> Verified: 2026-10-17
+> Verified: 2026-10-17; patch-aligned and re-verified: 2026-11-15
 >
 > Scope: Expo SDK 57 to SDK 58 (stable), React Native 0.88, iOS scene
 > lifecycle, Xcode 27 and Android release builds
 
 ## Versions
 
-| Package                 | Before  | After   |
-| ----------------------- | ------- | ------- |
-| expo                    | 57.0.30 | 58.0.14 |
-| react-native            | 0.86.3  | 0.88.0  |
-| react / react-dom       | 19.2.3  | 19.3.0  |
-| expo-router             | 57.0.28 | 58.0.23 |
-| expo-notifications      | 57.0.23 | 58.1.5  |
-| react-native-reanimated | 4.5.1   | 4.7.1   |
-| react-native-worklets   | 0.10.1  | 0.13.0  |
-| gesture-handler         | 2.32    | 3.3     |
-| jest / jest-expo        | 29 / 57 | 30 / 58 |
-| React Native Firebase   | 25.1.0  | 25.1.0  |
+| Package                 | Before  | After (aligned `2026-11-15`) |
+| ----------------------- | ------- | ---------------------------- |
+| expo                    | 57.0.30 | ~58.0.25                     |
+| react-native            | 0.86.3  | 0.88.1                       |
+| react / react-dom       | 19.2.3  | 19.3.0                       |
+| expo-router             | 57.0.28 | ~58.0.31                     |
+| expo-notifications      | 57.0.23 | ~58.1.9                      |
+| react-native-reanimated | 4.5.1   | 4.7.1                        |
+| react-native-worklets   | 0.10.1  | 0.13.0                       |
+| gesture-handler         | 2.32    | ~3.3.0                       |
+| jest / jest-expo        | 29 / 57 | ~30.5.2 / ~58.0.14           |
+| React Native Firebase   | 25.1.0  | 25.1.0                       |
+| Functions runtime       | Node 22 | Node 24                      |
 
-`expo` 58.0.14 was the npm `latest` tag (not a prerelease) on the
-verification date. Every other Expo-managed version is the one
-`npx expo install --fix` selects for it; `npx expo install --check` reports
-the dependencies as up to date.
+All Expo-managed packages match `npx expo install --fix` for `expo` `~58.0.25`, and Expo Doctor passes 20/20.
 
 ## Changes
 
@@ -67,9 +65,10 @@ the dependencies as up to date.
 
 ## Verification
 
-- `npm ci` from the lockfile, `npx expo install --check`, Expo Doctor 20/20
-  (local 1.20.4 and 1.21.5), and `npm run validate`: Prettier, ESLint, strict
-  TypeScript, 47 Jest suites, Functions tests.
+- `npm ci` / aligned lockfile, Expo Doctor 20/20, and `npm run validate`:
+  Prettier, ESLint, strict TypeScript (`app`, `firebase`, `functions`),
+  illustration asset budget (`15` WebP illustrations totaling `314.1 KB`),
+  `51` Jest suites (`236` tests), and `4` Functions suites (`19` tests).
 - All six Firebase emulator suites pass.
 - iOS: Release simulator build with Xcode 27.0 and the iOS 27 SDK. On an
   iOS 27 simulator the app launches with a `UIWindowScene`, configures the
