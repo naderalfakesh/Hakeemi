@@ -1,6 +1,6 @@
 # Pixel 9 Android Device Verification
 
-> Verified: 2026-10-23; re-verified: 2026-11-15
+> Verified: 2026-10-23; re-verified: 2026-11-15 – 2026-11-16
 >
 > Scope: Android release build on a physical phone, Explore Demo and
 > onboarding in English and Arabic. iPhone testing is deferred by the owner.
@@ -27,6 +27,9 @@
   - Rescheduling moves the linked calendar event and reports `"نُقل إلى الوقت الجديد في <calendar>."` (`HK-M3`).
   - Cancelling removes the linked calendar event and reports `"أُزيل من <calendar>."` (`HK-M3b`).
 - Play Protect (`2026-11-15`): `com.naderalfakesh.hakeemi` targets `targetSdk=36` (`minSdk=24`) and installs without older-Android warnings (an earlier prompt on the device came from the external `com.android.cli.interact.instrumentation` helper APK, not Hakeemi).
+- Calendar permission denial (`2026-11-16`): declining calendar access from Visit details renders `"Calendar access was declined. You can still manage this appointment here."` inline while keeping Reschedule and Cancel interactive.
+- Landscape rotation (`2026-11-16`): Home, Find care, and Provider profile remain scrollable in landscape with the header actions and sticky booking CTA accessible.
+- End-to-end suite (`2026-11-16`): `npx e2e run --target android --retries 0 --action-timeout 15000` passed **3/3** on the Pixel 9 (`22.24s`), matching **3/3** on `--target web` (`10.28s`).
 - Largest Android font size: nothing cut off (owner).
 
 ## Findings
@@ -42,11 +45,21 @@ All six findings from the 2026-10-23 pass were fixed on `master` and verified on
 | HK-L1  | Low      | Arabic RTL `AppText` zeroes `letterSpacing` and `Chip` allows wrapping so `"حسب الجهاز"` ("Use device") renders without clipping                        | Fixed  |
 | HK-L2  | Low      | Visit details and cards format time zone names with `Intl.DateTimeFormat` (`توقيت الخليج` / `Gulf Standard Time`) instead of raw IANA `Asia/Dubai`      | Fixed  |
 
+## Performance & bundle baseline
+
+Measured `2026-11-16` with `npx expo export` (`preview` env, Hermes bytecode enabled) and on the Pixel 9:
+
+- Cold start (`am start -W`, `LaunchState: COLD`, 3 runs): `TotalTime` `398 ms`, `301 ms`, `302 ms` (median `302 ms`)
+- Installed Release APK on Pixel 9 (`base.apk`, R8 enabled): `92 MB`
+- Android Hermes bundle (`_expo/static/js/android/entry-*.hbc`): `6 MB` (`5.8 MB` on disk, `2004` modules)
+- iOS Hermes bundle (`_expo/static/js/ios/entry-*.hbc`): `6.1 MB` (`5.8 MB` on disk, `2212` modules)
+- Web static export (`23` routes, `26` JS bundles): `1.7 MB` shared chunk + `1.1 MB` entry + route chunks (`17 MB` total export directory with assets)
+
 ## Skipped
 
 By the owner's choice, within the showcase scope:
 
-- Offline guard in airplane mode.
+- Offline guard in airplane mode (Wi-Fi stayed active for wireless `adb`).
 - TalkBack.
 - Notifications, which need a real Firebase account.
 

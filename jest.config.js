@@ -11,5 +11,11 @@ module.exports = {
   },
   resolver: 'react-native-reanimated/jest/resolver.js',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-  testPathIgnorePatterns: ['/dist/', '/firebase/tests/', '/functions/'],
+  testPathIgnorePatterns: [
+    '/dist/',
+    '/firebase/tests/',
+    '/functions/',
+    '<rootDir>/.e2e/',
+    '<rootDir>/tests/',
+  ],
 };

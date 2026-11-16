@@ -65,3 +65,6 @@ pubsub-debug.log*
 # local working notes
 SESSION.md
 recordings/
+
+# e2e test outputs
+.e2e/

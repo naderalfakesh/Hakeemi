@@ -1300,16 +1300,39 @@ completion flag, Welcome still owns Create account / Sign in / Explore demo,
 and the session guard still redirects authenticated and demo users before any
 onboarding route renders. Details are in `docs/visual-identity.md`.
 
+The 19 October – 16 November 2026 SDK 58, Pixel 9 hardware, and portfolio QA
+pass landed across `master` (`f095568`..`498eb7d`):
+
+- Upgraded to Expo SDK 58 (`~58.0.25`), React Native `0.88.1`, React `19.3.0`,
+  `expo-router ~58.0.31`, and Node 24 Cloud Functions (`docs/expo-sdk-58-upgrade.md`),
+  and moved the main tabs to native tabs with an inline clinician booking flow,
+  Home Next Visit card, Specialty quick-chips, Demo exit, and calendar export from
+  confirmation.
+- Fixed all six Pixel 9 Android 17 findings (`HK-M1`, `HK-M2`, `HK-M3`,
+  `HK-M3b`, `HK-L1`, `HK-L2`), added calendar account selection plus lifecycle
+  sync across reschedule and cancel, and refreshed `docs/images/` from the
+  physical Pixel 9 (`docs/device-pixel9-android.md`, `498eb7d`).
+- Completed the portfolio review polish (`ab881bb`): bounded Firestore
+  discovery and appointment queries with cursor pagination and `limitToLast`,
+  unified all 15 illustrations into opaque-card transparent WebP assets totaling
+  `314.1 KB`, added Demo Mode Saved clinicians persistence, fixed keyboard/dark-mode
+  contrast edge cases, and aligned all SDK 58 patch versions (Expo Doctor `20/20`).
+- Added an end-to-end suite in `e2e.config.ts` and `tests/demo-booking.e2e.ts`
+  configured for `@e2e-dev/acp` (`claudeCode` + `codex`), `@e2e-dev/mobile`
+  (`android` and `ios` on `iPhone 18 Pro`), and `@e2e-dev/web`, passing **3/3**
+  on both Web (`10.28s`) and the physical Pixel 9 (`22.24s`). Also recorded
+  Pixel 9 cold start (`398 ms` / `301 ms` / `302 ms`), calendar denial,
+  landscape rotation, and release bundle sizes (`6 MB` Android Hermes `.hbc`,
+  `6.1 MB` iOS Hermes `.hbc`, `92 MB` Pixel 9 Release APK).
+
 ## Next execution queue
 
-1. Measure cold start, interaction latency, list frame stability, and JS bundle
-   size on representative iOS and Android builds; the bundled illustration
-   payload now has a measured and enforced budget.
-2. Complete the manual Phase 5/4 sign-off matrix: VoiceOver, TalkBack, rotation,
-   a physical small phone, Android hardware, and calendar/notification denial.
-3. Add privacy-safe Crashlytics, Performance Monitoring, and analytics, then
-   enable App Check in monitor mode before considering enforcement.
-4. Log in to EAS (`eas login`), configure signing through EAS credentials, and
+1. Complete remaining accessibility and connectivity hardware passes (VoiceOver,
+   TalkBack, and airplane-mode offline guard over USB).
+2. When observability is funded, instrument Crashlytics, Performance Monitoring,
+   the privacy-safe analytics contract (`docs/analytics-events.md`), and App Check
+   in monitor mode.
+3. Log in to EAS (`eas login`), configure signing through EAS credentials, and
    attach signed preview builds with an install link and QR code. Account-backed
    booking in a preview build also needs the Cloud Functions deployed to
    `hakeemi-portfolio-dev` (Blaze boundary); demo mode works without them.
@@ -1317,6 +1340,6 @@ onboarding route renders. Details are in `docs/visual-identity.md`.
    targeting `hakeemi-portfolio-dev` or gets its own Firebase project and real
    Google service files, and run `eas build:configure` so `app.config.ts`
    carries the EAS project ID.
-5. Revoke or regenerate the `person.png` download token in the legacy `hakeemi`
+4. Revoke or regenerate the `person.png` download token in the legacy `hakeemi`
    Storage bucket and confirm the legacy client API key is restricted; then
    decide whether the `promo` soundtrack stays AI-generated or is replaced.
