@@ -27,12 +27,12 @@ const en = {
   },
   review: {
     confirmAppointment: 'Confirm appointment',
-    confirmAppointmentHint: 'Reserves the selected time through a secure transaction.',
+    confirmAppointmentHint: 'Reserves the selected time.',
     disclaimer:
       'Portfolio demonstration only. This creates an appointment against fictional provider data.',
     offlineBody: 'Your choices are saved. Reconnect before confirming; bookings are never queued.',
     offlineTitle: 'You are offline',
-    subtitle: 'Nothing is booked until the secure transaction succeeds.',
+    subtitle: 'Check the details. Your time is reserved once you confirm.',
     title: 'Review and confirm',
   },
   routeState: {
@@ -85,13 +85,13 @@ export const bookingStrings: LocalizedStrings<typeof en> = {
     },
     review: {
       confirmAppointment: 'تأكيد الموعد',
-      confirmAppointmentHint: 'يحجز الوقت المحدد عبر معاملة آمنة.',
+      confirmAppointmentHint: 'يحجز الوقت المحدد.',
       disclaimer:
         'عرض توضيحي لأغراض معرض الأعمال فقط، وينشئ هذا الإجراء موعدًا باستخدام بيانات مقدمي رعاية خياليين.',
       offlineBody:
         'خياراتك محفوظة. أعد الاتصال بالإنترنت قبل التأكيد؛ فالحجوزات لا تُوضع في قائمة انتظار أبدًا.',
       offlineTitle: 'أنت غير متصل بالإنترنت',
-      subtitle: 'لن يُحجز أي موعد حتى تكتمل المعاملة الآمنة بنجاح.',
+      subtitle: 'راجع التفاصيل. يُحجز موعدك عند التأكيد.',
       title: 'المراجعة والتأكيد',
     },
     routeState: {

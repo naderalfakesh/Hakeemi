@@ -283,31 +283,29 @@ export function OnboardingScreen({
             </View>
           </View>
 
-          {isLastStep ? (
-            <View style={styles.finalActions}>
-              <Button accessibilityLabel={strings.finishAccessibilityLabel} onPress={onComplete}>
-                {strings.finish}
-              </Button>
-              <Button onPress={showPreviousStep} variant="tertiary">
-                {strings.back}
-              </Button>
-            </View>
-          ) : (
-            <View style={styles.navigationRow}>
-              {!isFirstStep && (
-                <View style={styles.backAction}>
-                  <Button onPress={showPreviousStep} variant="secondary">
-                    {strings.back}
-                  </Button>
-                </View>
-              )}
-              <View style={styles.primaryAction}>
+          {/* Every step shares one action row, so the last step's content
+              keeps the same height as the others instead of losing a row to
+              a second stacked button. */}
+          <View style={styles.navigationRow}>
+            {!isFirstStep && (
+              <View style={styles.backAction}>
+                <Button onPress={showPreviousStep} variant="secondary">
+                  {strings.back}
+                </Button>
+              </View>
+            )}
+            <View style={styles.primaryAction}>
+              {isLastStep ? (
+                <Button accessibilityLabel={strings.finishAccessibilityLabel} onPress={onComplete}>
+                  {strings.finish}
+                </Button>
+              ) : (
                 <Button accessibilityLabel={strings.nextAccessibilityLabel} onPress={showNextStep}>
                   {strings.next}
                 </Button>
-              </View>
+              )}
             </View>
-          )}
+          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -512,9 +510,6 @@ function createStyles(
     navigationRow: {
       flexDirection: stackActions ? 'column-reverse' : 'row',
       gap: stackActions ? theme.spacing.xs : theme.spacing.sm,
-    },
-    finalActions: {
-      gap: theme.spacing.xs,
     },
     backAction: {
       flex: stackActions ? 0 : 1,

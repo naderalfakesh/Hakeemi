@@ -67,6 +67,10 @@ export function formatLocalizedCount(
  * "توقيت الخليج") instead of its IANA id ("Asia/Dubai"). The instant matters
  * for zones with daylight saving time, so pass the appointment's start. An
  * engine without time zone names keeps the id rather than failing the screen.
+ *
+ * The name is what the time zone option adds to a formatted year. Hermes on
+ * iOS splits a multi-word name across formatToParts and tags only its first
+ * word ("Gulf") as the time zone, so the parts cannot be trusted there.
  */
 export function formatTimeZoneName(
   timeZone: string,
@@ -74,15 +78,20 @@ export function formatTimeZoneName(
   at: Date | string = new Date(),
 ) {
   try {
-    const name = new Intl.DateTimeFormat(toIntlLocale(locale), {
+    const intlLocale = toIntlLocale(locale);
+    const instant = typeof at === 'string' ? new Date(at) : at;
+    const year = new Intl.DateTimeFormat(intlLocale, { timeZone, year: 'numeric' }).format(instant);
+    const yearWithName = new Intl.DateTimeFormat(intlLocale, {
       timeZone,
       timeZoneName: 'long',
-    })
-      .formatToParts(typeof at === 'string' ? new Date(at) : at)
-      .find((part) => part.type === 'timeZoneName')?.value;
+      year: 'numeric',
+    }).format(instant);
+    const name = yearWithName.replace(year, '').replace(EDGE_SEPARATORS, '');
 
-    return name ?? timeZone;
+    return name || timeZone;
   } catch {
     return timeZone;
   }
 }
+
+const EDGE_SEPARATORS = /^[\s,،\u200e\u200f]+|[\s,،\u200e\u200f]+$/gu;

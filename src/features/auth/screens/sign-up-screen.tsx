@@ -148,7 +148,9 @@ export function SignUpScreen({ onBack, onSignIn, onSubmit }: SignUpScreenProps) 
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     form: {
-      gap: theme.spacing.md,
+      // Four fields and two actions: the tighter rhythm keeps the whole card
+      // on one screen on a standard phone.
+      gap: theme.spacing.sm,
     },
   });
 }

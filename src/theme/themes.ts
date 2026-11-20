@@ -17,6 +17,8 @@ export type SemanticColors = {
   canvas: string;
   danger: string;
   dangerSoft: string;
+  hero: string;
+  heroPressed: string;
   info: string;
   infoSoft: string;
   overlay: string;
@@ -27,6 +29,7 @@ export type SemanticColors = {
   surfaceMuted: string;
   surfaceRaised: string;
   textInverse: string;
+  textOnHero: string;
   textPrimary: string;
   textSecondary: string;
   warning: string;
@@ -62,6 +65,8 @@ const lightColors: SemanticColors = {
   canvas: '#F5F8F5',
   danger: '#A9333E',
   dangerSoft: '#F8E3E5',
+  hero: '#0A6765',
+  heroPressed: '#07504F',
   info: '#315F96',
   infoSoft: '#E3EBF5',
   overlay: 'rgba(6, 28, 27, 0.56)',
@@ -72,6 +77,7 @@ const lightColors: SemanticColors = {
   surfaceMuted: '#EBF1EE',
   surfaceRaised: '#FFFFFF',
   textInverse: '#FFFFFF',
+  textOnHero: '#FFFFFF',
   textPrimary: '#102726',
   textSecondary: '#506663',
   warning: '#7B570B',
@@ -90,6 +96,8 @@ const darkColors: SemanticColors = {
   canvas: '#071A18',
   danger: '#FFABB2',
   dangerSoft: '#43262B',
+  hero: '#0E5B57',
+  heroPressed: '#0B4B48',
   info: '#9CC7FA',
   infoSoft: '#20364D',
   overlay: 'rgba(0, 8, 7, 0.72)',
@@ -100,6 +108,7 @@ const darkColors: SemanticColors = {
   surfaceMuted: '#17302D',
   surfaceRaised: '#142B28',
   textInverse: '#062421',
+  textOnHero: '#F1FBF9',
   textPrimary: '#EFF7F4',
   textSecondary: '#B4C7C2',
   warning: '#EBC66C',

@@ -22,6 +22,7 @@ import { careRepository } from '@/features/care/data/care-repository';
 import { careQueryKeys } from '@/features/care/data/query-keys';
 import type { Provider } from '@/features/care/domain/types';
 import { useProviderDetail } from '@/features/care/hooks/use-provider-detail';
+import { formatAppointmentReference } from '@/features/appointments/domain/reference';
 import { formatTimeZoneName } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
@@ -281,37 +282,20 @@ function AuthenticatedAppointmentDetail({
             )}`}
           />
           <AppText selectable tone="secondary" variant="caption">
-            {strings.reference(appointment.id.slice(-10).toUpperCase())}
+            {strings.reference(formatAppointmentReference(appointment.id))}
           </AppText>
         </Surface>
 
-        {/* The section stays for a cancelled visit so its calendar event is
-            removed and the outcome reported. */}
-        {(appointment.status === 'confirmed' || appointment.status === 'cancelled') &&
-          !confirmingCancel &&
-          !showReschedule && (
+        {/* Only one intent is visible at a time: the default action stack,
+            the focused cancel confirmation, or the reschedule flow. The stack
+            leads with rescheduling and keeps one rhythm down to cancelling. */}
+        {canManage && !confirmingCancel && !showReschedule && (
+          <View style={styles.actions}>
+            <Button onPress={() => setShowReschedule(true)}>{strings.reschedule}</Button>
             <AppointmentCalendarSection
               appointmentStatus={appointment.status}
               calendar={calendar}
             />
-          )}
-
-        {appointment.status === 'cancelled' && appointment.cancelledAt && (
-          <Surface padding="compact" style={styles.notice} variant="muted">
-            <DecorativeIcon color={theme.colors.warning} name="information-circle" size={20} />
-            <AppText style={styles.flexText} tone="secondary" variant="bodyMedium">
-              {strings.cancelledOn(formatDate(appointment.cancelledAt, intlLocale))}
-            </AppText>
-          </Surface>
-        )}
-
-        {/* Only one intent is visible at a time: the default action stack,
-            the focused cancel confirmation, or the reschedule flow. */}
-        {canManage && !confirmingCancel && !showReschedule && (
-          <View style={styles.actions}>
-            <Button onPress={() => setShowReschedule(true)} variant="secondary">
-              {strings.reschedule}
-            </Button>
             <Button
               accessibilityHint={strings.cancelAppointmentHint}
               onPress={() => setConfirmingCancel(true)}
@@ -320,6 +304,22 @@ function AuthenticatedAppointmentDetail({
               {strings.cancelAppointment}
             </Button>
           </View>
+        )}
+
+        {/* The section stays for a cancelled visit so its calendar event is
+            removed and the outcome reported. */}
+        {(appointment.status === 'cancelled' ||
+          (appointment.status === 'confirmed' && !canManage)) && (
+          <AppointmentCalendarSection appointmentStatus={appointment.status} calendar={calendar} />
+        )}
+
+        {appointment.status === 'cancelled' && appointment.cancelledAt && (
+          <Surface padding="compact" style={styles.notice} variant="muted">
+            <DecorativeIcon color={theme.colors.warning} name="information-circle" size={20} />
+            <AppText style={styles.flexText} tone="secondary" variant="bodyMedium">
+              {strings.cancelledOn(formatDate(appointment.cancelledAt, intlLocale))}
+            </AppText>
+          </Surface>
         )}
 
         {confirmingCancel && canManage && (

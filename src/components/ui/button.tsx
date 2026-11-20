@@ -44,7 +44,7 @@ export function Button({
     >
       <View style={styles.content}>
         {busy ? (
-          <ActivityIndicator color={foregroundColor} size="small" />
+          <ActivityIndicator color={foregroundColor} size="small" style={styles.leading} />
         ) : (
           leading && <View style={styles.leading}>{leading}</View>
         )}

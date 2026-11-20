@@ -81,7 +81,7 @@ const verifyEmailEn = {
   resendConfirmation: 'A fresh verification email was sent.',
   resendEmail: 'Resend email',
   sentTo: 'We sent a verification link to:',
-  subtitle: 'Verification keeps the demo account recoverable and prevents mistyped addresses.',
+  subtitle: 'Open the link in the email, then come back here to continue.',
   title: 'Verify your email',
   useAnotherAccount: 'Use another account',
   yourEmailAddress: 'your email address',
@@ -94,7 +94,7 @@ export const verifyEmailStrings: LocalizedStrings<typeof verifyEmailEn> = {
     resendConfirmation: 'تم إرسال رسالة تحقق جديدة.',
     resendEmail: 'إعادة إرسال الرسالة',
     sentTo: 'أرسلنا رابط التحقق إلى:',
-    subtitle: 'يحافظ التحقق على إمكانية استعادة الحساب التجريبي ويمنع العناوين المكتوبة خطأً.',
+    subtitle: 'افتح الرابط في الرسالة، ثم عُد إلى هنا للمتابعة.',
     title: 'تحقق من بريدك الإلكتروني',
     useAnotherAccount: 'استخدام حساب آخر',
     yourEmailAddress: 'عنوان بريدك الإلكتروني',
@@ -109,9 +109,9 @@ const forgotPasswordEn = {
   emailPlaceholder: 'you@example.com',
   eyebrow: 'ACCOUNT RECOVERY',
   resetSent: (email: string) =>
-    `If an account exists for ${email}, Firebase has sent password reset instructions.`,
+    `If an account exists for ${email}, we have sent password reset instructions.`,
   sendResetInstructions: 'Send reset instructions',
-  subtitle: 'We keep the response neutral so an email address cannot be used to discover accounts.',
+  subtitle: 'Enter your email and we will send a reset link if an account uses it.',
   title: 'Reset your password',
 };
 
@@ -123,9 +123,9 @@ export const forgotPasswordStrings: LocalizedStrings<typeof forgotPasswordEn> = 
     emailPlaceholder: 'you@example.com',
     eyebrow: 'استعادة الحساب',
     resetSent: (email) =>
-      `إذا كان هناك حساب مرتبط بالعنوان ${email}، فقد أرسل Firebase تعليمات إعادة تعيين كلمة المرور.`,
+      `إذا كان هناك حساب مرتبط بالعنوان ${email}، فقد أرسلنا تعليمات إعادة تعيين كلمة المرور.`,
     sendResetInstructions: 'إرسال تعليمات إعادة التعيين',
-    subtitle: 'نُبقي الرد محايدًا حتى لا يمكن استخدام عنوان البريد الإلكتروني لاكتشاف الحسابات.',
+    subtitle: 'أدخل بريدك الإلكتروني وسنرسل رابط إعادة التعيين إن كان مرتبطًا بحساب.',
     title: 'إعادة تعيين كلمة المرور',
   },
   en: forgotPasswordEn,

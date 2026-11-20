@@ -50,18 +50,18 @@ export function NextVisitCard({
           {when}
         </AppText>
       </View>
-      <AppText numberOfLines={1} tone="inverse" variant="titleMedium">
+      <AppText numberOfLines={1} style={styles.onHero} variant="titleMedium">
         {providerName}
       </AppText>
       <View style={styles.detailRow}>
-        <DecorativeIcon color={theme.colors.textInverse} name="time-outline" size={18} />
-        <AppText tone="inverse" variant="bodyStrong">
+        <DecorativeIcon color={theme.colors.textOnHero} name="time-outline" size={18} />
+        <AppText style={styles.onHero} variant="bodyStrong">
           {formatAppointmentTime(appointment, intlLocale)}
         </AppText>
       </View>
       <View style={styles.detailRow}>
         <DecorativeIcon
-          color={theme.colors.textInverse}
+          color={theme.colors.textOnHero}
           name={appointment.visitMode === 'video' ? 'videocam-outline' : 'location-outline'}
           size={18}
         />
@@ -69,7 +69,7 @@ export function NextVisitCard({
           {statusStrings.visitModeLabels[appointment.visitMode]}
         </AppText>
         <View style={styles.spacer} />
-        <DecorativeIcon color={theme.colors.textInverse} name="chevron-forward" size={20} />
+        <DecorativeIcon color={theme.colors.textOnHero} name="chevron-forward" size={20} />
       </View>
     </Pressable>
   );
@@ -79,14 +79,14 @@ function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     card: {
       ...theme.shadows.raised,
-      backgroundColor: theme.colors.brand,
+      backgroundColor: theme.colors.hero,
       borderCurve: 'continuous',
       borderRadius: theme.radii.lg,
       gap: theme.spacing.xs,
       padding: theme.spacing.lg,
     },
     pressed: {
-      backgroundColor: theme.colors.brandPressed,
+      backgroundColor: theme.colors.heroPressed,
       transform: [{ scale: 0.99 }],
     },
     topRow: {
@@ -95,20 +95,20 @@ function createStyles(theme: AppTheme) {
       justifyContent: 'space-between',
       marginBottom: theme.spacing.xxs,
     },
+    onHero: {
+      color: theme.colors.textOnHero,
+    },
     pill: {
-      // A tint of the card's own text color reads on both the light-mode
-      // teal and the pale dark-mode teal.
-      backgroundColor:
-        theme.mode === 'dark' ? 'rgba(6, 36, 33, 0.12)' : 'rgba(255, 255, 255, 0.18)',
+      backgroundColor: 'rgba(255, 255, 255, 0.18)',
       borderRadius: theme.radii.full,
       paddingHorizontal: theme.spacing.sm,
       paddingVertical: theme.spacing.xxs,
     },
     pillText: {
-      color: theme.colors.textInverse,
+      color: theme.colors.textOnHero,
     },
     when: {
-      color: theme.colors.textInverse,
+      color: theme.colors.textOnHero,
       opacity: 0.9,
     },
     detailRow: {
@@ -117,7 +117,7 @@ function createStyles(theme: AppTheme) {
       gap: theme.spacing.xs,
     },
     secondary: {
-      color: theme.colors.textInverse,
+      color: theme.colors.textOnHero,
       opacity: 0.86,
     },
     spacer: {

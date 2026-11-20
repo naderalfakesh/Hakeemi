@@ -28,7 +28,9 @@ export default function VerifyEmailRoute() {
     return <Redirect href={{ pathname: '/auth/sign-in', params: returnParams }} />;
   }
 
-  if (session.user?.emailVerified) {
+  // A demo session has no account to verify, and a verified one is finished
+  // here. Deep links can open this route in either state.
+  if (session.status === 'demo' || session.user?.emailVerified) {
     return <Redirect href={bookingDestination(bookingReturn)} />;
   }
 
@@ -53,7 +55,9 @@ export default function VerifyEmailRoute() {
 
   return (
     <VerifyEmailScreen
-      email={email ?? session.user?.email ?? strings.yourEmailAddress}
+      // The signed-in address wins: the link's email parameter is unverified
+      // input and must not be shown as the place a message was sent.
+      email={session.user?.email ?? email ?? strings.yourEmailAddress}
       onBack={() => (router.canGoBack() ? router.back() : router.replace('/auth/sign-in'))}
       onContinue={handleContinue}
       onResend={resendVerificationEmail}

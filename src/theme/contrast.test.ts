@@ -14,6 +14,12 @@ describe.each([
     ).toBeGreaterThanOrEqual(4.5);
   });
 
+  it('keeps hero text readable on the hero surface', () => {
+    expect(getContrastRatio(theme.colors.textOnHero, theme.colors.hero)).toBeGreaterThanOrEqual(
+      4.5,
+    );
+  });
+
   it('keeps inverse text readable on the brand color', () => {
     expect(getContrastRatio(theme.colors.textInverse, theme.colors.brand)).toBeGreaterThanOrEqual(
       4.5,

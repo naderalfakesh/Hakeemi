@@ -485,7 +485,7 @@ function SavedProvidersSection({
                 <AppText numberOfLines={1} variant="bodyStrong">
                   {provider.displayName[locale]}
                 </AppText>
-                <AppText numberOfLines={1} tone="secondary" variant="caption">
+                <AppText numberOfLines={2} tone="secondary" variant="caption">
                   {provider.credentialSummary[locale]}
                 </AppText>
               </Pressable>

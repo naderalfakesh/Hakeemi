@@ -72,7 +72,7 @@ function createStyles(theme: AppTheme) {
     content: {
       alignSelf: 'center',
       flexGrow: 1,
-      paddingBottom: theme.spacing.xl,
+      paddingBottom: theme.spacing.md,
       paddingHorizontal: theme.spacing.lg,
       paddingTop: theme.spacing.sm,
       width: '100%',
@@ -80,12 +80,12 @@ function createStyles(theme: AppTheme) {
     },
     heading: {
       gap: theme.spacing.xs,
-      marginBottom: theme.spacing.lg,
-      marginTop: theme.spacing.md,
+      marginBottom: theme.spacing.md,
+      marginTop: theme.spacing.sm,
     },
     disclaimer: {
       marginTop: 'auto',
-      paddingTop: theme.spacing.xl,
+      paddingTop: theme.spacing.lg,
       textAlign: 'center',
     },
   });

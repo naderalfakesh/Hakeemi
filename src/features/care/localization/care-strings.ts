@@ -93,7 +93,7 @@ const providerDetailEn = {
   clinics: 'Clinics',
   consultation: 'Consultation',
   disclosure:
-    'This fictional profile demonstrates discovery UX with Firebase-backed availability. Confirmed bookings are protected by a server-controlled transaction.',
+    'This clinician is fictional and part of a portfolio demonstration. Availability and bookings are not real.',
   errorDescription: 'Check your connection and retry the profile.',
   errorTitle: 'Profile could not be loaded',
   loadingProfile: 'Loading provider profile',
@@ -102,7 +102,7 @@ const providerDetailEn = {
   notFoundDescription: (providerId: string) =>
     `No active fictional provider matches “${providerId}”.`,
   notFoundTitle: 'Provider not found',
-  providerProfile: 'Provider profile',
+  providerProfile: 'Clinician profile',
   removeFromSaved: (name: string) => `Remove ${name} from saved clinicians`,
   save: (name: string) => `Save ${name}`,
   timezoneNote: 'Times are shown in Gulf Standard Time. Choose an available time to continue.',
@@ -126,7 +126,7 @@ export const providerDetailStrings: LocalizedStrings<typeof providerDetailEn> = 
     clinics: 'العيادات',
     consultation: 'الاستشارة',
     disclosure:
-      'يعرض هذا الملف الشخصي الخيالي تجربة استكشاف الرعاية مع مواعيد مدعومة من Firebase، والحجوزات المؤكدة محمية بمعاملة يتحكم بها الخادم.',
+      'هذا الطبيب شخصية خيالية ضمن عرض توضيحي لمعرض أعمال. المواعيد والحجوزات غير حقيقية.',
     errorDescription: 'تحقق من اتصالك وأعد محاولة تحميل الملف الشخصي.',
     errorTitle: 'تعذّر تحميل الملف الشخصي',
     loadingProfile: 'جارٍ تحميل الملف الشخصي للطبيب',

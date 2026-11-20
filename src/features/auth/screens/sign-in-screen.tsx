@@ -134,7 +134,7 @@ function createStyles(theme: AppTheme) {
     },
     secondaryActions: {
       gap: theme.spacing.sm,
-      marginTop: theme.spacing.lg,
+      marginTop: theme.spacing.md,
     },
   });
 }

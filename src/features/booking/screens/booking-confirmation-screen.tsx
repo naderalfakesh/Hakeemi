@@ -7,6 +7,7 @@ import { AppointmentCalendarSection } from '@/features/appointments/components/a
 import type { Appointment } from '@/features/appointments/domain/types';
 import type { AppointmentCalendar } from '@/features/appointments/hooks/use-appointment-calendar';
 import type { Provider } from '@/features/care/domain/types';
+import { formatAppointmentReference } from '@/features/appointments/domain/reference';
 import { formatTimeZoneName } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
@@ -69,7 +70,7 @@ export function BookingConfirmationScreen({
             )}
           </AppText>
           <AppText selectable tone="secondary" variant="caption">
-            {strings.confirmation.reference(appointment.id.slice(-10).toUpperCase())}
+            {strings.confirmation.reference(formatAppointmentReference(appointment.id))}
           </AppText>
           {calendar && (
             <View style={styles.calendar}>

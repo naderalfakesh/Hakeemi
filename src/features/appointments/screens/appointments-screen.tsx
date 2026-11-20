@@ -284,7 +284,9 @@ function AppointmentCard({
             {statusStrings.statusLabels[appointment.status]}
           </AppText>
           {onPress && (
-            <DecorativeIcon color={theme.colors.textSecondary} name="chevron-forward" size={17} />
+            <View style={styles.statusChevron}>
+              <DecorativeIcon color={theme.colors.textSecondary} name="chevron-forward" size={17} />
+            </View>
           )}
         </View>
         <AppText variant="titleSmall">{providerName}</AppText>
@@ -381,6 +383,9 @@ function createStyles(theme: AppTheme) {
       alignItems: 'center',
       flexDirection: 'row',
       gap: theme.spacing.xs,
+    },
+    statusChevron: {
+      marginStart: 'auto',
     },
     statusDot: {
       borderRadius: theme.radii.full,

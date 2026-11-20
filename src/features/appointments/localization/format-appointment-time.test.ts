@@ -24,7 +24,21 @@ describe('daysUntil', () => {
 describe('formatAppointmentTime', () => {
   it('shows the time in the clinic time zone', () => {
     expect(
-      formatAppointmentTime({ startsAt: '2026-07-26T05:30:00.000Z', timezone: 'Asia/Dubai' }, 'en'),
-    ).toBe('Jul 26, 2026, 9:30 AM');
+      formatAppointmentTime(
+        { startsAt: '2026-07-26T05:30:00.000Z', timezone: 'Asia/Dubai' },
+        'en',
+        new Date('2026-07-01T00:00:00.000Z'),
+      ),
+    ).toBe('Sun, Jul 26, 9:30 AM');
+  });
+
+  it('adds the year when the visit is not in the current one', () => {
+    expect(
+      formatAppointmentTime(
+        { startsAt: '2026-07-26T05:30:00.000Z', timezone: 'Asia/Dubai' },
+        'en',
+        new Date('2027-01-05T00:00:00.000Z'),
+      ),
+    ).toBe('Sun, Jul 26, 2026, 9:30 AM');
   });
 });
