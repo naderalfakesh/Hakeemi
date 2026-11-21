@@ -7,7 +7,8 @@ import type { WritableCalendar } from '@/services/calendar/calendar';
 import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 import type { AppointmentStatus } from '../domain/types';
-import { formatCalendarName, type AppointmentCalendar } from '../hooks/use-appointment-calendar';
+import type { AppointmentCalendar } from '../hooks/use-appointment-calendar';
+import { formatCalendarName } from '../localization/format-calendar-name';
 import { appointmentDetailStrings } from '../localization/appointment-detail-strings';
 
 export function AppointmentCalendarSection({

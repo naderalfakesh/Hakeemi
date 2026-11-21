@@ -1,7 +1,5 @@
-import {
-  buildDemoAppointmentFixtures,
-  DemoAppointmentRepository,
-} from './demo-appointment-repository';
+import { buildDemoAppointmentFixtures } from './demo-appointment-fixtures';
+import { DemoAppointmentRepository } from './demo-appointment-repository';
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
   getItem: jest.fn().mockResolvedValue(null),

@@ -1,6 +1,6 @@
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
-import { buildDemoAppointmentFixtures } from '@/features/appointments/data/demo-appointment-repository';
+import { buildDemoAppointmentFixtures } from '@/features/appointments/data/demo-appointment-fixtures';
 import { fixtureCareRepository } from '@/features/care/data/fixture-care-repository';
 import { AppLocaleProvider } from '@/localization/locale-provider';
 import { TestAppProviders } from '@/test/test-app-providers';

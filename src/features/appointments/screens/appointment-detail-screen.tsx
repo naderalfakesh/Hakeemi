@@ -1,6 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query';
 import * as Crypto from 'expo-crypto';
-import { useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -16,38 +14,29 @@ import {
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import type { CareRepository } from '@/features/care/domain/repository';
 import { careRepository } from '@/features/care/data/care-repository';
-import { careQueryKeys } from '@/features/care/data/query-keys';
-import type { Provider } from '@/features/care/domain/types';
-import { useProviderDetail } from '@/features/care/hooks/use-provider-detail';
-import { formatAppointmentReference } from '@/features/appointments/domain/reference';
-import { formatTimeZoneName } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
-import { triggerHaptic } from '@/services/haptics/haptics';
 import type { AppDataScope } from '@/services/query/data-scope';
 import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 import { AppointmentCalendarSection } from '../components/appointment-calendar-section';
-import { AppointmentDetailRow } from '../components/appointment-detail-row';
 import {
   AppointmentDetailLoading,
   AppointmentDetailState,
 } from '../components/appointment-detail-state';
 import { AppointmentStatusPill } from '../components/appointment-status-pill';
+import { AppointmentSummaryCard } from '../components/appointment-summary-card';
 import { CancelConfirmation } from '../components/cancel-confirmation';
 import { RescheduleSection } from '../components/reschedule-section';
 import { calendarLinkOwner } from '../data/calendar-link-storage';
+import { useAppointmentActions } from '../hooks/use-appointment-actions';
 import { useAppointmentCalendar } from '../hooks/use-appointment-calendar';
-import { useCancelAppointment } from '../hooks/use-cancel-appointment';
 import { useAppointmentDetail } from '../hooks/use-appointment-detail';
-import { useRescheduleAppointment } from '../hooks/use-reschedule-appointment';
+import { useAppointmentProvider } from '../hooks/use-appointment-provider';
+import { canManageAppointment } from '../domain/appointment-access';
 import type { AppointmentRepository } from '../domain/repository';
-import {
-  formatAppointmentDate,
-  formatAppointmentDateTime,
-} from '../localization/format-appointment-time';
+import { formatAppointmentDate } from '../localization/format-appointment-time';
 import { appointmentDetailStrings } from '../localization/appointment-detail-strings';
-import { appointmentStatusStrings } from '../localization/appointment-status-strings';
 import { localizeAppointmentError } from '../localization/appointment-error-strings';
 
 type AppointmentDetailScreenProps = {
@@ -119,45 +108,16 @@ function AuthenticatedAppointmentDetail({
   const theme = useAppTheme();
   const { intlLocale, locale } = useAppLocale();
   const strings = useStrings(appointmentDetailStrings);
-  const statusStrings = useStrings(appointmentStatusStrings);
   const styles = useThemedStyles(createStyles);
-  const queryClient = useQueryClient();
   const detailQuery = useAppointmentDetail(appointmentId, {
     accountId,
     queryScope,
     repository: appointmentRepository,
   });
-  const providerId = detailQuery.data?.providerId ?? '';
-  const providerQuery = useProviderDetail(providerId, {
-    queryScope,
-    repository: careDataRepository,
-  });
-  const cancelMutation = useCancelAppointment({
-    queryScope,
-    repository: appointmentRepository,
-  });
-  const rescheduleMutation = useRescheduleAppointment({
-    queryScope,
-    repository: appointmentRepository,
-  });
-  const [confirmingCancel, setConfirmingCancel] = useState(false);
-  const [showReschedule, setShowReschedule] = useState(false);
-  // A retry of a failed action reuses its request ID, so the server can
-  // replay an action that committed but whose response never arrived.
-  const cancelRequestId = useRef<string | null>(null);
-  const rescheduleRequest = useRef<{ requestId: string; slotId: string } | null>(null);
-  const cachedProvider =
-    providerId.length > 0
-      ? (queryClient.getQueryData<{ provider: Provider } | null>(
-          careQueryKeys.detail(providerId, queryScope),
-        )?.provider ??
-        queryClient.getQueryData<Provider | null>(
-          careQueryKeys.providerSummary(providerId, queryScope),
-        ) ??
-        null)
-      : null;
-  const resolvedProvider =
-    providerQuery.state.status === 'success' ? providerQuery.state.data.provider : cachedProvider;
+  const { provider: resolvedProvider, providerState } = useAppointmentProvider(
+    detailQuery.data?.providerId ?? '',
+    { queryScope, repository: careDataRepository },
+  );
   const providerName = resolvedProvider
     ? resolvedProvider.displayName[locale]
     : strings.appointmentDetails;
@@ -167,6 +127,14 @@ function AuthenticatedAppointmentDetail({
     appointment: detailQuery.data ?? null,
     owner: calendarLinkOwner(queryScope, accountId),
     providerName,
+  });
+  const actions = useAppointmentActions({
+    appointmentId: detailQuery.data?.id ?? appointmentId,
+    createRequestId,
+    onCancelled: () => void calendar.followCancel(),
+    onRescheduled: (time) => void calendar.followReschedule(time),
+    queryScope,
+    repository: appointmentRepository,
   });
 
   if (detailQuery.isPending) {
@@ -197,57 +165,7 @@ function AuthenticatedAppointmentDetail({
     );
   }
 
-  const appointmentRecord = appointment;
-
-  const canManage =
-    appointment.status === 'confirmed' && new Date(appointment.startsAt) > new Date();
-  const actionError = cancelMutation.error ?? rescheduleMutation.error;
-
-  // Failures are shown from the mutation's error state, so the handlers
-  // settle instead of rejecting.
-  async function confirmCancel() {
-    await triggerHaptic('warning');
-    cancelRequestId.current ??= createRequestId();
-
-    try {
-      await cancelMutation.cancel({
-        appointmentId: appointmentRecord.id,
-        requestId: cancelRequestId.current,
-      });
-    } catch {
-      return;
-    }
-
-    cancelRequestId.current = null;
-    setConfirmingCancel(false);
-    void calendar.followCancel();
-  }
-
-  async function reschedule(slotId: string) {
-    if (rescheduleRequest.current?.slotId !== slotId) {
-      rescheduleRequest.current = { requestId: createRequestId(), slotId };
-    }
-
-    let moved: Awaited<ReturnType<typeof rescheduleMutation.reschedule>>['appointment'];
-
-    try {
-      ({ appointment: moved } = await rescheduleMutation.reschedule({
-        appointmentId: appointmentRecord.id,
-        requestId: rescheduleRequest.current.requestId,
-        slotId,
-      }));
-    } catch {
-      return;
-    }
-
-    rescheduleRequest.current = null;
-    setShowReschedule(false);
-    void calendar.followReschedule({
-      endsAt: moved.endsAt,
-      startsAt: moved.startsAt,
-      timezone: moved.timezone,
-    });
-  }
+  const canManage = canManageAppointment(appointment);
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
@@ -266,7 +184,7 @@ function AuthenticatedAppointmentDetail({
         </View>
 
         <View style={styles.heading}>
-          {resolvedProvider || providerQuery.state.status !== 'loading' ? (
+          {resolvedProvider || providerState.status !== 'loading' ? (
             <AppText accessibilityRole="header" variant="titleLarge">
               {providerName}
             </AppText>
@@ -276,38 +194,21 @@ function AuthenticatedAppointmentDetail({
           <AppointmentStatusPill appointment={appointment} />
         </View>
 
-        <Surface padding="spacious" style={styles.summary} variant="brand">
-          <AppointmentDetailRow
-            icon="calendar-outline"
-            label={formatAppointmentDateTime(appointment, intlLocale)}
-            tone="primary"
-          />
-          <AppointmentDetailRow
-            icon={appointment.visitMode === 'video' ? 'videocam-outline' : 'location-outline'}
-            label={`${statusStrings.visitModeLabels[appointment.visitMode]} · ${formatTimeZoneName(
-              appointment.timezone,
-              locale,
-              appointment.startsAt,
-            )}`}
-          />
-          <AppText selectable tone="secondary" variant="caption">
-            {strings.reference(formatAppointmentReference(appointment.id))}
-          </AppText>
-        </Surface>
+        <AppointmentSummaryCard appointment={appointment} />
 
         {/* Only one intent is visible at a time: the default action stack,
             the focused cancel confirmation, or the reschedule flow. The stack
             leads with rescheduling and keeps one rhythm down to cancelling. */}
-        {canManage && !confirmingCancel && !showReschedule && (
+        {canManage && !actions.confirmingCancel && !actions.showReschedule && (
           <View style={styles.actions}>
-            <Button onPress={() => setShowReschedule(true)}>{strings.reschedule}</Button>
+            <Button onPress={actions.openReschedule}>{strings.reschedule}</Button>
             <AppointmentCalendarSection
               appointmentStatus={appointment.status}
               calendar={calendar}
             />
             <Button
               accessibilityHint={strings.cancelAppointmentHint}
-              onPress={() => setConfirmingCancel(true)}
+              onPress={actions.startCancel}
               variant="dangerSoft"
             >
               {strings.cancelAppointment}
@@ -331,29 +232,31 @@ function AuthenticatedAppointmentDetail({
           </Surface>
         )}
 
-        {confirmingCancel && canManage && (
+        {actions.confirmingCancel && canManage && (
           <CancelConfirmation
-            isCancelling={cancelMutation.status === 'pending'}
-            onConfirm={() => void confirmCancel()}
-            onKeep={() => setConfirmingCancel(false)}
+            isCancelling={actions.isCancelling}
+            onConfirm={() => void actions.confirmCancel()}
+            onKeep={actions.dismissCancel}
           />
         )}
 
-        {showReschedule && canManage && (
+        {actions.showReschedule && canManage && (
           <>
-            <Button onPress={() => setShowReschedule(false)} variant="secondary">
+            <Button onPress={actions.closeReschedule} variant="secondary">
               {strings.keepCurrentTime}
             </Button>
             <RescheduleSection
               currentSlotId={appointment.slotId}
-              onSelect={(slotId) => void reschedule(slotId)}
-              providerState={providerQuery.state}
-              submitting={rescheduleMutation.status === 'pending'}
+              onSelect={(slotId) => void actions.reschedule(slotId)}
+              providerState={providerState}
+              submitting={actions.isRescheduling}
             />
           </>
         )}
 
-        {actionError && <InlineError message={localizeAppointmentError(actionError, locale)} />}
+        {actions.actionError && (
+          <InlineError message={localizeAppointmentError(actions.actionError, locale)} />
+        )}
 
         {!canManage && appointment.status !== 'cancelled' && (
           <Surface padding="compact" variant="muted">
@@ -363,7 +266,7 @@ function AuthenticatedAppointmentDetail({
           </Surface>
         )}
 
-        {!confirmingCancel && !showReschedule && (
+        {!actions.confirmingCancel && !actions.showReschedule && (
           <Button onPress={onFindCare} variant="tertiary">
             {strings.findAnotherClinician}
           </Button>
@@ -387,7 +290,6 @@ function createStyles(theme: AppTheme) {
     },
     topBar: { alignItems: 'center', flexDirection: 'row', gap: theme.spacing.sm },
     heading: { gap: theme.spacing.sm },
-    summary: { gap: theme.spacing.md },
     flexText: { flex: 1 },
     notice: { alignItems: 'flex-start', flexDirection: 'row', gap: theme.spacing.sm },
     actions: { gap: theme.spacing.sm },
