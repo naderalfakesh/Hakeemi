@@ -1,10 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText, Button, DecorativeIcon, Surface } from '@/components/ui';
 import { useStrings } from '@/localization/use-strings';
 import type { WritableCalendar } from '@/services/calendar/calendar';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 import type { AppointmentStatus } from '../domain/types';
 import { formatCalendarName, type AppointmentCalendar } from '../hooks/use-appointment-calendar';
@@ -18,7 +18,7 @@ export function AppointmentCalendarSection({
   calendar: AppointmentCalendar;
 }) {
   const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const strings = useStrings(appointmentDetailStrings);
   // The chooser list a calendar was picked from; each opening is a new list,
   // so a fresh chooser is enabled again without resetting state in an effect.

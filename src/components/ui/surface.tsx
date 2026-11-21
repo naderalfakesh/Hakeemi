@@ -1,7 +1,7 @@
-import { useMemo, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { StyleSheet, View, type ViewProps } from 'react-native';
 
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useThemedStyles, type AppTheme } from '@/theme';
 
 type SurfaceVariant = 'brand' | 'muted' | 'plain' | 'raised';
 
@@ -18,8 +18,7 @@ export function Surface({
   variant = 'plain',
   ...props
 }: SurfaceProps) {
-  const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   return (
     <View {...props} style={[styles.base, styles[variant], styles[padding], style]}>

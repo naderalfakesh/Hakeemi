@@ -1,10 +1,9 @@
-import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { AppText, Button, DecorativeIcon, InlineError, Surface } from '@/components/ui';
 import type { AppointmentReasonCategory } from '@/features/appointments/domain/types';
 import { useStrings } from '@/localization/use-strings';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 import { BookingScaffold } from '../components/booking-scaffold';
 import { BookingSummary } from '../components/booking-summary';
@@ -30,7 +29,7 @@ export function BookingReviewScreen({
 }) {
   const theme = useAppTheme();
   const strings = useStrings(bookingStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const isOffline = isOnline === false;
 
   return (

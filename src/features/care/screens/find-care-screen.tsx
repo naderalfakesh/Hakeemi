@@ -2,24 +2,17 @@ import { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, View, type ListRenderItem } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import {
-  AppText,
-  Button,
-  EmptyState,
-  Skeleton,
-  StaleDataNotice,
-  stateIllustrations,
-  TextField,
-} from '@/components/ui';
+import { AppText, Button, Skeleton, StaleDataNotice, TextField } from '@/components/ui';
 import { formatLocalizedCount } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import { useIsOffline } from '@/services/connectivity/use-is-offline';
 import type { AppDataScope } from '@/services/query/data-scope';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
+import { FindCareResultsState } from '../components/find-care-results-state';
 import { ProviderCard } from '../components/provider-card';
-import { ProviderCardSkeleton } from '../components/provider-card-skeleton';
+import { ProviderListSeparator, providerKeyExtractor } from '../components/provider-list';
 import { SpecialtyFilter } from '../components/specialty-filter';
 import type { CareRepository } from '../domain/repository';
 import type { Provider } from '../domain/types';
@@ -45,7 +38,7 @@ export function FindCareScreen({
   const theme = useAppTheme();
   const { locale } = useAppLocale();
   const strings = useStrings(findCareStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const [query, setQuery] = useState('');
   const [specialtyId, setSpecialtyId] = useState<string | null>(initialSpecialtyId ?? null);
   const [prevInitialSpecialtyId, setPrevInitialSpecialtyId] = useState(initialSpecialtyId);
@@ -117,7 +110,7 @@ export function FindCareScreen({
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <FlatList
         ListEmptyComponent={
-          <ResultsState
+          <FindCareResultsState
             hasFilters={Boolean(query || specialtyId)}
             onClear={clearFilters}
             onRetry={retry}
@@ -190,7 +183,7 @@ export function FindCareScreen({
         contentContainerStyle={styles.content}
         data={data?.providers ?? []}
         initialNumToRender={6}
-        ItemSeparatorComponent={ResultSeparator}
+        ItemSeparatorComponent={ProviderListSeparator}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
         keyExtractor={providerKeyExtractor}
@@ -206,69 +199,6 @@ export function FindCareScreen({
     </SafeAreaView>
   );
 }
-
-type ResultsStateProps = {
-  hasFilters: boolean;
-  onClear: () => void;
-  onRetry: () => void;
-  status: 'error' | 'loading' | 'success';
-};
-
-function ResultsState({ hasFilters, onClear, onRetry, status }: ResultsStateProps) {
-  const theme = useAppTheme();
-  const strings = useStrings(findCareStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
-
-  if (status === 'loading') {
-    return (
-      <View accessibilityLabel={strings.loadingClinicians} style={styles.loadingCards}>
-        <ProviderCardSkeleton />
-        <ProviderCardSkeleton />
-        <ProviderCardSkeleton />
-      </View>
-    );
-  }
-
-  if (status === 'error') {
-    return (
-      <EmptyState
-        action={<Button onPress={onRetry}>{strings.tryAgain}</Button>}
-        description={strings.errorDescription}
-        illustration={stateIllustrations.offline}
-        title={strings.errorTitle}
-      />
-    );
-  }
-
-  return (
-    <EmptyState
-      action={
-        hasFilters ? (
-          <Button onPress={onClear} variant="secondary">
-            {strings.clearFilters}
-          </Button>
-        ) : undefined
-      }
-      description={strings.emptyDescription}
-      illustration={stateIllustrations.noResults}
-      title={strings.emptyTitle}
-    />
-  );
-}
-
-function ResultSeparator() {
-  return <View style={separatorStyles.result} />;
-}
-
-function providerKeyExtractor(provider: Provider) {
-  return provider.id;
-}
-
-const separatorStyles = StyleSheet.create({
-  result: {
-    height: 12,
-  },
-});
 
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
@@ -296,9 +226,6 @@ function createStyles(theme: AppTheme) {
       flexDirection: 'row',
       gap: theme.spacing.xs,
       overflow: 'hidden',
-    },
-    loadingCards: {
-      gap: theme.spacing.sm,
     },
     resultsMeta: {
       alignItems: 'center',

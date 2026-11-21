@@ -12,19 +12,15 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import {
-  AppText,
-  BrandMark,
-  Button,
-  Chip,
-  DecorativeIcon,
-  type DecorativeIconName,
-} from '@/components/ui';
+import { AppText, BrandMark, Button } from '@/components/ui';
 import type { AppPreferences } from '@/features/preferences/domain/preferences';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import { useAppMotion, useAppTheme, type AppTheme, type SemanticColors } from '@/theme';
 
+import { JourneyStep } from '../components/journey-step';
+import { PermissionsStep } from '../components/permissions-step';
+import { PersonalizeStep } from '../components/personalize-step';
 import { onboardingStrings } from '../localization/onboarding-strings';
 
 const onboardingSteps = [
@@ -123,83 +119,10 @@ export function OnboardingScreen({
 
   const stepContent: Record<(typeof onboardingSteps)[number]['key'], ReactNode> = {
     personalize: (
-      <>
-        <View style={styles.copy}>
-          <AppText accessibilityRole="header" maxFontSizeMultiplier={1.5} variant="display">
-            {strings.headline}
-          </AppText>
-          <AppText tone="secondary" variant="bodyLarge">
-            {strings.subheadline}
-          </AppText>
-        </View>
-        <View style={styles.preferenceCard}>
-          <PreferenceChoices
-            label={strings.language}
-            onChange={(locale) => onUpdatePreferences({ ...preferences, locale })}
-            options={[
-              { label: strings.languageEnglish, language: 'en', value: 'en' },
-              { label: strings.languageArabic, language: 'ar', value: 'ar' },
-            ]}
-            styles={styles}
-            value={preferences.locale}
-          />
-          <PreferenceChoices
-            label={strings.appearance}
-            onChange={(themePreference) =>
-              onUpdatePreferences({ ...preferences, theme: themePreference })
-            }
-            options={[
-              { label: strings.appearanceSystem, value: 'system' },
-              { label: strings.appearanceLight, value: 'light' },
-              { label: strings.appearanceDark, value: 'dark' },
-            ]}
-            styles={styles}
-            value={preferences.theme}
-          />
-          <AppText tone="secondary" variant="caption">
-            {strings.languageReloadNote}
-          </AppText>
-        </View>
-      </>
+      <PersonalizeStep onUpdatePreferences={onUpdatePreferences} preferences={preferences} />
     ),
-    journey: (
-      <>
-        <View style={styles.copy}>
-          <AppText accessibilityRole="header" variant="titleLarge">
-            {strings.journeyTitle}
-          </AppText>
-          <AppText tone="secondary" variant="bodyLarge">
-            {strings.journeyBody}
-          </AppText>
-        </View>
-        <View style={styles.rows}>
-          <FeatureRow icon="search-outline" styles={styles} text={strings.journeyFind} />
-          <FeatureRow icon="time-outline" styles={styles} text={strings.journeyCompare} />
-          <FeatureRow icon="checkmark-circle-outline" styles={styles} text={strings.journeyBook} />
-        </View>
-      </>
-    ),
-    permissions: (
-      <>
-        <View style={styles.copy}>
-          <AppText accessibilityRole="header" variant="titleLarge">
-            {strings.permissionsTitle}
-          </AppText>
-          <AppText tone="secondary" variant="bodyLarge">
-            {strings.permissionsBody}
-          </AppText>
-        </View>
-        <View style={styles.rows}>
-          <FeatureRow icon="calendar-outline" styles={styles} text={strings.permissionsCalendar} />
-          <FeatureRow
-            icon="notifications-outline"
-            styles={styles}
-            text={strings.permissionsNotifications}
-          />
-          <FeatureRow icon="options-outline" styles={styles} text={strings.permissionsChange} />
-        </View>
-      </>
-    ),
+    journey: <JourneyStep />,
+    permissions: <PermissionsStep />,
   };
 
   return (
@@ -312,68 +235,6 @@ export function OnboardingScreen({
   );
 }
 
-type Styles = ReturnType<typeof createStyles>;
-
-function PreferenceChoices<Value extends string>({
-  label,
-  onChange,
-  options,
-  styles,
-  value,
-}: {
-  label: string;
-  onChange: (value: Value) => void;
-  options: readonly { label: string; language?: string; value: Value }[];
-  styles: Styles;
-  value: Value;
-}) {
-  return (
-    <View style={styles.preferenceGroup}>
-      <AppText variant="bodyStrong">{label}</AppText>
-      <View
-        accessibilityLabel={label}
-        accessibilityRole="radiogroup"
-        style={styles.preferenceOptions}
-      >
-        {options.map((option) => (
-          <Chip
-            accessibilityLanguage={option.language}
-            accessibilityRole="radio"
-            accessibilityState={{ checked: option.value === value }}
-            key={option.value}
-            label={option.label}
-            onPress={() => onChange(option.value)}
-            selected={option.value === value}
-          />
-        ))}
-      </View>
-    </View>
-  );
-}
-
-function FeatureRow({
-  icon,
-  styles,
-  text,
-}: {
-  icon: DecorativeIconName;
-  styles: Styles;
-  text: string;
-}) {
-  const theme = useAppTheme();
-
-  return (
-    <View style={styles.row}>
-      <View style={styles.rowIcon}>
-        <DecorativeIcon color={theme.colors.brand} name={icon} size={20} />
-      </View>
-      <AppText style={styles.rowText} variant="bodyMedium">
-        {text}
-      </AppText>
-    </View>
-  );
-}
-
 function createStyles(
   theme: AppTheme,
   {
@@ -445,43 +306,6 @@ function createStyles(
     artwork: {
       height: '90%',
       width: '88%',
-    },
-    copy: {
-      gap: theme.spacing.sm,
-      maxWidth: 580,
-    },
-    preferenceCard: {
-      backgroundColor: theme.colors.surfaceBrand,
-      borderRadius: theme.radii.xl,
-      gap: theme.spacing.md,
-      padding: theme.spacing.lg,
-    },
-    preferenceGroup: {
-      gap: theme.spacing.xs,
-    },
-    preferenceOptions: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: theme.spacing.xs,
-    },
-    rows: {
-      gap: theme.spacing.sm,
-    },
-    row: {
-      alignItems: 'center',
-      flexDirection: 'row',
-      gap: theme.spacing.sm,
-    },
-    rowIcon: {
-      alignItems: 'center',
-      backgroundColor: theme.colors.brandSoft,
-      borderRadius: theme.radii.full,
-      height: 40,
-      justifyContent: 'center',
-      width: 40,
-    },
-    rowText: {
-      flex: 1,
     },
     footer: {
       gap: isCompact ? theme.spacing.xxs : theme.spacing.xs,

@@ -6,11 +6,11 @@ import { TestAppProviders } from '@/test/test-app-providers';
 import { createAvailabilityWindow } from '../domain/availability';
 import { buildAvailabilityFixtures } from '../data/fixtures';
 import {
-  AvailabilityCalendar,
   buildAvailabilityCalendarDays,
   dayGridColumns,
   formatWeekday,
-} from './availability-calendar';
+} from '../presentation/availability-calendar-days';
+import { AvailabilityCalendar } from './availability-calendar';
 
 describe('availability calendar', () => {
   it('maps the complete booking window and preserves unavailable days', () => {

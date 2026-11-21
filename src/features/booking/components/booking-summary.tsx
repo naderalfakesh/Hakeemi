@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { AppText, DecorativeIcon, Surface } from '@/components/ui';
@@ -6,7 +5,7 @@ import { formatFee } from '@/features/care/presentation/formatters';
 import { formatTimeZoneName } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 import type { BookingSelection } from '../hooks/use-booking-selection';
 import { bookingStrings } from '../localization/booking-strings';
@@ -22,10 +21,9 @@ export function BookingSummary({
   selection: BookingSelection;
   showReason?: boolean;
 }) {
-  const theme = useAppTheme();
   const { locale } = useAppLocale();
   const strings = useStrings(bookingStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   return (
     <Surface padding="spacious" style={styles.card} variant="raised">
@@ -77,7 +75,7 @@ function SummaryRow({
   value: string;
 }) {
   const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   return (
     <View style={styles.row}>

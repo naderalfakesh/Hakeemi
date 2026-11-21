@@ -6,7 +6,7 @@ import { StyleSheet } from 'react-native';
 import { Button, InlineError, Surface, TextField } from '@/components/ui';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useThemedStyles, type AppTheme } from '@/theme';
 
 import { AuthScaffold } from '../components/auth-scaffold';
 import { createSignUpSchema, type SignUpValues } from '../domain/schemas';
@@ -21,8 +21,7 @@ type SignUpScreenProps = {
 };
 
 export function SignUpScreen({ onBack, onSignIn, onSubmit }: SignUpScreenProps) {
-  const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const { locale } = useAppLocale();
   const strings = useStrings(signUpStrings);
   const validationMessages = useStrings(authValidationStrings);

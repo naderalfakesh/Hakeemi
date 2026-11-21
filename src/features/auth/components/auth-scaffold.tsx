@@ -1,10 +1,10 @@
-import { useMemo, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText, DecorativeIcon, IconButton } from '@/components/ui';
 import { useStrings } from '@/localization/use-strings';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 import { authScaffoldStrings } from '../localization/auth-strings';
 
@@ -18,7 +18,7 @@ type AuthScaffoldProps = {
 
 export function AuthScaffold({ children, eyebrow, onBack, subtitle, title }: AuthScaffoldProps) {
   const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const strings = useStrings(authScaffoldStrings);
 
   return (

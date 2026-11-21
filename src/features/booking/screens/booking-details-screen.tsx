@@ -5,7 +5,7 @@ import { AppText, Button, Chip, InlineError, Surface } from '@/components/ui';
 import type { AppointmentReasonCategory } from '@/features/appointments/domain/types';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useThemedStyles, type AppTheme } from '@/theme';
 
 import { BookingScaffold } from '../components/booking-scaffold';
 import { BookingSummary } from '../components/booking-summary';
@@ -30,10 +30,9 @@ export function BookingDetailsScreen({
   reasonCategory: AppointmentReasonCategory | null;
   selection: BookingSelection;
 }) {
-  const theme = useAppTheme();
   const { locale } = useAppLocale();
   const strings = useStrings(bookingStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const reasonCategoryOptions = useMemo(() => getReasonCategoryOptions(locale), [locale]);
 
   return (

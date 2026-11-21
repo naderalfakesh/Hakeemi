@@ -1,7 +1,7 @@
-import { useMemo, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View, type PressableProps } from 'react-native';
 
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 import { AppText, type TextTone } from './app-text';
 
@@ -24,7 +24,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const isDisabled = disabled || busy;
   const foregroundColor = getForegroundColor(theme, variant);
 

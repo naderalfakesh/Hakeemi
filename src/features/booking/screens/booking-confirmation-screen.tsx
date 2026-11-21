@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -13,7 +13,7 @@ import { formatTimeZoneName } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import { triggerHaptic } from '@/services/haptics/haptics';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useThemedStyles, type AppTheme } from '@/theme';
 
 import { bookingStrings } from '../localization/booking-strings';
 
@@ -31,10 +31,9 @@ export function BookingConfirmationScreen({
   onViewAppointments: () => void;
   provider: Provider | null;
 }) {
-  const theme = useAppTheme();
   const { intlLocale, locale } = useAppLocale();
   const strings = useStrings(bookingStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   useEffect(() => {
     void triggerHaptic('success');

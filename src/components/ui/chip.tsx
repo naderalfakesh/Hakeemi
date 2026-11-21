@@ -1,7 +1,6 @@
-import { useMemo } from 'react';
 import { Pressable, StyleSheet, type PressableProps } from 'react-native';
 
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 import { AppText } from './app-text';
 
@@ -12,7 +11,7 @@ type ChipProps = Omit<PressableProps, 'children' | 'style'> & {
 
 export function Chip({ disabled = false, label, selected = false, ...props }: ChipProps) {
   const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const isDisabled = disabled === true;
 
   return (

@@ -1,7 +1,6 @@
-import { useMemo } from 'react';
 import { StyleSheet, View, type ViewProps } from 'react-native';
 
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 import { AppText } from './app-text';
 import { DecorativeIcon } from './decorative-icon';
@@ -12,7 +11,7 @@ type InlineErrorProps = Omit<ViewProps, 'children'> & {
 
 export function InlineError({ message, style, ...props }: InlineErrorProps) {
   const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   return (
     <View

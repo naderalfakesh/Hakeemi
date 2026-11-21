@@ -1,9 +1,8 @@
-import { useMemo } from 'react';
 import { StyleSheet, View, type ViewProps } from 'react-native';
 
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings, type LocalizedStrings } from '@/localization/use-strings';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 import { AppText } from './app-text';
 import { DecorativeIcon } from './decorative-icon';
@@ -38,7 +37,7 @@ export function StaleDataNotice({ reason, style, updatedAt, ...props }: StaleDat
   const theme = useAppTheme();
   const strings = useStrings(staleDataStrings);
   const { intlLocale } = useAppLocale();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const updatedLabel = updatedAt
     ? strings.updatedAt(
         new Intl.DateTimeFormat(intlLocale, { hour: 'numeric', minute: '2-digit' }).format(

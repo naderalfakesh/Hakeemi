@@ -1,10 +1,9 @@
-import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText, Button, Illustration, stateIllustrations, Surface } from '@/components/ui';
 import { useStrings } from '@/localization/use-strings';
-import { AppThemeProvider, useAppTheme, type AppTheme } from '@/theme';
+import { AppThemeProvider, useThemedStyles, type AppTheme } from '@/theme';
 
 import { navigationStrings } from './navigation-strings';
 
@@ -27,9 +26,8 @@ export function ErrorBoundaryScreen(props: ErrorBoundaryScreenProps) {
 }
 
 function ErrorBoundaryContent({ error, onRetry }: ErrorBoundaryScreenProps) {
-  const theme = useAppTheme();
   const strings = useStrings(navigationStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>

@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useCallback } from 'react';
 
 import { onboardingStorage } from '@/features/onboarding/data/onboarding-storage';
-import { OnboardingScreen } from '@/features/onboarding/screens/demo-entry-screen';
+import { OnboardingScreen } from '@/features/onboarding/screens/onboarding-screen';
 import { useAppPreferences } from '@/features/preferences/context/app-preferences-provider';
 import { logSafeError } from '@/services/logging/safe-logger';
 

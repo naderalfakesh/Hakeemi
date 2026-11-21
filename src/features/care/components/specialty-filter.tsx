@@ -1,10 +1,10 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { FlatList, StyleSheet, View, type ListRenderItem } from 'react-native';
 
 import { Chip } from '@/components/ui';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 import type { Specialty } from '../domain/types';
 import { specialtyFilterStrings } from '../localization/care-strings';
@@ -16,10 +16,9 @@ type SpecialtyFilterProps = {
 };
 
 export function SpecialtyFilter({ onChange, selectedId, specialties }: SpecialtyFilterProps) {
-  const theme = useAppTheme();
   const { locale } = useAppLocale();
   const strings = useStrings(specialtyFilterStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const renderItem = useCallback<ListRenderItem<Specialty>>(
     ({ item }) => (
       <Chip

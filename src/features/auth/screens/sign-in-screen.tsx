@@ -6,7 +6,7 @@ import { StyleSheet, View } from 'react-native';
 import { Button, InlineError, Surface, TextField } from '@/components/ui';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useThemedStyles, type AppTheme } from '@/theme';
 
 import { createSignInSchema, type SignInValues } from '../domain/schemas';
 import { localizeAuthError } from '../localization/auth-error-strings';
@@ -29,8 +29,7 @@ export function SignInScreen({
   onForgotPassword,
   onSubmit,
 }: SignInScreenProps) {
-  const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const { locale } = useAppLocale();
   const strings = useStrings(signInStrings);
   const validationMessages = useStrings(authValidationStrings);

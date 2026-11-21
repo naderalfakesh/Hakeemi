@@ -1,7 +1,7 @@
-import { useMemo, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { Pressable, StyleSheet, type PressableProps } from 'react-native';
 
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 type IconButtonVariant = 'filled' | 'ghost' | 'soft';
 
@@ -19,7 +19,7 @@ export function IconButton({
   ...props
 }: IconButtonProps) {
   const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const isDisabled = disabled === true;
 
   return (

@@ -1,7 +1,7 @@
-import { useMemo, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { StyleSheet, View, type ImageSourcePropType, type ViewProps } from 'react-native';
 
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useThemedStyles, type AppTheme } from '@/theme';
 
 import { AppText } from './app-text';
 import { Illustration } from './illustration';
@@ -23,8 +23,7 @@ export function EmptyState({
   title,
   ...props
 }: EmptyStateProps) {
-  const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   return (
     <View {...props} style={[styles.container, style]}>

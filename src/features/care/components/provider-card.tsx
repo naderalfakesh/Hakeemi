@@ -1,11 +1,11 @@
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText, DecorativeIcon, Skeleton } from '@/components/ui';
 import { formatLocalizedCount } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 import type { AvailabilitySlot, Provider } from '../domain/types';
 import { providerCardStrings, reviewCountLabels } from '../localization/care-strings';
@@ -30,7 +30,7 @@ export const ProviderCard = memo(function ProviderCard({
   const theme = useAppTheme();
   const { locale } = useAppLocale();
   const strings = useStrings(providerCardStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const handlePress = useCallback(() => onPress(provider.id), [onPress, provider.id]);
 
   return (

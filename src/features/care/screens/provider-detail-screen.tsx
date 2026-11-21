@@ -1,35 +1,26 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import {
-  AppText,
-  Button,
-  DecorativeIcon,
-  type DecorativeIconName,
-  EmptyState,
-  IconButton,
-  Skeleton,
-  stateIllustrations,
-  Surface,
-} from '@/components/ui';
+import { AppText, Button, DecorativeIcon, IconButton, Surface } from '@/components/ui';
 import { formatLocalizedCount } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import type { AppDataScope } from '@/services/query/data-scope';
-import { useAppMotion, useAppTheme, type AppTheme } from '@/theme';
+import { useAppMotion, useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
+import { AvailabilitySection } from '../components/availability-section';
+import { ClinicRow } from '../components/clinic-row';
+import { DetailSection } from '../components/detail-section';
+import { InfoRow } from '../components/info-row';
 import { ProviderAvatar } from '../components/provider-avatar';
-import {
-  AvailabilityCalendar,
-  formatSlotDateSummary,
-  formatSlotTime,
-} from '../components/availability-calendar';
+import { ProviderDetailState } from '../components/provider-detail-state';
 import type { CareRepository } from '../domain/repository';
-import type { AvailabilitySlot, AvailabilityWindow, Clinic } from '../domain/types';
+import type { AvailabilitySlot } from '../domain/types';
 import { useProviderDetail } from '../hooks/use-provider-detail';
 import { providerDetailStrings, reviewCountLabels } from '../localization/care-strings';
+import { formatSlotDateSummary, formatSlotTime } from '../presentation/availability-calendar-days';
 import { formatFee, formatVisitMode } from '../presentation/formatters';
 
 type ProviderDetailScreenProps = {
@@ -59,7 +50,7 @@ export function ProviderDetailScreen({
   const motion = useAppMotion();
   const { intlLocale, locale } = useAppLocale();
   const strings = useStrings(providerDetailStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const { retry, state } = useProviderDetail(providerId, { queryScope, repository });
   const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null);
 
@@ -212,148 +203,6 @@ export function ProviderDetailScreen({
   );
 }
 
-type ProviderDetailStateProps = {
-  onBack: () => void;
-  onRetry: () => void;
-  providerId: string;
-  status: 'error' | 'loading' | 'not-found';
-};
-
-function ProviderDetailState({ onBack, onRetry, providerId, status }: ProviderDetailStateProps) {
-  const theme = useAppTheme();
-  const strings = useStrings(providerDetailStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
-
-  if (status === 'loading') {
-    return (
-      <SafeAreaView
-        accessibilityLabel={strings.loadingProfile}
-        edges={['top']}
-        style={styles.safeArea}
-      >
-        <View style={styles.loadingContent}>
-          <Skeleton height={48} radius="md" width={48} />
-          <Skeleton height={88} radius="xl" width={88} />
-          <Skeleton height={34} width="74%" />
-          <Skeleton height={20} width="48%" />
-          <Skeleton height={170} radius="lg" width="100%" />
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  const isMissing = status === 'not-found';
-  return (
-    <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
-      <View style={styles.stateBack}>
-        <IconButton accessibilityLabel={strings.backToClinicians} onPress={onBack} variant="soft">
-          <DecorativeIcon color={theme.colors.brand} name="arrow-back" size={22} />
-        </IconButton>
-      </View>
-      <EmptyState
-        action={
-          isMissing ? (
-            <Button onPress={onBack} variant="secondary">
-              {strings.browseClinicians}
-            </Button>
-          ) : (
-            <Button onPress={onRetry}>{strings.tryAgain}</Button>
-          )
-        }
-        description={isMissing ? strings.notFoundDescription(providerId) : strings.errorDescription}
-        illustration={isMissing ? stateIllustrations.noResults : stateIllustrations.offline}
-        title={isMissing ? strings.notFoundTitle : strings.errorTitle}
-      />
-    </SafeAreaView>
-  );
-}
-
-function AvailabilitySection({
-  availabilityWindow,
-  clinics,
-  locale,
-  onChooseSlot,
-  onSelectedSlotChange,
-  slots,
-}: {
-  availabilityWindow: AvailabilityWindow;
-  clinics: readonly Clinic[];
-  locale: 'ar' | 'en';
-  onChooseSlot: (slot: AvailabilitySlot) => void;
-  onSelectedSlotChange: (slot: AvailabilitySlot | null) => void;
-  slots: readonly AvailabilitySlot[];
-}) {
-  const theme = useAppTheme();
-  const strings = useStrings(providerDetailStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
-
-  return (
-    <Surface padding="spacious" variant="brand">
-      <AppText tone="brand" variant="caption">
-        {strings.next14Days}
-      </AppText>
-      <AppText style={styles.availabilityTitle} variant="titleMedium">
-        {strings.availableAppointments}
-      </AppText>
-      <AppText tone="secondary" variant="bodyMedium">
-        {slots.length > 0 ? strings.timezoneNote : strings.noAppointments}
-      </AppText>
-      <AvailabilityCalendar
-        availabilityWindow={availabilityWindow}
-        clinics={clinics}
-        hideConfirmButton
-        locale={locale}
-        onChooseSlot={onChooseSlot}
-        onSelectedSlotChange={onSelectedSlotChange}
-        slots={slots}
-      />
-    </Surface>
-  );
-}
-
-function DetailSection({ children, title }: { children: ReactNode; title: string }) {
-  const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
-
-  return (
-    <View style={styles.section}>
-      <AppText variant="titleSmall">{title}</AppText>
-      <View style={styles.sectionContent}>{children}</View>
-    </View>
-  );
-}
-
-function InfoRow({ icon, label }: { icon: DecorativeIconName; label: string }) {
-  const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
-
-  return (
-    <View style={styles.infoRow}>
-      <DecorativeIcon color={theme.colors.brand} name={icon} size={20} />
-      <AppText style={styles.flexText} variant="bodyMedium">
-        {label}
-      </AppText>
-    </View>
-  );
-}
-
-function ClinicRow({ clinic, locale }: { clinic: Clinic; locale: 'ar' | 'en' }) {
-  const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
-
-  return (
-    <View style={styles.infoRow}>
-      <DecorativeIcon color={theme.colors.brand} name="location-outline" size={20} />
-      <View style={styles.clinicCopy}>
-        <AppText variant="bodyStrong">{clinic.name[locale]}</AppText>
-        <AppText tone="secondary" variant="caption">
-          {clinic.address[locale]}
-        </AppText>
-      </View>
-    </View>
-  );
-}
-
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     safeArea: {
@@ -395,24 +244,6 @@ function createStyles(theme: AppTheme) {
       flex: 1,
       gap: theme.spacing.xxs,
     },
-    availabilityTitle: {
-      marginBottom: theme.spacing.xxs,
-      marginTop: theme.spacing.sm,
-    },
-    section: {
-      gap: theme.spacing.sm,
-    },
-    sectionContent: {
-      gap: theme.spacing.sm,
-    },
-    infoRow: {
-      alignItems: 'flex-start',
-      flexDirection: 'row',
-      gap: theme.spacing.sm,
-    },
-    clinicCopy: {
-      flex: 1,
-    },
     flexText: {
       flex: 1,
     },
@@ -428,17 +259,6 @@ function createStyles(theme: AppTheme) {
       gap: theme.spacing.xs,
       paddingHorizontal: theme.spacing.lg,
       paddingVertical: theme.spacing.sm,
-    },
-    loadingContent: {
-      alignSelf: 'center',
-      gap: theme.spacing.md,
-      maxWidth: theme.sizes.contentMaxWidth,
-      padding: theme.spacing.lg,
-      width: '100%',
-    },
-    stateBack: {
-      paddingHorizontal: theme.spacing.lg,
-      paddingTop: theme.spacing.md,
     },
   });
 }

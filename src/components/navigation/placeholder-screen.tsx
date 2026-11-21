@@ -1,8 +1,7 @@
-import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useThemedStyles, type AppTheme } from '@/theme';
 
 type PlaceholderScreenProps = {
   description: string;
@@ -10,8 +9,7 @@ type PlaceholderScreenProps = {
 };
 
 export function PlaceholderScreen({ description, title }: PlaceholderScreenProps) {
-  const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>

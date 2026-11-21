@@ -1,8 +1,7 @@
-import { useMemo } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { AppText, BrandMark } from '@/components/ui';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 // Same size the native splash renders the tile at (imageWidth 96 dp on a
 // 512 px canvas holding a 5/6 tile), so the mark does not jump on hand-off.
@@ -19,7 +18,7 @@ type LaunchGateProps = {
  */
 export function LaunchGate({ accessibilityLabel, message }: LaunchGateProps) {
   const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   return (
     <View

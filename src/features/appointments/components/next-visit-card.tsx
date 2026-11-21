@@ -1,10 +1,9 @@
-import { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText, DecorativeIcon } from '@/components/ui';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 import type { Appointment } from '../domain/types';
 import { appointmentStatusStrings } from '../localization/appointment-status-strings';
@@ -25,7 +24,7 @@ export function NextVisitCard({
   const { intlLocale } = useAppLocale();
   const strings = useStrings(nextVisitStrings);
   const statusStrings = useStrings(appointmentStatusStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const when = strings.when(daysUntil(appointment.startsAt));
 
   return (

@@ -6,7 +6,7 @@ import { StyleSheet, View } from 'react-native';
 import { AppText, Button, DecorativeIcon, InlineError, Surface, TextField } from '@/components/ui';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 import { AuthScaffold } from '../components/auth-scaffold';
 import { createPasswordResetSchema, type PasswordResetValues } from '../domain/schemas';
@@ -26,7 +26,7 @@ export function ForgotPasswordScreen({
   onSubmit,
 }: ForgotPasswordScreenProps) {
   const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const { locale } = useAppLocale();
   const strings = useStrings(forgotPasswordStrings);
   const validationMessages = useStrings(authValidationStrings);

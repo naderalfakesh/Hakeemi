@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -11,7 +10,7 @@ import {
   stateIllustrations,
 } from '@/components/ui';
 import { useStrings } from '@/localization/use-strings';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 import type { BookingSelectionState } from '../hooks/use-booking-selection';
 import { bookingStrings } from '../localization/booking-strings';
@@ -27,7 +26,7 @@ export function BookingRouteState({
 }) {
   const theme = useAppTheme();
   const strings = useStrings(bookingStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   if (status === 'loading') {
     return (

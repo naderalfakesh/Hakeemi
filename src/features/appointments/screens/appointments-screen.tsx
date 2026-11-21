@@ -1,9 +1,8 @@
-import { useCallback, useMemo, useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { useCallback, useState } from 'react';
+import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
-  AppText,
   Button,
   Chip,
   DecorativeIcon,
@@ -11,29 +10,36 @@ import {
   Skeleton,
   StaleDataNotice,
   stateIllustrations,
-  Surface,
 } from '@/components/ui';
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import type { CareRepository } from '@/features/care/domain/repository';
-import { formatTimeZoneName } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import { useIsOffline } from '@/services/connectivity/use-is-offline';
 import type { AppDataScope } from '@/services/query/data-scope';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
+import { AppointmentCard } from '../components/appointment-card';
+import { AppointmentsHeader } from '../components/appointments-header';
+import { AppointmentsState } from '../components/appointments-state';
 import type { AppointmentRepository } from '../domain/repository';
 import {
   selectAppointments,
   useAppointments,
   type AppointmentFilter,
 } from '../hooks/use-appointments';
-import type { Appointment } from '../domain/types';
-import { formatAppointmentTime } from '../localization/format-appointment-time';
-import { appointmentStatusStrings } from '../localization/appointment-status-strings';
 import { appointmentsStrings } from '../localization/appointments-strings';
 
 const filterKeys: readonly AppointmentFilter[] = ['upcoming', 'past', 'cancelled'];
+
+type AppointmentsScreenProps = {
+  appointmentRepository?: AppointmentRepository | undefined;
+  careDataRepository?: CareRepository | undefined;
+  onFindCare: () => void;
+  onSignIn: () => void;
+  onViewAppointment?: ((appointmentId: string) => void) | undefined;
+  queryScope?: AppDataScope;
+};
 
 export function AppointmentsScreen({
   onFindCare,
@@ -42,20 +48,13 @@ export function AppointmentsScreen({
   onSignIn,
   onViewAppointment,
   queryScope = 'account',
-}: {
-  appointmentRepository?: AppointmentRepository | undefined;
-  careDataRepository?: CareRepository | undefined;
-  onFindCare: () => void;
-  onSignIn: () => void;
-  onViewAppointment?: ((appointmentId: string) => void) | undefined;
-  queryScope?: AppDataScope;
-}) {
+}: AppointmentsScreenProps) {
   const session = useAuthSession();
   const strings = useStrings(appointmentsStrings);
 
   if (session.status !== 'authenticated' && session.status !== 'demo') {
     return (
-      <AppointmentState
+      <AppointmentsState
         action={<Button onPress={onSignIn}>{strings.signIn}</Button>}
         description={strings.signInDescription}
         title={strings.signInTitle}
@@ -93,7 +92,7 @@ function AuthenticatedAppointments({
   const theme = useAppTheme();
   const { locale } = useAppLocale();
   const strings = useStrings(appointmentsStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const appointmentsQuery = useAppointments({
     accountId,
     careRepository: careDataRepository,
@@ -220,130 +219,6 @@ function AuthenticatedAppointments({
   );
 }
 
-function AppointmentsHeader({
-  hasAppointments,
-  onFindCare,
-}: {
-  hasAppointments: boolean;
-  onFindCare: () => void;
-}) {
-  const theme = useAppTheme();
-  const strings = useStrings(appointmentsStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
-  const actionLabel = hasAppointments ? strings.bookAnotherAppointment : strings.bookAppointment;
-
-  return (
-    <View style={styles.heading}>
-      <View style={styles.headingCopy}>
-        <AppText accessibilityRole="header" variant="titleLarge">
-          {strings.title}
-        </AppText>
-        <AppText tone="secondary" variant="bodyMedium">
-          {strings.subtitle}
-        </AppText>
-      </View>
-      <Button
-        accessibilityLabel={actionLabel}
-        leading={<DecorativeIcon color={theme.colors.brand} name="add-circle-outline" size={20} />}
-        onPress={onFindCare}
-        variant="secondary"
-      >
-        {actionLabel}
-      </Button>
-    </View>
-  );
-}
-
-function AppointmentCard({
-  appointment,
-  onPress,
-  providerName,
-}: {
-  appointment: Appointment;
-  onPress?: (() => void) | undefined;
-  providerName: string;
-}) {
-  const theme = useAppTheme();
-  const { intlLocale, locale } = useAppLocale();
-  const strings = useStrings(appointmentsStrings);
-  const statusStrings = useStrings(appointmentStatusStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
-  const statusTone = appointment.status === 'confirmed' ? 'success' : 'secondary';
-
-  return (
-    <Pressable
-      accessibilityLabel={strings.openAppointmentWith(providerName)}
-      accessibilityRole={onPress ? 'button' : undefined}
-      disabled={!onPress}
-      onPress={onPress}
-      style={({ pressed }) => [styles.cardPressable, pressed && styles.cardPressed]}
-    >
-      <Surface padding="spacious" style={styles.card} variant="raised">
-        <View style={styles.statusRow}>
-          <View style={[styles.statusDot, { backgroundColor: statusColor(theme, appointment) }]} />
-          <AppText tone={statusTone} variant="labelSmall">
-            {statusStrings.statusLabels[appointment.status]}
-          </AppText>
-          {onPress && (
-            <View style={styles.statusChevron}>
-              <DecorativeIcon color={theme.colors.textSecondary} name="chevron-forward" size={17} />
-            </View>
-          )}
-        </View>
-        <AppText variant="titleSmall">{providerName}</AppText>
-        <View style={styles.detailRow}>
-          <DecorativeIcon color={theme.colors.brand} name="calendar-outline" size={20} />
-          <AppText style={styles.detailText} variant="bodyStrong">
-            {formatAppointmentTime(appointment, intlLocale)}
-          </AppText>
-        </View>
-        <View style={styles.detailRow}>
-          <DecorativeIcon
-            color={theme.colors.brand}
-            name={appointment.visitMode === 'video' ? 'videocam-outline' : 'location-outline'}
-            size={20}
-          />
-          <AppText style={styles.detailText} tone="secondary" variant="bodyMedium">
-            {statusStrings.visitModeLabels[appointment.visitMode]} ·{' '}
-            {formatTimeZoneName(appointment.timezone, locale, appointment.startsAt)}
-          </AppText>
-        </View>
-      </Surface>
-    </Pressable>
-  );
-}
-
-function AppointmentState({
-  action,
-  description,
-  title,
-}: {
-  action: React.ReactNode;
-  description: string;
-  title: string;
-}) {
-  const theme = useAppTheme();
-
-  return (
-    <SafeAreaView edges={['top']} style={{ backgroundColor: theme.colors.canvas, flex: 1 }}>
-      <EmptyState
-        action={action}
-        description={description}
-        icon={<DecorativeIcon color={theme.colors.brand} name="calendar-outline" size={34} />}
-        title={title}
-      />
-    </SafeAreaView>
-  );
-}
-
-function statusColor(theme: AppTheme, appointment: Appointment) {
-  if (appointment.status === 'confirmed') {
-    return theme.colors.success;
-  }
-
-  return appointment.status === 'cancelled' ? theme.colors.warning : theme.colors.textSecondary;
-}
-
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     safeArea: {
@@ -359,47 +234,9 @@ function createStyles(theme: AppTheme) {
       paddingTop: theme.spacing.lg,
       width: '100%',
     },
-    heading: {
-      gap: theme.spacing.md,
-      marginBottom: theme.spacing.sm,
-    },
-    headingCopy: {
-      gap: theme.spacing.xs,
-    },
     filterRow: {
       gap: theme.spacing.xs,
       paddingBottom: theme.spacing.xxs,
-    },
-    cardPressable: {
-      borderRadius: theme.radii.lg,
-    },
-    cardPressed: {
-      opacity: 0.86,
-      transform: [{ scale: 0.99 }],
-    },
-    card: {
-      gap: theme.spacing.sm,
-    },
-    statusRow: {
-      alignItems: 'center',
-      flexDirection: 'row',
-      gap: theme.spacing.xs,
-    },
-    statusChevron: {
-      marginStart: 'auto',
-    },
-    statusDot: {
-      borderRadius: theme.radii.full,
-      height: 8,
-      width: 8,
-    },
-    detailRow: {
-      alignItems: 'center',
-      flexDirection: 'row',
-      gap: theme.spacing.sm,
-    },
-    detailText: {
-      flex: 1,
     },
   });
 }

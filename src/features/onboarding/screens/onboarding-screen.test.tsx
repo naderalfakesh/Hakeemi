@@ -4,7 +4,7 @@ import { defaultAppPreferences } from '@/features/preferences/domain/preferences
 import { AppLocaleProvider } from '@/localization/locale-provider';
 import { AppThemeProvider } from '@/theme';
 
-import { OnboardingScreen } from './demo-entry-screen';
+import { OnboardingScreen } from './onboarding-screen';
 
 function renderOnboarding({
   locale = 'en',

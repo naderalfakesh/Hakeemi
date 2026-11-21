@@ -1,10 +1,10 @@
-import { useMemo, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText, DecorativeIcon, IconButton } from '@/components/ui';
 import { useStrings } from '@/localization/use-strings';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 import { bookingStrings } from '../localization/booking-strings';
 
@@ -28,7 +28,7 @@ export function BookingScaffold({
 }) {
   const theme = useAppTheme();
   const strings = useStrings(bookingStrings);
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>

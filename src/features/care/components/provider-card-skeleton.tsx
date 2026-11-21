@@ -1,12 +1,10 @@
-import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Skeleton, Surface } from '@/components/ui';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useThemedStyles, type AppTheme } from '@/theme';
 
 export function ProviderCardSkeleton() {
-  const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   return (
     <Surface style={styles.card} variant="raised">

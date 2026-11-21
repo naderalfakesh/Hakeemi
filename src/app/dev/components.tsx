@@ -1,5 +1,5 @@
 import { Redirect } from 'expo-router';
-import { useMemo, useState, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -16,11 +16,11 @@ import {
   TextField,
 } from '@/components/ui';
 import { environment } from '@/config/env';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 export default function ComponentCatalogueScreen() {
   const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState(true);
 
@@ -128,8 +128,7 @@ type CatalogueSectionProps = {
 };
 
 function CatalogueSection({ children, title }: CatalogueSectionProps) {
-  const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   return (
     <View style={styles.section}>
