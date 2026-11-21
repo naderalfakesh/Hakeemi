@@ -17,6 +17,7 @@ import {
 import { formatLocalizedCount } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
+import type { AppDataScope } from '@/services/query/data-scope';
 import { useAppMotion, useAppTheme, type AppTheme } from '@/theme';
 
 import { ProviderAvatar } from '../components/provider-avatar';
@@ -25,7 +26,6 @@ import {
   formatSlotDateSummary,
   formatSlotTime,
 } from '../components/availability-calendar';
-import type { CareQueryScope } from '../data/query-keys';
 import type { CareRepository } from '../domain/repository';
 import type { AvailabilitySlot, AvailabilityWindow, Clinic } from '../domain/types';
 import { useProviderDetail } from '../hooks/use-provider-detail';
@@ -38,7 +38,7 @@ type ProviderDetailScreenProps = {
   onSignInToSave?: (() => void) | undefined;
   onToggleSavedProvider?: ((providerId: string) => void) | undefined;
   providerId: string;
-  queryScope?: CareQueryScope;
+  queryScope?: AppDataScope;
   repository?: CareRepository;
   savedProviderStatus?: 'error' | 'loading' | 'ready' | 'saving' | 'unavailable' | undefined;
   isProviderSaved?: boolean;
@@ -60,7 +60,7 @@ export function ProviderDetailScreen({
   const { intlLocale, locale } = useAppLocale();
   const strings = useStrings(providerDetailStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const { retry, state } = useProviderDetail(providerId, repository, queryScope);
+  const { retry, state } = useProviderDetail(providerId, { queryScope, repository });
   const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null);
 
   if (state.status !== 'success') {

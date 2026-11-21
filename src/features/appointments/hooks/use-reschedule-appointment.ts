@@ -2,7 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { appointmentRepository } from '@/features/appointments/data/appointment-repository';
 import { careQueryKeys } from '@/features/care/data/query-keys';
-import { hasInternetConnection } from '@/services/connectivity/connectivity';
+import { connectionCheckFor, type ConnectionCheck } from '@/services/connectivity/connectivity';
+import type { AppDataScope } from '@/services/query/data-scope';
 
 import { appointmentQueryKeys } from '../data/query-keys';
 import { createOfflineAppointmentError, toAppointmentActionError } from '../domain/errors';
@@ -10,10 +11,12 @@ import type { AppointmentRepository } from '../domain/repository';
 import type { RescheduleAppointmentInput } from '../domain/types';
 
 export function useRescheduleAppointment({
-  checkConnection = hasInternetConnection,
+  queryScope = 'account',
+  checkConnection = connectionCheckFor(queryScope),
   repository = appointmentRepository,
 }: {
-  checkConnection?: (() => Promise<boolean>) | undefined;
+  checkConnection?: ConnectionCheck | undefined;
+  queryScope?: AppDataScope | undefined;
   repository?: AppointmentRepository | undefined;
 } = {}) {
   const queryClient = useQueryClient();
@@ -29,8 +32,7 @@ export function useRescheduleAppointment({
         throw toAppointmentActionError(error);
       }
     },
-    onSuccess: ({ appointment }) => {
-      void appointment;
+    onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: appointmentQueryKeys.all });
       void queryClient.invalidateQueries({ queryKey: careQueryKeys.all });
     },

@@ -19,6 +19,7 @@ import { formatTimeZoneName } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import { useIsOffline } from '@/services/connectivity/use-is-offline';
+import type { AppDataScope } from '@/services/query/data-scope';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import type { AppointmentRepository } from '../domain/repository';
@@ -47,7 +48,7 @@ export function AppointmentsScreen({
   onFindCare: () => void;
   onSignIn: () => void;
   onViewAppointment?: ((appointmentId: string) => void) | undefined;
-  queryScope?: 'account' | 'demo';
+  queryScope?: AppDataScope;
 }) {
   const session = useAuthSession();
   const strings = useStrings(appointmentsStrings);
@@ -87,18 +88,18 @@ function AuthenticatedAppointments({
   careDataRepository?: CareRepository | undefined;
   onFindCare: () => void;
   onViewAppointment?: ((appointmentId: string) => void) | undefined;
-  queryScope: 'account' | 'demo';
+  queryScope: AppDataScope;
 }) {
   const theme = useAppTheme();
   const { locale } = useAppLocale();
   const strings = useStrings(appointmentsStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const appointmentsQuery = useAppointments(
-    appointmentRepository,
-    careDataRepository,
-    queryScope,
+  const appointmentsQuery = useAppointments({
     accountId,
-  );
+    careRepository: careDataRepository,
+    queryScope,
+    repository: appointmentRepository,
+  });
   const isOffline = useIsOffline();
   const [filter, setFilter] = useState<AppointmentFilter>('upcoming');
   const [isRefreshing, setIsRefreshing] = useState(false);

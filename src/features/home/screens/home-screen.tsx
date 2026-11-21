@@ -24,7 +24,7 @@ import type { Appointment } from '@/features/appointments/domain/types';
 import { ProviderCard } from '@/features/care/components/provider-card';
 import { ProviderCardSkeleton } from '@/features/care/components/provider-card-skeleton';
 import type { CareRepository } from '@/features/care/domain/repository';
-import type { CareQueryScope } from '@/features/care/data/query-keys';
+import type { AppDataScope } from '@/services/query/data-scope';
 import type { Provider, Specialty } from '@/features/care/domain/types';
 import { useProviderDiscovery } from '@/features/care/hooks/use-provider-discovery';
 import { homeStrings } from '@/features/home/localization/home-strings';
@@ -46,7 +46,7 @@ type HomeScreenProps = {
   onOpenCatalogue?: () => void;
   onSelectProvider: (providerId: string) => void;
   onSelectSpecialty?: ((specialtyId: string) => void) | undefined;
-  queryScope?: CareQueryScope;
+  queryScope?: AppDataScope;
   repository?: CareRepository;
 };
 

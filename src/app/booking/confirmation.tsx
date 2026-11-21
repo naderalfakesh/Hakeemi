@@ -13,20 +13,18 @@ import { fetchProviderDetailSummary } from '@/features/care/hooks/use-provider-d
 import { useAppDataSources } from '@/features/demo/use-app-data-sources';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
+import { firstParam } from '@/navigation/route-params';
 
 export default function BookingConfirmationRoute() {
   const params = useLocalSearchParams<{ appointmentId?: string | string[] }>();
-  const appointmentId = Array.isArray(params.appointmentId)
-    ? (params.appointmentId[0] ?? '')
-    : (params.appointmentId ?? '');
+  const appointmentId = firstParam(params.appointmentId);
   const session = useAuthSession();
   const dataSources = useAppDataSources();
-  const appointmentQuery = useAppointmentDetail(
-    appointmentId,
-    dataSources.appointmentRepository,
-    dataSources.scope,
-    session.user?.id ?? null,
-  );
+  const appointmentQuery = useAppointmentDetail(appointmentId, {
+    accountId: dataSources.accountId,
+    queryScope: dataSources.scope,
+    repository: dataSources.appointmentRepository,
+  });
   const providerId = appointmentQuery.data?.providerId ?? '';
   const providerQuery = useQuery({
     enabled: providerId.length > 0,
@@ -40,7 +38,7 @@ export default function BookingConfirmationRoute() {
   // follows a later reschedule or cancellation from there.
   const calendar = useAppointmentCalendar({
     appointment: appointmentQuery.data ?? null,
-    owner: calendarLinkOwner(dataSources.scope, session.user?.id ?? null),
+    owner: calendarLinkOwner(dataSources.scope, dataSources.accountId),
     providerName: provider?.displayName[locale] ?? strings.confirmation.confirmedProviderFallback,
   });
 

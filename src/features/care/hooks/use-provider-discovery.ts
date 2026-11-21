@@ -1,9 +1,10 @@
 import { keepPreviousData, useInfiniteQuery, useQueries, useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 
+import type { AppDataScope } from '@/services/query/data-scope';
 import { careRepository } from '@/features/care/data/care-repository';
 
-import { careQueryKeys, type CareQueryScope } from '../data/query-keys';
+import { careQueryKeys } from '../data/query-keys';
 import { createAvailabilityWindow } from '../domain/availability';
 import type { CareRepository, ProviderPageCursor } from '../domain/repository';
 import type { AvailabilitySlot, Provider, Specialty } from '../domain/types';
@@ -23,7 +24,7 @@ export type ProviderDiscoveryState =
 
 type ProviderDiscoveryOptions = {
   featuredOnly?: boolean;
-  queryScope?: CareQueryScope;
+  queryScope?: AppDataScope;
   query: string;
   repository?: CareRepository;
   specialtyId: string | null;

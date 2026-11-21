@@ -1,5 +1,5 @@
 import * as Network from 'expo-network';
-import { Redirect, router, useLocalSearchParams } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import { useState } from 'react';
 
 import type { AppointmentReasonCategory } from '@/features/appointments/domain/types';
@@ -9,68 +9,39 @@ import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { BookingRouteState } from '@/features/booking/components/booking-route-state';
 import { useBookingDraft } from '@/features/booking/context/booking-draft-provider';
 import { useBookingSelection } from '@/features/booking/hooks/use-booking-selection';
+import {
+  bookingAccessRedirect,
+  useBookingTarget,
+} from '@/features/booking/navigation/booking-return';
 import { BookingReviewScreen } from '@/features/booking/screens/booking-review-screen';
 import { useAppDataSources } from '@/features/demo/use-app-data-sources';
 import { useAppLocale } from '@/localization/locale-provider';
 
-const alwaysConnected = async () => true;
-
 export default function BookingReviewRoute() {
-  const params = useLocalSearchParams<{
-    providerId?: string | string[];
-    slotId?: string | string[];
-  }>();
-  const providerId = readParam(params.providerId);
-  const slotId = readParam(params.slotId);
+  const target = useBookingTarget();
+  const { providerId, slotId } = target;
   const session = useAuthSession();
   const dataSources = useAppDataSources();
   const draftContext = useBookingDraft();
-  const selection = useBookingSelection(
-    providerId,
-    slotId,
-    dataSources.careRepository,
-    dataSources.scope,
-  );
-  const booking = useBookAppointment(
-    dataSources.isDemo
-      ? {
-          accountId: null,
-          checkConnection: alwaysConnected,
-          queryScope: dataSources.scope,
-          repository: dataSources.appointmentRepository,
-        }
-      : {
-          accountId: session.user?.id ?? null,
-          queryScope: dataSources.scope,
-          repository: dataSources.appointmentRepository,
-        },
-  );
+  const selection = useBookingSelection(target, {
+    queryScope: dataSources.scope,
+    repository: dataSources.careRepository,
+  });
+  const booking = useBookAppointment({
+    accountId: dataSources.accountId,
+    queryScope: dataSources.scope,
+    repository: dataSources.appointmentRepository,
+  });
   const networkState = Network.useNetworkState();
   const { locale } = useAppLocale();
   // The confirmed reason stays on screen while it hands over to confirmation.
   const [confirmedReason, setConfirmedReason] = useState<AppointmentReasonCategory | null>(null);
   const draft = draftContext.draft;
 
-  if (session.status === 'anonymous') {
-    return (
-      <Redirect
-        href={{
-          pathname: '/auth/sign-in',
-          params: { bookingProviderId: providerId, bookingSlotId: slotId },
-        }}
-      />
-    );
-  }
+  const accessRedirect = bookingAccessRedirect(session, target);
 
-  if (session.status === 'authenticated' && !session.user?.emailVerified) {
-    return (
-      <Redirect
-        href={{
-          pathname: '/auth/verify-email',
-          params: { bookingProviderId: providerId, bookingSlotId: slotId },
-        }}
-      />
-    );
+  if (accessRedirect) {
+    return <Redirect href={accessRedirect} />;
   }
 
   // After a successful booking the draft is cleared while this screen is on
@@ -144,8 +115,4 @@ export default function BookingReviewRoute() {
       selection={selection.state.data}
     />
   );
-}
-
-function readParam(value: string | string[] | undefined) {
-  return Array.isArray(value) ? (value[0] ?? '') : (value ?? '');
 }

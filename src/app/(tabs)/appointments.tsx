@@ -1,4 +1,4 @@
-import { router, type Href } from 'expo-router';
+import { router } from 'expo-router';
 
 import { AppointmentsScreen as AppointmentsFeatureScreen } from '@/features/appointments/screens/appointments-screen';
 import { useAppDataSources } from '@/features/demo/use-app-data-sources';
@@ -12,7 +12,9 @@ export default function AppointmentsScreen() {
       careDataRepository={dataSources.careRepository}
       onFindCare={() => router.push('/find-care')}
       onSignIn={() => router.push('/auth/sign-in')}
-      onViewAppointment={(appointmentId) => router.push(`/appointments/${appointmentId}` as Href)}
+      onViewAppointment={(appointmentId) =>
+        router.push({ pathname: '/appointments/[appointmentId]', params: { appointmentId } })
+      }
       queryScope={dataSources.scope}
     />
   );

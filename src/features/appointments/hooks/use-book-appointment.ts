@@ -2,23 +2,24 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { careQueryKeys } from '@/features/care/data/query-keys';
 import { appointmentRepository } from '@/features/appointments/data/appointment-repository';
-import { hasInternetConnection } from '@/services/connectivity/connectivity';
+import { connectionCheckFor, type ConnectionCheck } from '@/services/connectivity/connectivity';
+import type { AppDataScope } from '@/services/query/data-scope';
 
-import { appointmentQueryKeys, type AppointmentQueryScope } from '../data/query-keys';
+import { appointmentQueryKeys } from '../data/query-keys';
 import { createOfflineAppointmentError, toAppointmentActionError } from '../domain/errors';
 import type { AppointmentRepository } from '../domain/repository';
 import type { Appointment, BookAppointmentInput } from '../domain/types';
 
 export function useBookAppointment({
   accountId = null,
-  checkConnection = hasInternetConnection,
   queryScope = 'account',
+  checkConnection = connectionCheckFor(queryScope),
   repository = appointmentRepository,
 }: {
-  accountId?: string | null;
-  checkConnection?: () => Promise<boolean>;
-  queryScope?: AppointmentQueryScope;
-  repository?: AppointmentRepository;
+  accountId?: string | null | undefined;
+  checkConnection?: ConnectionCheck | undefined;
+  queryScope?: AppDataScope | undefined;
+  repository?: AppointmentRepository | undefined;
 } = {}) {
   const queryClient = useQueryClient();
   const mutation = useMutation({

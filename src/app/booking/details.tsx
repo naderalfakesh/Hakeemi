@@ -1,4 +1,4 @@
-import { Redirect, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { Redirect, router, useFocusEffect } from 'expo-router';
 import { useCallback } from 'react';
 
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
@@ -6,26 +6,31 @@ import { BookingRouteState } from '@/features/booking/components/booking-route-s
 import { useBookingDraft } from '@/features/booking/context/booking-draft-provider';
 import { useBookingSelection } from '@/features/booking/hooks/use-booking-selection';
 import { bookingStrings } from '@/features/booking/localization/booking-strings';
+import {
+  bookingAccessRedirect,
+  useBookingTarget,
+} from '@/features/booking/navigation/booking-return';
 import { BookingDetailsScreen } from '@/features/booking/screens/booking-details-screen';
 import { useAppDataSources } from '@/features/demo/use-app-data-sources';
 import { useStrings } from '@/localization/use-strings';
 
 export default function BookingDetailsRoute() {
-  const { providerId, slotId } = useBookingParams();
+  const target = useBookingTarget();
+  const { providerId, slotId } = target;
   const session = useAuthSession();
   const dataSources = useAppDataSources();
   const bookingDraft = useBookingDraft();
-  const selection = useBookingSelection(
-    providerId,
-    slotId,
-    dataSources.careRepository,
-    dataSources.scope,
-  );
+  const selection = useBookingSelection(target, {
+    queryScope: dataSources.scope,
+    repository: dataSources.careRepository,
+  });
   const strings = useStrings(bookingStrings);
   // Details is the first step of the booking sheet, so leaving it closes the
   // sheet and shows the clinician underneath.
   const closeBooking = () =>
-    router.canGoBack() ? router.back() : router.replace(`/providers/${providerId}`);
+    router.canGoBack()
+      ? router.back()
+      : router.replace({ pathname: '/providers/[providerId]', params: { providerId } });
 
   // Only the focused screen seeds a draft. Once a booking is confirmed this
   // screen may still be mounted while it animates away, and must not start a
@@ -43,26 +48,10 @@ export default function BookingDetailsRoute() {
     }, [bookingDraft, providerId, slotId]),
   );
 
-  if (session.status === 'anonymous') {
-    return (
-      <Redirect
-        href={{
-          pathname: '/auth/sign-in',
-          params: { bookingProviderId: providerId, bookingSlotId: slotId },
-        }}
-      />
-    );
-  }
+  const accessRedirect = bookingAccessRedirect(session, target);
 
-  if (session.status === 'authenticated' && !session.user?.emailVerified) {
-    return (
-      <Redirect
-        href={{
-          pathname: '/auth/verify-email',
-          params: { bookingProviderId: providerId, bookingSlotId: slotId },
-        }}
-      />
-    );
+  if (accessRedirect) {
+    return <Redirect href={accessRedirect} />;
   }
 
   if (selection.state.status !== 'success') {
@@ -94,20 +83,4 @@ export default function BookingDetailsRoute() {
       selection={selection.state.data}
     />
   );
-}
-
-function useBookingParams() {
-  const params = useLocalSearchParams<{
-    providerId?: string | string[];
-    slotId?: string | string[];
-  }>();
-
-  return {
-    providerId: readParam(params.providerId),
-    slotId: readParam(params.slotId),
-  };
-}
-
-function readParam(value: string | string[] | undefined) {
-  return Array.isArray(value) ? (value[0] ?? '') : (value ?? '');
 }

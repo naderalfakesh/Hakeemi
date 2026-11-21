@@ -1,23 +1,14 @@
-import { Redirect, router, useLocalSearchParams } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 
 import { signIn } from '@/features/auth/data/firebase-auth';
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import type { SignInValues } from '@/features/auth/domain/schemas';
 import { SignInScreen } from '@/features/auth/screens/sign-in-screen';
-import {
-  bookingDestination,
-  bookingReturnParams,
-  readBookingReturn,
-} from '@/features/booking/navigation/booking-return';
+import { bookingDestination, useBookingReturn } from '@/features/booking/navigation/booking-return';
 
 export default function SignInRoute() {
   const session = useAuthSession();
-  const params = useLocalSearchParams<{
-    bookingProviderId?: string | string[];
-    bookingSlotId?: string | string[];
-  }>();
-  const bookingReturn = readBookingReturn(params);
-  const returnParams = bookingReturnParams(bookingReturn);
+  const { bookingReturn, returnParams } = useBookingReturn();
 
   if (session.status === 'authenticated') {
     return (

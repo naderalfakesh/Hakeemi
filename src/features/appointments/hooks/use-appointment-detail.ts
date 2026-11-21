@@ -1,15 +1,22 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { appointmentRepository } from '@/features/appointments/data/appointment-repository';
+import type { AppDataScope } from '@/services/query/data-scope';
 
-import { appointmentQueryKeys, type AppointmentQueryScope } from '../data/query-keys';
+import { appointmentQueryKeys } from '../data/query-keys';
 import type { AppointmentRepository } from '../domain/repository';
 
 export function useAppointmentDetail(
   appointmentId: string,
-  repository: AppointmentRepository = appointmentRepository,
-  queryScope: AppointmentQueryScope = 'account',
-  accountId: string | null = null,
+  {
+    accountId = null,
+    queryScope = 'account',
+    repository = appointmentRepository,
+  }: {
+    accountId?: string | null | undefined;
+    queryScope?: AppDataScope | undefined;
+    repository?: AppointmentRepository | undefined;
+  } = {},
 ) {
   return useQuery({
     // Account appointments need a signed-in account.

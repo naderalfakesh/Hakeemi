@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import type { WritableCalendar } from '@/services/calendar/calendar';
+import type { AppDataScope } from '@/services/query/data-scope';
 
 import type { AppointmentCalendarLink } from '../domain/calendar-link';
 
@@ -14,7 +15,7 @@ const CALENDAR_LINK_PREFIX = '@hakeemi/calendar-link/v2/';
 export type CalendarLinkOwner = 'demo' | `account:${string}`;
 
 export function calendarLinkOwner(
-  scope: 'account' | 'demo',
+  scope: AppDataScope,
   accountId: string | null,
 ): CalendarLinkOwner | null {
   if (scope === 'demo') {

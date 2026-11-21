@@ -15,13 +15,13 @@ import { formatLocalizedCount } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import { useIsOffline } from '@/services/connectivity/use-is-offline';
+import type { AppDataScope } from '@/services/query/data-scope';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { ProviderCard } from '../components/provider-card';
 import { ProviderCardSkeleton } from '../components/provider-card-skeleton';
 import { SpecialtyFilter } from '../components/specialty-filter';
 import type { CareRepository } from '../domain/repository';
-import type { CareQueryScope } from '../data/query-keys';
 import type { Provider } from '../domain/types';
 import { useDebouncedValue } from '../hooks/use-debounced-value';
 import { useProviderDiscovery } from '../hooks/use-provider-discovery';
@@ -32,7 +32,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 type FindCareScreenProps = {
   initialSpecialtyId?: string | null | undefined;
   onSelectProvider: (providerId: string) => void;
-  queryScope?: CareQueryScope;
+  queryScope?: AppDataScope;
   repository?: CareRepository;
 };
 

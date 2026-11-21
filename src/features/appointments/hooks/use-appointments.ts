@@ -1,11 +1,12 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { appointmentRepository } from '@/features/appointments/data/appointment-repository';
-import { careRepository } from '@/features/care/data/care-repository';
+import { careRepository as accountCareRepository } from '@/features/care/data/care-repository';
 import { careQueryKeys } from '@/features/care/data/query-keys';
 import type { CareRepository } from '@/features/care/domain/repository';
+import type { AppDataScope } from '@/services/query/data-scope';
 
-import { appointmentQueryKeys, type AppointmentQueryScope } from '../data/query-keys';
+import { appointmentQueryKeys } from '../data/query-keys';
 import type { AppointmentRepository } from '../domain/repository';
 import type { Appointment } from '../domain/types';
 
@@ -49,12 +50,17 @@ function matchesFilter(appointment: Appointment, filter: AppointmentFilter, now:
   );
 }
 
-export function useAppointments(
-  repository: AppointmentRepository = appointmentRepository,
-  providerRepository: CareRepository = careRepository,
-  queryScope: AppointmentQueryScope = 'account',
-  accountId: string | null = null,
-) {
+export function useAppointments({
+  accountId = null,
+  careRepository = accountCareRepository,
+  queryScope = 'account',
+  repository = appointmentRepository,
+}: {
+  accountId?: string | null | undefined;
+  careRepository?: CareRepository | undefined;
+  queryScope?: AppDataScope | undefined;
+  repository?: AppointmentRepository | undefined;
+} = {}) {
   const queryClient = useQueryClient();
 
   return useQuery({
@@ -68,7 +74,7 @@ export function useAppointments(
       ];
       const resolvedProviders = await Promise.all(
         uniqueProviderIds.map(async (providerId) => {
-          const provider = await providerRepository.getProvider(providerId);
+          const provider = await careRepository.getProvider(providerId);
           queryClient.setQueryData(careQueryKeys.providerSummary(providerId, queryScope), provider);
           return [providerId, provider] as const;
         }),

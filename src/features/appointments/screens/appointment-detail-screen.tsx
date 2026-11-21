@@ -27,6 +27,7 @@ import { formatTimeZoneName } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import { triggerHaptic } from '@/services/haptics/haptics';
+import type { AppDataScope } from '@/services/query/data-scope';
 import { useAppTheme, type AppTheme } from '@/theme';
 
 import { AppointmentCalendarSection } from '../components/appointment-calendar-section';
@@ -40,8 +41,6 @@ import type { Appointment } from '../domain/types';
 import { appointmentDetailStrings } from '../localization/appointment-detail-strings';
 import { appointmentStatusStrings } from '../localization/appointment-status-strings';
 import { localizeAppointmentError } from '../localization/appointment-error-strings';
-
-const alwaysConnected = async () => true;
 
 export function AppointmentDetailScreen({
   appointmentId,
@@ -58,7 +57,7 @@ export function AppointmentDetailScreen({
   createRequestId?: () => string;
   onBack: () => void;
   onFindCare: () => void;
-  queryScope?: 'account' | 'demo';
+  queryScope?: AppDataScope;
 }) {
   const session = useAuthSession();
   const strings = useStrings(appointmentDetailStrings);
@@ -105,7 +104,7 @@ function AuthenticatedAppointmentDetail({
   createRequestId: () => string;
   onBack: () => void;
   onFindCare: () => void;
-  queryScope: 'account' | 'demo';
+  queryScope: AppDataScope;
 }) {
   const theme = useAppTheme();
   const { intlLocale, locale } = useAppLocale();
@@ -113,24 +112,24 @@ function AuthenticatedAppointmentDetail({
   const statusStrings = useStrings(appointmentStatusStrings);
   const styles = useMemo(() => createStyles(theme), [theme]);
   const queryClient = useQueryClient();
-  const detailQuery = useAppointmentDetail(
-    appointmentId,
-    appointmentRepository,
-    queryScope,
+  const detailQuery = useAppointmentDetail(appointmentId, {
     accountId,
-  );
+    queryScope,
+    repository: appointmentRepository,
+  });
   const providerId = detailQuery.data?.providerId ?? '';
-  const providerQuery = useProviderDetail(providerId, careDataRepository, queryScope);
-  const cancelMutation = useCancelAppointment(
-    queryScope === 'demo'
-      ? { checkConnection: alwaysConnected, repository: appointmentRepository }
-      : { repository: appointmentRepository },
-  );
-  const rescheduleMutation = useRescheduleAppointment(
-    queryScope === 'demo'
-      ? { checkConnection: alwaysConnected, repository: appointmentRepository }
-      : { repository: appointmentRepository },
-  );
+  const providerQuery = useProviderDetail(providerId, {
+    queryScope,
+    repository: careDataRepository,
+  });
+  const cancelMutation = useCancelAppointment({
+    queryScope,
+    repository: appointmentRepository,
+  });
+  const rescheduleMutation = useRescheduleAppointment({
+    queryScope,
+    repository: appointmentRepository,
+  });
   const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [showReschedule, setShowReschedule] = useState(false);
   // A retry of a failed action reuses its request ID, so the server can

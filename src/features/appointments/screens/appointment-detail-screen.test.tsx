@@ -24,7 +24,7 @@ jest.mock('@/features/auth/context/auth-session-provider', () => ({
 }));
 
 jest.mock('@/services/connectivity/connectivity', () => ({
-  hasInternetConnection: jest.fn().mockResolvedValue(true),
+  connectionCheckFor: () => async () => true,
 }));
 
 jest.mock('@/services/calendar/calendar', () => ({

@@ -1,8 +1,8 @@
-export type AppointmentQueryScope = 'account' | 'demo';
+import type { AppDataScope } from '@/services/query/data-scope';
 
 // Account data is keyed by the signed-in user so one account's cache is never
 // served to the next account on the same device.
-function scopeKey(scope: AppointmentQueryScope, accountId: string | null) {
+function scopeKey(scope: AppDataScope, accountId: string | null) {
   return scope === 'demo'
     ? (['appointments', 'demo'] as const)
     : (['appointments', 'account', accountId ?? 'anonymous'] as const);
@@ -13,9 +13,9 @@ export const appointmentQueryKeys = {
   account: (accountId: string) => scopeKey('account', accountId),
   detail: (
     appointmentId: string,
-    scope: AppointmentQueryScope = 'account',
+    scope: AppDataScope = 'account',
     accountId: string | null = null,
   ) => [...scopeKey(scope, accountId), 'detail', appointmentId] as const,
-  list: (scope: AppointmentQueryScope = 'account', accountId: string | null = null) =>
+  list: (scope: AppDataScope = 'account', accountId: string | null = null) =>
     [...scopeKey(scope, accountId), 'list'] as const,
 };

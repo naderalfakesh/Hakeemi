@@ -2,8 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 
 import { careRepository } from '@/features/care/data/care-repository';
+import type { AppDataScope } from '@/services/query/data-scope';
 
-import { careQueryKeys, type CareQueryScope } from '../data/query-keys';
+import { careQueryKeys } from '../data/query-keys';
 import { createAvailabilityWindow } from '../domain/availability';
 import type { CareRepository } from '../domain/repository';
 import type { AvailabilitySlot, Clinic, Provider, Specialty } from '../domain/types';
@@ -45,23 +46,26 @@ export async function fetchProviderDetailSummary(
   return { clinics, provider, specialties };
 }
 
+export type ProviderDetailOptions = {
+  queryScope?: AppDataScope | undefined;
+  repository?: CareRepository | undefined;
+};
+
 export function useProviderDetail(
   providerId: string,
-  repository?: CareRepository,
-  queryScope: CareQueryScope = 'account',
+  { queryScope = 'account', repository = careRepository }: ProviderDetailOptions = {},
 ) {
-  const resolvedRepository = repository ?? careRepository;
   const [availabilityWindow] = useState(createAvailabilityWindow);
   const providerQuery = useQuery({
     enabled: providerId.length > 0,
     queryKey: careQueryKeys.detail(providerId, queryScope),
-    queryFn: () => fetchProviderDetailSummary(resolvedRepository, providerId),
+    queryFn: () => fetchProviderDetailSummary(repository, providerId),
   });
   const availabilityQuery = useQuery({
     enabled:
       providerId.length > 0 && providerQuery.data !== undefined && providerQuery.data !== null,
     queryKey: careQueryKeys.availability(providerId, availabilityWindow, queryScope),
-    queryFn: () => resolvedRepository.listAvailableSlots(providerId, availabilityWindow),
+    queryFn: () => repository.listAvailableSlots(providerId, availabilityWindow),
   });
 
   let state: ProviderDetailState;

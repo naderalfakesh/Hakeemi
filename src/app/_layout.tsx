@@ -1,7 +1,7 @@
-import { Stack, ThemeProvider as NavigationThemeProvider, useRouter, type Href } from 'expo-router';
+import { Stack, ThemeProvider as NavigationThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -12,16 +12,14 @@ import { navigationStrings } from '@/components/navigation/navigation-strings';
 import { AccountDataReset } from '@/features/auth/context/account-data-reset';
 import { AuthSessionProvider, useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { BookingDraftProvider } from '@/features/booking/context/booking-draft-provider';
+import { NotificationNavigationBridge } from '@/features/notifications/components/notification-navigation-bridge';
 import { NotificationRegistrationProvider } from '@/features/notifications/context/notification-registration-provider';
 import {
   AppPreferencesProvider,
   useAppPreferences,
 } from '@/features/preferences/context/app-preferences-provider';
 import { initializeFirebaseServices } from '@/services/firebase/initialize';
-import {
-  disableAppointmentNotifications,
-  subscribeToAppointmentNotificationOpen,
-} from '@/services/notifications/notifications';
+import { disableAppointmentNotifications } from '@/services/notifications/notifications';
 import { AppQueryProvider } from '@/services/query/query-provider';
 import {
   AppThemeProvider,
@@ -31,12 +29,8 @@ import {
   useAppTheme,
 } from '@/theme';
 import { logSafeError } from '@/services/logging/safe-logger';
-import {
-  isLayoutDirectionPendingRestart,
-  restartToApplyLayoutDirection,
-  syncNativeLayoutDirection,
-} from '@/localization/layout-direction';
 import { AppLocaleProvider } from '@/localization/locale-provider';
+import { useLayoutDirectionSync } from '@/localization/use-layout-direction-sync';
 import { useStrings } from '@/localization/use-strings';
 
 initializeFirebaseServices();
@@ -115,71 +109,10 @@ function Navigation() {
   );
 }
 
-function NotificationNavigationBridge() {
-  const router = useRouter();
-  const session = useAuthSession();
-  const pendingAppointmentId = useRef<string | null>(null);
-  // The listener reads the latest status through a ref, so it subscribes once
-  // instead of on every session change.
-  const sessionStatus = useRef(session.status);
-
-  useEffect(() => {
-    sessionStatus.current = session.status;
-  }, [session.status]);
-
-  useEffect(
-    () =>
-      subscribeToAppointmentNotificationOpen((appointmentId) => {
-        if (sessionStatus.current !== 'authenticated') {
-          pendingAppointmentId.current = appointmentId;
-          return;
-        }
-
-        router.push({
-          pathname: '/appointments/[appointmentId]',
-          params: { appointmentId },
-        } as unknown as Href);
-      }),
-    [router],
-  );
-
-  useEffect(() => {
-    if (session.status === 'authenticated' && pendingAppointmentId.current) {
-      const appointmentId = pendingAppointmentId.current;
-      pendingAppointmentId.current = null;
-      router.push({
-        pathname: '/appointments/[appointmentId]',
-        params: { appointmentId },
-      } as unknown as Href);
-    }
-  }, [router, session.status]);
-
-  return null;
-}
-
 function AppShell() {
   const { preferences, status } = useAppPreferences();
-  const hasRequestedRestart = useRef(false);
 
-  useEffect(() => {
-    syncNativeLayoutDirection(preferences.locale);
-  }, [preferences.locale]);
-
-  useEffect(() => {
-    // Reload the app once the changed locale is persisted so the new layout
-    // direction applies without a manual restart. The persisted RTL flag is
-    // already in place, so the reloaded instance boots in the right direction.
-    if (
-      status !== 'ready' ||
-      hasRequestedRestart.current ||
-      !isLayoutDirectionPendingRestart(preferences.locale)
-    ) {
-      return;
-    }
-
-    hasRequestedRestart.current = true;
-    void restartToApplyLayoutDirection();
-  }, [preferences.locale, status]);
+  useLayoutDirectionSync(preferences.locale, status === 'ready');
 
   return (
     <AppLocaleProvider locale={preferences.locale}>

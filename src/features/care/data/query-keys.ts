@@ -1,6 +1,6 @@
-import type { AvailabilityWindow, ProviderSearch } from '../domain/types';
+import type { AppDataScope } from '@/services/query/data-scope';
 
-export type CareQueryScope = 'account' | 'demo';
+import type { AvailabilityWindow, ProviderSearch } from '../domain/types';
 
 function normalizedSearch(search: ProviderSearch) {
   return {
@@ -11,16 +11,13 @@ function normalizedSearch(search: ProviderSearch) {
 
 export const careQueryKeys = {
   all: ['care'] as const,
-  availability: (
-    providerId: string,
-    window: AvailabilityWindow,
-    scope: CareQueryScope = 'account',
-  ) => ['care', scope, 'availability', providerId, window] as const,
-  detail: (providerId: string, scope: CareQueryScope = 'account') =>
+  availability: (providerId: string, window: AvailabilityWindow, scope: AppDataScope = 'account') =>
+    ['care', scope, 'availability', providerId, window] as const,
+  detail: (providerId: string, scope: AppDataScope = 'account') =>
     ['care', scope, 'provider', providerId] as const,
-  discovery: (search: ProviderSearch, scope: CareQueryScope = 'account') =>
+  discovery: (search: ProviderSearch, scope: AppDataScope = 'account') =>
     ['care', scope, 'provider-discovery', normalizedSearch(search)] as const,
-  providerSummary: (providerId: string, scope: CareQueryScope = 'account') =>
+  providerSummary: (providerId: string, scope: AppDataScope = 'account') =>
     ['care', scope, 'provider-summary', providerId] as const,
-  specialties: (scope: CareQueryScope = 'account') => ['care', scope, 'specialties'] as const,
+  specialties: (scope: AppDataScope = 'account') => ['care', scope, 'specialties'] as const,
 };
