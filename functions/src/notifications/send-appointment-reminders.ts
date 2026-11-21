@@ -1,72 +1,37 @@
-import { createHash } from 'node:crypto';
-
-import { FieldValue, type Firestore, Timestamp } from 'firebase-admin/firestore';
-import { type Messaging, type MulticastMessage, type SendResponse } from 'firebase-admin/messaging';
+import { type Firestore, Timestamp } from 'firebase-admin/firestore';
+import { type Messaging, type SendResponse } from 'firebase-admin/messaging';
 import * as functionsLogger from 'firebase-functions/logger';
-import { z, ZodError } from 'zod';
 
 import { appointmentDocumentSchema } from '../appointments/contracts.js';
+import {
+  type DeviceTokenEntry,
+  disableInvalidTokens,
+  groupTokensByLocale,
+  readEnabledTokens,
+} from './reminder-device-tokens.js';
+import {
+  classifyDeliveryError,
+  type DeliveryFailure,
+  NON_RETRYABLE_DELIVERY_CODES,
+  readErrorCode,
+  ReminderDeliveryError,
+} from './reminder-delivery-errors.js';
+import { buildAppointmentReminderMessage } from './reminder-message.js';
+import {
+  APPOINTMENT_REMINDER_MAX_ATTEMPTS,
+  deriveReminderId,
+  getAppointmentReminderWindow,
+  isReminderStillDue,
+} from './reminder-policy.js';
+import {
+  claimReminder,
+  type ReminderPass,
+  reminderReceiptSchema,
+  settleFailedReceipt,
+  updateReminderReceipt,
+} from './reminder-receipts.js';
 
-export const APPOINTMENT_REMINDER_LEAD_TIME_MS = 24 * 60 * 60 * 1_000;
-export const APPOINTMENT_REMINDER_WINDOW_MS = 15 * 60 * 1_000;
-// Each run also looks back this far past the 24-hour target, so an
-// appointment a failed or missed run skipped is picked up by a later one.
-// Receipts keep it from being reminded twice.
-export const APPOINTMENT_REMINDER_CATCH_UP_MS = 60 * 60 * 1_000;
-export const APPOINTMENT_REMINDER_RETRY_LOOKBACK_MS = 48 * 60 * 60 * 1_000;
-export const APPOINTMENT_REMINDER_MAX_ATTEMPTS = 3;
-const REMINDER_CLAIM_LEASE_MS = 10 * 60 * 1_000;
 const RETRY_QUERY_LIMIT = 500;
-
-// Errors that no later attempt can fix: malformed requests, credential,
-// permission and sender configuration problems, and tokens FCM has rejected.
-const NON_RETRYABLE_DELIVERY_CODES = new Set([
-  'app/invalid-argument',
-  'app/invalid-credential',
-  'grpc/7',
-  'grpc/16',
-  'messaging/authentication-error',
-  'messaging/invalid-apns-credentials',
-  'messaging/invalid-argument',
-  'messaging/invalid-data-payload-key',
-  'messaging/invalid-options',
-  'messaging/invalid-package-name',
-  'messaging/invalid-payload',
-  'messaging/invalid-recipient',
-  'messaging/invalid-registration-token',
-  'messaging/mismatched-credential',
-  'messaging/payload-size-limit-exceeded',
-  'messaging/registration-token-not-registered',
-  'messaging/sender-id-mismatch',
-  'messaging/third-party-auth-error',
-  'permission-denied',
-  'unauthenticated',
-]);
-
-const deviceTokenSchema = z
-  .object({
-    enabled: z.literal(true),
-    locale: z.string().optional(),
-    platform: z.enum(['android', 'ios']),
-    token: z.string().trim().min(16).max(4096),
-  })
-  .passthrough();
-
-const reminderReceiptSchema = z
-  .object({
-    appointmentId: z.string().min(1),
-    attempts: z.number().int().min(0).optional(),
-    claimedAt: z.custom<Timestamp>((value) => value instanceof Timestamp),
-    createdAt: z.custom<Timestamp>((value) => value instanceof Timestamp),
-    sendIssuedAt: z.custom<Timestamp>((value) => value instanceof Timestamp).optional(),
-    status: z.enum(['abandoned', 'failed', 'sending', 'sent', 'skipped']),
-    updatedAt: z.custom<Timestamp>((value) => value instanceof Timestamp),
-  })
-  .passthrough();
-
-export type ReminderLocale = 'ar' | 'en';
-
-export type ReminderReceiptStatus = z.infer<typeof reminderReceiptSchema>['status'];
 
 export type ReminderLogger = {
   error: (message: string, fields: Record<string, unknown>) => void;
@@ -78,11 +43,6 @@ export type SendAppointmentRemindersOptions = {
   logger?: ReminderLogger;
 };
 
-export type AppointmentReminderWindow = {
-  end: Timestamp;
-  start: Timestamp;
-};
-
 export type AppointmentReminderRunResult = {
   abandoned: number;
   considered: number;
@@ -91,86 +51,6 @@ export type AppointmentReminderRunResult = {
   sent: number;
   skipped: number;
 };
-
-export type DeliveryFailure = {
-  code: string;
-  retryable: boolean;
-};
-
-const REMINDER_COPY: Record<ReminderLocale, { body: string; title: string }> = {
-  ar: {
-    body: 'لديك موعد قادم في «حكيمي».',
-    title: 'تذكير بالموعد',
-  },
-  en: {
-    body: 'You have a Hakeemi appointment coming up.',
-    title: 'Appointment reminder',
-  },
-};
-
-export function getAppointmentReminderWindow(now: Timestamp): AppointmentReminderWindow {
-  const target = now.toMillis() + APPOINTMENT_REMINDER_LEAD_TIME_MS;
-  const halfWindow = APPOINTMENT_REMINDER_WINDOW_MS / 2;
-
-  return {
-    end: Timestamp.fromMillis(target + halfWindow),
-    start: Timestamp.fromMillis(target - halfWindow - APPOINTMENT_REMINDER_CATCH_UP_MS),
-  };
-}
-
-export function deriveReminderId(appointmentId: string) {
-  return createHash('sha256').update(appointmentId).update('\0').update('24h').digest('hex');
-}
-
-export function resolveReminderLocale(locale: unknown): ReminderLocale {
-  return typeof locale === 'string' && /^ar(?![a-z])/i.test(locale.trim()) ? 'ar' : 'en';
-}
-
-export function buildAppointmentReminderMessage(
-  tokens: readonly string[],
-  appointmentId: string,
-  locale: ReminderLocale = 'en',
-): MulticastMessage {
-  return {
-    android: {
-      notification: {
-        channelId: 'appointment-reminders',
-      },
-    },
-    apns: {
-      payload: {
-        aps: {
-          sound: 'default',
-        },
-      },
-    },
-    data: {
-      appointmentId,
-      type: 'appointment_reminder',
-    },
-    notification: { ...REMINDER_COPY[locale] },
-    tokens: [...tokens],
-  };
-}
-
-export function shouldDisableDeviceToken(response: SendResponse) {
-  const code = response.error?.code;
-
-  return (
-    code === 'messaging/registration-token-not-registered' ||
-    code === 'messaging/invalid-registration-token'
-  );
-}
-
-export function classifyDeliveryError(error: unknown): DeliveryFailure {
-  if (error instanceof ZodError) {
-    return { code: 'invalid-document', retryable: false };
-  }
-
-  const code = readErrorCode(error);
-
-  return { code, retryable: !NON_RETRYABLE_DELIVERY_CODES.has(code) };
-}
 
 export async function sendAppointmentReminders(
   firestore: Firestore,
@@ -223,20 +103,6 @@ type RunContext = {
   now: Timestamp;
 };
 
-type DeviceTokenEntry = {
-  locale: ReminderLocale;
-  reference: FirebaseFirestore.DocumentReference;
-  token: string;
-};
-
-// Only the retry pass picks up `failed` receipts, so a reminder that fails is
-// retried on the next schedule tick rather than again in the same run.
-type ReminderPass = 'retry' | 'scheduled';
-
-type ClaimResult =
-  | { appointmentData: FirebaseFirestore.DocumentData | undefined; attempt: number; claimed: true }
-  | { claimed: false };
-
 type ReminderOutcome = {
   code: string;
   status: 'abandoned' | 'failed' | 'sent' | 'skipped';
@@ -247,16 +113,6 @@ type DeliveryProgress = {
   delivered: number;
   issued: number;
 };
-
-class ReminderDeliveryError extends Error {
-  constructor(
-    readonly code: string,
-    readonly retryable: boolean,
-  ) {
-    super(`Appointment reminder delivery failed: ${code}`);
-    this.name = 'ReminderDeliveryError';
-  }
-}
 
 // One appointment's unexpected error (for example a claim transaction that
 // keeps aborting) must not stop the rest of the run. Nothing is recorded, so
@@ -502,248 +358,4 @@ async function retryFailedReminders(context: RunContext, result: AppointmentRemi
     result.retried += 1;
     await processReminderSafely(context, appointmentSnapshot, result, 'retry');
   }
-}
-
-function isReminderStillDue(
-  appointmentData: FirebaseFirestore.DocumentData | undefined,
-  now: Timestamp,
-): { ok: true } | { ok: false; reason: string } {
-  const appointment = appointmentDocumentSchema.safeParse(appointmentData);
-
-  if (!appointment.success) {
-    return { ok: false, reason: 'invalid-document' };
-  }
-
-  if (appointment.data.status !== 'confirmed') {
-    return { ok: false, reason: 'appointment-not-confirmed' };
-  }
-
-  const startsAt = appointment.data.startsAt.toMillis();
-
-  if (startsAt <= now.toMillis()) {
-    return { ok: false, reason: 'appointment-started' };
-  }
-
-  const dueAt = startsAt - APPOINTMENT_REMINDER_LEAD_TIME_MS;
-
-  if (now.toMillis() - dueAt > APPOINTMENT_REMINDER_RETRY_LOOKBACK_MS) {
-    return { ok: false, reason: 'lookback-expired' };
-  }
-
-  return { ok: true };
-}
-
-function groupTokensByLocale(tokens: readonly DeviceTokenEntry[]) {
-  const groups = new Map<ReminderLocale, DeviceTokenEntry[]>();
-
-  for (const entry of tokens) {
-    const group = groups.get(entry.locale);
-
-    if (group) {
-      group.push(entry);
-    } else {
-      groups.set(entry.locale, [entry]);
-    }
-  }
-
-  return groups;
-}
-
-async function readEnabledTokens(firestore: Firestore, patientId: string) {
-  const snapshot = await firestore
-    .collection('users')
-    .doc(patientId)
-    .collection('deviceTokens')
-    .where('enabled', '==', true)
-    .limit(500)
-    .get();
-
-  return snapshot.docs.flatMap<DeviceTokenEntry>((document) => {
-    const parsed = deviceTokenSchema.safeParse(document.data());
-
-    return parsed.success
-      ? [
-          {
-            locale: resolveReminderLocale(parsed.data.locale),
-            reference: document.ref,
-            token: parsed.data.token,
-          },
-        ]
-      : [];
-  });
-}
-
-async function disableInvalidTokens(
-  firestore: Firestore,
-  tokens: readonly DeviceTokenEntry[],
-  responses: readonly SendResponse[],
-) {
-  const batch = firestore.batch();
-  let invalidCount = 0;
-
-  responses.forEach((response, index) => {
-    const entry = tokens[index];
-
-    if (entry && shouldDisableDeviceToken(response)) {
-      batch.update(entry.reference, {
-        enabled: false,
-        updatedAt: FieldValue.serverTimestamp(),
-      });
-      invalidCount += 1;
-    }
-  });
-
-  if (invalidCount > 0) {
-    await batch.commit();
-  }
-
-  return invalidCount;
-}
-
-async function claimReminder(
-  firestore: Firestore,
-  appointmentReference: FirebaseFirestore.DocumentReference,
-  now: Timestamp,
-  pass: ReminderPass,
-): Promise<ClaimResult> {
-  const appointmentId = appointmentReference.id;
-  const receiptReference = firestore.doc(`appointmentReminders/${deriveReminderId(appointmentId)}`);
-
-  return firestore.runTransaction(async (transaction) => {
-    // The appointment is re-read here so a cancellation or reschedule that
-    // landed after the run's query is respected before anything is sent.
-    const [snapshot, appointmentSnapshot] = await Promise.all([
-      transaction.get(receiptReference),
-      transaction.get(appointmentReference),
-    ]);
-    const appointmentData = appointmentSnapshot.data();
-    const current = appointmentDocumentSchema.safeParse(appointmentData);
-
-    if (
-      current.success &&
-      (current.data.status !== 'confirmed' || current.data.startsAt.toMillis() <= now.toMillis())
-    ) {
-      return { claimed: false };
-    }
-
-    const existing = snapshot.exists ? reminderReceiptSchema.safeParse(snapshot.data()) : null;
-    let attempts = 0;
-
-    if (existing?.success) {
-      const { status } = existing.data;
-
-      if (status === 'abandoned' || status === 'sent' || status === 'skipped') {
-        return { claimed: false };
-      }
-
-      if (status === 'failed' && pass === 'scheduled' && existing.data.attempts !== undefined) {
-        return { claimed: false };
-      }
-
-      // Receipts written before `attempts` existed may already have been
-      // delivered (the old code recorded `failed` for post-send errors too).
-      if (existing.data.attempts === undefined) {
-        if (status === 'failed') {
-          transaction.update(receiptReference, {
-            outcomeCode: 'legacy-receipt',
-            status: 'abandoned',
-            updatedAt: now,
-          });
-        }
-        return { claimed: false };
-      }
-
-      attempts = existing.data.attempts;
-
-      if (
-        status === 'sending' &&
-        (existing.data.sendIssuedAt !== undefined ||
-          now.toMillis() - existing.data.claimedAt.toMillis() < REMINDER_CLAIM_LEASE_MS)
-      ) {
-        return { claimed: false };
-      }
-
-      if (attempts >= APPOINTMENT_REMINDER_MAX_ATTEMPTS) {
-        transaction.update(receiptReference, {
-          outcomeCode: 'attempts-exhausted',
-          status: 'abandoned',
-          updatedAt: now,
-        });
-        return { claimed: false };
-      }
-    }
-
-    const attempt = attempts + 1;
-    const fields = {
-      appointmentId,
-      attempts: attempt,
-      claimedAt: now,
-      status: 'sending' as const,
-      updatedAt: FieldValue.serverTimestamp(),
-    };
-
-    if (snapshot.exists) {
-      transaction.update(receiptReference, { ...fields, sendIssuedAt: FieldValue.delete() });
-    } else {
-      transaction.create(receiptReference, {
-        ...fields,
-        createdAt: FieldValue.serverTimestamp(),
-      });
-    }
-
-    return { appointmentData, attempt, claimed: true };
-  });
-}
-
-// Moves a `failed` receipt to a terminal state only if no concurrent run has
-// claimed it in the meantime.
-async function settleFailedReceipt(
-  firestore: Firestore,
-  receiptReference: FirebaseFirestore.DocumentReference,
-  status: 'abandoned' | 'skipped',
-  outcomeCode: string,
-  now: Timestamp,
-) {
-  return firestore.runTransaction(async (transaction) => {
-    const snapshot = await transaction.get(receiptReference);
-
-    if (!snapshot.exists || snapshot.get('status') !== 'failed') {
-      return false;
-    }
-
-    transaction.update(receiptReference, { outcomeCode, status, updatedAt: now });
-    return true;
-  });
-}
-
-async function updateReminderReceipt(
-  firestore: Firestore,
-  appointmentId: string,
-  status: 'abandoned' | 'failed' | 'sent' | 'skipped',
-  now: Timestamp,
-  outcomeCode: string,
-) {
-  await firestore.doc(`appointmentReminders/${deriveReminderId(appointmentId)}`).update({
-    outcomeCode,
-    status,
-    updatedAt: now,
-  });
-}
-
-// Only short enumerated identifiers are kept; error messages are never
-// logged or stored because provider messages can echo request contents.
-function readErrorCode(error: unknown): string {
-  if (typeof error === 'object' && error !== null && 'code' in error) {
-    const code = (error as { code: unknown }).code;
-
-    if (typeof code === 'string' && /^[a-z0-9/_.-]{1,64}$/i.test(code)) {
-      return code;
-    }
-
-    if (typeof code === 'number' && Number.isInteger(code)) {
-      return `grpc/${code}`;
-    }
-  }
-
-  return 'unknown';
 }

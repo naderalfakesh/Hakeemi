@@ -4,19 +4,17 @@ import { describe, it } from 'node:test';
 import { Timestamp } from 'firebase-admin/firestore';
 import { z } from 'zod';
 
+import { classifyDeliveryError, shouldDisableDeviceToken } from './reminder-delivery-errors.js';
+import { buildAppointmentReminderMessage, resolveReminderLocale } from './reminder-message.js';
 import {
   APPOINTMENT_REMINDER_CATCH_UP_MS,
   APPOINTMENT_REMINDER_LEAD_TIME_MS,
   APPOINTMENT_REMINDER_MAX_ATTEMPTS,
   APPOINTMENT_REMINDER_RETRY_LOOKBACK_MS,
   APPOINTMENT_REMINDER_WINDOW_MS,
-  buildAppointmentReminderMessage,
-  classifyDeliveryError,
   deriveReminderId,
   getAppointmentReminderWindow,
-  resolveReminderLocale,
-  shouldDisableDeviceToken,
-} from './send-appointment-reminders.js';
+} from './reminder-policy.js';
 
 describe('appointment reminder delivery', () => {
   it('builds a privacy-safe deep-link payload without appointment details', () => {

@@ -13,9 +13,11 @@ import {
 import {
   cancelAppointment as cancelAppointmentTransaction,
   parseCancelAppointmentRequest,
+} from './appointments/cancel-appointment.js';
+import {
   parseRescheduleAppointmentRequest,
   rescheduleAppointment as rescheduleAppointmentTransaction,
-} from './appointments/manage-appointments.js';
+} from './appointments/reschedule-appointment.js';
 import {
   parseRegisterDeviceTokenRequest,
   registerDeviceToken as registerDeviceTokenTransaction,
