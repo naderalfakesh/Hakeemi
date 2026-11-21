@@ -8,6 +8,7 @@ import type { Appointment } from '@/features/appointments/domain/types';
 import type { AppointmentCalendar } from '@/features/appointments/hooks/use-appointment-calendar';
 import type { Provider } from '@/features/care/domain/types';
 import { formatAppointmentReference } from '@/features/appointments/domain/reference';
+import { formatAppointmentDateTime } from '@/features/appointments/localization/format-appointment-time';
 import { formatTimeZoneName } from '@/localization/format';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
@@ -60,7 +61,9 @@ export function BookingConfirmationScreen({
               ? provider.displayName[locale]
               : strings.confirmation.confirmedProviderFallback}
           </AppText>
-          <AppText variant="bodyStrong">{formatAppointment(appointment, intlLocale)}</AppText>
+          <AppText variant="bodyStrong">
+            {formatAppointmentDateTime(appointment, intlLocale)}
+          </AppText>
           <AppText tone="secondary" variant="bodyMedium">
             {strings.confirmation.visitMeta(
               appointment.visitMode === 'video'
@@ -91,14 +94,6 @@ export function BookingConfirmationScreen({
       </ScrollView>
     </SafeAreaView>
   );
-}
-
-function formatAppointment(appointment: Appointment, locale = 'en-AE') {
-  return new Intl.DateTimeFormat(locale, {
-    dateStyle: 'full',
-    timeStyle: 'short',
-    timeZone: appointment.timezone,
-  }).format(new Date(appointment.startsAt));
 }
 
 function createStyles(theme: AppTheme) {

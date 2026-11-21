@@ -38,6 +38,10 @@ import { useAppointmentDetail } from '../hooks/use-appointment-detail';
 import { useRescheduleAppointment } from '../hooks/use-reschedule-appointment';
 import type { AppointmentRepository } from '../domain/repository';
 import type { Appointment } from '../domain/types';
+import {
+  formatAppointmentDate,
+  formatAppointmentDateTime,
+} from '../localization/format-appointment-time';
 import { appointmentDetailStrings } from '../localization/appointment-detail-strings';
 import { appointmentStatusStrings } from '../localization/appointment-status-strings';
 import { localizeAppointmentError } from '../localization/appointment-error-strings';
@@ -269,7 +273,7 @@ function AuthenticatedAppointmentDetail({
         <Surface padding="spacious" style={styles.summary} variant="brand">
           <DetailRow
             icon="calendar-outline"
-            label={formatAppointment(appointment, intlLocale)}
+            label={formatAppointmentDateTime(appointment, intlLocale)}
             tone="primary"
           />
           <DetailRow
@@ -316,7 +320,7 @@ function AuthenticatedAppointmentDetail({
           <Surface padding="compact" style={styles.notice} variant="muted">
             <DecorativeIcon color={theme.colors.warning} name="information-circle" size={20} />
             <AppText style={styles.flexText} tone="secondary" variant="bodyMedium">
-              {strings.cancelledOn(formatDate(appointment.cancelledAt, intlLocale))}
+              {strings.cancelledOn(formatAppointmentDate(appointment.cancelledAt, intlLocale))}
             </AppText>
           </Surface>
         )}
@@ -532,18 +536,6 @@ function DetailState({
       />
     </SafeAreaView>
   );
-}
-
-function formatAppointment(appointment: Appointment, locale = 'en-AE') {
-  return new Intl.DateTimeFormat(locale, {
-    dateStyle: 'full',
-    timeStyle: 'short',
-    timeZone: appointment.timezone,
-  }).format(new Date(appointment.startsAt));
-}
-
-function formatDate(value: string, locale = 'en-AE') {
-  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(new Date(value));
 }
 
 function createStyles(theme: AppTheme) {

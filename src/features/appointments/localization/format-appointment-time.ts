@@ -28,6 +28,26 @@ export function formatAppointmentTime(
   }).format(startsAt);
 }
 
+/**
+ * The visit's full date and time in the clinic's own time zone, for the
+ * screens that show a single appointment.
+ */
+export function formatAppointmentDateTime(
+  appointment: Pick<Appointment, 'startsAt' | 'timezone'>,
+  locale = 'en-AE',
+) {
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: 'full',
+    timeStyle: 'short',
+    timeZone: appointment.timezone,
+  }).format(new Date(appointment.startsAt));
+}
+
+/** A calendar date without a time, such as the day a visit was cancelled. */
+export function formatAppointmentDate(value: string, locale = 'en-AE') {
+  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(new Date(value));
+}
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /**
