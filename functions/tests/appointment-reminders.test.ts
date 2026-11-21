@@ -16,6 +16,8 @@ import { unregisterDeviceToken } from '../src/notifications/unregister-device-to
 import {
   APPOINTMENT_REMINDER_MAX_ATTEMPTS,
   deriveReminderId,
+} from '../src/notifications/reminder-policy.js';
+import {
   sendAppointmentReminders,
   type AppointmentReminderRunResult,
   type ReminderLogger,
