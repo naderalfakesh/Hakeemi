@@ -1,45 +1,20 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  View,
-  useWindowDimensions,
-  type ImageSourcePropType,
-  type NativeScrollEvent,
-  type NativeSyntheticEvent,
-  type ScrollViewInstance,
-} from 'react-native';
+import { useMemo, type ReactNode } from 'react';
+import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText, BrandMark, Button } from '@/components/ui';
 import type { AppPreferences } from '@/features/preferences/domain/preferences';
-import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
-import { useAppMotion, useAppTheme, type AppTheme, type SemanticColors } from '@/theme';
+import { useAppTheme, type AppTheme } from '@/theme';
 
 import { JourneyStep } from '../components/journey-step';
+import { OnboardingArtwork } from '../components/onboarding-artwork';
+import { OnboardingFooter } from '../components/onboarding-footer';
 import { PermissionsStep } from '../components/permissions-step';
 import { PersonalizeStep } from '../components/personalize-step';
+import { useOnboardingPager } from '../hooks/use-onboarding-pager';
 import { onboardingStrings } from '../localization/onboarding-strings';
-
-const onboardingSteps = [
-  { key: 'personalize' },
-  {
-    illustration: require('../../../../assets/illustrations/onboarding-discover.webp'),
-    key: 'journey',
-    surface: 'infoSoft',
-  },
-  {
-    illustration: require('../../../../assets/illustrations/onboarding-care.webp'),
-    key: 'permissions',
-    surface: 'successSoft',
-  },
-] as const satisfies readonly {
-  illustration?: ImageSourcePropType;
-  key: 'journey' | 'permissions' | 'personalize';
-  surface?: keyof SemanticColors;
-}[];
+import { onboardingSteps, type OnboardingStepKey } from '../onboarding-steps';
 
 type OnboardingScreenProps = {
   onComplete: () => void;
@@ -56,68 +31,25 @@ export function OnboardingScreen({
 }: OnboardingScreenProps) {
   const theme = useAppTheme();
   const strings = useStrings(onboardingStrings);
-  const { isRTL } = useAppLocale();
-  const { prefersReducedMotion } = useAppMotion();
   const { fontScale, height, width } = useWindowDimensions();
   const isCompact = height < 720;
   const isTablet = width >= 768;
   // At accessibility text sizes the Back/Next pair no longer fits side by side.
   const stackActions = fontScale >= 1.5;
-  const styles = useMemo(
-    () => createStyles(theme, { isCompact, isTablet, stackActions }),
-    [isCompact, isTablet, stackActions, theme],
-  );
-  const [activeStep, setActiveStep] = useState(0);
-  const scrollViewRef = useRef<ScrollViewInstance>(null);
-  const activeStepRef = useRef(activeStep);
+  const styles = useMemo(() => createStyles(theme, { isCompact }), [isCompact, theme]);
   const pageWidth = Math.min(width, theme.sizes.contentMaxWidth) - theme.spacing.lg * 2;
-  // The horizontal ScrollView row is already visually reversed by the native
-  // RTL layout, and getPhysicalIndex maps logical -> physical offsets for it.
-  // Reversing the step array as well would cancel that mapping out.
-  const isFirstStep = activeStep === 0;
-  const isLastStep = activeStep === onboardingSteps.length - 1;
+  const {
+    activeStep,
+    isFirstStep,
+    isLastStep,
+    scrollViewRef,
+    initialContentOffset,
+    handleMomentumScrollEnd,
+    showNextStep,
+    showPreviousStep,
+  } = useOnboardingPager({ pageWidth, stepCount: onboardingSteps.length });
 
-  const getPhysicalIndex = useCallback(
-    (logicalIndex: number) => (isRTL ? onboardingSteps.length - 1 - logicalIndex : logicalIndex),
-    [isRTL],
-  );
-  const showStep = useCallback(
-    (logicalIndex: number) => {
-      const nextIndex = Math.max(0, Math.min(onboardingSteps.length - 1, logicalIndex));
-      activeStepRef.current = nextIndex;
-      setActiveStep(nextIndex);
-      scrollViewRef.current?.scrollTo({
-        animated: !prefersReducedMotion,
-        x: getPhysicalIndex(nextIndex) * pageWidth,
-        y: 0,
-      });
-    },
-    [getPhysicalIndex, pageWidth, prefersReducedMotion],
-  );
-  const showPreviousStep = () => showStep(activeStep - 1);
-  const showNextStep = () => showStep(activeStep + 1);
-  const handleMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const physicalIndex = Math.max(
-      0,
-      Math.min(
-        onboardingSteps.length - 1,
-        Math.round(event.nativeEvent.contentOffset.x / pageWidth),
-      ),
-    );
-    const logicalIndex = isRTL ? onboardingSteps.length - 1 - physicalIndex : physicalIndex;
-    activeStepRef.current = logicalIndex;
-    setActiveStep(logicalIndex);
-  };
-
-  useEffect(() => {
-    scrollViewRef.current?.scrollTo({
-      animated: false,
-      x: getPhysicalIndex(activeStepRef.current) * pageWidth,
-      y: 0,
-    });
-  }, [getPhysicalIndex, pageWidth]);
-
-  const stepContent: Record<(typeof onboardingSteps)[number]['key'], ReactNode> = {
+  const stepContent: Record<OnboardingStepKey, ReactNode> = {
     personalize: (
       <PersonalizeStep onUpdatePreferences={onUpdatePreferences} preferences={preferences} />
     ),
@@ -146,7 +78,7 @@ export function OnboardingScreen({
 
         <ScrollView
           bounces={false}
-          contentOffset={{ x: getPhysicalIndex(0) * pageWidth, y: 0 }}
+          contentOffset={initialContentOffset}
           decelerationRate="fast"
           horizontal
           onMomentumScrollEnd={handleMomentumScrollEnd}
@@ -170,15 +102,12 @@ export function OnboardingScreen({
                 style={{ width: pageWidth }}
               >
                 {'illustration' in step && (
-                  <View
-                    accessibilityElementsHidden
-                    importantForAccessibility="no-hide-descendants"
-                    style={[styles.artworkStage, { backgroundColor: theme.colors[step.surface] }]}
-                  >
-                    <View style={styles.ambientOrb} />
-                    <View style={styles.ambientOrbSmall} />
-                    <Image resizeMode="contain" source={step.illustration} style={styles.artwork} />
-                  </View>
+                  <OnboardingArtwork
+                    illustration={step.illustration}
+                    isCompact={isCompact}
+                    isTablet={isTablet}
+                    surface={step.surface}
+                  />
                 )}
                 {stepContent[step.key]}
               </ScrollView>
@@ -186,63 +115,23 @@ export function OnboardingScreen({
           })}
         </ScrollView>
 
-        <View style={styles.footer}>
-          <View
-            accessibilityLabel={strings.stepProgress(activeStep + 1, onboardingSteps.length)}
-            accessibilityRole="text"
-            accessible
-            style={styles.progressRow}
-          >
-            <AppText tone="secondary" variant="caption">
-              {strings.stepProgress(activeStep + 1, onboardingSteps.length)}
-            </AppText>
-            <View accessibilityElementsHidden importantForAccessibility="no" style={styles.dots}>
-              {onboardingSteps.map((step, index) => (
-                <View
-                  key={step.key}
-                  style={[styles.dot, index === activeStep && styles.dotActive]}
-                />
-              ))}
-            </View>
-          </View>
-
-          {/* Every step shares one action row, so the last step's content
-              keeps the same height as the others instead of losing a row to
-              a second stacked button. */}
-          <View style={styles.navigationRow}>
-            {!isFirstStep && (
-              <View style={styles.backAction}>
-                <Button onPress={showPreviousStep} variant="secondary">
-                  {strings.back}
-                </Button>
-              </View>
-            )}
-            <View style={styles.primaryAction}>
-              {isLastStep ? (
-                <Button accessibilityLabel={strings.finishAccessibilityLabel} onPress={onComplete}>
-                  {strings.finish}
-                </Button>
-              ) : (
-                <Button accessibilityLabel={strings.nextAccessibilityLabel} onPress={showNextStep}>
-                  {strings.next}
-                </Button>
-              )}
-            </View>
-          </View>
-        </View>
+        <OnboardingFooter
+          activeStep={activeStep}
+          isCompact={isCompact}
+          isFirstStep={isFirstStep}
+          isLastStep={isLastStep}
+          onBack={showPreviousStep}
+          onComplete={onComplete}
+          onNext={showNextStep}
+          stackActions={stackActions}
+          stepKeys={onboardingSteps.map((step) => step.key)}
+        />
       </View>
     </SafeAreaView>
   );
 }
 
-function createStyles(
-  theme: AppTheme,
-  {
-    isCompact,
-    isTablet,
-    stackActions,
-  }: { isCompact: boolean; isTablet: boolean; stackActions: boolean },
-) {
+function createStyles(theme: AppTheme, { isCompact }: { isCompact: boolean }) {
   return StyleSheet.create({
     safeArea: {
       backgroundColor: theme.colors.canvas,
@@ -274,72 +163,6 @@ function createStyles(
       justifyContent: 'center',
       paddingBottom: isCompact ? theme.spacing.sm : theme.spacing.lg,
       paddingTop: isCompact ? theme.spacing.sm : theme.spacing.md,
-    },
-    artworkStage: {
-      alignItems: 'center',
-      borderRadius: theme.radii.xl,
-      height: isCompact ? 176 : isTablet ? 320 : 240,
-      justifyContent: 'center',
-      overflow: 'hidden',
-      width: '100%',
-    },
-    ambientOrb: {
-      backgroundColor: theme.colors.brandSoft,
-      borderRadius: theme.radii.full,
-      end: isTablet ? -72 : -52,
-      height: isTablet ? 230 : 170,
-      opacity: 0.72,
-      position: 'absolute',
-      top: isTablet ? -90 : -62,
-      width: isTablet ? 230 : 170,
-    },
-    ambientOrbSmall: {
-      backgroundColor: theme.colors.surfaceRaised,
-      borderRadius: theme.radii.full,
-      bottom: isTablet ? -54 : -38,
-      height: isTablet ? 140 : 104,
-      opacity: 0.46,
-      position: 'absolute',
-      start: isTablet ? -38 : -28,
-      width: isTablet ? 140 : 104,
-    },
-    artwork: {
-      height: '90%',
-      width: '88%',
-    },
-    footer: {
-      gap: isCompact ? theme.spacing.xxs : theme.spacing.xs,
-      paddingBottom: theme.spacing.xs,
-    },
-    progressRow: {
-      alignItems: 'center',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      minHeight: theme.sizes.minimumTouchTarget,
-    },
-    dots: {
-      flexDirection: 'row',
-      gap: theme.spacing.xs,
-    },
-    dot: {
-      backgroundColor: theme.colors.borderStrong,
-      borderRadius: theme.radii.full,
-      height: 7,
-      width: 7,
-    },
-    dotActive: {
-      backgroundColor: theme.colors.brand,
-      width: 24,
-    },
-    navigationRow: {
-      flexDirection: stackActions ? 'column-reverse' : 'row',
-      gap: stackActions ? theme.spacing.xs : theme.spacing.sm,
-    },
-    backAction: {
-      flex: stackActions ? 0 : 1,
-    },
-    primaryAction: {
-      flex: stackActions ? 0 : 2,
     },
   });
 }
