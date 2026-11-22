@@ -1,117 +1,106 @@
 # Hakeemi
 
-**A production-shaped React Native appointment experience, rebuilt from a 2021 portfolio app with modern Expo and Firebase architecture.**
+**A mobile app for finding a clinician and booking a visit — in English or Arabic, in light or dark mode, on iPhone and Android.**
 
-> Hakeemi is a technical portfolio project. It uses fictional clinicians and
-> patient data and is not a healthcare service or clinical product.
+Hakeemi is a portfolio project by [Nadir Alfakesh](https://naderalfakesh.com):
+one person taking a product from design to a tested, working app. Every
+clinician and appointment in it is fictional; it is not a healthcare service.
 
 <p align="center">
-  <img src="docs/hakeemi-loop.gif" alt="Animated tour: finding a clinician, booking against real availability, switching to Arabic RTL, and flipping to dark mode" width="760" />
+  <img src="docs/hakeemi-loop.gif" alt="Animated tour: finding a clinician, picking a time, confirming a booking, switching to Arabic, and switching to dark mode" width="760" />
 </p>
 
 <p align="center">
-  <a href="docs/hakeemi-promo.mp4"><strong>▶ Watch the full 70-second promo with sound</strong></a>
-  · built with <a href="video/">Remotion</a> from real simulator captures
+  <a href="docs/hakeemi-promo.mp4"><strong>▶ Watch the 80-second walkthrough with sound</strong></a>
 </p>
 
-| Illustrated welcome                                                                                                                      | Discovery with portraits                                                                                                                 | Provider profile                                                                                                                                  |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| <img src="docs/images/welcome-illustrated-native.png" alt="Signed-out Welcome screen with account and demo entry choices" width="260" /> | <img src="docs/images/find-care-illustrated-native.png" alt="Find Care with illustrated doctor portraits on tinted tiles" width="260" /> | <img src="docs/images/provider-detail-illustrated-native.png" alt="Provider profile with a large ringed portrait and availability" width="260" /> |
+## At a glance
 
-| Arabic RTL discovery                                                                                                                     | Dark mode, Arabic                                                                                       | Account preferences                                                                                                                     |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| <img src="docs/images/find-care-arabic-rtl-native.png" alt="Find Care fully localized in Arabic with mirrored RTL layout" width="260" /> | <img src="docs/images/home-arabic-dark-native.png" alt="Home screen in Arabic dark mode" width="260" /> | <img src="docs/images/profile-preferences-dark.png" alt="Profile screen with saved clinicians and dark-mode preferences" width="260" /> |
+- **A complete product, not a screen mock-up.** Sign-up, search, booking,
+  rescheduling, cancelling, reminders and settings all work end to end.
+- **Try it in seconds.** "Explore the demo" opens the full app without an
+  account.
+- **Truly bilingual.** One tap switches the whole app to Arabic, and every
+  screen mirrors for right-to-left reading.
+- **Built to be relied on.** Two people can never book the same time, the app
+  keeps working on a poor connection, and it supports large text and screen-reader
+  labels.
+- **Tested like production software.** More than 250 automated tests run on
+  every change.
+- **One codebase, two platforms.** The same React Native code ships to iOS and
+  Android.
 
-## The rebuild
+## Screens
 
-The original Hakeemi was a bare React Native 0.64 app from 2021, preserved
-under the [`legacy-v1`](https://github.com/naderalfakesh/Hakeemi/tree/legacy-v1)
-tag. The rebuild replaces it with Expo SDK 58, React Native 0.88, React 19.3,
-TypeScript, Expo Router, and native React Native Firebase — not an Expo Go
-prototype, but development builds with Continuous Native Generation and EAS
-profiles ([ADR 0001](docs/adr/0001-expo-cng.md)). The work landed as small,
-independently reviewable commits; the [roadmap](docs/ROADMAP.md) records the
-sequence and current position.
+| Welcome                                                                                                              | Home                                                                                                                | Real availability                                                                                                              |
+| -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| <img src="docs/images/readme/welcome.png" alt="Welcome screen with a demo button and account options" width="250" /> | <img src="docs/images/readme/home.png" alt="Home screen with the next visit and featured clinicians" width="250" /> | <img src="docs/images/readme/clinician.png" alt="Clinician profile with a two-week calendar of available times" width="250" /> |
 
-## Features
+| Booking confirmed                                                                                                            | Arabic, right to left                                                                                                                   | Arabic in dark mode                                                                                               |
+| ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| <img src="docs/images/readme/confirmed.png" alt="Appointment confirmed screen with an add-to-calendar button" width="250" /> | <img src="docs/images/readme/arabic-find-care.png" alt="Clinician search in Arabic with a mirrored right-to-left layout" width="250" /> | <img src="docs/images/readme/arabic-dark-home.png" alt="Home screen in Arabic with the dark theme" width="250" /> |
 
-- Original H-pulse identity across icon, adaptive icon, splash and in-app
-  mark, with a splash-to-first-frame hand-off that holds until the session
-  has restored
-- Three-step first run (language and appearance, how booking works,
-  permissions only in context) with RTL and reduced-motion support, a
-  signed-out Welcome entry, and typed four-tab Expo Router navigation
-- Provider discovery backed by Firestore: search, specialty filters, cursor
-  pagination, and a two-week availability calendar
-- Email/password accounts with verification, password recovery, and cold-start
-  session restoration; profiles are server-owned and created by an idempotent
-  callable Function
-- Transactional booking plus atomic cancellation and rescheduling through
-  Cloud Functions that prevent double-booking and keep all lifecycle writes
-  server-controlled
-- Account-free Explore Demo with seeded appointments in an isolated on-device
-  repository
-- Calendar export, opt-in privacy-safe appointment reminders over FCM, and
-  restrained haptics — each behind a platform adapter with deterministic
-  web/Jest fixtures
-- Saved clinicians and synchronized language/theme preferences with optimistic
-  updates and rollback
-- Full Arabic localization: typed bilingual string catalogs, bilingual provider
-  data, CLDR plural rules, native RTL layout with mirrored navigation,
-  offline-aware cached reads, Dynamic Type up to 2×, and 44 pt touch targets
+## What you can do in it
 
-Spoken VoiceOver/TalkBack passes, Android-hardware E2E, and the native
-permission dialogs remain for interactive release sign-off.
+- **Find care** — search clinicians by name, specialty or language, and
+  filter by specialty.
+- **See real availability** — each clinician shows the next two weeks of
+  open times.
+- **Book in two steps** — pick a time, review, confirm. The time is only
+  reserved once the server confirms it.
+- **Change your plans** — reschedule to another open time or cancel with a
+  single clear confirmation.
+- **Stay organised** — add a visit to your calendar and opt in to reminders.
+- **Make it yours** — English or Arabic, light or dark, and a shortlist of
+  saved clinicians that follows your account.
 
-## Architecture
+## How it is built
+
+For engineers: the short version of what is under the hood.
+
+| Area       | Choice                                                                        |
+| ---------- | ----------------------------------------------------------------------------- |
+| App        | React Native 0.88, React 19, Expo SDK 58, TypeScript (strict)                 |
+| Navigation | Expo Router with typed routes and native tabs                                 |
+| Backend    | Firebase Auth, Firestore, Cloud Functions, Security Rules, Cloud Messaging    |
+| Data       | TanStack Query for server state, Zod validation at the Firestore boundary     |
+| Forms      | React Hook Form with Zod schemas                                              |
+| Quality    | Jest, React Native Testing Library, Firebase Emulator Suite, ESLint, Prettier |
+| Build      | Expo development builds with Continuous Native Generation and EAS profiles    |
 
 ```mermaid
 flowchart LR
-    Routes["Expo Router screens"] --> Features["Feature hooks and contexts"]
-    Features --> Query["TanStack Query and typed repositories"]
+    Screens["Expo Router screens"] --> Features["Feature hooks and contexts"]
+    Features --> Query["TanStack Query + typed repositories"]
     Query --> Native["Native adapters: React Native Firebase"]
-    Query --> Portable["Web and Jest fixture adapters"]
-    Native --> Cloud["Firebase development project"]
-    Native --> Emulator["Firebase Emulator Suite"]
-    Cloud --> Data["Auth, Firestore, indexes and rules"]
-    Emulator --> Functions["Callable profile and appointment Functions"]
+    Query --> Fixtures["Web and Jest fixture adapters"]
+    Native --> Firebase["Auth · Firestore · Cloud Functions"]
 ```
 
-Feature code owns domain types and behavior; platform adapters own SDK details.
-Zod validates Firestore data at the boundary, TanStack Query owns server state,
-and one application-level session owner handles authentication. The backend is
-the isolated `hakeemi-portfolio-dev` project; Cloud Functions and Storage stay
-emulator-only until enabling billing is an explicit decision.
+Decisions worth a look:
 
-## Technology
+- **No double-booking.** Booking, rescheduling and cancelling run in Cloud
+  Functions as Firestore transactions; clients can never write appointment
+  state directly ([ADR 0003](docs/adr/0003-transactional-booking.md)).
+- **Features own their code.** Each feature folder holds its UI, domain
+  types, data access and tests. Platform SDKs sit behind adapters, so the same
+  feature code runs on device, on the web and in Jest.
+- **Right-to-left is native, not simulated.** Typed bilingual string
+  catalogues, bilingual clinician data, CLDR plural rules and mirrored
+  layouts; the theme choice also drives the system status bar and tab bar.
+- **Offline-aware.** Cached reads keep the app useful without a connection
+  ([ADR 0004](docs/adr/0004-offline-aware-caching.md)).
+- **Accessible by default.** Dynamic Type up to 2×, 44 pt touch targets,
+  screen-reader labels, reduced-motion support and contrast checks in the
+  test suite.
 
-| Area                 | Choice                                                                                                      |
-| -------------------- | ----------------------------------------------------------------------------------------------------------- |
-| Runtime              | Expo SDK 58, React Native 0.88, React 19.3, New Architecture                                                |
-| Navigation           | Expo Router with typed routes and static web export                                                         |
-| Native services      | React Native Firebase App, Auth, Firestore, Functions, Messaging; Expo Calendar, Notifications, and Haptics |
-| Server state         | TanStack Query with stable keys, retries, caching, and cursor pages                                         |
-| Forms and validation | React Hook Form and Zod                                                                                     |
-| Backend              | Firebase Auth, Firestore, Cloud Functions, Security Rules, Emulator Suite                                   |
-| Quality              | Strict TypeScript, Jest, React Native Testing Library, ESLint, Prettier, Expo Doctor                        |
-| Native lifecycle     | Expo CNG, config plugins, development builds, and EAS profiles                                              |
-
-## Quality
-
-CI runs `npm run validate` — formatting, lint, strict types, 51 Jest suites
-with 236 tests (including Arabic-locale renders), 19 Functions unit tests,
-CI-enforced illustration budgets, and Expo Doctor — plus the Firebase emulator
-matrix: 14 security-rules tests and callable integration suites for booking,
-appointment management, notification tokens, and scheduled reminders. Native
-evidence includes iOS and iPad development builds, an iOS Release simulator
-build, an Android arm64 APK, and the static web export.
-An Android release APK was also run on a Pixel 9
-([device notes](docs/device-pixel9-android.md)); iPhone testing is deferred.
-The [testing strategy](docs/testing-strategy.md), per-phase verification
-records, and the privacy-safe [analytics contract](docs/analytics-events.md)
-live under [`docs/`](docs/).
-
-## Project structure
+**Tests:** `npm run validate` runs formatting, lint, strict type checks, 52
+Jest suites with 245 tests, the Cloud Functions unit tests and Expo Doctor.
+Firestore security rules and the booking, appointment-management, reminder
+and notification-token Functions are tested against the Firebase Emulator
+Suite, and CI runs all of it on every push. More in the
+[testing strategy](docs/testing-strategy.md), the
+[roadmap](docs/ROADMAP.md) and the [architecture decisions](docs/adr/).
 
 ```text
 src/app/                 Expo Router routes
@@ -120,85 +109,69 @@ src/features/            Feature-owned UI, domain, data, and tests
 src/services/            Firebase initialization and query infrastructure
 src/theme/               Tokens, themes, navigation theme, contrast checks
 firebase/                Rules, indexes, seed catalogue, integration tests
-functions/src/           TypeScript callable backend and seed tooling
+functions/src/           TypeScript Cloud Functions and seed tooling
 docs/                    Roadmap, ADRs, verification evidence, backend guide
 ```
 
-## Run locally
+## Run it locally
 
-Local development runs entirely against the Firebase Emulator Suite —
-**no Firebase account, project, or credentials are required**. Native builds
-fall back to committed emulator-only placeholder Google service files when no
-real configuration is present.
-
-Prerequisites: Node.js 22.13+ (below 25), npm, a Java runtime (JDK 17+) for
-the emulators, Xcode 27 with the iOS 27 SDK and CocoaPods for iOS, and Android
-Studio with an SDK and a JDK 17 to 21 for Android (the Android Gradle Plugin's
-CMake step aborts on the native-access warning that JDK 24+ prints, so point
-`JAVA_HOME` at an older JDK rather than a JBR 25). The iOS 27 SDK only launches apps that
-use the UIKit scene lifecycle, which SDK 58 generates by default; a local config
-plugin configures Firebase in the generated AppDelegate, so no native edits are
-needed.
+Everything runs against the Firebase Emulator Suite, so **no Firebase account
+or credentials are needed**.
 
 ```sh
 npm install
 npm --prefix functions install
 cp .env.example .env
-npm run validate
-```
 
-Start the local Firebase backend in one terminal and keep it running:
-
-```sh
+# Terminal 1: local Firebase backend, seeded with the fictional catalogue
 npm run firebase:emulators:seeded
-```
 
-A fresh clone starts clean and is seeded with the fictional catalogue
-automatically; emulator state is exported on exit and reused, with appointment
-dates rolled forward to today, on later runs.
-
-Then build and run the app:
-
-```sh
+# Terminal 2: build and run the app
 npx expo prebuild --clean
-npm run ios
-# or
-npm run android
+npm run ios        # or: npm run android
 ```
 
-`.env.example` enables emulator mode, so accounts, discovery, booking, and
+<details>
+<summary>Prerequisites, environment notes and commands</summary>
+
+- Node.js 22.13+ (below 25) and npm.
+- A Java runtime (JDK 17+) for the emulators.
+- iOS: Xcode 27 with the iOS 27 SDK and CocoaPods.
+- Android: Android Studio with an SDK and a JDK 17 to 21. Point `JAVA_HOME`
+  at one of those rather than a newer JDK; the Android Gradle Plugin's CMake
+  step aborts on the native-access warning that JDK 24+ prints.
+- Expo Go is not supported; the app uses development builds.
+
+`.env.example` enables emulator mode, so accounts, discovery, booking and
 appointment management all work locally; only push-notification registration
-needs a real Firebase project. Development bundles fall back to the same
-emulator settings when no `.env` exists, while release bundles (preview and
-production) have no defaults and stop at startup if a public variable is
-missing or emulator mode is requested, so a release build can never reach the
-emulators. Expo Go is not a supported runtime. To target
-your own Firebase project instead, drop its service files under
-`.firebase/development/` and rebuild — the
-[Firebase development guide](docs/firebase-development.md) covers the
-resolution order, emulator namespaces, service ports, and deployment
-safeguards.
+needs a real Firebase project. Release bundles (preview and production) have
+no defaults and stop at startup if a variable is missing or emulator mode is
+requested, so a release build can never reach the emulators. To use your own
+Firebase project, put its service files under `.firebase/development/` and
+rebuild; the [Firebase development guide](docs/firebase-development.md) has
+the details.
 
 | Command                           | Purpose                                                    |
 | --------------------------------- | ---------------------------------------------------------- |
 | `npm start`                       | Start Metro for the Expo development client                |
 | `npm run ios` / `npm run android` | Generate and run a native build                            |
-| `npm run web`                     | Run the static-compatible web portfolio build              |
+| `npm run web`                     | Run the web build                                          |
 | `npm test`                        | Run application tests                                      |
 | `npm run firebase:rules:test`     | Verify Firestore and Storage authorization                 |
 | `npm run validate`                | Run formatting, lint, strict types, tests, and Expo Doctor |
 
-## Historical context
+</details>
 
-The 2021 app was based on a free
-[Doctor Appointment App Community design](https://www.figma.com/file/t9IGYhQmBToThHPtxJUuz5/Doctor-Appointment-App-Community?node-id=0%3A1);
-its visual assets are reference-only because no license was retained. The
-modern interface and screenshots are newly implemented, and the
-[legacy baseline](docs/legacy-baseline.md) records provenance and the original
-architecture audit.
+## Background
 
-## Contributing and license
+Hakeemi began in 2021 as a bare React Native 0.64 app, preserved under the
+[`legacy-v1`](https://github.com/naderalfakesh/Hakeemi/tree/legacy-v1) tag.
+This version is a full rebuild on a modern stack with a new interface and
+original illustrations. The 2021 app followed a free
+[Figma community design](https://www.figma.com/file/t9IGYhQmBToThHPtxJUuz5/Doctor-Appointment-App-Community?node-id=0%3A1),
+which is kept as a reference only; the [legacy baseline](docs/legacy-baseline.md)
+records the original audit.
 
-Contributions follow [CONTRIBUTING.md](CONTRIBUTING.md) — fictional data only,
-single-line conventional commits, and `npm run validate` before review. The
-code is available under the [MIT License](LICENSE).
+## License
+
+[MIT](LICENSE). Contributions follow [CONTRIBUTING.md](CONTRIBUTING.md).
