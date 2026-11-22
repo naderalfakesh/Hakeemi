@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react-native';
-import { Text } from 'react-native';
+import { Appearance, Text } from 'react-native';
 
 import { AppThemeProvider, useAppTheme } from './theme-provider';
 
@@ -27,5 +27,25 @@ describe('AppThemeProvider', () => {
     );
 
     expect(view.getByText('light')).toBeOnTheScreen();
+  });
+
+  it('applies an explicit preference to the native appearance and releases it for system', async () => {
+    const setColorScheme = jest.spyOn(Appearance, 'setColorScheme').mockImplementation(() => {});
+
+    const view = await render(
+      <AppThemeProvider preference="dark">
+        <ThemeProbe />
+      </AppThemeProvider>,
+    );
+    expect(setColorScheme).toHaveBeenLastCalledWith('dark');
+
+    await view.rerender(
+      <AppThemeProvider preference="system">
+        <ThemeProbe />
+      </AppThemeProvider>,
+    );
+    expect(setColorScheme).toHaveBeenLastCalledWith('auto');
+
+    setColorScheme.mockRestore();
   });
 });

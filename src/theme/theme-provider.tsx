@@ -1,5 +1,5 @@
-import { createContext, useContext, type ReactNode } from 'react';
-import { useColorScheme, type ColorSchemeName } from 'react-native';
+import { createContext, useContext, useEffect, type ReactNode } from 'react';
+import { Appearance, useColorScheme, type ColorSchemeName } from 'react-native';
 
 import { getTheme, type AppTheme, type ThemePreference } from './themes';
 
@@ -17,6 +17,13 @@ export function AppThemeProvider({
   preference = 'system',
 }: AppThemeProviderProps) {
   const systemColorScheme = useColorScheme();
+
+  // The system draws the status bar, tab bar glass, keyboard and alerts from
+  // the native appearance, so an in-app Light or Dark choice has to override
+  // it too. 'auto' hands control back to the device setting.
+  useEffect(() => {
+    Appearance.setColorScheme(preference === 'system' ? 'auto' : preference);
+  }, [preference]);
   const preferredColorScheme = preference === 'system' ? systemColorScheme : preference;
   const theme = getTheme((colorScheme ?? preferredColorScheme) === 'dark' ? 'dark' : 'light');
 

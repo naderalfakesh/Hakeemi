@@ -89,6 +89,9 @@ function Navigation() {
         screenOptions={{
           animation: prefersReducedMotion ? 'none' : 'default',
           headerShown: false,
+          // iOS takes the status bar style from the screen's view controller,
+          // so the <StatusBar> below only reaches Android.
+          statusBarStyle: theme.mode === 'dark' ? 'light' : 'dark',
         }}
       >
         {/* Onboarding and Welcome only exist for someone who is not signed in
