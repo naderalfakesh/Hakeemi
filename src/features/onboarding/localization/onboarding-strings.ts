@@ -1,10 +1,6 @@
 import type { LocalizedStrings } from '@/localization/use-strings';
 
 const en = {
-  appearance: 'Appearance',
-  appearanceDark: 'Dark',
-  appearanceLight: 'Light',
-  appearanceSystem: 'Use device',
   back: 'Back',
   brandWordmark: 'Hakeemi',
   finish: 'Continue',
@@ -15,10 +11,6 @@ const en = {
   journeyCompare: 'See each clinician’s availability at a glance.',
   journeyFind: 'Search clinicians by specialty or language.',
   journeyTitle: 'Find, compare, book.',
-  language: 'Language',
-  languageArabic: 'العربية',
-  languageEnglish: 'English',
-  languageReloadNote: 'Switching language reloads the app to apply the layout direction.',
   next: 'Next',
   nextAccessibilityLabel: 'Show the next onboarding page',
   permissionsBody: 'Nothing is requested during setup.',
@@ -35,10 +27,6 @@ const en = {
 
 export const onboardingStrings: LocalizedStrings<typeof en> = {
   ar: {
-    appearance: 'المظهر',
-    appearanceDark: 'داكن',
-    appearanceLight: 'فاتح',
-    appearanceSystem: 'حسب الجهاز',
     back: 'رجوع',
     brandWordmark: 'Hakeemi',
     finish: 'متابعة',
@@ -49,10 +37,6 @@ export const onboardingStrings: LocalizedStrings<typeof en> = {
     journeyCompare: 'اطّلع على المواعيد المتاحة لكل طبيب بنظرة واحدة.',
     journeyFind: 'ابحث عن الأطباء حسب التخصص أو اللغة.',
     journeyTitle: 'ابحث، قارن، احجز.',
-    language: 'اللغة',
-    languageArabic: 'العربية',
-    languageEnglish: 'English',
-    languageReloadNote: 'عند تغيير اللغة يُعاد تشغيل التطبيق لتطبيق اتجاه الواجهة.',
     next: 'التالي',
     nextAccessibilityLabel: 'اعرض صفحة التعريف التالية',
     permissionsBody: 'لا يُطلب أي إذن أثناء الإعداد.',

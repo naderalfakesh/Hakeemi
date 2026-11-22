@@ -3,15 +3,14 @@ import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText, BrandMark, Button } from '@/components/ui';
-import type { AppPreferences } from '@/features/preferences/domain/preferences';
 import { useStrings } from '@/localization/use-strings';
 import { useAppTheme, type AppTheme } from '@/theme';
 
+import { IntroStep } from '../components/intro-step';
 import { JourneyStep } from '../components/journey-step';
 import { OnboardingArtwork } from '../components/onboarding-artwork';
 import { OnboardingFooter } from '../components/onboarding-footer';
 import { PermissionsStep } from '../components/permissions-step';
-import { PersonalizeStep } from '../components/personalize-step';
 import { useOnboardingPager } from '../hooks/use-onboarding-pager';
 import { onboardingStrings } from '../localization/onboarding-strings';
 import { onboardingSteps, type OnboardingStepKey } from '../onboarding-steps';
@@ -19,16 +18,9 @@ import { onboardingSteps, type OnboardingStepKey } from '../onboarding-steps';
 type OnboardingScreenProps = {
   onComplete: () => void;
   onSkip: () => void;
-  onUpdatePreferences: (preferences: AppPreferences) => void;
-  preferences: AppPreferences;
 };
 
-export function OnboardingScreen({
-  onComplete,
-  onSkip,
-  onUpdatePreferences,
-  preferences,
-}: OnboardingScreenProps) {
+export function OnboardingScreen({ onComplete, onSkip }: OnboardingScreenProps) {
   const theme = useAppTheme();
   const strings = useStrings(onboardingStrings);
   const { fontScale, height, width } = useWindowDimensions();
@@ -37,7 +29,9 @@ export function OnboardingScreen({
   // At accessibility text sizes the Back/Next pair no longer fits side by side.
   const stackActions = fontScale >= 1.5;
   const styles = useMemo(() => createStyles(theme, { isCompact }), [isCompact, theme]);
-  const pageWidth = Math.min(width, theme.sizes.contentMaxWidth) - theme.spacing.lg * 2;
+  // Pages span the full content column and carry their own side padding, so
+  // a swipe moves each page edge to edge with a gutter between neighbours.
+  const pageWidth = Math.min(width, theme.sizes.contentMaxWidth);
   const {
     activeStep,
     isFirstStep,
@@ -50,9 +44,7 @@ export function OnboardingScreen({
   } = useOnboardingPager({ pageWidth, stepCount: onboardingSteps.length });
 
   const stepContent: Record<OnboardingStepKey, ReactNode> = {
-    personalize: (
-      <PersonalizeStep onUpdatePreferences={onUpdatePreferences} preferences={preferences} />
-    ),
+    intro: <IntroStep />,
     journey: <JourneyStep />,
     permissions: <PermissionsStep />,
   };
@@ -63,17 +55,22 @@ export function OnboardingScreen({
         <View style={styles.brandRow}>
           <BrandMark />
           <AppText variant="titleSmall">{strings.brandWordmark}</AppText>
-          {!isLastStep && (
-            <View style={styles.skipAction}>
-              <Button
-                accessibilityLabel={strings.skipAccessibilityLabel}
-                onPress={onSkip}
-                variant="tertiary"
-              >
-                {strings.skip}
-              </Button>
-            </View>
-          )}
+          {/* Stays mounted on the last step so the header keeps its height
+              and the brand row does not shift when Skip goes away. */}
+          <View
+            accessibilityElementsHidden={isLastStep}
+            importantForAccessibility={isLastStep ? 'no-hide-descendants' : 'auto'}
+            pointerEvents={isLastStep ? 'none' : 'auto'}
+            style={[styles.skipAction, isLastStep && styles.skipActionHidden]}
+          >
+            <Button
+              accessibilityLabel={strings.skipAccessibilityLabel}
+              onPress={onSkip}
+              variant="tertiary"
+            >
+              {strings.skip}
+            </Button>
+          </View>
         </View>
 
         <ScrollView
@@ -101,14 +98,12 @@ export function OnboardingScreen({
                 showsVerticalScrollIndicator={false}
                 style={{ width: pageWidth }}
               >
-                {'illustration' in step && (
-                  <OnboardingArtwork
-                    illustration={step.illustration}
-                    isCompact={isCompact}
-                    isTablet={isTablet}
-                    surface={step.surface}
-                  />
-                )}
+                <OnboardingArtwork
+                  illustration={step.illustration}
+                  isCompact={isCompact}
+                  isTablet={isTablet}
+                  surface={step.surface}
+                />
                 {stepContent[step.key]}
               </ScrollView>
             );
@@ -141,10 +136,10 @@ function createStyles(theme: AppTheme, { isCompact }: { isCompact: boolean }) {
       alignSelf: 'center',
       flex: 1,
       maxWidth: theme.sizes.contentMaxWidth,
-      paddingHorizontal: theme.spacing.lg,
       width: '100%',
     },
     brandRow: {
+      marginHorizontal: theme.spacing.lg,
       alignItems: 'center',
       flexDirection: 'row',
       gap: theme.spacing.sm,
@@ -154,13 +149,16 @@ function createStyles(theme: AppTheme, { isCompact }: { isCompact: boolean }) {
     skipAction: {
       marginStart: 'auto',
     },
+    skipActionHidden: {
+      opacity: 0,
+    },
     stepViewport: {
       flex: 1,
     },
     stepContent: {
       flexGrow: 1,
       gap: isCompact ? theme.spacing.md : theme.spacing.lg,
-      justifyContent: 'center',
+      paddingHorizontal: theme.spacing.lg,
       paddingBottom: isCompact ? theme.spacing.sm : theme.spacing.lg,
       paddingTop: isCompact ? theme.spacing.sm : theme.spacing.md,
     },

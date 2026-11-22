@@ -91,6 +91,7 @@ function createStyles(
     footer: {
       gap: isCompact ? theme.spacing.xxs : theme.spacing.xs,
       paddingBottom: theme.spacing.xs,
+      paddingHorizontal: theme.spacing.lg,
     },
     progressRow: {
       alignItems: 'center',

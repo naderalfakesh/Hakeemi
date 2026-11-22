@@ -4,12 +4,17 @@ import { Pressable, Text } from 'react-native';
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { TestAppProviders } from '@/test/test-app-providers';
 
+import { getDevicePreferences } from '../data/device-preferences';
 import { readAppPreferences, writeAppPreferences } from '../data/firebase-preferences';
 import { readLocalPreferences, writeLocalPreferences } from '../data/local-preferences';
 import { AppPreferencesProvider, useAppPreferences } from './app-preferences-provider';
 
 jest.mock('@/features/auth/context/auth-session-provider', () => ({
   useAuthSession: jest.fn(),
+}));
+
+jest.mock('../data/device-preferences', () => ({
+  getDevicePreferences: jest.fn(),
 }));
 
 jest.mock('../data/firebase-preferences', () => ({
@@ -23,6 +28,7 @@ jest.mock('../data/local-preferences', () => ({
 }));
 
 const mockedUseAuthSession = jest.mocked(useAuthSession);
+const mockedGetDevicePreferences = jest.mocked(getDevicePreferences);
 const mockedReadAppPreferences = jest.mocked(readAppPreferences);
 const mockedWriteAppPreferences = jest.mocked(writeAppPreferences);
 const mockedReadLocalPreferences = jest.mocked(readLocalPreferences);
@@ -71,6 +77,7 @@ describe('AppPreferencesProvider', () => {
         id: 'demo-user',
       },
     });
+    mockedGetDevicePreferences.mockReturnValue({ locale: 'en', theme: 'system' });
     mockedReadAppPreferences.mockResolvedValue({ locale: 'ar', theme: 'light' });
     mockedWriteAppPreferences.mockResolvedValue(undefined);
     mockedReadLocalPreferences.mockResolvedValue(null);
@@ -121,6 +128,32 @@ describe('AppPreferencesProvider', () => {
     await waitFor(() => expect(view.getByText('ready:en:dark')).toBeOnTheScreen());
     expect(mockedWriteLocalPreferences).toHaveBeenCalledWith({ locale: 'en', theme: 'dark' });
     expect(mockedWriteAppPreferences).not.toHaveBeenCalled();
+  });
+
+  it('follows the device language until a guest chooses one', async () => {
+    mockedUseAuthSession.mockReturnValue({
+      enterDemo: jest.fn(),
+      profile: null,
+      profileError: null,
+      profileStatus: 'idle',
+      refreshSession: jest.fn(),
+      retryProfile: jest.fn(),
+      signOut: jest.fn(),
+      status: 'anonymous',
+      user: null,
+    });
+    mockedGetDevicePreferences.mockReturnValue({ locale: 'ar', theme: 'system' });
+
+    const view = await render(
+      <TestAppProviders>
+        <AppPreferencesProvider>
+          <PreferencesProbe />
+        </AppPreferencesProvider>
+      </TestAppProviders>,
+    );
+
+    await waitFor(() => expect(view.getByText('ready:ar:system')).toBeOnTheScreen());
+    expect(mockedWriteLocalPreferences).not.toHaveBeenCalled();
   });
 
   it('rolls back an optimistic preference when Firestore rejects the write', async () => {

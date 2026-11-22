@@ -3,13 +3,10 @@ import { createContext, useCallback, useContext, useMemo, type ReactNode } from 
 
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 
+import { getDevicePreferences } from '../data/device-preferences';
 import { readAppPreferences, writeAppPreferences } from '../data/firebase-preferences';
 import { readLocalPreferences, writeLocalPreferences } from '../data/local-preferences';
-import {
-  appPreferencesSchema,
-  defaultAppPreferences,
-  type AppPreferences,
-} from '../domain/preferences';
+import { appPreferencesSchema, type AppPreferences } from '../domain/preferences';
 
 export type PreferencesStatus = 'error' | 'idle' | 'loading' | 'ready' | 'saving';
 
@@ -31,6 +28,8 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
   const session = useAuthSession();
   const queryClient = useQueryClient();
   const userId = session.user?.id ?? null;
+  // Until someone picks a language or appearance, the app follows the device.
+  const devicePreferences = useMemo(() => getDevicePreferences(), []);
   const profilePreferences = useMemo(
     () =>
       session.profile
@@ -38,8 +37,8 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
             locale: session.profile.locale,
             theme: session.profile.theme,
           })
-        : defaultAppPreferences,
-    [session.profile],
+        : devicePreferences,
+    [devicePreferences, session.profile],
   );
   const queryKey = preferencesQueryKey(userId ?? 'anonymous');
   const preferencesQuery = useQuery({
@@ -49,7 +48,7 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
     queryFn: async () =>
       userId
         ? ((await readAppPreferences()) ?? profilePreferences)
-        : ((await readLocalPreferences()) ?? defaultAppPreferences),
+        : ((await readLocalPreferences()) ?? devicePreferences),
   });
   const preferences = preferencesQuery.data ?? profilePreferences;
   const updateMutation = useMutation({

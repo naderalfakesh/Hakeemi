@@ -65,6 +65,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   plugins: [
     'expo-dev-client',
     'expo-router',
+    // Declares the app's languages to the system, so the per-app language
+    // setting on iOS and Android offers exactly the locales Hakeemi ships.
+    ['expo-localization', { supportedLocales: ['en', 'ar'] }],
     '@react-native-firebase/app',
     '@react-native-firebase/auth',
     [
