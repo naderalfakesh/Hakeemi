@@ -21,7 +21,6 @@ export function resolveStoredCalendarState(
   const next =
     followUp === 'keep' ? 'added' : followUp === 'move' ? 'stale' : ('notRemoved' as const);
 
-  // Keep "moved" once the refetched visit catches up with the event.
   return next === 'added' && previous.status === 'moved'
     ? previous
     : { calendar: link.calendar, status: next };
@@ -30,7 +29,6 @@ export function resolveStoredCalendarState(
 export function resolveMissingCalendarLinkState(
   previous: AppointmentCalendarState,
 ): AppointmentCalendarState {
-  // A finished follow-up already reported what happened to the event.
   return previous.status === 'removed' || previous.status === 'outdated'
     ? previous
     : { status: 'idle' };
@@ -49,8 +47,6 @@ export async function syncRescheduledCalendarEvent(
   ).catch(() => null);
 
   if (result?.status === 'done') {
-    // If this write fails the link keeps the old time, which only shows the
-    // (idempotent) move button again; it never adds a second event.
     await storage
       .write(owner, appointmentId, { ...link, startsAt: time.startsAt })
       .catch(() => undefined);
@@ -58,8 +54,6 @@ export async function syncRescheduledCalendarEvent(
   }
 
   if (result === null || result.status === 'denied') {
-    // The event still exists; keeping the link lets the user retry the move
-    // instead of adding a second event.
     return { calendar: link.calendar, status: 'stale' };
   }
 
@@ -79,7 +73,6 @@ export async function syncCancelledCalendarEvent(
   }).catch(() => null);
 
   if (result === null || result.status === 'denied') {
-    // Keep the link so the user can retry once access is back.
     return { calendar: link.calendar, status: 'notRemoved' };
   }
 
@@ -107,8 +100,6 @@ export async function addAndLinkCalendarEvent(
     eventId: result.eventId,
     startsAt: event.startsAt,
   };
-  // One retry covers a busy storage queue; after that the user is told the
-  // event will not follow the visit, rather than finding out later.
   const stored = await storage
     .write(owner, appointmentId, link)
     .catch(() => storage.write(owner, appointmentId, link))

@@ -97,7 +97,6 @@ const appointmentsByPatient: Record<string, readonly Appointment[]> = {
   [patientB.id]: [appointmentB],
 };
 
-// Mirrors the Firestore repository: the list depends on whoever is signed in.
 let signedInPatientId: string | null = null;
 let authListener: (user: AuthUser | null) => void = () => {};
 
@@ -162,7 +161,6 @@ async function renderScenario() {
     </QueryClientProvider>,
   );
 
-  // Firebase reports "no user" first, which settles the restored session as anonymous.
   await act(() => authListener(null));
   await waitFor(() => expect(view.getByRole('button', { name: 'Sign in' })).toBeOnTheScreen());
 
@@ -213,7 +211,6 @@ describe('Appointments across a same-device account switch', () => {
     await waitFor(() => expect(view.getByText('Dr. Lina Haddad')).toBeVisible());
     expect(listAppointments).toHaveBeenCalledTimes(1);
 
-    // The same account keeps its fresh cache: switching filters does not refetch.
     await fireEvent.press(view.getByText('Past'));
     await fireEvent.press(view.getByText('Upcoming'));
     await waitFor(() => expect(view.getByText('Dr. Lina Haddad')).toBeVisible());
@@ -231,7 +228,6 @@ describe('Appointments across a same-device account switch', () => {
     expect(storage.clear).toHaveBeenCalledTimes(1);
 
     await signIn(patientB);
-    // Nothing from account A may be painted while account B's list is loading.
     expect(view.queryByText('Dr. Lina Haddad')).not.toBeOnTheScreen();
 
     await waitFor(() => expect(view.getByText('Dr. Omar Rahman')).toBeVisible());
@@ -294,7 +290,6 @@ describe('Appointments across a same-device account switch', () => {
       queryClient.getQueryData(appointmentQueryKeys.list('account', patientA.id)),
     ).toBeUndefined();
 
-    // Retrying from the error state fetches account B's own list.
     await fireEvent.press(view.getByRole('button', { name: 'Try again' }));
     await waitFor(() => expect(view.getByText('Dr. Omar Rahman')).toBeVisible());
     expect(listAppointments).toHaveBeenCalledTimes(3);

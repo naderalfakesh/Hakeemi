@@ -4,10 +4,6 @@ import { appPreferencesSchema, type AppPreferences } from '../domain/preferences
 
 const LOCAL_PREFERENCES_KEY = '@hakeemi/app-preferences-v1';
 
-/**
- * Device-local preferences for guest and demo sessions. Signed-in accounts
- * use the synced Firebase copy instead.
- */
 export async function readLocalPreferences(): Promise<AppPreferences | null> {
   const raw = await AsyncStorage.getItem(LOCAL_PREFERENCES_KEY);
 

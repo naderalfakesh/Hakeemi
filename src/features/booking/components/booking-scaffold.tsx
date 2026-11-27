@@ -19,7 +19,6 @@ export function BookingScaffold({
 }: {
   children: ReactNode;
   footer?: ReactNode;
-  /** The first step closes the booking sheet instead of going back a step. */
   isFirstStep?: boolean;
   onBack: () => void;
   step: string;

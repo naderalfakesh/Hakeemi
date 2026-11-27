@@ -50,7 +50,6 @@ export function FindCareScreen({
     }
   }
 
-  // Typing settles before a new query runs; clearing the field applies at once.
   const debouncedQuery = useDebouncedValue(query.trim(), SEARCH_DEBOUNCE_MS);
   const searchQuery = query.trim() === '' ? '' : debouncedQuery;
   const {

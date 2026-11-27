@@ -80,8 +80,6 @@ async function withExistingEvent(
   { calendarId, eventId }: CalendarEventRef,
   change: (event: Calendar.ExpoCalendarEvent) => Promise<void>,
 ): Promise<CalendarEventChangeResult> {
-  // Following a reschedule or cancellation must never surprise the user with
-  // a permission prompt, so only an existing grant is used.
   const permission = await Calendar.getCalendarPermissions();
 
   if (!permission.granted) {
@@ -96,8 +94,7 @@ async function withExistingEvent(
     return { status: 'missing' };
   }
 
-  // Android reuses row ids after a calendar is removed and re-synced, so an
-  // id alone could point at someone else's event in another calendar.
+  // Android reuses event row IDs after a calendar is removed and re-synced.
   if (event.calendarId !== calendarId) {
     return { status: 'missing' };
   }
@@ -108,8 +105,6 @@ async function withExistingEvent(
 }
 
 function toWritableCalendar(calendar: Calendar.ExpoCalendar): WritableCalendar {
-  // Android names each account's primary calendar after the account itself,
-  // so repeating the account would read "name@example.com · name@example.com".
   const account = calendar.source?.name || calendar.ownerAccount || null;
 
   return {

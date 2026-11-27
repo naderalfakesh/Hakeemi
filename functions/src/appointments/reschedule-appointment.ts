@@ -75,8 +75,6 @@ export async function rescheduleAppointment(
       );
     }
 
-    // A retry after a committed reschedule is safe because the appointment already points to
-    // the requested slot. The slot consistency check below keeps this path fail-closed.
     if (appointment.slotId === request.slotId) {
       const currentSlotSnapshot = await transaction.get(targetSlotReference);
 
@@ -175,8 +173,7 @@ export async function rescheduleAppointment(
       updatedAt: FieldValue.serverTimestamp(),
       version: reservedSlot.version,
     });
-    // The reminder receipt belongs to the old time; dropping it lets the new
-    // time get its own reminder instead of matching a settled receipt.
+    // Drop the old reminder receipt so the rescheduled time receives its own reminder.
     transaction.delete(
       firestore.doc(`appointmentReminders/${deriveReminderId(request.appointmentId)}`),
     );

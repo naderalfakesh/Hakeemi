@@ -22,7 +22,6 @@ export default function SignInRoute() {
     );
   }
 
-  // The session redirect above navigates once the signed-in user is restored.
   async function handleSignIn(values: SignInValues) {
     await signIn(values);
     await session.refreshSession();

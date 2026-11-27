@@ -74,8 +74,6 @@ export function AvailabilityDayGrid({
             <AppText tone={isSelected ? 'inverse' : 'primary'} variant="bodyStrong">
               {formatDayNumber(day.date, intlLocale)}
             </AppText>
-            {/* Only bookable days get a dot; the legend says a dot means
-                appointments, so unavailable days keep an invisible spacer. */}
             <View
               style={[
                 styles.availabilityDot,

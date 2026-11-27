@@ -22,7 +22,6 @@ export default function SignUpRoute() {
     );
   }
 
-  // The session redirect above navigates once the new account is restored.
   async function handleSignUp(values: SignUpValues) {
     await signUp({
       displayName: values.displayName,

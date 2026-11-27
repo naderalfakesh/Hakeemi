@@ -1,7 +1,5 @@
 import type { AppDataScope } from '@/services/query/data-scope';
 
-// Account data is keyed by the signed-in user so one account's cache is never
-// served to the next account on the same device.
 function scopeKey(scope: AppDataScope, accountId: string | null) {
   return scope === 'demo'
     ? (['appointments', 'demo'] as const)

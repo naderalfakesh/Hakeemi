@@ -24,7 +24,6 @@ export default function ProfileRoute() {
       onEnableNotifications={notifications.enable}
       onExitDemo={async () => {
         await session.signOut();
-        // The entry route sends the signed-out visitor back to Welcome.
         router.replace('/');
       }}
       onRetryPreferences={appPreferences.retry}

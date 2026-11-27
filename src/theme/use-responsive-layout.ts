@@ -11,10 +11,6 @@ export type ResponsiveLayout = {
   width: number;
 };
 
-/**
- * Derives semantic layout flags from viewport dimensions and accessibility font
- * scale so screens never duplicate raw breakpoint numbers.
- */
 export function useResponsiveLayout(): ResponsiveLayout {
   const { fontScale, height, width } = useWindowDimensions();
 

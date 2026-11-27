@@ -6,9 +6,7 @@ export type CalendarEventInput = {
   visitMode: 'in_person' | 'video';
 };
 
-/** A device calendar the app may write into, named the way the user knows it. */
 export type WritableCalendar = {
-  /** The account that owns the calendar, or null when it equals the title. */
   accountName: string | null;
   id: string;
   title: string;
@@ -21,21 +19,12 @@ export type CalendarListResult =
 export type CalendarSaveResult =
   { eventId: string; status: 'added' } | { status: 'denied' | 'unavailable' };
 
-/** An event the app created, and the calendar it was created in. */
 export type CalendarEventRef = { calendarId: string; eventId: string };
 
 export type CalendarEventTime = Pick<CalendarEventInput, 'endsAt' | 'startsAt' | 'timezone'>;
 
-/**
- * `missing` means the event is gone (the user deleted it, its calendar was
- * removed, or the id now belongs to an event in another calendar); `denied` means calendar access was withdrawn since it was added.
- */
 export type CalendarEventChangeResult = { status: 'denied' | 'done' | 'missing' };
 
-/**
- * Asks for calendar access in context and lists the calendars that accept new
- * events, the primary calendar of each account first.
- */
 export function listWritableCalendars(): Promise<CalendarListResult>;
 
 export function addAppointmentToCalendar(
@@ -43,13 +32,13 @@ export function addAppointmentToCalendar(
   input: CalendarEventInput,
 ): Promise<CalendarSaveResult>;
 
-/** Moves an event the app created. Never prompts for access. */
+// Never prompts for calendar permission.
 export function moveAppointmentCalendarEvent(
   ref: CalendarEventRef,
   time: CalendarEventTime,
 ): Promise<CalendarEventChangeResult>;
 
-/** Deletes an event the app created. Never prompts for access. */
+// Never prompts for calendar permission.
 export function removeAppointmentCalendarEvent(
   ref: CalendarEventRef,
 ): Promise<CalendarEventChangeResult>;

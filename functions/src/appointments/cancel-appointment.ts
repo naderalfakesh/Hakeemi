@@ -70,7 +70,6 @@ export async function cancelAppointment(
 
     const slot = parseStoredSlot(slotSnapshot.data());
 
-    // A retry after a committed cancellation is safe and returns the durable state.
     if (appointment.status === 'cancelled') {
       if (appointment.cancelledBy !== 'patient') {
         throw new HttpsError('failed-precondition', 'This appointment cannot be cancelled again.');
@@ -138,8 +137,6 @@ export async function cancelAppointment(
   });
 }
 
-// Once released, the slot may already be booked by someone else; it is only
-// inconsistent if it still points at the cancelled appointment.
 function throwIfCancelledSlotIsNotReleased(
   slot: ReturnType<typeof parseStoredSlot>,
   appointmentId: string,

@@ -3,8 +3,7 @@ import { Image, StyleSheet, View } from 'react-native';
 
 import { useAppTheme, type AppTheme } from '@/theme';
 
-// Glyph mark space relative to the tile side. scripts/render-brand-assets.swift
-// renders the native splash tile with the same ratio, tilt and corner radius.
+// Must match scripts/render-brand-assets.swift for seamless splash hand-off.
 const GLYPH_RATIO = 0.78;
 const CORNER_RATIO = 0.22;
 const TILT = '-5deg';
@@ -14,10 +13,6 @@ type BrandMarkProps = {
   tilted?: boolean;
 };
 
-/**
- * The Hakeemi tile: brand-coloured rounded square carrying the H-pulse glyph.
- * Decorative; the adjacent wordmark or heading carries the meaning.
- */
 export function BrandMark({ size = 36, tilted = true }: BrandMarkProps) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme, size, tilted), [size, theme, tilted]);

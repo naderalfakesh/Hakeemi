@@ -5,8 +5,7 @@ import type { Provider } from '../domain/types';
 
 const providerCursorSchema = z.tuple([z.boolean(), z.string().min(1), z.string().min(1)]);
 
-// Cursors always encode the English display name because the Firestore
-// composite index orders documents by the plain `displayName` string field.
+// Always encode the English displayName to match the Firestore composite index.
 export function createProviderCursor(
   provider: Pick<Provider, 'displayName' | 'id' | 'isFeatured'>,
 ): ProviderPageCursor {

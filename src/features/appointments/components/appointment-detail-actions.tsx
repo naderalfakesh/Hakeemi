@@ -40,9 +40,6 @@ export function AppointmentDetailActions({
 
   return (
     <>
-      {/* Only one intent is visible at a time: the default action stack,
-          the focused cancel confirmation, or the reschedule flow. The stack
-          leads with rescheduling and keeps one rhythm down to cancelling. */}
       {canManage && !actions.confirmingCancel && !actions.showReschedule && (
         <View style={styles.actions}>
           <Button onPress={actions.openReschedule}>{strings.reschedule}</Button>
@@ -57,8 +54,6 @@ export function AppointmentDetailActions({
         </View>
       )}
 
-      {/* The section stays for a cancelled visit so its calendar event is
-          removed and the outcome reported. */}
       {(appointment.status === 'cancelled' ||
         (appointment.status === 'confirmed' && !canManage)) && (
         <AppointmentCalendarSection appointmentStatus={appointment.status} calendar={calendar} />

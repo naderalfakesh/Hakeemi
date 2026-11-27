@@ -3,8 +3,7 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { AppText, BrandMark } from '@/components/ui';
 import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
-// Same size the native splash renders the tile at (imageWidth 96 dp on a
-// 512 px canvas holding a 5/6 tile), so the mark does not jump on hand-off.
+// Matches the native splash tile (96dp × 5/6) to prevent a hand-off jump.
 export const LAUNCH_MARK_SIZE = 80;
 
 type LaunchGateProps = {
@@ -12,10 +11,6 @@ type LaunchGateProps = {
   message?: string;
 };
 
-/**
- * Full-screen canvas with the brand tile centred exactly where the native
- * splash leaves it. With a message it also shows progress below the mark.
- */
 export function LaunchGate({ accessibilityLabel, message }: LaunchGateProps) {
   const theme = useAppTheme();
   const styles = useThemedStyles(createStyles);

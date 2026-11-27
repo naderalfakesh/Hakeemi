@@ -14,7 +14,6 @@ export default function HomeRoute() {
   const dataSources = useAppDataSources();
   const { locale } = useAppLocale();
   const strings = useStrings(homeStrings);
-  // Shares the Appointments tab's cache, so the card and the list agree.
   const appointments = useAppointments({
     accountId: dataSources.accountId,
     careRepository: dataSources.careRepository,

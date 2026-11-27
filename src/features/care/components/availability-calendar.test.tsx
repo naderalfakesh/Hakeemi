@@ -63,8 +63,6 @@ describe('availability calendar', () => {
       'Fri',
       'Sat',
     ]);
-    // CLDR's Arabic "short" weekday is the whole word; the narrow letters are
-    // distinct for every day and never break inside a word.
     const arabic = week.map((day) => formatWeekday(day, 'ar-AE'));
     expect(arabic).toEqual(['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س']);
     expect(new Set(arabic).size).toBe(7);

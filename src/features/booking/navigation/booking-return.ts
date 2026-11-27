@@ -4,16 +4,11 @@ import type { AuthSessionStatus } from '@/features/auth/context/auth-session-pro
 import type { AuthUser } from '@/features/auth/domain/types';
 import { firstParam } from '@/navigation/route-params';
 
-/** The provider and slot a booking is for. */
 export type BookingTarget = {
   providerId: string;
   slotId: string;
 };
 
-/**
- * A booking interrupted by sign-in or email verification. The auth routes
- * carry it in their params so the visitor lands back on the same slot.
- */
 export type BookingReturn = BookingTarget;
 
 type BookingReturnParams = {
@@ -28,14 +23,12 @@ export function readBookingReturn(params: BookingReturnParams): BookingReturn | 
   return providerId && slotId ? { providerId, slotId } : null;
 }
 
-/** Reads the interrupted booking, if any, from the current auth route. */
 export function useBookingReturn() {
   const bookingReturn = readBookingReturn(useLocalSearchParams<BookingReturnParams>());
 
   return { bookingReturn, returnParams: bookingReturnParams(bookingReturn) };
 }
 
-/** Reads the provider and slot a booking route was opened for. */
 export function useBookingTarget(): BookingTarget {
   const params = useLocalSearchParams<{
     providerId?: string | string[];
@@ -63,11 +56,6 @@ export function bookingDestination(bookingReturn: BookingReturn | null) {
     : ('/home' as const);
 }
 
-/**
- * Booking needs a demo session or a verified account. Returns the auth route
- * that has to come first, carrying the target so the booking resumes after
- * it, or null when the session may book.
- */
 export function bookingAccessRedirect(
   session: { status: AuthSessionStatus; user: AuthUser | null },
   target: BookingTarget,

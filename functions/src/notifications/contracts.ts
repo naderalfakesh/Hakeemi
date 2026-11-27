@@ -18,10 +18,7 @@ export const registerDeviceTokenResultSchema = z
   })
   .strict();
 
-// The raw token is the possession proof: only the device that holds it can
-// present it, and a hash alone is never accepted. `userId` lets a device flush
-// a sign-out that could not reach the server while that account was still
-// signed in; it defaults to the caller.
+// Raw token proves device possession; optional userId flushes an offline sign-out.
 export const unregisterDeviceTokenRequestSchema = z
   .object({
     token: z.string().trim().min(16).max(4096),

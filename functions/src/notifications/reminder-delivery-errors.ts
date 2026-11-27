@@ -1,8 +1,6 @@
 import { type SendResponse } from 'firebase-admin/messaging';
 import { ZodError } from 'zod';
 
-// Errors that no later attempt can fix: malformed requests, credential,
-// permission and sender configuration problems, and tokens FCM has rejected.
 export const NON_RETRYABLE_DELIVERY_CODES = new Set([
   'app/invalid-argument',
   'app/invalid-credential',
@@ -60,8 +58,7 @@ export class ReminderDeliveryError extends Error {
   }
 }
 
-// Only short enumerated identifiers are kept; error messages are never
-// logged or stored because provider messages can echo request contents.
+// Keep only short error codes; provider messages can echo request contents.
 export function readErrorCode(error: unknown): string {
   if (typeof error === 'object' && error !== null && 'code' in error) {
     const code = (error as { code: unknown }).code;

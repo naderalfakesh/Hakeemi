@@ -3,12 +3,8 @@ const { CodeGenerator, withAppDelegate } = require('expo/config-plugins');
 const CONFIGURE_CALL = 'FirebaseApp.configure()';
 const RETURN_ANCHOR = /return super\.application\(application, didFinishLaunchingWithOptions/;
 
-// Expo SDK 58 starts React Native from SceneDelegate, so the AppDelegate no
-// longer calls `factory.startReactNative(`, which is the anchor
-// @react-native-firebase/app (25.x) uses to insert `FirebaseApp.configure()`.
-// Without it the native Firebase SDKs are never configured. The call goes at
-// the end of `didFinishLaunchingWithOptions`, which runs before the scene
-// starts React Native. Skipped when the upstream plugin already added it.
+// Expo SDK 58 launches React Native via SceneDelegate, removing the AppDelegate anchor
+// @react-native-firebase/app uses; inject FirebaseApp.configure() in didFinishLaunchingWithOptions.
 function addFirebaseConfigure(contents) {
   if (contents.includes(CONFIGURE_CALL)) {
     return contents;

@@ -1,9 +1,6 @@
 import * as Network from 'expo-network';
 
-/**
- * Treats an unknown network state as online so cached-data notices never
- * appear before the platform reports a definitive answer.
- */
+// Unknown network state defaults to online to avoid premature offline banners.
 export function useIsOffline(): boolean {
   const networkState = Network.useNetworkState();
 

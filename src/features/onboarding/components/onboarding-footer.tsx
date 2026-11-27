@@ -56,9 +56,6 @@ export function OnboardingFooter({
         </View>
       </View>
 
-      {/* Every step shares one action row, so the last step's content
-          keeps the same height as the others instead of losing a row to
-          a second stacked button. */}
       <View style={styles.navigationRow}>
         {!isFirstStep && (
           <View style={styles.backAction}>

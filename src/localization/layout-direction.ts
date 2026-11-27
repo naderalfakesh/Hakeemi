@@ -9,11 +9,7 @@ export function isLayoutRTL() {
   return I18nManager.isRTL;
 }
 
-/**
- * Aligns the persisted native layout direction with the selected locale.
- * The native runtime keeps its launch direction, so this returns true while
- * the new direction is pending an app restart.
- */
+// Returns true when the native layout direction changed and needs a restart.
 export function syncNativeLayoutDirection(locale: AppLocale): boolean {
   const shouldBeRTL = locale === 'ar';
 
@@ -39,11 +35,6 @@ export function isLayoutDirectionPendingRestart(locale: AppLocale): boolean {
   return I18nManager.isRTL !== (locale === 'ar');
 }
 
-/**
- * Reloads the app so a changed layout direction takes effect immediately.
- * Returns false where no programmatic reload exists (web); callers keep the
- * manual restart hint for that case.
- */
 export async function restartToApplyLayoutDirection(): Promise<boolean> {
   if (Platform.OS === 'web') {
     return false;

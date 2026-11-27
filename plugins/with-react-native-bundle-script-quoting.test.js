@@ -7,7 +7,6 @@ const { afterAll, beforeAll, describe, expect, test } = require('@jest/globals')
 
 const { quoteBundleScriptInvocation } = require('./with-react-native-bundle-script-quoting');
 
-// Escaped as stored in project.pbxproj, matching the template phase endings.
 const RESOLVE =
   "\\\"$NODE_BINARY\\\" --print \\\"require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh'\\\"";
 const SDK57_ENDING = `\`${RESOLVE}\`\n\n`;
@@ -29,8 +28,6 @@ describe('quoteBundleScriptInvocation', () => {
     fs.rmSync(root, { recursive: true, force: true });
   });
 
-  // Runs the phase ending the way Xcode does and returns the words the shell
-  // would execute, so a split path shows up as more than one word.
   function shellWords(pbxprojEnding) {
     const command = pbxprojEnding.replace(/\\"/g, '"').trim();
     const result = spawnSync('/bin/sh', ['-c', `printf '%s\\n' ${command}`], {

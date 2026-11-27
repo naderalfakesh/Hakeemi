@@ -4,16 +4,10 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import { subscribeToAppointmentNotificationOpen } from '@/services/notifications/notifications';
 
-/**
- * Opens the appointment a tapped reminder points at. A reminder opened before
- * the session is authenticated waits until sign-in completes.
- */
 export function NotificationNavigationBridge() {
   const router = useRouter();
   const session = useAuthSession();
   const pendingAppointmentId = useRef<string | null>(null);
-  // The listener reads the latest status through a ref, so it subscribes once
-  // instead of on every session change.
   const sessionStatus = useRef(session.status);
 
   const openAppointment = useCallback(

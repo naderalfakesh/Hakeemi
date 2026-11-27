@@ -22,8 +22,6 @@ export const reminderReceiptSchema = z
 
 export type ReminderReceiptStatus = z.infer<typeof reminderReceiptSchema>['status'];
 
-// Only the retry pass picks up `failed` receipts, so a reminder that fails is
-// retried on the next schedule tick rather than again in the same run.
 export type ReminderPass = 'retry' | 'scheduled';
 
 export type ClaimResult =
@@ -40,8 +38,7 @@ export async function claimReminder(
   const receiptReference = firestore.doc(`appointmentReminders/${deriveReminderId(appointmentId)}`);
 
   return firestore.runTransaction(async (transaction) => {
-    // The appointment is re-read here so a cancellation or reschedule that
-    // landed after the run's query is respected before anything is sent.
+    // Re-read the appointment inside the transaction in case it changed after the query.
     const [snapshot, appointmentSnapshot] = await Promise.all([
       transaction.get(receiptReference),
       transaction.get(appointmentReference),
@@ -70,8 +67,7 @@ export async function claimReminder(
         return { claimed: false };
       }
 
-      // Receipts written before `attempts` existed may already have been
-      // delivered (the old code recorded `failed` for post-send errors too).
+      // Legacy receipts without `attempts` may have already been sent.
       if (existing.data.attempts === undefined) {
         if (status === 'failed') {
           transaction.update(receiptReference, {
@@ -125,8 +121,6 @@ export async function claimReminder(
   });
 }
 
-// Moves a `failed` receipt to a terminal state only if no concurrent run has
-// claimed it in the meantime.
 export async function settleFailedReceipt(
   firestore: Firestore,
   receiptReference: FirebaseFirestore.DocumentReference,

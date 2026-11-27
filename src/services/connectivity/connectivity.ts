@@ -11,7 +11,6 @@ export async function hasInternetConnection() {
 
 const alwaysConnected: ConnectionCheck = async () => true;
 
-/** The demo runs on local data, so its actions never wait on the network. */
 export function connectionCheckFor(scope: AppDataScope): ConnectionCheck {
   return scope === 'demo' ? alwaysConnected : hasInternetConnection;
 }

@@ -12,10 +12,6 @@ export const defaultAppPreferences: AppPreferences = {
   theme: 'system',
 };
 
-/**
- * Picks the app locale from the device's ordered language preferences: the
- * first one Hakeemi ships wins, and anything else falls back to English.
- */
 export function resolveSupportedLocale(
   languageCodes: readonly (string | null)[],
 ): AppPreferences['locale'] {

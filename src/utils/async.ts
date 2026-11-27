@@ -1,7 +1,3 @@
-/**
- * Runs asynchronous tasks strictly one at a time in FIFO order. A failing task
- * rejects only its own returned promise and never wedges tasks queued behind it.
- */
 export function createSerialQueue() {
   let tail: Promise<unknown> = Promise.resolve();
 
@@ -16,10 +12,6 @@ export function createSerialQueue() {
   };
 }
 
-/**
- * Races `promise` against a timer so slow network or native calls cannot stall
- * a caller indefinitely. Always clears its timer once settled.
- */
 export function withTimeout<T>(
   promise: Promise<T>,
   timeoutMs: number,

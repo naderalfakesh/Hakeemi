@@ -122,8 +122,6 @@ function createStyles(theme: AppTheme) {
       paddingHorizontal: theme.spacing.sm,
       paddingVertical: theme.spacing.sm,
     },
-    // Soft selection styling keeps the chosen chip visually distinct from the
-    // solid primary "Continue" button below it.
     selectedTimeSlot: {
       backgroundColor: theme.colors.brandSoft,
       borderColor: theme.colors.brand,

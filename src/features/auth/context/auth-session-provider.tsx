@@ -44,11 +44,7 @@ const AuthSessionContext = createContext<AuthSessionContextValue | null>(null);
 
 type AuthSessionProviderProps = {
   children: ReactNode;
-  /**
-   * Runs while the account is still signed in, so server-side cleanup that
-   * needs its credentials (such as disabling push registration) can happen
-   * first. Failures are ignored: sign-out must always complete.
-   */
+  // Runs while credentials are still active; errors are ignored so sign-out always finishes.
   onBeforeSignOut?: () => Promise<void>;
 };
 
@@ -173,7 +169,7 @@ export function AuthSessionProvider({ children, onBeforeSignOut }: AuthSessionPr
       try {
         await onBeforeSignOut?.();
       } catch {
-        // Sign-out proceeds regardless; the hook owns its own retry strategy.
+        // Ignore cleanup errors so sign-out completes.
       }
 
       await signOutFromFirebase();

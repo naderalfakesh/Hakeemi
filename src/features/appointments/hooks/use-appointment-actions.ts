@@ -27,14 +27,11 @@ export function useAppointmentActions({
   const rescheduleMutation = useRescheduleAppointment({ queryScope, repository });
   const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [showReschedule, setShowReschedule] = useState(false);
-  // A retry of a failed action reuses its request ID, so the server can
-  // replay an action that committed but whose response never arrived.
+  // Reuse the same requestId across retries so the server replays an already-committed mutation.
   const cancelRequestId = useRef<string | null>(null);
   const rescheduleRequest = useRef<{ requestId: string; slotId: string } | null>(null);
   const actionError = cancelMutation.error ?? rescheduleMutation.error;
 
-  // Failures are shown from the mutation's error state, so the handlers
-  // settle instead of rejecting.
   async function confirmCancel() {
     await triggerHaptic('warning');
     cancelRequestId.current ??= createRequestId();

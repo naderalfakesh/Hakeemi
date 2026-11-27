@@ -60,8 +60,7 @@ jest.mock('expo-notifications', () => ({
 }));
 jest.mock('@/services/connectivity/connectivity', () => ({ hasInternetConnection: jest.fn() }));
 
-// Referenced lazily from the expo-crypto factory; the `mock` prefix is what
-// Jest requires for that.
+// Jest requires the `mock` prefix for variables referenced inside jest.mock factories.
 const mockCreateHash = createHash;
 const STORAGE_KEY = '@hakeemi/notification-deregistrations/v1';
 const TOKEN_A = 'fcm-token-for-a-fictional-device-123456';
@@ -288,8 +287,6 @@ describe('registration and sign-out races', () => {
     mockState.refreshListener?.(TOKEN_ROTATED);
     await service.disableAppointmentNotifications();
 
-    // The queued refresh registration is dropped because sign-out had already
-    // begun, and the sign-out disables whatever token the device now holds.
     expect(
       mockState.calls.map((call) => [call.name, (call.data as { token: string }).token]),
     ).toEqual([
@@ -330,8 +327,6 @@ describe('bounded sign-out behind a hung registration', () => {
     mockedHasInternetConnection.mockResolvedValue(true);
     service = loadService();
 
-    // The first registration never completes until the test releases it, and
-    // every callable is refused once nobody is signed in, like the real server.
     let hung = false;
     mockState.handleCallable = async (name, data) => {
       if (!mockState.currentUserId) {
@@ -361,23 +356,17 @@ describe('bounded sign-out behind a hung registration', () => {
     await jest.advanceTimersByTimeAsync(5_000);
     await expect(signOut).resolves.toBeUndefined();
 
-    // Sign-out returned while the registration still hangs: nothing else was
-    // sent, and the sign-out is recorded for a later retry.
     expect(mockState.calls).toHaveLength(1);
     expect(await readPending()).toEqual([{ tokenId: null, userId: 'user-a' }]);
 
-    // Firebase sign-out completes, then the registration finally lands.
     mockState.currentUserId = null;
     releaseRegistration();
     await expect(enable).resolves.toEqual({ status: 'registered', tokenId: sha256(TOKEN_A) });
     await jest.advanceTimersByTimeAsync(0);
 
-    // The queued disable ran without credentials, so it stays recorded with
-    // the exact token the device held, and no unregister went out.
     expect(mockState.calls.map((call) => call.name)).toEqual(['registerDeviceToken']);
     expect(await readPending()).toEqual([{ tokenId: sha256(TOKEN_A), userId: 'user-a' }]);
 
-    // The next signed-in account flushes it, then registers itself.
     mockState.currentUserId = 'user-b';
     await service.flushPendingNotificationDeregistrations();
     const next = await service.registerForAppointmentNotifications({ locale: 'ar' });
@@ -401,8 +390,6 @@ describe('bounded sign-out behind a hung registration', () => {
     await jest.advanceTimersByTimeAsync(5_000);
     await signOut;
 
-    // Account B signs in and enables notifications while A's registration is
-    // still hanging ahead of A's queued sign-out.
     mockState.currentUserId = 'user-b';
     const nextEnable = service.registerForAppointmentNotifications({ locale: 'ar' });
     await jest.advanceTimersByTimeAsync(0);
@@ -412,8 +399,6 @@ describe('bounded sign-out behind a hung registration', () => {
     await expect(enable).resolves.toEqual({ status: 'registered', tokenId: sha256(TOKEN_A) });
     await expect(nextEnable).resolves.toEqual({ status: 'registered', tokenId: sha256(TOKEN_A) });
 
-    // Order: A's late registration, A's sign-out flushed under B by possession
-    // of the token and scoped to A, then B's own registration last.
     expect(
       mockState.calls.map((call) => [call.name, (call.data as { userId?: string }).userId]),
     ).toEqual([
@@ -469,8 +454,6 @@ describe('degraded storage and failed token reads', () => {
     expect(mockState.calls.map((call) => call.name)).toEqual(['unregisterDeviceToken']);
     expect(await readPending()).toEqual([]);
 
-    // Storage recovers while the server is still rejecting: the next sign-out
-    // is recorded again, and the next signed-in account flushes it.
     setItem.mockImplementation(workingSetItem);
     mockState.handleCallable = async () => {
       throw new Error('unavailable');
@@ -505,7 +488,6 @@ describe('degraded storage and failed token reads', () => {
       }
       return respondLikeServer(name, data);
     };
-    // Token reads: A's registration, then the queued disable (fails), then B.
     mockState.getToken = jest
       .fn<Promise<string | null>, []>()
       .mockResolvedValueOnce(TOKEN_A)
@@ -519,8 +501,6 @@ describe('degraded storage and failed token reads', () => {
     await signOut;
     expect(await readPending()).toEqual([{ tokenId: null, userId: 'user-a' }]);
 
-    // Firebase sign-out, then A's registration lands late and supersedes the
-    // placeholder; the queued disable cannot read the token.
     mockState.currentUserId = null;
     releaseRegistration();
     await expect(enable).resolves.toEqual({ status: 'registered', tokenId: sha256(TOKEN_A) });
@@ -528,7 +508,6 @@ describe('degraded storage and failed token reads', () => {
     expect(mockState.calls.map((call) => call.name)).toEqual(['registerDeviceToken']);
     expect(await readPending()).toEqual([{ tokenId: null, userId: 'user-a' }]);
 
-    // The next account still ends A's registration and keeps its own.
     mockState.currentUserId = 'user-b';
     await service.flushPendingNotificationDeregistrations();
     const next = await service.registerForAppointmentNotifications({ locale: 'ar' });

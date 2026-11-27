@@ -1,10 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { z } from 'zod';
 
-// A sign-out that could not disable the account's push registration on the
-// server (offline, timeout, or server error) is recorded here and retried the
-// next time any account is signed in on this device. Only the account id and
-// the token hash are stored; the raw token stays with the messaging SDK.
+import { createSerialQueue } from '@/utils/async';
+
 const STORAGE_KEY = '@hakeemi/notification-deregistrations/v1';
 const MAX_ENTRIES = 10;
 
@@ -20,9 +18,7 @@ const pendingDeregistrationSchema = z
 
 export type PendingNotificationDeregistration = z.infer<typeof pendingDeregistrationSchema>;
 
-// Every read-modify-write goes through one chain: sign-out writes an entry
-// outside the registration queue while queued work may be rewriting the list.
-let storageQueue: Promise<unknown> = Promise.resolve();
+const serialize = createSerialQueue();
 
 export function readPendingDeregistrations(): Promise<PendingNotificationDeregistration[]> {
   return serialize(readEntries);
@@ -40,24 +36,12 @@ export function removePendingDeregistration(entry: PendingNotificationDeregistra
   return serialize(() => removeWhere((other) => isSameEntry(other, entry)));
 }
 
-/**
- * A successful registration supersedes any earlier sign-out of the same
- * account on this device, so its pending entries for that token (or with an
- * unknown token) are dropped.
- */
 export function removePendingDeregistrationsSupersededBy(userId: string, tokenId: string) {
   return serialize(() =>
     removeWhere(
       (entry) => entry.userId === userId && (entry.tokenId === null || entry.tokenId === tokenId),
     ),
   );
-}
-
-function serialize<T>(operation: () => Promise<T>): Promise<T> {
-  const run = storageQueue.then(operation, operation);
-  storageQueue = run.catch(() => undefined);
-
-  return run;
 }
 
 async function readEntries(): Promise<PendingNotificationDeregistration[]> {

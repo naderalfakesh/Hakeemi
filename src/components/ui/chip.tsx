@@ -48,8 +48,6 @@ function createStyles(theme: AppTheme) {
       maxWidth: '100%',
       minHeight: theme.sizes.minimumTouchTarget,
       paddingHorizontal: theme.spacing.md,
-      // A label that wraps (large text, long translations) grows the chip
-      // instead of being clipped to one line.
       paddingVertical: theme.spacing.xxs,
     },
     label: {

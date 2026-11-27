@@ -61,8 +61,7 @@ export async function sendAppointmentReminders(
     skipped: 0,
   };
 
-  // Retries run first so a reminder that fails in this run waits for the next
-  // schedule tick instead of being retried immediately.
+  // Run retries first so failures from this run wait until the next schedule tick.
   await retryFailedReminders(context, result, (appointmentSnapshot, pass) =>
     processReminderSafely(context, appointmentSnapshot, result, pass),
   );
@@ -86,9 +85,6 @@ export async function sendAppointmentReminders(
   return result;
 }
 
-// One appointment's unexpected error (for example a claim transaction that
-// keeps aborting) must not stop the rest of the run. Nothing is recorded, so
-// the catch-up window or the retry pass picks it up on a later run.
 async function processReminderSafely(
   context: ReminderRunContext,
   appointmentSnapshot: FirebaseFirestore.DocumentSnapshot,
@@ -158,8 +154,7 @@ async function processReminder(
   try {
     await updateReminderReceipt(firestore, appointmentId, outcome.status, now, outcome.code);
   } catch (error) {
-    // The receipt stays `sending`; once `sendIssuedAt` is set no later run
-    // claims it, so a reminder FCM may have accepted is never sent again.
+    // `sendIssuedAt` prevents future runs from re-claiming a possibly delivered reminder.
     logger.error('appointment reminder receipt update failed', {
       attempt: claim.attempt,
       delivered: progress.delivered,

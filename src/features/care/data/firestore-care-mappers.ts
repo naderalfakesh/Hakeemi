@@ -149,8 +149,6 @@ export function mapProviderDocument(documentId: string, data: unknown): Provider
     ...rest
   } = parseDocument('providers', documentId, providerDocumentSchema, data);
 
-  // Untranslated documents fall back to their English text so partially
-  // migrated backend data stays renderable in Arabic.
   return {
     id: documentId,
     ...rest,

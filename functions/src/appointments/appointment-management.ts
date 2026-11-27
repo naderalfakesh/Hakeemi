@@ -13,7 +13,6 @@ import {
   type RescheduleAppointmentResult,
 } from './contracts.js';
 
-/** Keep appointment management aligned with the booking lead-time policy. */
 export const APPOINTMENT_MANAGEMENT_LEAD_TIME_MS = 15 * 60 * 1_000;
 
 const operationReceiptTimestampSchema = z.custom<Timestamp>((value) => value instanceof Timestamp);
@@ -133,6 +132,4 @@ export function toAppointmentSummary(appointmentId: string, appointment: Appoint
   };
 }
 
-// Keep this import-level reference explicit so transaction mocks used by unit tests can satisfy
-// the same shape without needing a Firestore implementation detail.
 export type AppointmentTransaction = Transaction;

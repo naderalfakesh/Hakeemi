@@ -152,8 +152,6 @@ describe('device token sign-out lifecycle', () => {
     const tokenId = (previousResult.data as { tokenId: string }).tokenId;
     const legacyUserId = `legacy-${randomUUID()}`;
 
-    // An older registration that predates the ownership rule: same token, a
-    // record id that is not the token hash, and no callable involved.
     await testEnvironment.withSecurityRulesDisabled(async (context) => {
       await context.firestore().doc(`users/${legacyUserId}/deviceTokens/legacy-record`).set({
         createdAt: new Date(),
@@ -189,8 +187,6 @@ describe('device token sign-out lifecycle', () => {
   });
 
   it('still supersedes an enabled older record when many disabled records share the token', async () => {
-    // Fifty-plus disabled records of the same token (earlier handovers) sort
-    // ahead of one still-enabled older record; the handover must reach it.
     const enabledLegacyUserId = 'z-legacy-enabled';
     await testEnvironment.withSecurityRulesDisabled(async (context) => {
       const firestore = context.firestore();
@@ -239,13 +235,11 @@ describe('device token sign-out lifecycle', () => {
     const unregister = httpsCallable(getFunctions(app, FUNCTION_REGION), 'unregisterDeviceToken');
     await register({ enabled: true, locale: 'en', platform: 'ios', token: SHARED_DEVICE_TOKEN });
 
-    // The previous account signed out offline, so nothing reached the server.
     await signOut(getAuth(app));
     const next = await createAccount('offline-next');
     const nextOwnToken = 'fcm-token-for-the-next-accounts-device-123456';
     await register({ enabled: true, locale: 'en', platform: 'ios', token: nextOwnToken });
 
-    // Knowing the hash is not possession: a different raw token changes nothing.
     const wrongToken = await unregister({
       token: 'fcm-token-guessed-by-someone-else-123456',
       userId: previous.uid,
@@ -253,11 +247,9 @@ describe('device token sign-out lifecycle', () => {
     assert.equal((wrongToken.data as { disabled: boolean }).disabled, false);
     assert.deepEqual(await readEnabledTokens(previous.uid), [SHARED_DEVICE_TOKEN]);
 
-    // The device still holds the raw token and flushes the pending sign-out.
     const flushed = await unregister({ token: SHARED_DEVICE_TOKEN, userId: previous.uid });
     assert.equal((flushed.data as { disabled: boolean }).disabled, true);
     assert.deepEqual(await readEnabledTokens(previous.uid), []);
-    // The flush is scoped to the named account; the caller's own device stays registered.
     assert.deepEqual(await readEnabledTokens(next.uid), [nextOwnToken]);
   });
 

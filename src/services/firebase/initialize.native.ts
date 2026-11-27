@@ -14,8 +14,6 @@ import {
 
 let isConfigured = false;
 
-// Second guard beside env.ts: the Emulator Suite is a development-bundle-only
-// target, so a release bundle never connects even if the flag were true.
 function shouldConnectToEmulators() {
   return (
     environment.useFirebaseEmulators && environment.appEnvironment === 'development' && __DEV__

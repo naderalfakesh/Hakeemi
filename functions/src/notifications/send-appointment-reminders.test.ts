@@ -134,7 +134,6 @@ describe('appointment reminder delivery', () => {
       assert.deepEqual(classifyDeliveryError({ code }), { code, retryable: false });
     }
 
-    // Firestore PERMISSION_DENIED and UNAUTHENTICATED arrive as gRPC status numbers.
     assert.deepEqual(classifyDeliveryError({ code: 7 }), { code: 'grpc/7', retryable: false });
     assert.deepEqual(classifyDeliveryError({ code: 16 }), { code: 'grpc/16', retryable: false });
 

@@ -81,8 +81,6 @@ function createStyles(
   return StyleSheet.create({
     avatar: {
       alignItems: 'center',
-      // A translucent wash of the signature accent keeps each doctor's tile
-      // distinct while the ring frames the portrait.
       backgroundColor: accent ? `${accent}26` : backgroundColor,
       borderColor: accent ? `${accent}66` : 'transparent',
       borderRadius: size === 'large' ? theme.radii.xl : theme.radii.lg,

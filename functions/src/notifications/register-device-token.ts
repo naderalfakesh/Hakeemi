@@ -10,10 +10,6 @@ import {
   type RegisterDeviceTokenResult,
 } from './contracts.js';
 
-// Upper bound on enabled registrations of one token that a single
-// registration may supersede. Every registration leaves at most one enabled
-// record per token, so only records that predate this rule can accumulate; the
-// query filters on `enabled` so disabled history never crowds them out.
 const SUPERSEDED_REGISTRATION_LIMIT = 50;
 
 export function parseRegisterDeviceTokenRequest(input: unknown): RegisterDeviceTokenRequest {
@@ -46,11 +42,7 @@ export async function registerDeviceToken(
       ),
     ]);
 
-    // A device token belongs to the account that most recently registered it
-    // from the device holding it. Presenting the raw token proves possession,
-    // so every other account's registration of the same token is disabled in
-    // the same transaction. This also covers a previous account whose sign-out
-    // never reached the server, and older records that predate this rule.
+    // Disable other accounts' active registrations for the same raw token (possession proof).
     for (const otherSnapshot of sameTokenSnapshot.docs) {
       if (otherSnapshot.ref.path !== tokenReference.path) {
         transaction.update(otherSnapshot.ref, {

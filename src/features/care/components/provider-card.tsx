@@ -53,8 +53,7 @@ export const ProviderCard = memo(function ProviderCard({
           {provider.ratingSummary && (
             <View style={styles.rating}>
               <DecorativeIcon color={theme.colors.warning} name="star" size={15} />
-              {/* Separate nodes keep the rating beside the star and the count
-                  beside its label under RTL bidi reordering. */}
+              {/* Separate nodes prevent RTL bidi reordering of rating and count. */}
               <AppText variant="caption">{provider.ratingSummary.average.toFixed(1)}</AppText>
               <AppText tone="secondary" variant="caption">
                 ·

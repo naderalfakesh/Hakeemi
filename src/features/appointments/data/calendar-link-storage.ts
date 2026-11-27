@@ -7,11 +7,6 @@ import type { AppointmentCalendarLink } from '../domain/calendar-link';
 
 const CALENDAR_LINK_PREFIX = '@hakeemi/calendar-link/v2/';
 
-/**
- * Whose appointments a link belongs to: one signed-in account, or the demo.
- * Demo appointment ids repeat on every demo session, so links are kept per
- * owner and dropped when that session ends.
- */
 export type CalendarLinkOwner = 'demo' | `account:${string}`;
 
 export function calendarLinkOwner(
@@ -29,11 +24,6 @@ function linkKey(owner: CalendarLinkOwner, appointmentId: string) {
   return `${CALENDAR_LINK_PREFIX}${owner}/${appointmentId}`;
 }
 
-/**
- * Device calendar event ids only mean something on this device, so the link
- * between an appointment and its event stays in local storage and never
- * reaches Firestore.
- */
 export interface CalendarLinkStorage {
   clear(owner: CalendarLinkOwner): Promise<void>;
   read(owner: CalendarLinkOwner, appointmentId: string): Promise<AppointmentCalendarLink | null>;

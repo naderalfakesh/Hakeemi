@@ -26,12 +26,8 @@ import {
 export { subscribeToAppointmentNotificationOpen } from './notification-open.native';
 
 let stopTokenRefresh: (() => void) | null = null;
-// Registration changes run one at a time so a late registration (enable or
-// token refresh) can never land after the sign-out that had to disable it, and
-// a pending flush always precedes the registration that follows it.
 const enqueue = createSerialQueue();
-// Sign-out advances the epoch; registration work started for the previous
-// account checks it and drops out instead of re-enabling that account.
+// Incremented on sign-out so in-flight registrations for the previous account bail out.
 let sessionEpoch = 0;
 
 export async function registerForAppointmentNotifications({
@@ -78,19 +74,10 @@ export async function registerForAppointmentNotifications({
   return { status: 'registered', tokenId: registered.tokenId };
 }
 
-/**
- * Disables this device's push registration for the signed-in account. Must run
- * before Firebase sign-out because the callable needs the account's
- * credentials. Never throws and never waits longer than the sign-out budget,
- * even when a registration is still in flight ahead of it: the sign-out is
- * recorded locally first and retried the next time an account is signed in on
- * this device.
- */
 export async function disableAppointmentNotifications(): Promise<void> {
   stopNotificationTokenRefresh();
   sessionEpoch += 1;
-  // Fixed now, before anything can block: the queued disable must act on the
-  // account that signed out, never on whoever is signed in by the time it runs.
+  // Capture before queuing so a subsequent sign-in never redirects this disable.
   const userId = getAuth(getApp()).currentUser?.uid;
 
   if (!userId) {
@@ -118,18 +105,12 @@ async function disableAccountRegistration(userId: string) {
   const token = await readDeviceToken();
   const tokenId = token ? await deriveDeviceTokenId(token) : null;
 
-  // Storage is best effort from here on: the sign-out must still reach the
-  // server when the device can, even if the retry record cannot be written.
   await recordSignOut(userId, tokenId).catch(() => undefined);
 
   if (!token || !(await hasInternetConnection()) || !getAuth(getApp()).currentUser) {
-    // No raw token to present, offline, or nobody signed in to authenticate:
-    // the recorded entry is retried on the next signed-in opportunity.
     return;
   }
 
-  // Runs under whichever account is signed in when the queue reaches it.
-  // Sent directly rather than through stored entries so a failing store cannot skip it.
   await unregisterDeviceToken(token, userId);
   await removePendingDeregistration({ tokenId, userId }).catch(() => undefined);
   await removePendingDeregistration({ tokenId: null, userId }).catch(() => undefined);
@@ -138,12 +119,10 @@ async function disableAccountRegistration(userId: string) {
 
 async function recordSignOut(userId: string, tokenId: string | null) {
   if (tokenId === null) {
-    // Put the placeholder back in case a concurrent registration removed it.
     await addPendingDeregistration({ tokenId: null, userId });
     return;
   }
 
-  // Narrow the placeholder to the token the device held so a later rotation is detected.
   await addPendingDeregistration({ tokenId, userId });
   await removePendingDeregistration({ tokenId: null, userId });
 }
@@ -168,14 +147,12 @@ async function flushPendingDeregistrations(knownToken: string | null) {
   const currentTokenId = await deriveDeviceTokenId(token);
 
   for (const entry of entries) {
+    // Rotated tokens cannot be proven by possession; FCM disables them on next delivery.
     if (entry.tokenId !== null && entry.tokenId !== currentTokenId) {
-      // The device token rotated after that sign-out; FCM rejects the old token
-      // and the reminder job disables that record on its first delivery attempt.
       await removePendingDeregistration(entry);
       continue;
     }
 
-    // A failure stops the flush and keeps remaining entries for the next retry.
     await unregisterDeviceToken(token, entry.userId);
     await removePendingDeregistration(entry);
   }

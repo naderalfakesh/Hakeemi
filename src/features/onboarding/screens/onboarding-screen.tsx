@@ -25,8 +25,6 @@ export function OnboardingScreen({ onComplete, onSkip }: OnboardingScreenProps) 
   const strings = useStrings(onboardingStrings);
   const { isCompact, isTablet, stackActions, width } = useResponsiveLayout();
   const styles = useMemo(() => createStyles(theme, { isCompact }), [isCompact, theme]);
-  // Pages span the full content column and carry their own side padding, so
-  // a swipe moves each page edge to edge with a gutter between neighbours.
   const pageWidth = Math.min(width, theme.sizes.contentMaxWidth);
   const {
     activeStep,
@@ -51,8 +49,7 @@ export function OnboardingScreen({ onComplete, onSkip }: OnboardingScreenProps) 
         <View style={styles.brandRow}>
           <BrandMark />
           <AppText variant="titleSmall">{strings.brandWordmark}</AppText>
-          {/* Stays mounted on the last step so the header keeps its height
-              and the brand row does not shift when Skip goes away. */}
+          {/* Keep mounted on the last step so header height does not jump. */}
           <View
             accessibilityElementsHidden={isLastStep}
             importantForAccessibility={isLastStep ? 'no-hide-descendants' : 'auto'}

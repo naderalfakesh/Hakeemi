@@ -26,8 +26,6 @@ export async function ensureNotificationPermission(): Promise<boolean> {
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync(APPOINTMENT_REMINDER_CHANNEL_ID, {
       description: APPOINTMENT_REMINDER_CHANNEL.description,
-      // eslint-plugin-import cannot detect expo-notifications' compiled enum
-      // exports as an ES module; TypeScript still checks this member.
       // eslint-disable-next-line import/namespace
       importance: Notifications.AndroidImportance.DEFAULT,
       name: APPOINTMENT_REMINDER_CHANNEL.name,

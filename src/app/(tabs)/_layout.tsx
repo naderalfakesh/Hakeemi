@@ -16,11 +16,6 @@ type TabDefinition = {
   symbol: { default: SFSymbol; selected: SFSymbol };
 };
 
-/**
- * The system tab bar: Liquid Glass on iOS 26 and later, Material 3 navigation
- * on Android. iOS draws SF Symbols; Android and web use the same Ionicons as
- * the rest of the app.
- */
 export default function TabLayout() {
   const theme = useAppTheme();
   const strings = useStrings(navigationStrings);

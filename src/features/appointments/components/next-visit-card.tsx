@@ -10,7 +10,6 @@ import { appointmentStatusStrings } from '../localization/appointment-status-str
 import { daysUntil, formatAppointmentTime } from '../localization/format-appointment-time';
 import { nextVisitStrings } from '../localization/next-visit-strings';
 
-/** The patient's soonest confirmed visit, one tap away from its details. */
 export function NextVisitCard({
   appointment,
   onPress,

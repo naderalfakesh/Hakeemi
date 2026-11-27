@@ -56,8 +56,6 @@ export function WelcomeScreen({ onCreateAccount, onExploreDemo, onSignIn }: Welc
           </View>
         </View>
 
-        {/* The demo leads: it shows the whole app in one tap, with no email
-            or password, and an account is still one tap away. */}
         <View style={styles.actions}>
           <Button
             accessibilityLabel={strings.exploreDemoAccessibilityLabel}

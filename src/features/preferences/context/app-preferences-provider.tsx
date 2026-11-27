@@ -28,7 +28,6 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
   const session = useAuthSession();
   const queryClient = useQueryClient();
   const userId = session.user?.id ?? null;
-  // Until someone picks a language or appearance, the app follows the device.
   const devicePreferences = useMemo(() => getDevicePreferences(), []);
   const profilePreferences = useMemo(
     () =>
@@ -44,7 +43,6 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
   const preferencesQuery = useQuery({
     enabled: userId === null || session.profile !== null,
     queryKey,
-    // Guests keep their choices on the device; accounts use the synced copy.
     queryFn: async () =>
       userId
         ? ((await readAppPreferences()) ?? profilePreferences)

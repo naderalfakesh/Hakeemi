@@ -19,8 +19,7 @@ export function CalendarChooserCard({ calendars, onChoose, onDismiss }: Calendar
   const theme = useAppTheme();
   const styles = useThemedStyles(createStyles);
   const strings = useStrings(appointmentDetailStrings);
-  // The chooser list a calendar was picked from; each opening is a new list,
-  // so a fresh chooser is enabled again without resetting state in an effect.
+  // Keyed by list identity so reopening the chooser resets without an effect.
   const [pickedFrom, setPickedFrom] = useState<readonly WritableCalendar[] | null>(null);
   const picked = pickedFrom === calendars;
 
@@ -42,7 +41,6 @@ export function CalendarChooserCard({ calendars, onChoose, onDismiss }: Calendar
             disabled={picked}
             key={calendar.id}
             onPress={() => {
-              // A second tap before the chooser closes must not add twice.
               setPickedFrom(calendars);
               void onChoose(calendar);
             }}

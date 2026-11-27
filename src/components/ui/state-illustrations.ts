@@ -1,7 +1,3 @@
-/**
- * Shared spot illustrations for empty, error, offline, and success moments.
- * Keyed by meaning so screens stay declarative about intent.
- */
 export const stateIllustrations = {
   bookingConfirmed: require('../../../assets/illustrations/state-booking-confirmed.webp'),
   error: require('../../../assets/illustrations/state-error.webp'),

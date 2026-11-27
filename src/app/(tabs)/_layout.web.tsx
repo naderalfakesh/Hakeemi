@@ -26,10 +26,6 @@ function tabBarIcon(activeName: DecorativeIconName, inactiveName: DecorativeIcon
   };
 }
 
-/**
- * Web keeps the JavaScript tab bar: the native tab bar has no web
- * counterpart, and a bottom bar matches the phone layout people preview here.
- */
 export default function TabLayout() {
   const theme = useAppTheme();
   const strings = useStrings(navigationStrings);

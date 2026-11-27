@@ -34,19 +34,6 @@ type UseAppointmentCalendarOptions = {
   storage?: CalendarLinkStorage;
 };
 
-/**
- * Keeps a visit and its device calendar event together.
- *
- * Adding asks for access only when the user taps, uses a single writable
- * calendar directly, and opens a chooser when there are several, so the event
- * never lands silently in an account the user did not mean. The created event
- * id is stored on the device for the signed-in account or demo session.
- *
- * The event only changes because of something the user did: the screen calls
- * `followReschedule` or `followCancel` after its own reschedule or cancel
- * succeeds. A visit that changed any other way only offers a button to move or
- * remove the event.
- */
 export function useAppointmentCalendar({
   appointment,
   owner,
@@ -54,10 +41,8 @@ export function useAppointmentCalendar({
   storage = calendarLinkStorage,
 }: UseAppointmentCalendarOptions) {
   const [state, setState] = useState<AppointmentCalendarState>({ status: 'working' });
-  // Bumped by every follow-up the user starts, so a link read that began
-  // before it cannot overwrite its outcome.
+  // Prevents an earlier link read from overwriting a newer follow-up result.
   const generation = useRef(0);
-  // Guards against a second add while the first is still being written.
   const adding = useRef(false);
   const id = appointment?.id ?? null;
   const endsAt = appointment?.endsAt ?? '';

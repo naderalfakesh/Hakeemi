@@ -37,8 +37,6 @@ export function BookingSummary({
         label={strings.summary.appointment}
         value={formatBookingSlot(selection.slot, locale)}
       />
-      {/* The clinic name belongs under the "Clinic" label; only a clinic-less
-          video visit falls back to the visit-mode wording. */}
       <SummaryRow
         icon={selection.slot.visitMode === 'video' ? 'videocam-outline' : 'location-outline'}
         label={selection.clinic ? strings.summary.clinic : strings.summary.visitMode}

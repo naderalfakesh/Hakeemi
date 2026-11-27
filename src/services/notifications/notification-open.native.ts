@@ -10,11 +10,6 @@ import { parseAppointmentNotification } from '@/features/notifications/domain/sc
 let initialAppointmentId: Promise<string | null> | null = null;
 let hasDeliveredInitialNotification = false;
 
-/**
- * Listens for notification taps that open an appointment, delivering the
- * cold-launch notification at most once per process so re-subscriptions never
- * reopen it.
- */
 export function subscribeToAppointmentNotificationOpen(listener: (appointmentId: string) => void) {
   const messaging = getMessaging(getApp());
   let active = true;

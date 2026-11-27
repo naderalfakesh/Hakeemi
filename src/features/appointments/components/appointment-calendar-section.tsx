@@ -24,7 +24,6 @@ export function AppointmentCalendarSection({
   const strings = useStrings(appointmentDetailStrings);
 
   if (appointmentStatus !== 'confirmed') {
-    // A cancelled visit only reports what happened to its calendar event.
     if (state.status === 'removed') {
       return (
         <AppText accessibilityLiveRegion="polite" tone="secondary" variant="caption">

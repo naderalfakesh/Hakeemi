@@ -19,16 +19,7 @@ export function parseUnregisterDeviceTokenRequest(input: unknown): UnregisterDev
   return parsedRequest.data;
 }
 
-/**
- * Disables one account's registration of a device token. The caller must hold
- * the raw token, which only the device that owns it can present; a hash alone
- * is never enough. The caller may name another account (`userId`) so a device
- * can flush a sign-out that was recorded offline: whoever holds the raw token
- * could already end that account's registration by registering the token
- * under their own account, so this grants nothing new. Only the named account's
- * record for this exact token is touched. The call is idempotent and reports
- * whether this invocation changed anything.
- */
+// Raw token proves device possession, allowing an offline sign-out flush for another userId.
 export async function unregisterDeviceToken(
   firestore: Firestore,
   callerId: string,

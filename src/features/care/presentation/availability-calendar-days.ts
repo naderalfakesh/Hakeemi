@@ -78,12 +78,7 @@ export function formatCalendarRange(days: readonly AvailabilityCalendarDay[], lo
   return `${first} – ${last}`;
 }
 
-/**
- * Arabic has no abbreviated weekday names: CLDR's `short` form is the whole
- * word ("الأربعاء"), which cannot fit a week-wide row of chips and used to break
- * inside the word. Arabic calendars use the single-letter narrow form instead;
- * each chip's accessibility label still reads the full date.
- */
+// Arabic CLDR `short` weekdays are full words; use single-letter `narrow` form instead.
 export function formatWeekday(date: Date, locale: string) {
   return new Intl.DateTimeFormat(locale, {
     timeZone: 'UTC',
@@ -91,10 +86,6 @@ export function formatWeekday(date: Date, locale: string) {
   }).format(date);
 }
 
-/**
- * Seven chips a row fit a phone at the default text size. Larger text reflows
- * the two weeks into four columns so a weekday such as "WED" keeps its line.
- */
 export function dayGridColumns(fontScale: number) {
   return fontScale >= 1.3 ? 4 : 7;
 }

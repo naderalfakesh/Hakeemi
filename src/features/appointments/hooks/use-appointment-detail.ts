@@ -19,7 +19,6 @@ export function useAppointmentDetail(
   } = {},
 ) {
   return useQuery({
-    // Account appointments need a signed-in account.
     enabled: queryScope === 'demo' || accountId !== null,
     queryKey: appointmentQueryKeys.detail(appointmentId, queryScope, accountId),
     queryFn: () => repository.getAppointment(appointmentId),

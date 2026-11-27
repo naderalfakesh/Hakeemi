@@ -162,8 +162,6 @@ export const sendAppointmentReminders = onSchedule(
   },
 );
 
-// Reserving a slot needs a verified email, matching the app. Cancelling stays
-// open so an account can always release a visit it holds.
 function requireVerifiedEmail(token: { email_verified?: boolean }) {
   if (token.email_verified !== true) {
     throw new HttpsError('failed-precondition', 'Verify your email before booking.');

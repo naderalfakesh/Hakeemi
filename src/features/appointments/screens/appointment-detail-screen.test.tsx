@@ -235,8 +235,6 @@ describe('AppointmentDetailScreen', () => {
   });
 
   it('says when the added event cannot be remembered', async () => {
-    // The storage mock's setItem is already a jest.fn, so only fail the next
-    // two writes (the first try and the retry) instead of replacing it.
     const setItem = jest
       .mocked(AsyncStorage.setItem)
       .mockRejectedValueOnce(new Error('disk full'))
@@ -645,8 +643,6 @@ describe('AppointmentDetailScreen', () => {
     });
 
     it('does not move the event when the visit time changed without the user', async () => {
-      // The demo catalogue rolls forward every day; a stored link from an
-      // earlier day must not move the event by itself.
       await calendarLinkStorage.write('account:patient-1', appointment.id, {
         calendar: personalCalendar,
         eventId: 'event-1',

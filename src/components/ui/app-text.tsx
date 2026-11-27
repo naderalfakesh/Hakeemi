@@ -47,14 +47,10 @@ function createStyles(theme: AppTheme, tone: TextTone, variant: TextVariant, isR
   return StyleSheet.create({
     text: {
       ...theme.typeScale[variant],
-      // Arabic is a joined script: tracking pulls its letters apart, and on
-      // Android it also makes the measured width disagree with the drawn one,
-      // which clipped short labels such as "حسب الجهاز" after the first word.
+      // Disable letter-spacing for joined Arabic script (prevents Android clipping).
       ...(isRTL ? { letterSpacing: 0 } : {}),
       color: getToneColor(theme, tone),
-      // When the native layout is RTL, React Native swaps left/right styles,
-      // so 'left' is the logical start edge in both directions. Passing
-      // 'right' here would be swapped back to the physical left in RTL.
+      // RN swaps 'left' to the logical start edge in RTL.
       textAlign: 'left',
       writingDirection: isRTL ? 'rtl' : 'ltr',
     } as TextStyle,

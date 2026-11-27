@@ -15,9 +15,7 @@ export function useOnboardingPager({ pageWidth, stepCount }: UseOnboardingPagerO
   const [activeStep, setActiveStep] = useState(0);
   const scrollViewRef = useRef<ScrollViewInstance>(null);
   const activeStepRef = useRef(activeStep);
-  // The horizontal ScrollView row is already visually reversed by the native
-  // RTL layout, and getPhysicalIndex maps logical -> physical offsets for it.
-  // Reversing the step array as well would cancel that mapping out.
+  // Native RTL already mirrors horizontal ScrollViews; keep logical order for getPhysicalIndex.
   const isFirstStep = activeStep === 0;
   const isLastStep = activeStep === stepCount - 1;
 

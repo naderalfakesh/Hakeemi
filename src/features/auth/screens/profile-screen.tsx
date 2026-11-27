@@ -27,7 +27,6 @@ import { localizeAuthError } from '../localization/auth-error-strings';
 import { profileStrings } from '../localization/profile-strings';
 
 type ProfileScreenProps = {
-  /** A demo session has no account, so it gets a way out instead of sign-out. */
   isDemo?: boolean;
   notificationError: NotificationRegistrationError | null;
   notificationStatus: NotificationRegistrationStatus;

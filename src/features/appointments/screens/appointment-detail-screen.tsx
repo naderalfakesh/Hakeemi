@@ -110,8 +110,7 @@ function AuthenticatedAppointmentDetail({
   const providerName = resolvedProvider
     ? resolvedProvider.displayName[locale]
     : strings.appointmentDetails;
-  // The calendar follow-up lives here, not in its section, because the
-  // section is hidden while the user reschedules or cancels.
+  // Kept at screen level because the calendar section unmounts during reschedule/cancel.
   const calendar = useAppointmentCalendar({
     appointment: detailQuery.data ?? null,
     owner: calendarLinkOwner(queryScope, accountId),

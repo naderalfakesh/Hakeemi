@@ -13,7 +13,6 @@ const PROVIDER_PAGE_SIZE = 12;
 
 export type ProviderDiscoveryData = {
   nextSlots: ReadonlyMap<string, AvailabilitySlot>;
-  /** Providers whose availability is still loading; their cards show a placeholder. */
   pendingSlotProviderIds: ReadonlySet<string>;
   providers: readonly Provider[];
   specialties: readonly Specialty[];
@@ -51,7 +50,6 @@ export function useProviderDiscovery({
     queryFn: ({ pageParam }) => repository.listProviderPage(search, pageParam, PROVIDER_PAGE_SIZE),
     initialPageParam: null as ProviderPageCursor | null,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-    // A new search keeps the current results on screen until its first page arrives.
     placeholderData: keepPreviousData,
   });
   const providers = useMemo(() => {
@@ -93,8 +91,6 @@ export function useProviderDiscovery({
   if (isMissingData) {
     state = { status: 'error' };
   } else if (providersQuery.isPending || specialtiesQuery.isPending) {
-    // Only the first load blocks the list. Later pages and availability load
-    // in place, so "load more" never replaces the results with skeletons.
     state = { status: 'loading' };
   } else {
     const nextSlots = new Map<string, AvailabilitySlot>();

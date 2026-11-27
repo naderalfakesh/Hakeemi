@@ -18,9 +18,7 @@ export function AppThemeProvider({
 }: AppThemeProviderProps) {
   const systemColorScheme = useColorScheme();
 
-  // The system draws the status bar, tab bar glass, keyboard and alerts from
-  // the native appearance, so an in-app Light or Dark choice has to override
-  // it too. 'auto' hands control back to the device setting.
+  // Sync native appearance so system UI (status bar, tab bar, keyboard, alerts) follows the theme.
   useEffect(() => {
     Appearance.setColorScheme(preference === 'system' ? 'auto' : preference);
   }, [preference]);

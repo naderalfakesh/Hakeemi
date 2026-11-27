@@ -25,7 +25,6 @@ export function BookingConfirmationScreen({
   provider,
 }: {
   appointment: Appointment;
-  /** Offers to add the new visit to the device calendar right away. */
   calendar?: AppointmentCalendar | undefined;
   onFindCare: () => void;
   onViewAppointments: () => void;
@@ -110,8 +109,6 @@ function createStyles(theme: AppTheme) {
       padding: theme.spacing.lg,
       width: '100%',
     },
-    // Sized to the illustration; a fixed 72pt box let the 200pt artwork
-    // overflow onto the heading below.
     icon: {
       alignItems: 'center',
       alignSelf: 'center',

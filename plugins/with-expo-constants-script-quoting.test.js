@@ -13,7 +13,6 @@ const withExpoConstantsScriptQuoting = require('./with-expo-constants-script-quo
 
 const { PHASE_SCRIPT } = withExpoConstantsScriptQuoting;
 const SCRIPT_PATH = '$PODS_TARGET_SRCROOT/../scripts/get-app-config-ios.sh';
-// expo-constants form before 57.0.22 and the quoted form it uses from 57.0.22.
 const UNQUOTED_SCRIPT = `bash -l -c "${SCRIPT_PATH}"`;
 const QUOTED_SCRIPT = `bash -l -c "\\"${SCRIPT_PATH}\\""`;
 const UNRELATED_SCRIPT = 'echo unrelated';
@@ -32,8 +31,6 @@ function applyPodfileMod(contents) {
   return result.modResults.contents;
 }
 
-// Runs the generated post_install hook against stub CocoaPods objects and
-// prints the resulting shell scripts, one per line.
 function runHookInRuby(scripts) {
   const program = [
     'Phase = Struct.new(:shell_script)',
@@ -85,9 +82,6 @@ describe('withExpoConstantsScriptQuoting', () => {
   });
 });
 
-// Runs phase scripts the way Xcode does (`/bin/sh -c`) against the installed
-// expo-constants script, from a project path that contains spaces. Node is
-// replaced by a stub that records the arguments getAppConfig.js would receive.
 describe('expo-constants app.config phase from a path with spaces', () => {
   let root;
   let projectRoot;

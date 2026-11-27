@@ -68,9 +68,6 @@ export function HomeHeader({
         />
       )}
 
-      {/* A compact entry point: the Find care tab and "See all" already lead
-          to the same place, so the hero stays one tappable row instead of a
-          large card with its own button. */}
       <Pressable
         accessibilityLabel={strings.featureTitle}
         accessibilityRole="button"

@@ -34,16 +34,12 @@ export default function BookingConfirmationRoute() {
   const provider = providerQuery.data?.provider ?? null;
   const { locale } = useAppLocale();
   const strings = useStrings(bookingStrings);
-  // The same link the visit's detail screen reads, so an event added here
-  // follows a later reschedule or cancellation from there.
   const calendar = useAppointmentCalendar({
     appointment: appointmentQuery.data ?? null,
     owner: calendarLinkOwner(dataSources.scope, dataSources.accountId),
     providerName: provider?.displayName[locale] ?? strings.confirmation.confirmedProviderFallback,
   });
 
-  // Confirmation is the last step of the booking sheet: both ways out close
-  // the sheet and switch to the tab underneath instead of stacking a new one.
   if (session.status === 'anonymous') {
     return <Redirect href="/auth/sign-in" />;
   }

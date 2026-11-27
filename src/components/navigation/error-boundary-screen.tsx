@@ -12,11 +12,7 @@ type ErrorBoundaryScreenProps = {
   onRetry: () => void;
 };
 
-/**
- * The route-level boundary can mount above the app providers when the root
- * layout itself fails, so this screen provides its own theme scope instead of
- * assuming one exists.
- */
+// Provides its own theme scope in case the root layout failed above AppThemeProvider.
 export function ErrorBoundaryScreen(props: ErrorBoundaryScreenProps) {
   return (
     <AppThemeProvider>

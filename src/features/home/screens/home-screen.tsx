@@ -25,7 +25,6 @@ import { HomeResultsState } from '../components/home-results-state';
 const FEATURED_PROVIDERS_LIMIT = 3;
 
 type HomeScreenProps = {
-  /** Shows the demo badge so fictional data is never mistaken for an account. */
   isDemo?: boolean;
   nextVisit?: HomeNextVisit | null;
   onFindCare: () => void;

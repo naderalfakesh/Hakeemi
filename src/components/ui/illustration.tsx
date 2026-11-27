@@ -9,10 +9,6 @@ type IllustrationProps = {
   source: ImageSourcePropType;
 };
 
-/**
- * A decorative spot illustration with an optional organic blob backdrop.
- * Hidden from assistive technology; the surrounding copy carries the meaning.
- */
 export function Illustration({ backdrop = true, size = 180, source }: IllustrationProps) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme, size), [size, theme]);

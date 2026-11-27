@@ -17,7 +17,6 @@ export type AppointmentListItem = {
 
 export type AppointmentFilter = 'cancelled' | 'past' | 'upcoming';
 
-/** Keep lifecycle grouping in one place so list and home surfaces agree. */
 export function selectAppointments(
   items: readonly AppointmentListItem[],
   filter: AppointmentFilter,
@@ -25,7 +24,6 @@ export function selectAppointments(
 ) {
   const direction = filter === 'upcoming' ? 1 : -1;
 
-  // Upcoming reads soonest first; history reads most recent first.
   return items
     .filter(({ appointment }) => matchesFilter(appointment, filter, now))
     .sort(
@@ -64,7 +62,6 @@ export function useAppointments({
   const queryClient = useQueryClient();
 
   return useQuery({
-    // Account appointments need a signed-in account.
     enabled: queryScope === 'demo' || accountId !== null,
     queryKey: appointmentQueryKeys.list(queryScope, accountId),
     queryFn: async () => {

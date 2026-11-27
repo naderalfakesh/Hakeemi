@@ -23,9 +23,7 @@ const publicVariableNames: Record<keyof RawPublicEnvironment, string> = {
   useFirebaseEmulators: 'EXPO_PUBLIC_USE_FIREBASE_EMULATORS',
 };
 
-// Only a development bundle may fill in missing variables, so a fresh clone
-// runs against the Emulator Suite without a .env file. Release bundles get no
-// defaults: a missing variable there is a build mistake and must fail closed.
+// Release bundles fail closed; only dev bundles fall back to emulator defaults.
 const developmentBundleDefaults: Record<keyof RawPublicEnvironment, string> = {
   appEnvironment: 'development',
   firebaseProjectId: 'hakeemi-portfolio-dev',
@@ -102,9 +100,6 @@ export function resolvePublicEnvironment(
   return parsedEnvironment;
 }
 
-// Metro defines __DEV__ per bundle: true for development bundles, false for
-// release bundles. An undefined global is treated as a release bundle so an
-// unexpected runtime fails closed instead of defaulting to the emulators.
 const isDevelopmentBundle = typeof __DEV__ === 'boolean' && __DEV__;
 
 export const environment = resolvePublicEnvironment(

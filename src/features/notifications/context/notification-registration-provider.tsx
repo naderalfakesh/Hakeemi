@@ -46,8 +46,6 @@ export function NotificationRegistrationProvider({ children }: { children: React
     registeredLocale.current = null;
 
     if (userId) {
-      // A sign-out that could not reach the server is retried as soon as any
-      // account is signed in on this device.
       void flushPendingNotificationDeregistrations();
     }
 

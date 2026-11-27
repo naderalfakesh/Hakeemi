@@ -33,13 +33,10 @@ jest.mock('@react-native-firebase/functions', () => ({
 
 const originalDev = Reflect.get(globalThis, '__DEV__') as boolean;
 
-// React Native itself reads __DEV__ while loading, so only true/false are
-// reachable here; the undefined case is covered by the env module tests.
 function setBundleGlobal(value: boolean) {
   Reflect.set(globalThis, '__DEV__', value);
 }
 
-// The module keeps an "already configured" flag, so every case loads a fresh copy.
 function loadInitializer() {
   let loaded: InitializerModuleType | undefined;
 

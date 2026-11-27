@@ -51,8 +51,6 @@ export class DemoAppointmentRepository implements AppointmentRepository {
 
   private mutate<Result>(operation: (state: DemoAppointmentState) => Result): Promise<Result> {
     return this.enqueueMutation(async () => {
-      // Operations change a copy, so objects already handed to the query cache
-      // are never edited in place and a failed operation changes nothing.
       const current = await this.readState();
       const nextState: DemoAppointmentState = {
         ...current,
@@ -64,7 +62,7 @@ export class DemoAppointmentRepository implements AppointmentRepository {
       try {
         await AsyncStorage.setItem(DEMO_APPOINTMENTS_KEY, JSON.stringify(nextState));
       } catch {
-        // Demo state remains usable in memory when device storage is unavailable.
+        // Ignore storage failure; in-memory state stays usable.
       }
 
       return result;
@@ -87,7 +85,7 @@ export class DemoAppointmentRepository implements AppointmentRepository {
         return storedState;
       }
     } catch {
-      // Invalid or unavailable storage falls back to a fresh fictional seed.
+      // Fall back to a fresh seed when storage is unavailable or corrupt.
     }
 
     const state: DemoAppointmentState = {
@@ -99,7 +97,7 @@ export class DemoAppointmentRepository implements AppointmentRepository {
     try {
       await AsyncStorage.setItem(DEMO_APPOINTMENTS_KEY, JSON.stringify(state));
     } catch {
-      // The in-memory seed still provides the complete demo journey.
+      // Ignore storage failure; in-memory state stays usable.
     }
 
     return state;

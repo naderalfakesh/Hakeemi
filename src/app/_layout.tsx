@@ -35,9 +35,6 @@ import { useStrings } from '@/localization/use-strings';
 
 initializeFirebaseServices();
 
-// The native splash stays up until the session has restored, so launch goes
-// straight from the splash tile to the first routed screen. If restoration
-// is unusually slow the in-app gate takes over instead.
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 const SPLASH_HANDOFF_LIMIT_MS = 3000;
 
@@ -79,8 +76,6 @@ function Navigation() {
     );
   }
 
-  // Screens the launch gate resolves into fade in so the brand tile hands
-  // off in place instead of sliding the whole screen in from the side.
   const entryAnimation = prefersReducedMotion ? 'none' : 'fade';
 
   return (
@@ -89,21 +84,15 @@ function Navigation() {
         screenOptions={{
           animation: prefersReducedMotion ? 'none' : 'default',
           headerShown: false,
-          // iOS takes the status bar style from the screen's view controller,
-          // so the <StatusBar> below only reaches Android.
+          // iOS reads statusBarStyle from the screen view controller; <StatusBar> only affects Android.
           statusBarStyle: theme.mode === 'dark' ? 'light' : 'dark',
         }}
       >
-        {/* Onboarding and Welcome only exist for someone who is not signed in
-            or exploring the demo. Signing in or starting the demo removes them
-            from history, so Back can never return to them. */}
         <Stack.Protected guard={session.status === 'anonymous'}>
           <Stack.Screen name="onboarding" options={{ animation: entryAnimation }} />
           <Stack.Screen name="welcome" options={{ animation: entryAnimation }} />
         </Stack.Protected>
         <Stack.Screen name="(tabs)" options={{ animation: entryAnimation }} />
-        {/* Booking is one task with its own steps, so it opens as a sheet over
-            the clinician instead of pushing three more screens onto the stack. */}
         <Stack.Screen name="booking" options={{ presentation: 'modal' }} />
       </Stack>
       <NotificationNavigationBridge />

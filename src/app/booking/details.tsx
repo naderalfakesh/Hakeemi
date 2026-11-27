@@ -25,16 +25,12 @@ export default function BookingDetailsRoute() {
     repository: dataSources.careRepository,
   });
   const strings = useStrings(bookingStrings);
-  // Details is the first step of the booking sheet, so leaving it closes the
-  // sheet and shows the clinician underneath.
   const closeBooking = () =>
     router.canGoBack()
       ? router.back()
       : router.replace({ pathname: '/providers/[providerId]', params: { providerId } });
 
-  // Only the focused screen seeds a draft. Once a booking is confirmed this
-  // screen may still be mounted while it animates away, and must not start a
-  // new draft for the slot that was just booked.
+  // Seed only while focused so the dismiss animation does not recreate a cleared draft.
   useFocusEffect(
     useCallback(() => {
       if (

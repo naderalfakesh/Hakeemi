@@ -91,8 +91,7 @@ function createStyles(theme: AppTheme, isRTL: boolean) {
       minHeight: theme.sizes.controlHeight,
       paddingHorizontal: theme.spacing.md,
       paddingVertical: theme.spacing.sm,
-      // TextInput is excluded from RN's RTL left/right style swap, so the
-      // physical edge has to be chosen per direction.
+      // TextInput skips RN's RTL left/right swap.
       textAlign: isRTL ? 'right' : 'left',
     },
     focused: {

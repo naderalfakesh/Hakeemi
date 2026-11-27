@@ -2,8 +2,6 @@ const { describe, expect, test } = require('@jest/globals');
 
 const { addFirebaseConfigure } = require('./with-firebase-app-configure');
 
-// Shape of the SDK 58 scene-lifecycle AppDelegate after the upstream
-// @react-native-firebase/app plugin added only its import.
 const APP_DELEGATE = [
   'internal import Expo',
   'import FirebaseCore',

@@ -12,10 +12,6 @@ import { savedProvidersQueryKeys } from '@/features/care/hooks/use-saved-provide
 
 import { useAuthSession } from './auth-session-provider';
 
-/**
- * Drops account-private client state when a signed-in account ends, so the
- * next account on the same device starts from an empty cache and no draft.
- */
 export function AccountDataReset() {
   const session = useAuthSession();
   const queryClient = useQueryClient();
@@ -28,9 +24,6 @@ export function AccountDataReset() {
       : calendarLinkOwner('account', accountId);
   const previousCalendarOwner = useRef(calendarOwner);
 
-  // Calendar links follow the session that made them: signing out or leaving
-  // the demo forgets them, so the next session's appointments (demo ids
-  // repeat every session) never act on another session's events.
   useEffect(() => {
     const endedOwner = previousCalendarOwner.current;
     previousCalendarOwner.current = calendarOwner;
@@ -49,14 +42,12 @@ export function AccountDataReset() {
     const endedAccountId = previousAccountId.current;
     previousAccountId.current = accountId;
 
-    // Only a signed-in account ending counts: a draft started while signed
-    // out must survive the sign-in redirect that resumes booking.
+    // Ignore anonymous -> signed-in transitions so pre-sign-in booking drafts survive.
     if (endedAccountId === null || endedAccountId === accountId) {
       return;
     }
 
-    // Removing (rather than invalidating) also discards responses still in
-    // flight for the ended account.
+    // Remove (not invalidate) so in-flight responses for the previous account are dropped.
     queryClient.removeQueries({ queryKey: appointmentQueryKeys.account(endedAccountId) });
     queryClient.removeQueries({ queryKey: savedProvidersQueryKeys.owner(endedAccountId) });
     void clearBookingDraft();

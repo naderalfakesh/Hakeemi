@@ -41,10 +41,7 @@ export type DeliveryProgress = {
   issued: number;
 };
 
-// Once any device may have received the reminder, a retry could duplicate it.
-// Only failures with no successful recipient and a known-undelivered send are
-// retried: errors before the first multicast, a rejection of the first
-// multicast (the SDK rejects before transmitting), and per-token failures.
+// Never retry once any device succeeded or a multicast send outcome is unknown.
 export function resolveDeliveryFailure(
   failure: DeliveryFailure,
   progress: DeliveryProgress,
