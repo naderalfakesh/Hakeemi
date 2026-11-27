@@ -28,6 +28,12 @@ export const sizes = {
   minimumTouchTarget: 44,
 } as const;
 
+export const breakpoints = {
+  compactHeight: 720,
+  stackedActionFontScale: 1.5,
+  tabletWidth: 768,
+} as const;
+
 export const motion = {
   duration: {
     instant: 80,

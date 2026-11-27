@@ -1,20 +1,24 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
-  addAppointmentToCalendar,
   listWritableCalendars,
-  moveAppointmentCalendarEvent,
-  removeAppointmentCalendarEvent,
   type CalendarEventTime,
   type WritableCalendar,
 } from '@/services/calendar/calendar';
 
 import {
+  addAndLinkCalendarEvent,
+  resolveMissingCalendarLinkState,
+  resolveStoredCalendarState,
+  syncCancelledCalendarEvent,
+  syncRescheduledCalendarEvent,
+} from '../data/appointment-calendar-sync';
+import {
   calendarLinkStorage,
   type CalendarLinkOwner,
   type CalendarLinkStorage,
 } from '../data/calendar-link-storage';
-import { planCalendarFollowUp, type AppointmentCalendarLink } from '../domain/calendar-link';
+import type { AppointmentCalendarLink } from '../domain/calendar-link';
 import type { AppointmentCalendarState } from '../domain/calendar-state';
 import type { Appointment } from '../domain/types';
 
@@ -22,6 +26,13 @@ type CalendarAppointment = Pick<
   Appointment,
   'endsAt' | 'id' | 'startsAt' | 'status' | 'timezone' | 'visitMode'
 >;
+
+type UseAppointmentCalendarOptions = {
+  appointment: CalendarAppointment | null;
+  owner: CalendarLinkOwner | null;
+  providerName: string;
+  storage?: CalendarLinkStorage;
+};
 
 /**
  * Keeps a visit and its device calendar event together.
@@ -33,20 +44,15 @@ type CalendarAppointment = Pick<
  *
  * The event only changes because of something the user did: the screen calls
  * `followReschedule` or `followCancel` after its own reschedule or cancel
- * succeeds. A visit that changed any other way (the demo catalogue rolling
- * forward, another device) only offers a button to move or remove the event.
+ * succeeds. A visit that changed any other way only offers a button to move or
+ * remove the event.
  */
 export function useAppointmentCalendar({
   appointment,
   owner,
   providerName,
   storage = calendarLinkStorage,
-}: {
-  appointment: CalendarAppointment | null;
-  owner: CalendarLinkOwner | null;
-  providerName: string;
-  storage?: CalendarLinkStorage;
-}) {
+}: UseAppointmentCalendarOptions) {
   const [state, setState] = useState<AppointmentCalendarState>({ status: 'working' });
   // Bumped by every follow-up the user starts, so a link read that began
   // before it cannot overwrite its outcome.
@@ -70,47 +76,27 @@ export function useAppointmentCalendar({
     }
 
     let active = true;
-    const linkedOwner = owner;
-    const appointmentId = id;
-    const appointmentStatus = status;
-
     const startedAt = generation.current;
     const isCurrent = () => active && generation.current === startedAt;
 
-    async function describeLink() {
-      const link = await storage.read(linkedOwner, appointmentId);
+    storage
+      .read(owner, id)
+      .then((link) => {
+        if (!isCurrent()) {
+          return;
+        }
 
-      if (!isCurrent()) {
-        return;
-      }
-
-      if (!link) {
-        // A finished follow-up already said what happened to the event.
         setState((previous) =>
-          previous.status === 'removed' || previous.status === 'outdated'
-            ? previous
-            : { status: 'idle' },
+          link
+            ? resolveStoredCalendarState({ startsAt, status }, link, previous)
+            : resolveMissingCalendarLinkState(previous),
         );
-        return;
-      }
-
-      const followUp = planCalendarFollowUp({ startsAt, status: appointmentStatus }, link);
-      const next =
-        followUp === 'keep' ? 'added' : followUp === 'move' ? 'stale' : ('notRemoved' as const);
-
-      setState((previous) =>
-        // Keep "moved" once the refetched visit catches up with the event.
-        next === 'added' && previous.status === 'moved'
-          ? previous
-          : { calendar: link.calendar, status: next },
-      );
-    }
-
-    describeLink().catch(() => {
-      if (isCurrent()) {
-        setState({ status: 'idle' });
-      }
-    });
+      })
+      .catch(() => {
+        if (isCurrent()) {
+          setState({ status: 'idle' });
+        }
+      });
 
     return () => {
       active = false;
@@ -123,7 +109,7 @@ export function useAppointmentCalendar({
         link: AppointmentCalendarLink,
         linkedOwner: CalendarLinkOwner,
         appointmentId: string,
-      ) => Promise<void>,
+      ) => Promise<AppointmentCalendarState>,
     ) => {
       if (!owner || !id) {
         return;
@@ -137,7 +123,7 @@ export function useAppointmentCalendar({
 
         if (link) {
           setState({ status: 'working' });
-          await change(link, owner, id);
+          setState(await change(link, owner, id));
         }
       } catch {
         if (generation.current === startedAt) {
@@ -150,56 +136,17 @@ export function useAppointmentCalendar({
 
   const followReschedule = useCallback(
     (time: CalendarEventTime) =>
-      follow(async (link, linkedOwner, appointmentId) => {
-        const result = await moveAppointmentCalendarEvent(
-          { calendarId: link.calendar.id, eventId: link.eventId },
-          time,
-        ).catch(() => null);
-
-        if (result?.status === 'done') {
-          // If this write fails the link keeps the old time, which only shows
-          // the (idempotent) move button again; it never adds a second event.
-          await storage
-            .write(linkedOwner, appointmentId, { ...link, startsAt: time.startsAt })
-            .catch(() => undefined);
-          setState({ calendar: link.calendar, status: 'moved' });
-          return;
-        }
-
-        if (result === null || result.status === 'denied') {
-          // The event still exists; keeping the link lets the user retry the
-          // move instead of adding a second event.
-          setState({ calendar: link.calendar, status: 'stale' });
-          return;
-        }
-
-        await storage.remove(linkedOwner, appointmentId);
-        setState({ status: 'outdated' });
-      }),
+      follow((link, linkedOwner, appointmentId) =>
+        syncRescheduledCalendarEvent(storage, linkedOwner, appointmentId, link, time),
+      ),
     [follow, storage],
   );
 
   const followCancel = useCallback(
     () =>
-      follow(async (link, linkedOwner, appointmentId) => {
-        const result = await removeAppointmentCalendarEvent({
-          calendarId: link.calendar.id,
-          eventId: link.eventId,
-        }).catch(() => null);
-
-        if (result === null || result.status === 'denied') {
-          // Keep the link so the user can retry once access is back.
-          setState({ calendar: link.calendar, status: 'notRemoved' });
-          return;
-        }
-
-        await storage.remove(linkedOwner, appointmentId);
-        setState(
-          result.status === 'done'
-            ? { calendar: link.calendar, status: 'removed' }
-            : { status: 'idle' },
-        );
-      }),
+      follow((link, linkedOwner, appointmentId) =>
+        syncCancelledCalendarEvent(storage, linkedOwner, appointmentId, link),
+      ),
     [follow, storage],
   );
 
@@ -213,24 +160,7 @@ export function useAppointmentCalendar({
       setState({ status: 'working' });
 
       try {
-        const result = await addAppointmentToCalendar(calendar.id, event);
-
-        if (result.status !== 'added') {
-          setState(result);
-          return;
-        }
-
-        const link = { calendar, eventId: result.eventId, startsAt: event.startsAt };
-        // One retry covers a busy storage queue; after that the user is told
-        // the event will not follow the visit, rather than finding out later.
-        const stored = await storage
-          .write(owner, id, link)
-          .catch(() => storage.write(owner, id, link))
-          .then(
-            () => true,
-            () => false,
-          );
-        setState({ calendar, status: stored ? 'added' : 'addedUntracked' });
+        setState(await addAndLinkCalendarEvent(storage, owner, id, calendar, event));
       } catch {
         setState({ status: 'error' });
       } finally {

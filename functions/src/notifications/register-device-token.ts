@@ -8,7 +8,7 @@ import {
   registerDeviceTokenResultSchema,
   type RegisterDeviceTokenRequest,
   type RegisterDeviceTokenResult,
-} from '../appointments/contracts.js';
+} from './contracts.js';
 
 // Upper bound on enabled registrations of one token that a single
 // registration may supersede. Every registration leaves at most one enabled

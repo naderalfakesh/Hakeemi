@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppText, Button, InlineError } from '@/components/ui';
-import type { Provider } from '@/features/care/domain/types';
-import type { SavedProvidersStatus } from '@/features/care/hooks/use-saved-providers';
+import { AppText } from '@/components/ui';
 import type { ProfileStatus } from '@/features/auth/context/auth-session-provider';
 import type { UserProfile } from '@/features/auth/domain/profile';
 import type { AuthFailureCode, AuthUser } from '@/features/auth/domain/types';
+import type { Provider } from '@/features/care/domain/types';
+import type { SavedProvidersStatus } from '@/features/care/hooks/use-saved-providers';
 import type {
   NotificationRegistrationError,
   NotificationRegistrationStatus,
@@ -21,34 +21,30 @@ import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import { useThemedStyles, type AppTheme } from '@/theme';
 
-import { GuestCard } from '../components/guest-card';
-import { NotificationRemindersCard } from '../components/notification-reminders-card';
-import { PreferencesCard } from '../components/preferences-card';
-import { ProfileIdentityCard } from '../components/profile-identity-card';
-import { ProfileSyncStatusCard } from '../components/profile-sync-status-card';
-import { SavedProvidersSection } from '../components/saved-providers-section';
+import { GuestProfileContent } from '../components/guest-profile-content';
+import { SignedInProfileContent } from '../components/signed-in-profile-content';
 import { localizeAuthError } from '../localization/auth-error-strings';
 import { profileStrings } from '../localization/profile-strings';
 
 type ProfileScreenProps = {
   /** A demo session has no account, so it gets a way out instead of sign-out. */
   isDemo?: boolean;
+  notificationError: NotificationRegistrationError | null;
+  notificationStatus: NotificationRegistrationStatus;
   onCreateAccount: () => void;
   onEnableNotifications: () => Promise<void>;
   onExitDemo?: (() => Promise<void>) | undefined;
+  onOpenSavedProvider?: ((providerId: string) => void) | undefined;
   onRetryPreferences: () => void;
   onRetryProfile: () => Promise<void>;
+  onRetrySavedProviders?: (() => void) | undefined;
   onSignIn: () => void;
   onSignOut: () => Promise<void>;
-  onOpenSavedProvider?: ((providerId: string) => void) | undefined;
-  onRetrySavedProviders?: (() => void) | undefined;
   onToggleSavedProvider?: ((providerId: string) => void) | undefined;
   onUpdatePreferences: (preferences: AppPreferences) => void;
   preferences: AppPreferences;
   preferencesError: PreferencesError | null;
   preferencesStatus: PreferencesStatus;
-  notificationError: NotificationRegistrationError | null;
-  notificationStatus: NotificationRegistrationStatus;
   profile: UserProfile | null;
   profileError: AuthFailureCode | null;
   profileStatus: ProfileStatus;
@@ -59,22 +55,22 @@ type ProfileScreenProps = {
 
 export function ProfileScreen({
   isDemo = false,
+  notificationError,
+  notificationStatus,
   onCreateAccount,
   onEnableNotifications,
   onExitDemo,
+  onOpenSavedProvider,
   onRetryPreferences,
   onRetryProfile,
+  onRetrySavedProviders,
   onSignIn,
   onSignOut,
-  onOpenSavedProvider,
-  onRetrySavedProviders,
   onToggleSavedProvider,
   onUpdatePreferences,
   preferences,
   preferencesError,
   preferencesStatus,
-  notificationError,
-  notificationStatus,
   profile,
   profileError,
   profileStatus,
@@ -101,9 +97,6 @@ export function ProfileScreen({
     }
   }
 
-  const displayName = profile?.displayName ?? user?.displayName ?? strings.memberFallback;
-  const email = profile?.email ?? user?.email;
-
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -117,80 +110,48 @@ export function ProfileScreen({
         </View>
 
         {user ? (
-          <>
-            <ProfileIdentityCard
-              displayName={displayName}
-              email={email}
-              profileStatus={profileStatus}
-              user={user}
-            />
-
-            {(profileStatus === 'loading' || profileStatus === 'error') && (
-              <ProfileSyncStatusCard
-                onRetryProfile={onRetryProfile}
-                profileError={profileError}
-                profileStatus={profileStatus}
-              />
-            )}
-
-            <PreferencesCard
-              onRetryPreferences={onRetryPreferences}
-              onUpdatePreferences={onUpdatePreferences}
-              preferences={preferences}
-              preferencesError={preferencesError}
-              preferencesStatus={preferencesStatus}
-              subtitle={strings.preferencesSubtitle}
-            />
-
-            <NotificationRemindersCard
-              notificationError={notificationError}
-              notificationStatus={notificationStatus}
-              onEnableNotifications={onEnableNotifications}
-            />
-
-            <SavedProvidersSection
-              onOpenProvider={onOpenSavedProvider}
-              onRemoveProvider={onToggleSavedProvider}
-              onRetry={onRetrySavedProviders}
-              providers={savedProviders}
-              status={savedProvidersStatus}
-            />
-
-            {signOutError && <InlineError message={signOutError} />}
-            <Button busy={isSigningOut} onPress={() => void handleSignOut()} variant="secondary">
-              {strings.signOut}
-            </Button>
-          </>
+          <SignedInProfileContent
+            isSigningOut={isSigningOut}
+            notificationError={notificationError}
+            notificationStatus={notificationStatus}
+            onEnableNotifications={onEnableNotifications}
+            onOpenSavedProvider={onOpenSavedProvider}
+            onRetryPreferences={onRetryPreferences}
+            onRetryProfile={onRetryProfile}
+            onRetrySavedProviders={onRetrySavedProviders}
+            onSignOut={() => void handleSignOut()}
+            onToggleSavedProvider={onToggleSavedProvider}
+            onUpdatePreferences={onUpdatePreferences}
+            preferences={preferences}
+            preferencesError={preferencesError}
+            preferencesStatus={preferencesStatus}
+            profile={profile}
+            profileError={profileError}
+            profileStatus={profileStatus}
+            savedProviders={savedProviders}
+            savedProvidersStatus={savedProvidersStatus}
+            signOutError={signOutError}
+            user={user}
+          />
         ) : (
-          <>
-            <GuestCard
-              isDemo={isDemo}
-              isSigningOut={isSigningOut}
-              onCreateAccount={onCreateAccount}
-              onExitDemo={onExitDemo ? () => void handleSignOut(onExitDemo) : undefined}
-              onSignIn={onSignIn}
-              signOutError={signOutError}
-            />
-
-            <PreferencesCard
-              onRetryPreferences={onRetryPreferences}
-              onUpdatePreferences={onUpdatePreferences}
-              preferences={preferences}
-              preferencesError={preferencesError}
-              preferencesStatus={preferencesStatus}
-              subtitle={strings.preferencesLocalSubtitle}
-            />
-
-            {isDemo && savedProvidersStatus !== 'unavailable' && (
-              <SavedProvidersSection
-                onOpenProvider={onOpenSavedProvider}
-                onRemoveProvider={onToggleSavedProvider}
-                onRetry={onRetrySavedProviders}
-                providers={savedProviders}
-                status={savedProvidersStatus}
-              />
-            )}
-          </>
+          <GuestProfileContent
+            isDemo={isDemo}
+            isSigningOut={isSigningOut}
+            onCreateAccount={onCreateAccount}
+            onExitDemo={onExitDemo ? () => void handleSignOut(onExitDemo) : undefined}
+            onOpenSavedProvider={onOpenSavedProvider}
+            onRetryPreferences={onRetryPreferences}
+            onRetrySavedProviders={onRetrySavedProviders}
+            onSignIn={onSignIn}
+            onToggleSavedProvider={onToggleSavedProvider}
+            onUpdatePreferences={onUpdatePreferences}
+            preferences={preferences}
+            preferencesError={preferencesError}
+            preferencesStatus={preferencesStatus}
+            savedProviders={savedProviders}
+            savedProvidersStatus={savedProvidersStatus}
+            signOutError={signOutError}
+          />
         )}
 
         <AppText style={styles.disclaimer} tone="secondary" variant="caption">

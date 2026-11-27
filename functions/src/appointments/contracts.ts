@@ -1,5 +1,11 @@
-import { Timestamp } from 'firebase-admin/firestore';
 import { z } from 'zod';
+
+import {
+  documentIdSchema,
+  requestIdSchema,
+  timestampSchema,
+  VISIT_MODES,
+} from '../shared/schemas.js';
 
 export const APPOINTMENT_REASON_CATEGORIES = [
   'follow_up',
@@ -12,23 +18,8 @@ export const APPOINTMENT_REASON_CATEGORIES = [
 export const APPOINTMENT_STATUSES = ['confirmed', 'cancelled', 'completed', 'no_show'] as const;
 
 export const SLOT_STATUSES = ['available', 'held', 'booked', 'blocked'] as const;
-export const VISIT_MODES = ['in_person', 'video'] as const;
-export const NOTIFICATION_PLATFORMS = ['android', 'ios'] as const;
-export const SUPPORTED_LOCALES = ['ar', 'en'] as const;
 
-const documentIdSchema = z
-  .string()
-  .trim()
-  .min(1)
-  .max(128)
-  .regex(/^[A-Za-z0-9][A-Za-z0-9_-]*$/);
-
-const requestIdSchema = z
-  .string()
-  .trim()
-  .regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
-
-const timestampSchema = z.custom<Timestamp>((value) => value instanceof Timestamp);
+export { VISIT_MODES };
 
 export const bookAppointmentRequestSchema = z
   .object({
@@ -101,40 +92,6 @@ export const rescheduleAppointmentResultSchema = z
   .object({
     appointment: appointmentSummarySchema,
     isReplay: z.boolean(),
-  })
-  .strict();
-
-export const registerDeviceTokenRequestSchema = z
-  .object({
-    enabled: z.boolean().default(true),
-    locale: z.enum(SUPPORTED_LOCALES),
-    platform: z.enum(NOTIFICATION_PLATFORMS),
-    token: z.string().trim().min(16).max(4096),
-  })
-  .strict();
-
-export const registerDeviceTokenResultSchema = z
-  .object({
-    enabled: z.boolean(),
-    tokenId: z.string().regex(/^[0-9a-f]{64}$/),
-  })
-  .strict();
-
-// The raw token is the possession proof: only the device that holds it can
-// present it, and a hash alone is never accepted. `userId` lets a device flush
-// a sign-out that could not reach the server while that account was still
-// signed in; it defaults to the caller.
-export const unregisterDeviceTokenRequestSchema = z
-  .object({
-    token: z.string().trim().min(16).max(4096),
-    userId: documentIdSchema.optional(),
-  })
-  .strict();
-
-export const unregisterDeviceTokenResultSchema = z
-  .object({
-    disabled: z.boolean(),
-    tokenId: z.string().regex(/^[0-9a-f]{64}$/),
   })
   .strict();
 
@@ -265,7 +222,3 @@ export type CancelAppointmentRequest = z.infer<typeof cancelAppointmentRequestSc
 export type CancelAppointmentResult = z.infer<typeof cancelAppointmentResultSchema>;
 export type RescheduleAppointmentRequest = z.infer<typeof rescheduleAppointmentRequestSchema>;
 export type RescheduleAppointmentResult = z.infer<typeof rescheduleAppointmentResultSchema>;
-export type RegisterDeviceTokenRequest = z.infer<typeof registerDeviceTokenRequestSchema>;
-export type RegisterDeviceTokenResult = z.infer<typeof registerDeviceTokenResultSchema>;
-export type UnregisterDeviceTokenRequest = z.infer<typeof unregisterDeviceTokenRequestSchema>;
-export type UnregisterDeviceTokenResult = z.infer<typeof unregisterDeviceTokenResultSchema>;

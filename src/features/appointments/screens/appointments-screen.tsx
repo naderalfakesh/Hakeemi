@@ -1,18 +1,17 @@
-import { useCallback, useState } from 'react';
-import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { RefreshControl, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
   Button,
-  Chip,
   DecorativeIcon,
   EmptyState,
-  Skeleton,
   StaleDataNotice,
   stateIllustrations,
 } from '@/components/ui';
 import { useAuthSession } from '@/features/auth/context/auth-session-provider';
 import type { CareRepository } from '@/features/care/domain/repository';
+import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import { useIsOffline } from '@/services/connectivity/use-is-offline';
@@ -20,7 +19,9 @@ import type { AppDataScope } from '@/services/query/data-scope';
 import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
 
 import { AppointmentCard } from '../components/appointment-card';
+import { AppointmentsFilterBar } from '../components/appointments-filter-bar';
 import { AppointmentsHeader } from '../components/appointments-header';
+import { AppointmentsLoading } from '../components/appointments-loading';
 import { AppointmentsState } from '../components/appointments-state';
 import type { AppointmentRepository } from '../domain/repository';
 import {
@@ -29,8 +30,6 @@ import {
   type AppointmentFilter,
 } from '../hooks/use-appointments';
 import { appointmentsStrings } from '../localization/appointments-strings';
-
-const filterKeys: readonly AppointmentFilter[] = ['upcoming', 'past', 'cancelled'];
 
 type AppointmentsScreenProps = {
   appointmentRepository?: AppointmentRepository | undefined;
@@ -74,6 +73,15 @@ export function AppointmentsScreen({
   );
 }
 
+type AuthenticatedAppointmentsProps = {
+  accountId: string | null;
+  appointmentRepository?: AppointmentRepository | undefined;
+  careDataRepository?: CareRepository | undefined;
+  onFindCare: () => void;
+  onViewAppointment?: ((appointmentId: string) => void) | undefined;
+  queryScope: AppDataScope;
+};
+
 function AuthenticatedAppointments({
   accountId,
   appointmentRepository,
@@ -81,14 +89,7 @@ function AuthenticatedAppointments({
   onFindCare,
   onViewAppointment,
   queryScope,
-}: {
-  accountId: string | null;
-  appointmentRepository?: AppointmentRepository | undefined;
-  careDataRepository?: CareRepository | undefined;
-  onFindCare: () => void;
-  onViewAppointment?: ((appointmentId: string) => void) | undefined;
-  queryScope: AppDataScope;
-}) {
+}: AuthenticatedAppointmentsProps) {
   const theme = useAppTheme();
   const { locale } = useAppLocale();
   const strings = useStrings(appointmentsStrings);
@@ -101,47 +102,26 @@ function AuthenticatedAppointments({
   });
   const isOffline = useIsOffline();
   const [filter, setFilter] = useState<AppointmentFilter>('upcoming');
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    try {
-      await appointmentsQuery.refetch();
-    } finally {
-      setIsRefreshing(false);
-    }
-  }, [appointmentsQuery]);
+  const { handleRefresh, isRefreshing } = usePullToRefresh(appointmentsQuery.refetch);
 
   if (appointmentsQuery.isPending) {
-    return (
-      <SafeAreaView
-        accessibilityLabel={strings.loadingAppointments}
-        edges={['top']}
-        style={styles.safeArea}
-      >
-        <View style={styles.content}>
-          <AppointmentsHeader hasAppointments={false} onFindCare={onFindCare} />
-          <View style={styles.filterRow}>
-            <Skeleton height={44} radius="sm" width={112} />
-            <Skeleton height={44} radius="sm" width={92} />
-          </View>
-          <Skeleton height={150} radius="lg" width="100%" />
-        </View>
-      </SafeAreaView>
-    );
+    return <AppointmentsLoading onFindCare={onFindCare} />;
   }
+
+  const refreshControl = (
+    <RefreshControl
+      onRefresh={() => void handleRefresh()}
+      refreshing={isRefreshing}
+      tintColor={theme.colors.brand}
+    />
+  );
 
   if (appointmentsQuery.isError && appointmentsQuery.data === undefined) {
     return (
       <SafeAreaView edges={['top']} style={styles.safeArea}>
         <ScrollView
           contentContainerStyle={styles.content}
-          refreshControl={
-            <RefreshControl
-              onRefresh={() => void handleRefresh()}
-              refreshing={isRefreshing}
-              tintColor={theme.colors.brand}
-            />
-          }
+          refreshControl={refreshControl}
           showsVerticalScrollIndicator={false}
         >
           <AppointmentsHeader hasAppointments={false} onFindCare={onFindCare} />
@@ -168,13 +148,7 @@ function AuthenticatedAppointments({
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <ScrollView
         contentContainerStyle={styles.content}
-        refreshControl={
-          <RefreshControl
-            onRefresh={() => void handleRefresh()}
-            refreshing={isRefreshing}
-            tintColor={theme.colors.brand}
-          />
-        }
+        refreshControl={refreshControl}
         showsVerticalScrollIndicator={false}
       >
         <AppointmentsHeader hasAppointments={hasAppointments} onFindCare={onFindCare} />
@@ -183,20 +157,7 @@ function AuthenticatedAppointments({
           <StaleDataNotice reason={staleReason} updatedAt={appointmentsQuery.dataUpdatedAt} />
         )}
 
-        <ScrollView
-          contentContainerStyle={styles.filterRow}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        >
-          {filterKeys.map((candidate) => (
-            <Chip
-              key={candidate}
-              label={strings.filterLabels[candidate]}
-              onPress={() => setFilter(candidate)}
-              selected={candidate === filter}
-            />
-          ))}
-        </ScrollView>
+        <AppointmentsFilterBar filter={filter} onChange={setFilter} />
 
         {visibleAppointments.length === 0 ? (
           <EmptyState
@@ -233,10 +194,6 @@ function createStyles(theme: AppTheme) {
       paddingHorizontal: theme.spacing.lg,
       paddingTop: theme.spacing.lg,
       width: '100%',
-    },
-    filterRow: {
-      gap: theme.spacing.xs,
-      paddingBottom: theme.spacing.xxs,
     },
   });
 }

@@ -8,10 +8,10 @@ import {
   cancelAppointmentResultSchema,
   rescheduleAppointmentResultSchema,
   type AppointmentDocument,
+  type AvailabilitySlotDocument,
   type CancelAppointmentResult,
   type RescheduleAppointmentResult,
 } from './contracts.js';
-import { type parseStoredSlot } from './book-appointment.js';
 
 /** Keep appointment management aligned with the booking lead-time policy. */
 export const APPOINTMENT_MANAGEMENT_LEAD_TIME_MS = 15 * 60 * 1_000;
@@ -95,7 +95,7 @@ export function assertAppointmentOwner(appointment: AppointmentDocument, patient
   }
 }
 
-export function assertBookedSlot(slot: ReturnType<typeof parseStoredSlot>, appointmentId: string) {
+export function assertBookedSlot(slot: AvailabilitySlotDocument, appointmentId: string) {
   if (slot.status !== 'booked' || slot.appointmentId !== appointmentId) {
     throw new HttpsError('internal', 'The appointment and availability slot are inconsistent.');
   }

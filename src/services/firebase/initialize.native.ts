@@ -6,7 +6,11 @@ import { Platform } from 'react-native';
 
 import { environment } from '@/config/env';
 
-const FUNCTIONS_REGION = 'me-central1';
+import {
+  FIREBASE_EMULATOR_HOSTS,
+  FIREBASE_EMULATOR_PORTS,
+  FIREBASE_FUNCTIONS_REGION,
+} from './constants';
 
 let isConfigured = false;
 
@@ -29,12 +33,17 @@ export function initializeFirebaseServices() {
     return;
   }
 
-  const emulatorHost = Platform.OS === 'android' ? '10.0.2.2' : '127.0.0.1';
+  const emulatorHost =
+    Platform.OS === 'android' ? FIREBASE_EMULATOR_HOSTS.android : FIREBASE_EMULATOR_HOSTS.default;
   const app = getApp();
 
-  connectAuthEmulator(getAuth(app), `http://${emulatorHost}:9099`, {
+  connectAuthEmulator(getAuth(app), `http://${emulatorHost}:${FIREBASE_EMULATOR_PORTS.auth}`, {
     disableWarnings: true,
   });
-  connectFirestoreEmulator(getFirestore(app), emulatorHost, 8080);
-  connectFunctionsEmulator(getFunctions(app, FUNCTIONS_REGION), emulatorHost, 5001);
+  connectFirestoreEmulator(getFirestore(app), emulatorHost, FIREBASE_EMULATOR_PORTS.firestore);
+  connectFunctionsEmulator(
+    getFunctions(app, FIREBASE_FUNCTIONS_REGION),
+    emulatorHost,
+    FIREBASE_EMULATOR_PORTS.functions,
+  );
 }

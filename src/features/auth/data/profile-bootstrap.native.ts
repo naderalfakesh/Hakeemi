@@ -1,12 +1,12 @@
 import { getApp } from '@react-native-firebase/app';
 import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
 
+import { FIREBASE_FUNCTIONS_REGION } from '@/services/firebase/constants';
+
 import { userProfileSchema } from '../domain/profile';
 
-const FUNCTIONS_REGION = 'me-central1';
-
 export async function bootstrapUserProfile() {
-  const functions = getFunctions(getApp(), FUNCTIONS_REGION);
+  const functions = getFunctions(getApp(), FIREBASE_FUNCTIONS_REGION);
   const callable = httpsCallable(functions, 'bootstrapUserProfile');
   const response = await callable();
 

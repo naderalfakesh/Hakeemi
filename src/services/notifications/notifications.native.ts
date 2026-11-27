@@ -1,50 +1,35 @@
 import { getApp } from '@react-native-firebase/app';
 import { getAuth } from '@react-native-firebase/auth';
-import {
-  getInitialNotification,
-  getMessaging,
-  getToken,
-  onNotificationOpenedApp,
-  onTokenRefresh,
-} from '@react-native-firebase/messaging';
-import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
-import * as Crypto from 'expo-crypto';
-import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
+import { getMessaging, getToken, onTokenRefresh } from '@react-native-firebase/messaging';
 
-import {
-  notificationDeregistrationResultSchema,
-  notificationRegistrationResultSchema,
-  parseAppointmentNotification,
-} from '@/features/notifications/domain/schemas';
 import { hasInternetConnection } from '@/services/connectivity/connectivity';
+import { createSerialQueue, withTimeout } from '@/utils/async';
 
+import {
+  NOTIFICATION_DEREGISTRATION_TIMEOUT_MESSAGE,
+  NOTIFICATION_SIGN_OUT_BUDGET_MS,
+} from './constants';
+import {
+  deriveDeviceTokenId,
+  ensureNotificationPermission,
+  readDeviceToken,
+  registerDeviceToken,
+  unregisterDeviceToken,
+} from './device-token-api.native';
 import type { NotificationRegistrationInput, NotificationSetupResult } from './notifications';
 import {
   addPendingDeregistration,
   readPendingDeregistrations,
   removePendingDeregistration,
-  removePendingDeregistrationsSupersededBy,
 } from './pending-deregistrations';
 
-const FUNCTIONS_REGION = 'me-central1';
-const APPOINTMENT_REMINDER_CHANNEL = 'appointment-reminders';
-// Sign-out must stay usable on a poor connection: the whole wait for the
-// server-side disable, including anything queued ahead of it, gets this
-// budget. Slower work keeps running in the queue, and the sign-out is already
-// recorded for a later retry before the wait starts.
-const SIGN_OUT_BUDGET_MS = 5_000;
-// Bounds each network or native call made from the queue so one slow call
-// cannot stall the registrations behind it.
-const DEREGISTRATION_TIMEOUT_MS = 5_000;
+export { subscribeToAppointmentNotificationOpen } from './notification-open.native';
 
 let stopTokenRefresh: (() => void) | null = null;
-let initialAppointmentId: Promise<string | null> | null = null;
-let hasDeliveredInitialNotification = false;
 // Registration changes run one at a time so a late registration (enable or
 // token refresh) can never land after the sign-out that had to disable it, and
 // a pending flush always precedes the registration that follows it.
-let operationQueue: Promise<unknown> = Promise.resolve();
+const enqueue = createSerialQueue();
 // Sign-out advances the epoch; registration work started for the previous
 // account checks it and drops out instead of re-enabling that account.
 let sessionEpoch = 0;
@@ -55,24 +40,7 @@ export async function registerForAppointmentNotifications({
   stopNotificationTokenRefresh();
   const epoch = sessionEpoch;
 
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync(APPOINTMENT_REMINDER_CHANNEL, {
-      description: 'Non-sensitive reminders about fictional Hakeemi appointments.',
-      // eslint-plugin-import cannot detect expo-notifications' compiled enum
-      // exports as an ES module; TypeScript still checks this member.
-      // eslint-disable-next-line import/namespace
-      importance: Notifications.AndroidImportance.DEFAULT,
-      name: 'Appointment reminders',
-      vibrationPattern: [0, 250, 250, 250],
-    });
-  }
-
-  const currentPermission = await Notifications.getPermissionsAsync();
-  const permission = currentPermission.granted
-    ? currentPermission
-    : await Notifications.requestPermissionsAsync();
-
-  if (!permission.granted) {
+  if (!(await ensureNotificationPermission())) {
     return { status: 'denied' };
   }
 
@@ -89,7 +57,7 @@ export async function registerForAppointmentNotifications({
     }
 
     await flushPendingDeregistrations(token).catch(() => undefined);
-    return registerToken(token, locale);
+    return registerDeviceToken(token, locale);
   });
 
   if (!registered) {
@@ -101,7 +69,7 @@ export async function registerForAppointmentNotifications({
     stopTokenRefresh = onTokenRefresh(messaging, (nextToken) => {
       void enqueue(async () => {
         if (epoch === sessionEpoch) {
-          await registerToken(nextToken, locale);
+          await registerDeviceToken(nextToken, locale);
         }
       }).catch(() => undefined);
     });
@@ -116,9 +84,7 @@ export async function registerForAppointmentNotifications({
  * credentials. Never throws and never waits longer than the sign-out budget,
  * even when a registration is still in flight ahead of it: the sign-out is
  * recorded locally first and retried the next time an account is signed in on
- * this device. Until that retry (or until another account registers the same
- * token) the server still holds the registration, so an offline or
- * timed-out sign-out is not an immediate remote disable.
+ * this device.
  */
 export async function disableAppointmentNotifications(): Promise<void> {
   stopNotificationTokenRefresh();
@@ -134,7 +100,8 @@ export async function disableAppointmentNotifications(): Promise<void> {
   await addPendingDeregistration({ tokenId: null, userId }).catch(() => undefined);
   await withTimeout(
     enqueue(() => disableAccountRegistration(userId)),
-    SIGN_OUT_BUDGET_MS,
+    NOTIFICATION_SIGN_OUT_BUDGET_MS,
+    NOTIFICATION_DEREGISTRATION_TIMEOUT_MESSAGE,
   ).catch(() => undefined);
 }
 
@@ -147,38 +114,9 @@ export function stopNotificationTokenRefresh() {
   stopTokenRefresh = null;
 }
 
-export function subscribeToAppointmentNotificationOpen(listener: (appointmentId: string) => void) {
-  const messaging = getMessaging(getApp());
-  let active = true;
-  const unsubscribe = onNotificationOpenedApp(messaging, (message) => {
-    const appointmentId = parseAppointmentNotification(message.data);
-
-    if (active && appointmentId) {
-      listener(appointmentId);
-    }
-  });
-
-  // The notification that launched the app is delivered once per process, so
-  // a later re-subscription never reopens it.
-  initialAppointmentId ??= getInitialNotification(messaging)
-    .then((message) => parseAppointmentNotification(message?.data))
-    .catch(() => null);
-  void initialAppointmentId.then((appointmentId) => {
-    if (active && appointmentId && !hasDeliveredInitialNotification) {
-      hasDeliveredInitialNotification = true;
-      listener(appointmentId);
-    }
-  });
-
-  return () => {
-    active = false;
-    unsubscribe();
-  };
-}
-
 async function disableAccountRegistration(userId: string) {
   const token = await readDeviceToken();
-  const tokenId = token ? await deriveTokenId(token) : null;
+  const tokenId = token ? await deriveDeviceTokenId(token) : null;
 
   // Storage is best effort from here on: the sign-out must still reach the
   // server when the device can, even if the retry record cannot be written.
@@ -190,13 +128,9 @@ async function disableAccountRegistration(userId: string) {
     return;
   }
 
-  // Runs under whichever account is signed in when the queue reaches it: the
-  // same account if the sign-out is still waiting, or the next account, which
-  // may disable the signed-out account's record by possession of the token.
-  // The request names the account that signed out, so the next account's own
-  // registration is never touched. Sent directly rather than through the
-  // stored entries so a failing store cannot skip it.
-  await unregisterToken(token, userId);
+  // Runs under whichever account is signed in when the queue reaches it.
+  // Sent directly rather than through stored entries so a failing store cannot skip it.
+  await unregisterDeviceToken(token, userId);
   await removePendingDeregistration({ tokenId, userId }).catch(() => undefined);
   await removePendingDeregistration({ tokenId: null, userId }).catch(() => undefined);
   await flushPendingDeregistrations(token).catch(() => undefined);
@@ -204,16 +138,12 @@ async function disableAccountRegistration(userId: string) {
 
 async function recordSignOut(userId: string, tokenId: string | null) {
   if (tokenId === null) {
-    // The token could not be read, so the placeholder written at sign-out is
-    // put back: a registration that completed meanwhile may have removed it
-    // as superseded, and without it the sign-out would never be retried.
+    // Put the placeholder back in case a concurrent registration removed it.
     await addPendingDeregistration({ tokenId: null, userId });
     return;
   }
 
-  // Narrow the placeholder to the token the device held, so a later rotation
-  // is detected. Written again here because a registration that completed
-  // meanwhile may have superseded the placeholder.
+  // Narrow the placeholder to the token the device held so a later rotation is detected.
   await addPendingDeregistration({ tokenId, userId });
   await removePendingDeregistration({ tokenId: null, userId });
 }
@@ -235,75 +165,18 @@ async function flushPendingDeregistrations(knownToken: string | null) {
     return;
   }
 
-  const currentTokenId = await deriveTokenId(token);
+  const currentTokenId = await deriveDeviceTokenId(token);
 
   for (const entry of entries) {
     if (entry.tokenId !== null && entry.tokenId !== currentTokenId) {
-      // The device token rotated after that sign-out, so the old record can no
-      // longer be proven by possession. FCM rejects the rotated-out token and
-      // the reminder job disables that record on its first delivery attempt.
+      // The device token rotated after that sign-out; FCM rejects the old token
+      // and the reminder job disables that record on its first delivery attempt.
       await removePendingDeregistration(entry);
       continue;
     }
 
-    // A failure stops the flush and keeps the remaining entries for the next retry.
-    await unregisterToken(token, entry.userId);
+    // A failure stops the flush and keeps remaining entries for the next retry.
+    await unregisterDeviceToken(token, entry.userId);
     await removePendingDeregistration(entry);
   }
-}
-
-async function registerToken(token: string, locale: NotificationRegistrationInput['locale']) {
-  const userId = getAuth(getApp()).currentUser?.uid;
-  const callable = httpsCallable(getFunctions(getApp(), FUNCTIONS_REGION), 'registerDeviceToken');
-  const response = await callable({
-    enabled: true,
-    locale,
-    platform: Platform.OS,
-    token,
-  });
-  const result = notificationRegistrationResultSchema.parse(response.data);
-
-  if (userId) {
-    await removePendingDeregistrationsSupersededBy(userId, result.tokenId).catch(() => undefined);
-  }
-
-  return result;
-}
-
-async function unregisterToken(token: string, userId: string) {
-  const callable = httpsCallable(getFunctions(getApp(), FUNCTIONS_REGION), 'unregisterDeviceToken');
-  const response = await withTimeout(callable({ token, userId }), DEREGISTRATION_TIMEOUT_MS);
-
-  return notificationDeregistrationResultSchema.parse(response.data);
-}
-
-async function readDeviceToken() {
-  try {
-    return (await withTimeout(getToken(getMessaging(getApp())), DEREGISTRATION_TIMEOUT_MS)) || null;
-  } catch {
-    return null;
-  }
-}
-
-function deriveTokenId(token: string) {
-  return Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, token);
-}
-
-function enqueue<T>(operation: () => Promise<T>): Promise<T> {
-  const run = operationQueue.then(operation, operation);
-  operationQueue = run.catch(() => undefined);
-
-  return run;
-}
-
-function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  const timeout = new Promise<never>((_, reject) => {
-    timer = setTimeout(
-      () => reject(new Error('Notification deregistration timed out.')),
-      timeoutMs,
-    );
-  });
-
-  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }

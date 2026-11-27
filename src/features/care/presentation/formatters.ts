@@ -2,7 +2,7 @@ import type { AppLocale } from '@/localization/locale-provider';
 import { toIntlLocale } from '@/localization/locale-provider';
 import type { LocalizedStrings } from '@/localization/use-strings';
 
-import type { AvailabilitySlot, Money, VisitMode } from '../domain/types';
+import type { AvailabilitySlot, Money, Specialty, VisitMode } from '../domain/types';
 
 const formatterStrings: LocalizedStrings<{
   feeOnRequest: string;
@@ -49,4 +49,13 @@ export function formatFee(fee: Money | null, locale: AppLocale = 'en') {
 
 export function formatVisitMode(mode: VisitMode, locale: AppLocale = 'en') {
   return formatterStrings[locale].visitMode[mode];
+}
+
+export function buildSpecialtyNameMap(
+  specialties: readonly Specialty[] | undefined,
+  locale: AppLocale,
+): ReadonlyMap<string, string> {
+  return new Map(
+    specialties?.map((specialty) => [specialty.id, specialty.name[locale]] as const) ?? [],
+  );
 }

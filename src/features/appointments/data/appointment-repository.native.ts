@@ -13,6 +13,8 @@ import {
 } from '@react-native-firebase/firestore';
 import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
 
+import { FIREBASE_FUNCTIONS_REGION } from '@/services/firebase/constants';
+
 import type { AppointmentRepository } from '../domain/repository';
 import {
   appointmentActionResultSchema,
@@ -25,7 +27,7 @@ import type {
   RescheduleAppointmentInput,
 } from '../domain/types';
 
-const FUNCTIONS_REGION = 'me-central1';
+const MAX_APPOINTMENTS_QUERY_LIMIT = 50;
 
 function getUserId() {
   const userId = getAuth(getApp()).currentUser?.uid;
@@ -37,9 +39,13 @@ function getUserId() {
   return userId;
 }
 
+function getFunctionsClient() {
+  return getFunctions(getApp(), FIREBASE_FUNCTIONS_REGION);
+}
+
 class FirebaseAppointmentRepository implements AppointmentRepository {
   public async book(input: BookAppointmentInput) {
-    const callable = httpsCallable(getFunctions(getApp(), FUNCTIONS_REGION), 'bookAppointment');
+    const callable = httpsCallable(getFunctionsClient(), 'bookAppointment');
     const response = await callable(input);
 
     return bookAppointmentResultSchema.parse(response.data);
@@ -47,7 +53,7 @@ class FirebaseAppointmentRepository implements AppointmentRepository {
 
   public async cancel(input: CancelAppointmentInput) {
     getUserId();
-    const callable = httpsCallable(getFunctions(getApp(), FUNCTIONS_REGION), 'cancelAppointment');
+    const callable = httpsCallable(getFunctionsClient(), 'cancelAppointment');
     const response = await callable(input);
 
     return appointmentActionResultSchema.parse(response.data);
@@ -67,7 +73,7 @@ class FirebaseAppointmentRepository implements AppointmentRepository {
         where('patientId', '==', patientId),
         // Latest first, so the cap drops the oldest history and never an upcoming visit.
         orderBy('startsAt', 'desc'),
-        limit(50),
+        limit(MAX_APPOINTMENTS_QUERY_LIMIT),
       ),
     );
 
@@ -78,10 +84,7 @@ class FirebaseAppointmentRepository implements AppointmentRepository {
 
   public async reschedule(input: RescheduleAppointmentInput) {
     getUserId();
-    const callable = httpsCallable(
-      getFunctions(getApp(), FUNCTIONS_REGION),
-      'rescheduleAppointment',
-    );
+    const callable = httpsCallable(getFunctionsClient(), 'rescheduleAppointment');
     const response = await callable(input);
 
     return appointmentActionResultSchema.parse(response.data);

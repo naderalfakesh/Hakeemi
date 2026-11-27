@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
-import { Image, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText, BrandMark, Button } from '@/components/ui';
 import { useStrings } from '@/localization/use-strings';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useResponsiveLayout, type AppTheme } from '@/theme';
 
 import { welcomeStrings } from '../localization/welcome-strings';
 
@@ -17,10 +17,10 @@ type WelcomeScreenProps = {
 export function WelcomeScreen({ onCreateAccount, onExploreDemo, onSignIn }: WelcomeScreenProps) {
   const theme = useAppTheme();
   const strings = useStrings(welcomeStrings);
-  const { height, width } = useWindowDimensions();
+  const { isCompact, isTablet } = useResponsiveLayout();
   const styles = useMemo(
-    () => createStyles(theme, { isCompact: height < 720, isTablet: width >= 768 }),
-    [height, theme, width],
+    () => createStyles(theme, { isCompact, isTablet }),
+    [isCompact, isTablet, theme],
   );
 
   return (

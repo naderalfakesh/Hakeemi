@@ -14,7 +14,7 @@ import {
   parseStoredSlot,
   validateAvailableSlot,
   validateSlotOwnership,
-} from './book-appointment.js';
+} from './slot-validation.js';
 import {
   appointmentDocumentSchema,
   availabilitySlotDocumentSchema,

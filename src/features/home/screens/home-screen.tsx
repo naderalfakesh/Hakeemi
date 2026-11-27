@@ -1,8 +1,7 @@
-import { useCallback, useMemo, useState } from 'react';
-import { FlatList, StyleSheet, View, type ListRenderItem } from 'react-native';
+import { useCallback, useMemo } from 'react';
+import { FlatList, StyleSheet, type ListRenderItem } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppText, Button, DecorativeIcon } from '@/components/ui';
 import { ProviderCard } from '@/features/care/components/provider-card';
 import {
   ProviderListSeparator,
@@ -11,14 +10,19 @@ import {
 import type { CareRepository } from '@/features/care/domain/repository';
 import type { Provider } from '@/features/care/domain/types';
 import { useProviderDiscovery } from '@/features/care/hooks/use-provider-discovery';
+import { buildSpecialtyNameMap } from '@/features/care/presentation/formatters';
 import { homeStrings } from '@/features/home/localization/home-strings';
+import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import { useAppLocale } from '@/localization/locale-provider';
 import { useStrings } from '@/localization/use-strings';
 import type { AppDataScope } from '@/services/query/data-scope';
-import { useAppTheme, useThemedStyles, type AppTheme } from '@/theme';
+import { useThemedStyles, type AppTheme } from '@/theme';
 
+import { HomeFooter } from '../components/home-footer';
 import { HomeHeader, type HomeNextVisit } from '../components/home-header';
 import { HomeResultsState } from '../components/home-results-state';
+
+const FEATURED_PROVIDERS_LIMIT = 3;
 
 type HomeScreenProps = {
   /** Shows the demo badge so fictional data is never mistaken for an account. */
@@ -44,11 +48,9 @@ export function HomeScreen({
   queryScope = 'account',
   repository,
 }: HomeScreenProps) {
-  const theme = useAppTheme();
   const { locale } = useAppLocale();
   const strings = useStrings(homeStrings);
   const styles = useThemedStyles(createStyles);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const { refresh, retry, state } = useProviderDiscovery({
     featuredOnly: true,
     queryScope,
@@ -56,24 +58,14 @@ export function HomeScreen({
     specialtyId: null,
     ...(repository ? { repository } : {}),
   });
-  const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    try {
-      await refresh();
-    } finally {
-      setIsRefreshing(false);
-    }
-  }, [refresh]);
+  const { handleRefresh, isRefreshing } = usePullToRefresh(refresh);
   const discovery = state.status === 'success' ? state.data : null;
   const providers =
-    discovery?.providers.filter((provider) => provider.isFeatured).slice(0, 3) ?? [];
+    discovery?.providers
+      .filter((provider) => provider.isFeatured)
+      .slice(0, FEATURED_PROVIDERS_LIMIT) ?? [];
   const specialtyNames = useMemo(
-    () =>
-      new Map(
-        discovery?.specialties.map(
-          (specialty) => [specialty.id, specialty.name[locale]] as const,
-        ) ?? [],
-      ),
+    () => buildSpecialtyNameMap(discovery?.specialties, locale),
     [discovery?.specialties, locale],
   );
   const renderProvider = useCallback<ListRenderItem<Provider>>(
@@ -101,25 +93,7 @@ export function HomeScreen({
         ListEmptyComponent={
           <HomeResultsState onFindCare={onFindCare} onRetry={retry} status={state.status} />
         }
-        ListFooterComponent={
-          <View style={styles.footer}>
-            <View style={styles.note}>
-              <DecorativeIcon
-                color={theme.colors.textSecondary}
-                name="information-circle"
-                size={20}
-              />
-              <AppText style={styles.noteText} tone="secondary" variant="caption">
-                {strings.fictionalDataNote}
-              </AppText>
-            </View>
-            {onOpenCatalogue && (
-              <Button onPress={onOpenCatalogue} variant="tertiary">
-                {strings.openCatalogue}
-              </Button>
-            )}
-          </View>
-        }
+        ListFooterComponent={<HomeFooter onOpenCatalogue={onOpenCatalogue} />}
         ListHeaderComponent={
           <HomeHeader
             isDemo={isDemo}
@@ -132,7 +106,7 @@ export function HomeScreen({
         }
         contentContainerStyle={styles.content}
         data={providers}
-        initialNumToRender={3}
+        initialNumToRender={FEATURED_PROVIDERS_LIMIT}
         ItemSeparatorComponent={ProviderListSeparator}
         keyExtractor={providerKeyExtractor}
         onRefresh={() => void handleRefresh()}
@@ -157,19 +131,6 @@ function createStyles(theme: AppTheme) {
       paddingBottom: theme.spacing.xxxl,
       paddingHorizontal: theme.spacing.lg,
       width: '100%',
-    },
-    footer: {
-      gap: theme.spacing.lg,
-      paddingTop: theme.spacing.xl,
-    },
-    note: {
-      alignItems: 'flex-start',
-      flexDirection: 'row',
-      gap: theme.spacing.xs,
-      paddingHorizontal: theme.spacing.xs,
-    },
-    noteText: {
-      flex: 1,
     },
   });
 }

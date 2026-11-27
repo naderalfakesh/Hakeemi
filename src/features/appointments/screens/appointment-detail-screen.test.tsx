@@ -140,7 +140,7 @@ describe('AppointmentDetailScreen', () => {
     await waitFor(() =>
       expect(view.getByRole('header', { name: 'Dr. Lina Haddad' })).toBeVisible(),
     );
-    await act(async () => fireEvent.press(view.getByRole('button', { name: 'Add to calendar' })));
+    await fireEvent.press(view.getByRole('button', { name: 'Add to calendar' }));
 
     await waitFor(() =>
       expect(mockedAddAppointmentToCalendar).toHaveBeenCalledWith('calendar-1', {
@@ -175,13 +175,11 @@ describe('AppointmentDetailScreen', () => {
     await waitFor(() =>
       expect(view.getByRole('button', { name: 'Add to calendar' })).toBeVisible(),
     );
-    await act(async () => fireEvent.press(view.getByRole('button', { name: 'Add to calendar' })));
+    await fireEvent.press(view.getByRole('button', { name: 'Add to calendar' }));
 
     await waitFor(() => expect(view.getByText('Choose a calendar')).toBeVisible());
     expect(mockedAddAppointmentToCalendar).not.toHaveBeenCalled();
-    await act(async () =>
-      fireEvent.press(view.getByRole('button', { name: 'Clinic visits · work@example.test' })),
-    );
+    await fireEvent.press(view.getByRole('button', { name: 'Clinic visits · work@example.test' }));
 
     await waitFor(() =>
       expect(mockedAddAppointmentToCalendar).toHaveBeenCalledWith(
@@ -222,14 +220,12 @@ describe('AppointmentDetailScreen', () => {
     await waitFor(() =>
       expect(view.getByRole('button', { name: 'Add to calendar' })).toBeEnabled(),
     );
-    await act(async () => fireEvent.press(view.getByRole('button', { name: 'Add to calendar' })));
+    await fireEvent.press(view.getByRole('button', { name: 'Add to calendar' }));
     await waitFor(() => expect(view.getByText('Choose a calendar')).toBeVisible());
 
     const row = view.getByRole('button', { name: 'Clinic visits · work@example.test' });
-    await act(async () => {
-      fireEvent.press(row);
-      fireEvent.press(row);
-    });
+    await fireEvent.press(row);
+    await fireEvent.press(row);
     await act(async () => finishAdd({ eventId: 'event-1', status: 'added' }));
 
     await waitFor(() =>
@@ -261,7 +257,7 @@ describe('AppointmentDetailScreen', () => {
     await waitFor(() =>
       expect(view.getByRole('button', { name: 'Add to calendar' })).toBeEnabled(),
     );
-    await act(async () => fireEvent.press(view.getByRole('button', { name: 'Add to calendar' })));
+    await fireEvent.press(view.getByRole('button', { name: 'Add to calendar' }));
 
     await waitFor(() =>
       expect(
@@ -293,9 +289,9 @@ describe('AppointmentDetailScreen', () => {
     await waitFor(() =>
       expect(view.getByRole('button', { name: 'Add to calendar' })).toBeVisible(),
     );
-    await act(async () => fireEvent.press(view.getByRole('button', { name: 'Add to calendar' })));
+    await fireEvent.press(view.getByRole('button', { name: 'Add to calendar' }));
     await waitFor(() => expect(view.getByText('Choose a calendar')).toBeVisible());
-    await act(async () => fireEvent.press(view.getByRole('button', { name: 'Not now' })));
+    await fireEvent.press(view.getByRole('button', { name: 'Not now' }));
 
     expect(view.getByRole('button', { name: 'Add to calendar' })).toBeEnabled();
     expect(mockedAddAppointmentToCalendar).not.toHaveBeenCalled();
@@ -318,7 +314,7 @@ describe('AppointmentDetailScreen', () => {
     await waitFor(() =>
       expect(view.getByRole('button', { name: 'Add to calendar' })).toBeVisible(),
     );
-    await act(async () => fireEvent.press(view.getByRole('button', { name: 'Add to calendar' })));
+    await fireEvent.press(view.getByRole('button', { name: 'Add to calendar' }));
 
     await waitFor(() =>
       expect(
@@ -346,14 +342,10 @@ describe('AppointmentDetailScreen', () => {
     await waitFor(() =>
       expect(view.getByRole('header', { name: 'Dr. Lina Haddad' })).toBeVisible(),
     );
-    await act(async () =>
-      fireEvent.press(view.getByRole('button', { name: 'Cancel appointment' })),
-    );
+    await fireEvent.press(view.getByRole('button', { name: 'Cancel appointment' }));
     await waitFor(() => expect(view.getByText('Cancel this appointment?')).toBeVisible());
 
-    await act(async () =>
-      fireEvent.press(view.getByRole('button', { name: 'Confirm cancellation' })),
-    );
+    await fireEvent.press(view.getByRole('button', { name: 'Confirm cancellation' }));
     await waitFor(() =>
       expect(cancel).toHaveBeenCalledWith({
         appointmentId: appointment.id,
@@ -385,18 +377,12 @@ describe('AppointmentDetailScreen', () => {
     await waitFor(() =>
       expect(view.getByRole('header', { name: 'Dr. Lina Haddad' })).toBeVisible(),
     );
-    await act(async () =>
-      fireEvent.press(view.getByRole('button', { name: 'Cancel appointment' })),
-    );
-    await act(async () =>
-      fireEvent.press(view.getByRole('button', { name: 'Confirm cancellation' })),
-    );
+    await fireEvent.press(view.getByRole('button', { name: 'Cancel appointment' }));
+    await fireEvent.press(view.getByRole('button', { name: 'Confirm cancellation' }));
     await waitFor(() => expect(cancel).toHaveBeenCalledTimes(1));
     expect(view.getByRole('button', { name: 'Confirm cancellation' })).toBeVisible();
 
-    await act(async () =>
-      fireEvent.press(view.getByRole('button', { name: 'Confirm cancellation' })),
-    );
+    await fireEvent.press(view.getByRole('button', { name: 'Confirm cancellation' }));
     await waitFor(() => expect(cancel).toHaveBeenCalledTimes(2));
     expect(cancel.mock.calls.map(([input]) => input.requestId)).toEqual(['request-1', 'request-1']);
   });
@@ -417,10 +403,10 @@ describe('AppointmentDetailScreen', () => {
     );
 
     await waitFor(() => expect(view.getByRole('button', { name: 'Reschedule' })).toBeVisible());
-    await act(async () => fireEvent.press(view.getByRole('button', { name: 'Reschedule' })));
+    await fireEvent.press(view.getByRole('button', { name: 'Reschedule' }));
     await waitFor(() => expect(view.getByText('Choose a new time')).toBeVisible());
 
-    await act(async () => fireEvent.press(view.getByRole('button', { name: /Continue with/u })));
+    await fireEvent.press(view.getByRole('button', { name: /Continue with/u }));
     await waitFor(() => expect(reschedule).toHaveBeenCalled());
     expect(reschedule.mock.calls[0]?.[0]).toMatchObject({
       appointmentId: appointment.id,
@@ -499,14 +485,14 @@ describe('AppointmentDetailScreen', () => {
       await waitFor(() =>
         expect(view.getByRole('button', { name: 'Add to calendar' })).toBeEnabled(),
       );
-      await act(async () => fireEvent.press(view.getByRole('button', { name: 'Add to calendar' })));
+      await fireEvent.press(view.getByRole('button', { name: 'Add to calendar' }));
       await waitFor(() => expect(view.getByText('Saved in owner@example.test.')).toBeVisible());
     }
 
     async function rescheduleToNextTime(view: Awaited<ReturnType<typeof renderDetail>>) {
-      await act(async () => fireEvent.press(view.getByRole('button', { name: 'Reschedule' })));
+      await fireEvent.press(view.getByRole('button', { name: 'Reschedule' }));
       await waitFor(() => expect(view.getByText('Choose a new time')).toBeVisible());
-      await act(async () => fireEvent.press(view.getByRole('button', { name: /Continue with/u })));
+      await fireEvent.press(view.getByRole('button', { name: /Continue with/u }));
     }
 
     it('remembers the added event when the screen opens again', async () => {
@@ -566,9 +552,7 @@ describe('AppointmentDetailScreen', () => {
       expect(view.queryByText('Added to calendar')).not.toBeOnTheScreen();
 
       mockedAddAppointmentToCalendar.mockResolvedValue({ eventId: 'event-2', status: 'added' });
-      await act(async () =>
-        fireEvent.press(view.getByRole('button', { name: 'Add the new time to calendar' })),
-      );
+      await fireEvent.press(view.getByRole('button', { name: 'Add the new time to calendar' }));
       await waitFor(() =>
         expect(mockedAddAppointmentToCalendar).toHaveBeenLastCalledWith(
           'calendar-1',
@@ -607,8 +591,8 @@ describe('AppointmentDetailScreen', () => {
       });
 
       mockedMoveEvent.mockResolvedValue({ status: 'done' });
-      await act(async () =>
-        fireEvent.press(view.getByRole('button', { name: 'Move the calendar event to this time' })),
+      await fireEvent.press(
+        view.getByRole('button', { name: 'Move the calendar event to this time' }),
       );
       await waitFor(() =>
         expect(view.getByText('Moved to the new time in owner@example.test.')).toBeVisible(),
@@ -625,12 +609,8 @@ describe('AppointmentDetailScreen', () => {
       const view = await renderDetail(repository({ cancel, getAppointment }));
       await addToOnlyCalendar(view);
 
-      await act(async () =>
-        fireEvent.press(view.getByRole('button', { name: 'Cancel appointment' })),
-      );
-      await act(async () =>
-        fireEvent.press(view.getByRole('button', { name: 'Confirm cancellation' })),
-      );
+      await fireEvent.press(view.getByRole('button', { name: 'Cancel appointment' }));
+      await fireEvent.press(view.getByRole('button', { name: 'Confirm cancellation' }));
 
       await waitFor(() =>
         expect(mockedRemoveEvent).toHaveBeenCalledWith({
@@ -652,12 +632,8 @@ describe('AppointmentDetailScreen', () => {
       const view = await renderDetail(repository({ cancel, getAppointment }));
       await addToOnlyCalendar(view);
 
-      await act(async () =>
-        fireEvent.press(view.getByRole('button', { name: 'Cancel appointment' })),
-      );
-      await act(async () =>
-        fireEvent.press(view.getByRole('button', { name: 'Confirm cancellation' })),
-      );
+      await fireEvent.press(view.getByRole('button', { name: 'Cancel appointment' }));
+      await fireEvent.press(view.getByRole('button', { name: 'Confirm cancellation' }));
 
       await waitFor(() =>
         expect(
@@ -689,8 +665,8 @@ describe('AppointmentDetailScreen', () => {
       expect(mockedMoveEvent).not.toHaveBeenCalled();
       expect(view.queryByText('Added to calendar')).not.toBeOnTheScreen();
 
-      await act(async () =>
-        fireEvent.press(view.getByRole('button', { name: 'Move the calendar event to this time' })),
+      await fireEvent.press(
+        view.getByRole('button', { name: 'Move the calendar event to this time' }),
       );
 
       await waitFor(() =>

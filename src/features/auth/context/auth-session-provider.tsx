@@ -4,8 +4,8 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useReducer,
   useRef,
-  useState,
   type ReactNode,
 } from 'react';
 
@@ -19,9 +19,14 @@ import { bootstrapUserProfile } from '../data/profile-bootstrap';
 import { toAuthActionError } from '../domain/errors';
 import type { UserProfile } from '../domain/profile';
 import type { AuthFailureCode, AuthUser } from '../domain/types';
+import {
+  authSessionReducer,
+  initialAuthSessionState,
+  type AuthSessionStatus,
+  type ProfileStatus,
+} from './auth-session-state';
 
-export type AuthSessionStatus = 'anonymous' | 'authenticated' | 'demo' | 'restoring';
-export type ProfileStatus = 'error' | 'idle' | 'loading' | 'ready';
+export type { AuthSessionStatus, ProfileStatus };
 
 type AuthSessionContextValue = {
   enterDemo: () => void;
@@ -48,36 +53,24 @@ type AuthSessionProviderProps = {
 };
 
 export function AuthSessionProvider({ children, onBeforeSignOut }: AuthSessionProviderProps) {
-  const [status, setStatus] = useState<AuthSessionStatus>('restoring');
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [profileStatus, setProfileStatus] = useState<ProfileStatus>('idle');
-  const [profileError, setProfileError] = useState<AuthFailureCode | null>(null);
+  const [state, dispatch] = useReducer(authSessionReducer, initialAuthSessionState);
   const profileRequestId = useRef(0);
-  const statusRef = useRef<AuthSessionStatus>(status);
+  const statusRef = useRef<AuthSessionStatus>(state.status);
   const demoModeRef = useRef(false);
-
-  const updateStatus = useCallback((nextStatus: AuthSessionStatus) => {
-    statusRef.current = nextStatus;
-    setStatus(nextStatus);
-  }, []);
 
   const synchronizeProfile = useCallback(async () => {
     const requestId = ++profileRequestId.current;
-    setProfileStatus('loading');
-    setProfileError(null);
+    dispatch({ type: 'PROFILE_LOADING' });
 
     try {
       const nextProfile = await bootstrapUserProfile();
 
       if (profileRequestId.current === requestId) {
-        setProfile(nextProfile);
-        setProfileStatus('ready');
+        dispatch({ profile: nextProfile, type: 'PROFILE_READY' });
       }
     } catch (error) {
       if (profileRequestId.current === requestId) {
-        setProfileError(toAuthActionError(error).code);
-        setProfileStatus('error');
+        dispatch({ code: toAuthActionError(error).code, type: 'PROFILE_ERROR' });
       }
     }
   }, []);
@@ -90,32 +83,26 @@ export function AuthSessionProvider({ children, onBeforeSignOut }: AuthSessionPr
         }
 
         profileRequestId.current += 1;
-        setProfile(null);
-        setProfileError(null);
-        setProfileStatus('idle');
-        setUser(null);
-        updateStatus('anonymous');
+        statusRef.current = 'anonymous';
+        dispatch({ type: 'ANONYMOUS' });
         return;
       }
 
       demoModeRef.current = false;
       void demoSessionStorage.clear();
-      setUser(nextUser);
-      updateStatus('authenticated');
+      statusRef.current = 'authenticated';
+      dispatch({ type: 'AUTHENTICATED', user: nextUser });
       void synchronizeProfile();
     },
-    [synchronizeProfile, updateStatus],
+    [synchronizeProfile],
   );
 
   const applyDemo = useCallback(() => {
     demoModeRef.current = true;
     profileRequestId.current += 1;
-    setProfile(null);
-    setProfileError(null);
-    setProfileStatus('idle');
-    setUser(null);
-    updateStatus('demo');
-  }, [updateStatus]);
+    statusRef.current = 'demo';
+    dispatch({ type: 'DEMO' });
+  }, []);
 
   useEffect(() => {
     let isActive = true;
@@ -167,16 +154,16 @@ export function AuthSessionProvider({ children, onBeforeSignOut }: AuthSessionPr
       return;
     }
 
-    setUser(nextUser);
-    updateStatus('authenticated');
+    statusRef.current = 'authenticated';
+    dispatch({ type: 'AUTHENTICATED', user: nextUser });
     await synchronizeProfile();
-  }, [applyAuthUser, synchronizeProfile, updateStatus]);
+  }, [applyAuthUser, synchronizeProfile]);
 
   const retryProfile = useCallback(async () => {
-    if (user) {
+    if (state.user) {
       await synchronizeProfile();
     }
-  }, [synchronizeProfile, user]);
+  }, [state.user, synchronizeProfile]);
 
   const signOut = useCallback(async () => {
     demoModeRef.current = false;
@@ -192,9 +179,9 @@ export function AuthSessionProvider({ children, onBeforeSignOut }: AuthSessionPr
       await signOutFromFirebase();
     }
 
-    updateStatus('anonymous');
+    statusRef.current = 'anonymous';
     applyAuthUser(null);
-  }, [applyAuthUser, onBeforeSignOut, updateStatus]);
+  }, [applyAuthUser, onBeforeSignOut]);
 
   const enterDemo = useCallback(() => {
     applyDemo();
@@ -204,26 +191,16 @@ export function AuthSessionProvider({ children, onBeforeSignOut }: AuthSessionPr
   const value = useMemo<AuthSessionContextValue>(
     () => ({
       enterDemo,
-      profile,
-      profileError,
-      profileStatus,
+      profile: state.profile,
+      profileError: state.profileError,
+      profileStatus: state.profileStatus,
       refreshSession,
       retryProfile,
       signOut,
-      status,
-      user,
+      status: state.status,
+      user: state.user,
     }),
-    [
-      enterDemo,
-      profile,
-      profileError,
-      profileStatus,
-      refreshSession,
-      retryProfile,
-      signOut,
-      status,
-      user,
-    ],
+    [enterDemo, refreshSession, retryProfile, signOut, state],
   );
 
   return <AuthSessionContext.Provider value={value}>{children}</AuthSessionContext.Provider>;

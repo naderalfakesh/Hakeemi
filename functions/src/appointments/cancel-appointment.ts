@@ -9,7 +9,7 @@ import {
   toAppointmentSummary,
   validateAppointmentManagementLeadTime,
 } from './appointment-management.js';
-import { parseStoredAppointment, parseStoredSlot } from './book-appointment.js';
+import { parseStoredAppointment, parseStoredSlot } from './slot-validation.js';
 import {
   appointmentDocumentSchema,
   availabilitySlotDocumentSchema,

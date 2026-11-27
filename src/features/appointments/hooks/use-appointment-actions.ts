@@ -93,3 +93,5 @@ export function useAppointmentActions({
     startCancel: () => setConfirmingCancel(true),
   };
 }
+
+export type AppointmentActions = ReturnType<typeof useAppointmentActions>;

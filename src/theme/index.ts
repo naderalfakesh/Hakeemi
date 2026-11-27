@@ -9,6 +9,7 @@ export {
   type ThemeMode,
   type ThemePreference,
 } from './themes';
-export { motion, radii, sizes, spacing, typeScale, zIndices } from './tokens';
+export { breakpoints, motion, radii, sizes, spacing, typeScale, zIndices } from './tokens';
 export { useAppMotion } from './use-app-motion';
+export { useResponsiveLayout, type ResponsiveLayout } from './use-responsive-layout';
 export { useThemedStyles } from './use-themed-styles';

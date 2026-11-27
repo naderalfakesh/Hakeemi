@@ -1,10 +1,10 @@
 import { useMemo, type ReactNode } from 'react';
-import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText, BrandMark, Button } from '@/components/ui';
 import { useStrings } from '@/localization/use-strings';
-import { useAppTheme, type AppTheme } from '@/theme';
+import { useAppTheme, useResponsiveLayout, type AppTheme } from '@/theme';
 
 import { IntroStep } from '../components/intro-step';
 import { JourneyStep } from '../components/journey-step';
@@ -23,11 +23,7 @@ type OnboardingScreenProps = {
 export function OnboardingScreen({ onComplete, onSkip }: OnboardingScreenProps) {
   const theme = useAppTheme();
   const strings = useStrings(onboardingStrings);
-  const { fontScale, height, width } = useWindowDimensions();
-  const isCompact = height < 720;
-  const isTablet = width >= 768;
-  // At accessibility text sizes the Back/Next pair no longer fits side by side.
-  const stackActions = fontScale >= 1.5;
+  const { isCompact, isTablet, stackActions, width } = useResponsiveLayout();
   const styles = useMemo(() => createStyles(theme, { isCompact }), [isCompact, theme]);
   // Pages span the full content column and carry their own side padding, so
   // a swipe moves each page edge to edge with a gutter between neighbours.

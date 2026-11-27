@@ -6,7 +6,7 @@ import {
   unregisterDeviceTokenResultSchema,
   type UnregisterDeviceTokenRequest,
   type UnregisterDeviceTokenResult,
-} from '../appointments/contracts.js';
+} from './contracts.js';
 import { deriveTokenId } from './register-device-token.js';
 
 export function parseUnregisterDeviceTokenRequest(input: unknown): UnregisterDeviceTokenRequest {
